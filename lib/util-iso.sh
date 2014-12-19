@@ -516,9 +516,11 @@ make_de_image() {
 	
 	cp "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt" ${target_dir}/${img_name}-${desktop}-${iso_version}-${arch}-pkgs.txt
 	
-	if [ -e ${desktop}-overlay ] ; then
-	    copy_overlay_desktop
-	fi
+	# copy later in livecd-image to support livecd packages
+	# otherwise filesystemconflicts will be complained by pacman
+# 	if [ -e ${desktop}-overlay ] ; then
+# 	    copy_overlay_desktop
+# 	fi
 	
 	${auto_svc_conf} && configure_services "${work_dir}/${desktop}-image"
 	
@@ -539,14 +541,14 @@ make_livecd_image() {
 	
 	mkdir -p ${work_dir}/livecd-image
 	
-	if [ ! -z "$(mount -l | grep livecd-image)" ]; then
+	if [ -n "$(mount -l | grep livecd-image)" ]; then
 	    umount -l ${work_dir}/livecd-image
 	fi
 	
 	msg2 "mount root-image"
 	mount -t aufs -o br=${work_dir}/livecd-image:${work_dir}/root-image=ro none ${work_dir}/livecd-image
 	
-	if [ ! -z "${desktop}" ] ; then
+	if [ -n "${desktop}" ] ; then
 	    msg2 "mount ${desktop}-image"
 	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/livecd-image
 	fi
@@ -554,6 +556,8 @@ make_livecd_image() {
 	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}"
 
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
+	
+	[[ -d ${desktop}-overlay ]] && copy_overlay_desktop
 	
 	copy_overlay_livecd "${work_dir}/livecd-image"
 	
