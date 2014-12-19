@@ -369,7 +369,8 @@ copy_startup_scripts(){
 }
 
 copy_livecd_helpers(){
-    msg2 "Copying livecd helpers ..."
+    msg2 "Copying livecd helpers ..."	
+    [[ ! -d $1 ]] && mkdir -p $1
     cp ${LIBDIR}/util-livecd.sh $1
     cp ${LIBDIR}/util-msg.sh $1
     cp ${LIBDIR}/util-mount.sh $1
