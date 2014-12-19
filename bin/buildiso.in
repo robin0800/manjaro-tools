@@ -220,7 +220,7 @@ if [ -e "${pkgsfile}" ] ; then
 fi
 
 if [[ -f Packages-Livecd ]]; then
-    get_pkglist_overlay
+    get_pkglist_livecd
 fi
 
 ${pretend} && display_settings && exit 1
@@ -272,7 +272,7 @@ make_images(){
     
     # install overlay
     if [[ -f Packages-Livecd ]]; then
-	make_overlay_image
+	make_livecd_image
     fi
 }
 

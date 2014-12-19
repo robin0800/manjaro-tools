@@ -332,20 +332,13 @@ configure_calamares(){
     fi
 }
 
-# $1: source image
-# $2: target image
-# copy_userconfig(){	
-#     msg2 "Copying $1/etc/skel/. $2/etc/skel"
-#     cp -a --no-preserve=ownership $1/etc/skel/. $2/etc/skel
-# }
-
 copy_initcpio(){
     cp /usr/lib/initcpio/hooks/miso* ${work_dir}/boot-image/usr/lib/initcpio/hooks
     cp /usr/lib/initcpio/install/miso* ${work_dir}/boot-image/usr/lib/initcpio/install
     cp mkinitcpio.conf ${work_dir}/boot-image/etc/mkinitcpio-${manjaroiso}.conf
 }
 
-copy_overlay(){
+copy_overlay_root(){
     msg2 "Copying overlay ..."
     cp -a --no-preserve=ownership overlay/* $1
 }
@@ -360,22 +353,29 @@ copy_overlay_livecd(){
 	cp -a --no-preserve=ownership overlay-livecd/* $1
 }
 
+copy_startup_scripts(){
+    msg2 "Copying startup scripts ..."
+    cp ${PKGDATADIR}/scripts/livecd $1
+    cp ${PKGDATADIR}/scripts/mhwd-live $1
+    
+    # fix script permissions
+    chmod +x $1/livecd
+    chmod +x $1/mhwd-live
+    
+    cp ${BINDIR}/chroot-run $1
+
+    # fix paths
+    sed -e "s|${LIBDIR}|/opt/livecd|g" -i $1/chroot-run
+}
+
 copy_livecd_helpers(){
-    msg2 "Copying livecd helpers ..."
+    msg2 "Copying livecd helpers ..."	
+    [[ ! -d $1 ]] && mkdir -p $1
     cp ${LIBDIR}/util-livecd.sh $1
     cp ${LIBDIR}/util-msg.sh $1
     cp ${LIBDIR}/util-mount.sh $1
     cp ${LIBDIR}/util.sh $1
-    cp ${BINDIR}/chroot-run $1
-    cp ${PKGDATADIR}/scripts/livecd $1
-    cp ${PKGDATADIR}/scripts/mhwd $1
-    
-    # fix script permissions
-    chmod +x $1/livecd
-    chmod +x $1/mhwd
-    
-    # fix paths
-    sed -e "s|${LIBDIR}|/opt/livecd|g" -i $1/chroot-run
+
     
     if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
 	msg2 "Copying ${USER_CONFIG}/manjaro-tools.conf ..."
@@ -415,7 +415,7 @@ clean_up(){
 }
 
 # $1: chroot
-configure_overlay_image(){
+configure_livecd_image(){
     msg "Configuring [$1]"
     
     configure_displaymanager "$1"
@@ -484,7 +484,7 @@ make_root_image() {
 	    sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" ${work_dir}/root-image/etc/lsb-release
 	fi
 	
-	copy_overlay "${work_dir}/root-image"
+	copy_overlay_root "${work_dir}/root-image"
 	
 	# Clean up GnuPG keys
 	rm -rf "${work_dir}/root-image/etc/pacman.d/gnupg"
@@ -510,7 +510,7 @@ make_de_image() {
 	
 	mount -t aufs -o br=${work_dir}/${desktop}-image:${work_dir}/root-image=ro none ${work_dir}/${desktop}-image
 
-	mkiso ${create_args[*]} -i "${desktop}-image" -p "${de_packages}" create "${work_dir}"
+	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}"
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
@@ -533,110 +533,112 @@ make_de_image() {
     fi
 }
 
-make_overlay_image() {
+make_livecd_image() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-	msg "Prepare [overlay-image]"
+	msg "Prepare [livecd-image]"
 	
-	mkdir -p ${work_dir}/overlay-image
+	mkdir -p ${work_dir}/livecd-image
 	
-	if [ ! -z "$(mount -l | grep overlay-image)" ]; then
-	    umount -l ${work_dir}/overlay-image
+	if [ ! -z "$(mount -l | grep livecd-image)" ]; then
+	    umount -l ${work_dir}/livecd-image
 	fi
 	
 	msg2 "mount root-image"
-	mount -t aufs -o br=${work_dir}/overlay-image:${work_dir}/root-image=ro none ${work_dir}/overlay-image
+	mount -t aufs -o br=${work_dir}/livecd-image:${work_dir}/root-image=ro none ${work_dir}/livecd-image
 	
 	if [ ! -z "${desktop}" ] ; then
 	    msg2 "mount ${desktop}-image"
-	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/overlay-image
+	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/livecd-image
 	fi
 	
-	mkiso ${create_args[*]} -i "overlay-image" -p "${overlay_packages}" create "${work_dir}"
+	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}"
 
-	pacman -Qr "${work_dir}/overlay-image" > "${work_dir}/overlay-image/overlay-image-pkgs.txt"
+	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
-	copy_overlay_livecd "${work_dir}/overlay-image"
+	copy_overlay_livecd "${work_dir}/livecd-image"
 	
-	configure_overlay_image "${work_dir}/overlay-image"
+	configure_livecd_image "${work_dir}/livecd-image"
 	
         #wget -O ${work_dir}/overlay/etc/pacman.d/mirrorlist http://git.manjaro.org/packages-sources/basis/blobs/raw/master/pacman-mirrorlist/mirrorlist    
         
         # copy over setup helpers and config loader
-        copy_livecd_helpers "${work_dir}/overlay-image/opt/livecd"
+        copy_livecd_helpers "${work_dir}/livecd-image/opt/livecd"
         
-        cp ${work_dir}/root-image/etc/pacman.d/mirrorlist ${work_dir}/overlay-image/etc/pacman.d/mirrorlist
-        sed -i "s/#Server/Server/g" ${work_dir}/overlay-image/etc/pacman.d/mirrorlist
+        copy_startup_scripts "${work_dir}/livecd-image/usr/bin"
+        
+        cp ${work_dir}/root-image/etc/pacman.d/mirrorlist ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
+        sed -i "s/#Server/Server/g" ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
        	
 	# Clean up GnuPG keys?
 	#rm -rf "${work_dir}/${desktop}-image/etc/pacman.d/gnupg"
 	
-	umount -l ${work_dir}/overlay-image
+	umount -l ${work_dir}/livecd-image
 	
-	rm -R ${work_dir}/overlay-image/.wh*
+	rm -R ${work_dir}/livecd-image/.wh*
 	
         : > ${work_dir}/build.${FUNCNAME}
-	msg "Done [overlay-image]"
+	msg "Done [livecd-image]"
     fi
 }
 
-make_free_overlay(){
-	msg "Prepare [pkgs-free-overlay]"
-	mkdir -p ${work_dir}/pkgs-free-overlay
-	if [ ! -z "$(mount -l | grep pkgs-free-overlay)" ]; then
-	  umount -l ${work_dir}/pkgs-free-overlay
+make_free_image(){
+	msg "Prepare [pkgs-free-image]"
+	mkdir -p ${work_dir}/pkgs-free-image
+	if [ ! -z "$(mount -l | grep pkgs-free-image)" ]; then
+	  umount -l ${work_dir}/pkgs-free-image
 	fi
 
 	msg2 "mount root-image"
-	mount -t aufs -o br=${work_dir}/pkgs-free-overlay:${work_dir}/root-image=ro none ${work_dir}/pkgs-free-overlay
+	mount -t aufs -o br=${work_dir}/pkgs-free-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-free-image
 
 	if [ ! -z "${desktop}" ] ; then
 	  msg2 "mount ${desktop}-image"
-	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-free-overlay
+	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-free-image
 	fi
 
-	mkiso ${create_args[*]} -i "pkgs-free-overlay" -p "${xorg_free_overlay}" create "${work_dir}"
+	mkiso ${create_args[*]} -i "pkgs-free-image" -p "${packages_free}" create "${work_dir}"
 
 	# Clean up GnuPG keys
-	rm -rf "${work_dir}/pkgs-free-overlay/etc/pacman.d/gnupg"
+	rm -rf "${work_dir}/pkgs-free-image/etc/pacman.d/gnupg"
 	
-	umount -l ${work_dir}/pkgs-free-overlay
+	umount -l ${work_dir}/pkgs-free-image
 
-	if [ -e ${work_dir}/pkgs-free-overlay/etc/modules-load.d/*virtualbox*conf ] ; then
-	  rm ${work_dir}/pkgs-free-overlay/etc/modules-load.d/*virtualbox*conf
+	if [ -e ${work_dir}/pkgs-free-image/etc/modules-load.d/*virtualbox*conf ] ; then
+	  rm ${work_dir}/pkgs-free-image/etc/modules-load.d/*virtualbox*conf
 	fi
 
-	rm -R ${work_dir}/pkgs-free-overlay/.wh*
-	msg "Done [pkgs-free-overlay]"
+	rm -R ${work_dir}/pkgs-free-image/.wh*
+	msg "Done [pkgs-free-image]"
 }
 
-make_non_free_overlay(){
-	msg "Prepare [pkgs-nonfree-overlay]"
-	mkdir -p ${work_dir}/pkgs-nonfree-overlay
+make_non_free_image(){
+	msg "Prepare [pkgs-nonfree-image]"
+	mkdir -p ${work_dir}/pkgs-nonfree-image
       
-	if [ ! -z "$(mount -l | grep pkgs-nonfree-overlay)" ]; then
-	  umount -l ${work_dir}/pkgs-nonfree-overlay
+	if [ ! -z "$(mount -l | grep pkgs-nonfree-image)" ]; then
+	  umount -l ${work_dir}/pkgs-nonfree-image
 	fi
 	
 	msg2 "mount root-image"
-	mount -t aufs -o br=${work_dir}/pkgs-nonfree-overlay:${work_dir}/root-image=ro none ${work_dir}/pkgs-nonfree-overlay
+	mount -t aufs -o br=${work_dir}/pkgs-nonfree-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-nonfree-image
 	
 	if [ ! -z "${desktop}" ] ; then
 	  msg2 "mount ${desktop}-image"
-	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-nonfree-overlay
+	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-nonfree-image
 	fi
 	
-	mkiso ${create_args[*]} -i "pkgs-nonfree-overlay" -p "${xorg_nonfree_overlay}" create "${work_dir}"
+	mkiso ${create_args[*]} -i "pkgs-nonfree-image" -p "${packages_nonfree}" create "${work_dir}"
 	
-	rm -rf "${work_dir}/pkgs-nonfree-overlay/etc/pacman.d/gnupg"
+	rm -rf "${work_dir}/pkgs-nonfree-image/etc/pacman.d/gnupg"
 	
-	umount -l ${work_dir}/pkgs-nonfree-overlay
+	umount -l ${work_dir}/pkgs-nonfree-image
 	
-	if [ -e ${work_dir}/pkgs-nonfree-overlay/etc/modules-load.d/*virtualbox*conf ] ; then
-	  rm ${work_dir}/pkgs-nonfree-overlay/etc/modules-load.d/*virtualbox*conf
+	if [ -e ${work_dir}/pkgs-nonfree-image/etc/modules-load.d/*virtualbox*conf ] ; then
+	  rm ${work_dir}/pkgs-nonfree-image/etc/modules-load.d/*virtualbox*conf
 	fi
 	
-	rm -R ${work_dir}/pkgs-nonfree-overlay/.wh*
-	msg "Done [pkgs-nonfree-overlay]"
+	rm -R ${work_dir}/pkgs-nonfree-image/.wh*
+	msg "Done [pkgs-nonfree-image]"
 }
 
 configure_xorg_drivers(){
@@ -690,11 +692,11 @@ make_pkgs_image() {
 	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-image
 	fi
 	
-	download_to_cache "${work_dir}/pkgs-image" "${cache_pkgs}" "${xorg_packages}"
+	download_to_cache "${work_dir}/pkgs-image" "${cache_pkgs}" "${packages_xorg}"
 	copy_cache_pkgs	
 	
-	if [ ! -z "${xorg_packages_cleanup}" ]; then
-	    for xorg_clean in ${xorg_packages_cleanup}; do  
+	if [ ! -z "${packages_xorg_cleanup}" ]; then
+	    for xorg_clean in ${packages_xorg_cleanup}; do  
 		rm ${work_dir}/pkgs-image/opt/livecd/pkgs/${xorg_clean}
 	    done
 	fi
@@ -710,8 +712,8 @@ make_pkgs_image() {
 	rm -R ${work_dir}/pkgs-image/.wh*
 	
 	if ${xorg_overlays}; then
-	    make_free_overlay
-	    make_non_free_overlay
+	    make_free_image
+	    make_non_free_image
 	fi
 	: > ${work_dir}/build.${FUNCNAME}
 	msg "Done [pkgs-image]"
@@ -723,28 +725,28 @@ make_lng_image() {
 	msg "Prepare [lng-image]"
 	mkdir -p ${work_dir}/lng-image/opt/livecd/lng
 	
-	if [ ! -z "$(mount -l | grep lng-image)" ]; then
+	if [ -n "$(mount -l | grep lng-image)" ]; then
 	    umount -l ${work_dir}/lng-image
 	fi
 	
 	msg2 "mount root-image"
 	mount -t aufs -o br=${work_dir}/lng-image:${work_dir}/root-image=ro none ${work_dir}/lng-image
 	
-	if [ ! -z "${desktop}" ] ; then
+	if [ -n "${desktop}" ] ; then
 	    msg2 "mount ${desktop}-image"
 	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/lng-image
 	fi
 
-	if ${kde_lng_packages}; then
-	    download_to_cache "${work_dir}/lng-image" "${cache_lng}" "${lng_packages} ${lng_packages_kde}"
+	if ${packages_lng_kde}; then
+	    download_to_cache "${work_dir}/lng-image" "${cache_lng}" "${packages_lng} ${packages_lng_kde}"
 	    copy_cache_lng
 	else
-	    download_to_cache "${work_dir}/lng-image" "${cache_lng}" "${lng_packages}"
+	    download_to_cache "${work_dir}/lng-image" "${cache_lng}" "${packages_lng}"
 	    copy_cache_lng
 	fi
 	
-	if [ ! -z "${lng_packages_cleanup}" ]; then
-	    for lng_clean in ${lng_packages_cleanup}; do
+	if [ -n "${packages_lng_cleanup}" ]; then
+	    for lng_clean in ${packages_lng_cleanup}; do
 		rm ${work_dir}/lng-image/opt/livecd/lng/${lng_clean}
 	    done
 	fi
@@ -978,32 +980,32 @@ load_desktop_definition(){
 
 get_pkglist_xorg(){
     if [ "${arch}" == "i686" ]; then
-	xorg_packages=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-	xorg_free_overlay=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-	xorg_nonfree_overlay=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni.*||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|^.*catalyst-legacy.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_free=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_nonfree=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni.*||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|^.*catalyst-legacy.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
-	xorg_packages=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-	xorg_free_overlay=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni.*||g" | sed "s|>nonfree_x64.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-	xorg_nonfree_overlay=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni.*||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|^.*catalyst-legacy.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_free=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni.*||g" | sed "s|>nonfree_x64.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_nonfree=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni.*||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|^.*catalyst-legacy.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
-    xorg_packages_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
 get_pkglist_lng(){
     if [ "${arch}" == "i686" ]; then
-	lng_packages=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_lng=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
-	lng_packages=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_lng=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
-    lng_packages_cleanup=$(sed "s|#.*||g" Packages-Lng | grep cleanup | sed "s|>cleanup||g")
-    lng_packages_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
+    packages_lng_cleanup=$(sed "s|#.*||g" Packages-Lng | grep cleanup | sed "s|>cleanup||g")
+    packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
 get_pkglist_de(){
     if [ "${arch}" == "i686" ]; then
-	de_packages=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
-	de_packages=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
 }
 
@@ -1015,10 +1017,10 @@ get_pkglist(){
     fi
 }
 
-get_pkglist_overlay(){
+get_pkglist_livecd(){
     if [ "${arch}" == "i686" ]; then
-	overlay_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	livecd_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
-	overlay_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	livecd_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
 }
