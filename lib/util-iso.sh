@@ -345,7 +345,7 @@ copy_initcpio(){
     cp mkinitcpio.conf ${work_dir}/boot-image/etc/mkinitcpio-${manjaroiso}.conf
 }
 
-copy_overlay(){
+copy_overlay_root(){
     msg2 "Copying overlay ..."
     cp -a --no-preserve=ownership overlay/* $1
 }
@@ -355,9 +355,20 @@ copy_overlay_desktop(){
     cp -a --no-preserve=ownership ${desktop}-overlay/* ${work_dir}/${desktop}-image
 }
 
-copy_overlay_livecd(){
-	msg2 "Copying overlay-livecd ..."
-	cp -a --no-preserve=ownership overlay-livecd/* $1
+# should be deprecated, done by livecd packages
+# copy_overlay_livecd(){
+# 	msg2 "Copying overlay-livecd ..."
+# 	cp -a --no-preserve=ownership overlay-livecd/* $1
+# }
+
+copy_startup_scripts(){
+    msg2 "Copying startup scripts ..."
+    cp ${PKGDATADIR}/scripts/livecd $1
+    cp ${PKGDATADIR}/scripts/mhwd $1
+    
+    # fix script permissions
+    chmod +x $1/livecd
+    chmod +x $1/mhwd
 }
 
 copy_livecd_helpers(){
@@ -367,13 +378,7 @@ copy_livecd_helpers(){
     cp ${LIBDIR}/util-mount.sh $1
     cp ${LIBDIR}/util.sh $1
     cp ${BINDIR}/chroot-run $1
-    cp ${PKGDATADIR}/scripts/livecd $1
-    cp ${PKGDATADIR}/scripts/mhwd $1
-    
-    # fix script permissions
-    chmod +x $1/livecd
-    chmod +x $1/mhwd
-    
+
     # fix paths
     sed -e "s|${LIBDIR}|/opt/livecd|g" -i $1/chroot-run
     
@@ -484,7 +489,7 @@ make_root_image() {
 	    sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" ${work_dir}/root-image/etc/lsb-release
 	fi
 	
-	copy_overlay "${work_dir}/root-image"
+	copy_overlay_root "${work_dir}/root-image"
 	
 	# Clean up GnuPG keys
 	rm -rf "${work_dir}/root-image/etc/pacman.d/gnupg"
@@ -555,7 +560,8 @@ make_overlay_image() {
 
 	pacman -Qr "${work_dir}/overlay-image" > "${work_dir}/overlay-image/overlay-image-pkgs.txt"
 	
-	copy_overlay_livecd "${work_dir}/overlay-image"
+	# should be deprecated, done by livecd packages
+	#copy_overlay_livecd "${work_dir}/overlay-image"
 	
 	configure_overlay_image "${work_dir}/overlay-image"
 	
@@ -563,6 +569,8 @@ make_overlay_image() {
         
         # copy over setup helpers and config loader
         copy_livecd_helpers "${work_dir}/overlay-image/opt/livecd"
+        
+        copy_startup_scripts "${work_dir}/overlay-image/usr/bin"
         
         cp ${work_dir}/root-image/etc/pacman.d/mirrorlist ${work_dir}/overlay-image/etc/pacman.d/mirrorlist
         sed -i "s/#Server/Server/g" ${work_dir}/overlay-image/etc/pacman.d/mirrorlist
