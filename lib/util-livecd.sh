@@ -297,14 +297,14 @@ configure_alsa_live(){
 
 configure_live_installer_live(){
     if [ -e "/etc/live-installer/install.conf" ] ; then
-      _conf_file="/etc/live-installer/install.conf"
+      local _conf_file="/etc/live-installer/install.conf"
     fi
 }
 
 configure_calamares_live(){
     if [ -e "/usr/share/calamares/settings.conf" ] ; then
 	echo "configure calamares" >> /tmp/livecd.log
-	_conf_file="/usr/share/calamares/modules/unpackfs.conf"
+	local _conf_file="/usr/share/calamares/modules/unpackfs.conf"
 	sed -i "s|_root-image_|/bootmnt/${install_dir}/_ARCH_/root-image.sqfs|g" $_conf_file
 	sed -i "s|_kernel_|$manjaro_kernel|g" "/usr/share/calamares/modules/initcpio.conf"
 
