@@ -361,6 +361,11 @@ copy_startup_scripts(){
     # fix script permissions
     chmod +x $1/livecd
     chmod +x $1/mhwd-live
+    
+    cp ${BINDIR}/chroot-run $1
+
+    # fix paths
+    sed -e "s|${LIBDIR}|/opt/livecd|g" -i $1/chroot-run
 }
 
 copy_livecd_helpers(){
@@ -369,10 +374,7 @@ copy_livecd_helpers(){
     cp ${LIBDIR}/util-msg.sh $1
     cp ${LIBDIR}/util-mount.sh $1
     cp ${LIBDIR}/util.sh $1
-    cp ${BINDIR}/chroot-run $1
 
-    # fix paths
-    sed -e "s|${LIBDIR}|/opt/livecd|g" -i $1/chroot-run
     
     if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
 	msg2 "Copying ${USER_CONFIG}/manjaro-tools.conf ..."
