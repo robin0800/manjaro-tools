@@ -516,11 +516,7 @@ make_de_image() {
 	
 	cp "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt" ${target_dir}/${img_name}-${desktop}-${iso_version}-${arch}-pkgs.txt
 	
-	# copy later in livecd-image to support livecd packages
-	# otherwise filesystemconflicts will be complained by pacman
-# 	if [ -e ${desktop}-overlay ] ; then
-# 	    copy_overlay_desktop
-# 	fi
+	[[ -d ${desktop}-overlay ]] && copy_overlay_desktop
 	
 	${auto_svc_conf} && configure_services "${work_dir}/${desktop}-image"
 	
@@ -556,8 +552,6 @@ make_livecd_image() {
 	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}"
 
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
-	
-	[[ -d ${desktop}-overlay ]] && copy_overlay_desktop
 	
 	copy_overlay_livecd "${work_dir}/livecd-image"
 	
