@@ -350,7 +350,11 @@ copy_overlay_desktop(){
 
 copy_overlay_livecd(){
 	msg2 "Copying overlay-livecd ..."
-	cp -a --no-preserve=ownership overlay-livecd/* $1
+	if [[ -L $1 ]];then
+	    cp -a --no-preserve=ownership overlay-livecd/* $1
+	else
+	    cp -a --no-preserve=ownership,links overlay-livecd/* $1
+	fi
 }
 
 copy_startup_scripts(){
