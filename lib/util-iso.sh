@@ -504,7 +504,7 @@ make_de_image() {
 	
 	mkdir -p ${work_dir}/${desktop}-image
 	
-	if [ ! -z "$(mount -l | grep ${desktop}-image)" ]; then
+	if [[ -n "$(mount -l | grep ${desktop}-image)" ]]; then
 	    umount -l ${work_dir}/${desktop}-image
 	fi
 	
@@ -579,66 +579,6 @@ make_livecd_image() {
     fi
 }
 
-make_free_image(){
-	msg "Prepare [pkgs-free-image]"
-	mkdir -p ${work_dir}/pkgs-free-image
-	if [ ! -z "$(mount -l | grep pkgs-free-image)" ]; then
-	  umount -l ${work_dir}/pkgs-free-image
-	fi
-
-	msg2 "mount root-image"
-	mount -t aufs -o br=${work_dir}/pkgs-free-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-free-image
-
-	if [ ! -z "${desktop}" ] ; then
-	  msg2 "mount ${desktop}-image"
-	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-free-image
-	fi
-
-	mkiso ${create_args[*]} -i "pkgs-free-image" -p "${packages_free}" create "${work_dir}"
-
-	# Clean up GnuPG keys
-	rm -rf "${work_dir}/pkgs-free-image/etc/pacman.d/gnupg"
-	
-	umount -l ${work_dir}/pkgs-free-image
-
-	if [ -e ${work_dir}/pkgs-free-image/etc/modules-load.d/*virtualbox*conf ] ; then
-	  rm ${work_dir}/pkgs-free-image/etc/modules-load.d/*virtualbox*conf
-	fi
-
-	rm -R ${work_dir}/pkgs-free-image/.wh*
-	msg "Done [pkgs-free-image]"
-}
-
-make_non_free_image(){
-	msg "Prepare [pkgs-nonfree-image]"
-	mkdir -p ${work_dir}/pkgs-nonfree-image
-      
-	if [ ! -z "$(mount -l | grep pkgs-nonfree-image)" ]; then
-	  umount -l ${work_dir}/pkgs-nonfree-image
-	fi
-	
-	msg2 "mount root-image"
-	mount -t aufs -o br=${work_dir}/pkgs-nonfree-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-nonfree-image
-	
-	if [ ! -z "${desktop}" ] ; then
-	  msg2 "mount ${desktop}-image"
-	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-nonfree-image
-	fi
-	
-	mkiso ${create_args[*]} -i "pkgs-nonfree-image" -p "${packages_nonfree}" create "${work_dir}"
-	
-	rm -rf "${work_dir}/pkgs-nonfree-image/etc/pacman.d/gnupg"
-	
-	umount -l ${work_dir}/pkgs-nonfree-image
-	
-	if [ -e ${work_dir}/pkgs-nonfree-image/etc/modules-load.d/*virtualbox*conf ] ; then
-	  rm ${work_dir}/pkgs-nonfree-image/etc/modules-load.d/*virtualbox*conf
-	fi
-	
-	rm -R ${work_dir}/pkgs-nonfree-image/.wh*
-	msg "Done [pkgs-nonfree-image]"
-}
-
 configure_xorg_drivers(){
 	# Disable Catalyst if not present
 	if  [ -z "$(ls ${work_dir}/pkgs-image/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
@@ -678,14 +618,14 @@ make_pkgs_image() {
 	msg "Prepare [pkgs-image]"
 	mkdir -p ${work_dir}/pkgs-image/opt/livecd/pkgs
 	
-	if [ ! -z "$(mount -l | grep pkgs-image)" ]; then
+	if [[ -n "$(mount -l | grep pkgs-image)" ]]; then
 	    umount -l ${work_dir}/pkgs-image
 	fi
 	
 	msg2 "mount root-image"
 	mount -t aufs -o br=${work_dir}/pkgs-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-image
 	
-	if [ ! -z "${desktop}" ] ; then
+	if [[ -n "${desktop}" ]] ; then
 	    msg2 "mount ${desktop}-image"
 	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-image
 	fi
@@ -693,7 +633,7 @@ make_pkgs_image() {
 	download_to_cache "${work_dir}/pkgs-image" "${cache_pkgs}" "${packages_xorg}"
 	copy_cache_pkgs	
 	
-	if [ ! -z "${packages_xorg_cleanup}" ]; then
+	if [[ -n "${packages_xorg_cleanup}" ]]; then
 	    for xorg_clean in ${packages_xorg_cleanup}; do  
 		rm ${work_dir}/pkgs-image/opt/livecd/pkgs/${xorg_clean}
 	    done
@@ -709,10 +649,10 @@ make_pkgs_image() {
 	umount -l ${work_dir}/pkgs-image
 	rm -R ${work_dir}/pkgs-image/.wh*
 	
-	if ${xorg_overlays}; then
-	    make_free_image
-	    make_non_free_image
-	fi
+# 	if ${xorg_overlays}; then
+# 	    make_free_image
+# 	    make_non_free_image
+# 	fi
 	: > ${work_dir}/build.${FUNCNAME}
 	msg "Done [pkgs-image]"
     fi
@@ -723,19 +663,19 @@ make_lng_image() {
 	msg "Prepare [lng-image]"
 	mkdir -p ${work_dir}/lng-image/opt/livecd/lng
 	
-	if [ -n "$(mount -l | grep lng-image)" ]; then
+	if [[ -n "$(mount -l | grep lng-image)" ]]; then
 	    umount -l ${work_dir}/lng-image
 	fi
 	
 	msg2 "mount root-image"
 	mount -t aufs -o br=${work_dir}/lng-image:${work_dir}/root-image=ro none ${work_dir}/lng-image
 	
-	if [ -n "${desktop}" ] ; then
+	if [[ -n "${desktop}" ]] ; then
 	    msg2 "mount ${desktop}-image"
 	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/lng-image
 	fi
 
-	if ${packages_lng_kde}; then
+	if [[ -n ${packages_lng_kde} ]]; then
 	    download_to_cache "${work_dir}/lng-image" "${cache_lng}" "${packages_lng} ${packages_lng_kde}"
 	    copy_cache_lng
 	else
@@ -743,7 +683,7 @@ make_lng_image() {
 	    copy_cache_lng
 	fi
 	
-	if [ -n "${packages_lng_cleanup}" ]; then
+	if [[ -n "${packages_lng_cleanup}" ]]; then
 	    for lng_clean in ${packages_lng_cleanup}; do
 		rm ${work_dir}/lng-image/opt/livecd/lng/${lng_clean}
 	    done
@@ -1022,3 +962,64 @@ get_pkglist_livecd(){
 	livecd_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
 }
+
+
+# make_free_image(){
+# 	msg "Prepare [pkgs-free-image]"
+# 	mkdir -p ${work_dir}/pkgs-free-image
+# 	if [ ! -z "$(mount -l | grep pkgs-free-image)" ]; then
+# 	  umount -l ${work_dir}/pkgs-free-image
+# 	fi
+# 
+# 	msg2 "mount root-image"
+# 	mount -t aufs -o br=${work_dir}/pkgs-free-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-free-image
+# 
+# 	if [ ! -z "${desktop}" ] ; then
+# 	  msg2 "mount ${desktop}-image"
+# 	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-free-image
+# 	fi
+# 
+# 	mkiso ${create_args[*]} -i "pkgs-free-image" -p "${packages_free}" create "${work_dir}"
+# 
+# 	# Clean up GnuPG keys
+# 	rm -rf "${work_dir}/pkgs-free-image/etc/pacman.d/gnupg"
+# 	
+# 	umount -l ${work_dir}/pkgs-free-image
+# 
+# 	if [ -e ${work_dir}/pkgs-free-image/etc/modules-load.d/*virtualbox*conf ] ; then
+# 	  rm ${work_dir}/pkgs-free-image/etc/modules-load.d/*virtualbox*conf
+# 	fi
+# 
+# 	rm -R ${work_dir}/pkgs-free-image/.wh*
+# 	msg "Done [pkgs-free-image]"
+# }
+# 
+# make_non_free_image(){
+# 	msg "Prepare [pkgs-nonfree-image]"
+# 	mkdir -p ${work_dir}/pkgs-nonfree-image
+#       
+# 	if [ ! -z "$(mount -l | grep pkgs-nonfree-image)" ]; then
+# 	  umount -l ${work_dir}/pkgs-nonfree-image
+# 	fi
+# 	
+# 	msg2 "mount root-image"
+# 	mount -t aufs -o br=${work_dir}/pkgs-nonfree-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-nonfree-image
+# 	
+# 	if [ ! -z "${desktop}" ] ; then
+# 	  msg2 "mount ${desktop}-image"
+# 	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-nonfree-image
+# 	fi
+# 	
+# 	mkiso ${create_args[*]} -i "pkgs-nonfree-image" -p "${packages_nonfree}" create "${work_dir}"
+# 	
+# 	rm -rf "${work_dir}/pkgs-nonfree-image/etc/pacman.d/gnupg"
+# 	
+# 	umount -l ${work_dir}/pkgs-nonfree-image
+# 	
+# 	if [ -e ${work_dir}/pkgs-nonfree-image/etc/modules-load.d/*virtualbox*conf ] ; then
+# 	  rm ${work_dir}/pkgs-nonfree-image/etc/modules-load.d/*virtualbox*conf
+# 	fi
+# 	
+# 	rm -R ${work_dir}/pkgs-nonfree-image/.wh*
+# 	msg "Done [pkgs-nonfree-image]"
+# }

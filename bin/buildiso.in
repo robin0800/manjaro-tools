@@ -44,8 +44,6 @@ display_settings(){
     msg2 "clean_first: ${clean_first}"
     msg2 "auto_svc_conf: ${auto_svc_conf}"
     msg2 "high_compression: ${high_compression}"
-    msg2 "xorg_overlays: ${xorg_overlays}"
-    msg2 "kde_lng_packages: ${kde_lng_packages}"
     msg2 "clean_cache_pkgs: ${clean_cache_pkgs}"
     msg2 "clean_cache_lng: ${clean_cache_lng}"
     msg2 "images_only: ${images_only}"
@@ -117,8 +115,6 @@ clean_cache_lng=true
 
 pretend=false
 verbose=false
-xorg_overlays=false
-kde_lng_packages=false
 images_only=false
 iso_only=false
 
@@ -141,8 +137,6 @@ usage() {
     echo '    -c                 Disable clean work dir and target dir iso'
     echo '    -z                 Disable high compression'
     echo '    -A                 Disable auto configure services'
-    echo '    -X                 Xorg overlays'
-    echo '    -K                 kde lng packages'
     echo '    -B                 Build images only'
     echo '    -G                 Generate iso only'
     echo '                       Requires pre built images'
@@ -156,7 +150,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='a:b:r:t:i:cvzqXKABGPLh'
+opts='a:b:r:t:i:cvzqABGPLh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -166,8 +160,6 @@ while getopts "${opts}" arg; do
 	t) target_dir="$OPTARG" ;;
 	i) pacman_conf="$OPTARG" ;;
 	v) verbose=true; iso_args+=(-v) ;;
-	X) xorg_overlays=true ;;
-	K) kde_lng_packages=true ;;
 	B) images_only=true ;;
 	G) iso_only=true ;;
 	q) pretend=true ;;
