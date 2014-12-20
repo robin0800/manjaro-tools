@@ -353,7 +353,8 @@ copy_overlay_livecd(){
 	if [[ -L $1 ]];then
 	    cp -a --no-preserve=ownership overlay-livecd/* $1
 	else
-	    cp -a --no-preserve=ownership,links overlay-livecd/* $1
+	    msg2 "Custom overlay-livecd found ..."
+	    cp -LR overlay-livecd/* $1
 	fi
 }
 
