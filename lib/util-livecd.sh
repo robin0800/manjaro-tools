@@ -296,81 +296,85 @@ configure_alsa_live(){
 }
 
 configure_live_image () {
-    _conf_file="$1" # Configuration file passed as first argument
 
-    if [ -e "$_conf_file" ] ; then
-	sed -i "s|_root-image_|/bootmnt/${install_dir}/_ARCH_/root-image.sqfs|g" $_conf_file
+    if [ -e "$1" ] ; then
+	sed -i "s|_root-image_|/bootmnt/${install_dir}/_ARCH_/root-image.sqfs|g" $1
 
 	if [ -e "/bootmnt/${install_dir}/${arch}/xfce-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/xfce-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/xfce-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/gnome-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/gnome-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/gnome-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/cinnamon-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/cinnamon-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/cinnamon-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/openbox-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/openbox-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/openbox-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/mate-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/mate-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/mate-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/kde-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/kde-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/kde-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/lxde-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/lxde-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/lxde-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/lxqt-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/lxqt-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/lxqt-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/enlightenment-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/enlightenment-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/enlightenment-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/pekwm-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/pekwm-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/pekwm-image.sqfs|g" $1
 	fi
 	if [ -e "/bootmnt/${install_dir}/${arch}/custom-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/custom-image.sqfs|g" $_conf_file
+	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/custom-image.sqfs|g" $1
 	fi
 	if [ "${arch}" == "i686" ] ; then
-	    sed -i "s|_ARCH_|i686|g" $_conf_file
+	    sed -i "s|_ARCH_|i686|g" $1
 	else
-	    sed -i "s|_ARCH_|x86_64|g" $_conf_file
+	    sed -i "s|_ARCH_|x86_64|g" $1
 	fi
     fi
+}
+
+get_release(){
+    echo $(cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d= -f2)
 }
 
 configure_live_installer_live(){
-    if [ -e "/etc/live-installer/install.conf" ] ; then
+    local conf_file="/etc/live-installer/install.conf"
+    if [[ -f "$conf_file" ]] ; then
         echo "configure live-installer" >> /tmp/livecd.log
-        conf_file="/etc/live-installer/install.conf"
+	local release=$(get_release)
+	sed -i "s|_version_|$release|g" $conf_file
+	sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
+	configure_live_image "$conf_file"
     fi
-    release=$(cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d= -f2)
-    sed -i "s|_version_|$release|g" $conf_file
-    sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
-    configure_live_image $conf_file
+
 }
 
 configure_thus_live(){
-    if [ -e "/etc/thus.conf" ] ; then
-        echo "configure thus" >> /tmp/livecd.log
-        conf_file="/etc/thus.conf"
+    local conf_file="/etc/thus.conf"
+    if [[ -f "$conf_file" ]];then 
+	echo "configure thus" >> /tmp/livecd.log
+	release=$(get_release)
+	sed -i "s|_version_|$release|g" $conf_file
+	sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
+	configure_live_image "$conf_file"
     fi
-    release=$(cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d= -f2)
-    sed -i "s|_version_|$release|g" $conf_file
-    sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
-    configure_live_image $conf_file
 }
 
 configure_calamares_live(){
-    if [ -e "/usr/share/calamares/settings.conf" ] ; then
+    local conf_file="/usr/share/calamares/modules/unpackfs.conf"
+    if [[ -f "$conf_file" ]] ; then
         echo "configure calamares" >> /tmp/livecd.log
-        conf_file="/usr/share/calamares/modules/unpackfs.conf"
+	sed -i "s|_kernel_|$manjaro_kernel|g" "/usr/share/calamares/modules/initcpio.conf"
+	configure_live_image "$conf_file"
     fi
-    sed -i "s|_kernel_|$manjaro_kernel|g" "/usr/share/calamares/modules/initcpio.conf"
-    configure_live_image $conf_file
 }
 
 fix_kdm(){
