@@ -484,7 +484,7 @@ make_de_image() {
 	
 	mount -t aufs -o br=${work_dir}/${desktop}-image:${work_dir}/root-image=ro none ${work_dir}/${desktop}-image
 
-	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages file! Exiting."
+	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting."
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
@@ -523,7 +523,7 @@ make_livecd_image() {
 	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/livecd-image
 	fi
 	
-	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages file! Exiting."
+	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting."
 
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
