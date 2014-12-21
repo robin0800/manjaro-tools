@@ -397,16 +397,12 @@ fix_lightdm(){
     
     mkdir -p /var/lib/lightdm-data
     
-    chown -R lightdm:lightdm /var/run/lightdm > /dev/null
+    #chown -R lightdm:lightdm /var/run/lightdm > /dev/null
     #chown lightdm:lightdm /var/lib/lightdm-data
     chown lightdm:lightdm /run/lightdm
     
     
     sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=1/' /etc/lightdm/lightdm.conf
     sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
-    
-#     if [[ -d /run/openrc ]];then
-# 	echo "d /run/lightdm 0711 lightdm lightdm" > /usr/lib/tmpfiles.d/lightdm.conf
-#     fi
-    
+       
 }

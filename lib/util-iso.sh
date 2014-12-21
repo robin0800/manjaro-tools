@@ -271,6 +271,14 @@ write_calamares_dm_conf(){
     echo "basicSetup: false" >> "$cdm"
 }
 
+write_calamares_initcpio_conf(){
+	local INITCPIO="$1/usr/share/calamares/modules/initcpio.conf"
+	if [ ! -e $INITCPIO ] ; then
+	    echo "---" > "$INITCPIO"
+	    echo "kernel: ${manjaro_kernel}" >> "$INITCPIO"
+	fi  
+}
+
 # $1: chroot
 configure_calamares(){
     if [[ -f $1/usr/bin/calamares ]];then
@@ -288,47 +296,8 @@ configure_calamares(){
 	    echo "        destination: \"\"" >> "$UNPACKFS"                
 	fi
 	
-	# TODO: maybe add a configuration flag in manjaro-tools.conf for default displymanager
-	
-	# TODO: review autodetection for systemd; a flag for DM could end up confusing
-	# intended goal is a auto configuration of services for overlay & desktop image
-	
-	#local DISPLAYMANAGER="$1/etc/calamares/modules/displaymanager.conf"
-	
 	write_calamares_dm_conf $1
-	
-	
-# 	if [ ! -e $DISPLAYMANAGER ] ; then
-# 	    echo "---" > "$DISPLAYMANAGER"
-# 	    echo "displaymanagers:" >> "$DISPLAYMANAGER"
-# 	    if [ -e "${work_dir}/${desktop}-image/usr/bin/lightdm" ] ; then
-# 		echo "  - lightdm" >> "$DISPLAYMANAGER"
-# 	    fi
-# 	    if [ -e "${work_dir}/${desktop}-image/usr/share/config/kdm/kdmrc" ] ; then
-# 		echo "  - kdm" >> "$DISPLAYMANAGER"
-# 	    fi
-# 	    if [ -e "${work_dir}/${desktop}-image/usr/bin/gdm" ] ; then
-# 		echo "  - gdm" >> "$DISPLAYMANAGER"
-# 	    fi
-# 	    if [ -e "${work_dir}/${desktop}-image/usr/bin/mdm" ] ; then
-# 		echo "  - mdm" >> "$DISPLAYMANAGER"
-# 	    fi
-# 	    if [ -e "${work_dir}/${desktop}-image/usr/bin/sddm" ] ; then
-# 		echo "  - sddm" >> "$DISPLAYMANAGER"
-# 	    fi
-# 	    if [ -e "${work_dir}/${desktop}-image/usr/bin/lxdm" ] ; then
-# 		echo "  - lxdm" >> "$DISPLAYMANAGER"
-# 	    fi
-# 	    if [ -e "${work_dir}/${desktop}-image/usr/bin/slim" ] ; then
-# 		echo "  - slim" >> "$DISPLAYMANAGER"
-# 	    fi   
-# 	fi
-
-	local INITCPIO="$1/usr/share/calamares/modules/initcpio.conf"
-	if [ ! -e $INITCPIO ] ; then
-	    echo "---" > "$INITCPIO"
-	    echo "kernel: ${manjaro_kernel}" >> "$INITCPIO"
-	fi  
+	write_calamares_initcpio_conf $1
     fi
 }
 
@@ -421,7 +390,7 @@ clean_up(){
 
 # $1: chroot
 configure_livecd_image(){
-    msg "Configuring [$1]"
+    msg2 "Configuring [$1]"
     
     configure_displaymanager "$1"
     
@@ -441,7 +410,7 @@ configure_livecd_image(){
     
     configure_plymouth "$1"
     
-    msg "Done configuring [$1]"
+    msg2 "Done configuring [$1]"
 }
 
 make_repo(){
