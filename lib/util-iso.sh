@@ -443,7 +443,7 @@ make_root_image() {
     
 	msg "Prepare [Base installation] (root-image)"
 	
-	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}"
+	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting." 
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 		
@@ -484,7 +484,7 @@ make_de_image() {
 	
 	mount -t aufs -o br=${work_dir}/${desktop}-image:${work_dir}/root-image=ro none ${work_dir}/${desktop}-image
 
-	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}"
+	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages file! Exiting."
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
@@ -523,7 +523,7 @@ make_livecd_image() {
 	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/livecd-image
 	fi
 	
-	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}"
+	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages file! Exiting."
 
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
@@ -542,7 +542,7 @@ make_livecd_image() {
         sed -i "s/#Server/Server/g" ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
        	
 	# Clean up GnuPG keys?
-	#rm -rf "${work_dir}/${desktop}-image/etc/pacman.d/gnupg"
+	rm -rf "${work_dir}/livecd-image/etc/pacman.d/gnupg"
 	
 	umount -l ${work_dir}/livecd-image
 	
