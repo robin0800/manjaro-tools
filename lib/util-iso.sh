@@ -350,7 +350,7 @@ copy_overlay_desktop(){
 
 copy_overlay_livecd(){
 	msg2 "Copying overlay-livecd ..."
-	if [[ -L $1 ]];then
+	if [[ -L overlay-livecd ]];then
 	    cp -a --no-preserve=ownership overlay-livecd/* $1
 	else
 	    msg2 "Custom overlay-livecd found ..."
