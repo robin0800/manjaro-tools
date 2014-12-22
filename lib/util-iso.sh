@@ -58,11 +58,10 @@ configure_services_live(){
    else
       msg2 "Congiguring SystemD ...."
       for svc in ${start_systemd_live[@]}; do
-	  msg2 "Setting $svc ..."
-	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
+# 	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
 	      msg2 "Setting $svc ..."
 	      chroot-run $1 systemctl enable $svc
-	  fi
+# 	  fi
       done
    fi
 }
@@ -80,11 +79,10 @@ configure_services(){
    else
       msg2 "Congiguring SystemD ...."
       for svc in ${start_systemd[@]}; do
-	  msg2 "Setting $svc ..."
-	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
+# 	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
 	      msg2 "Setting $svc ..."
 	      chroot-run $1 systemctl enable $svc
-	  fi
+# 	 fi
       done
    fi
 }
