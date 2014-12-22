@@ -60,7 +60,7 @@ configure_services_live(){
       for svc in ${start_systemd_live[@]}; do
 # 	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
 	      msg2 "Setting $svc ..."
-	      chroot-run $1 systemctl enable $svc
+	      chroot-run $1 systemctl enable $svc &> /dev/null
 # 	  fi
       done
    fi
@@ -81,7 +81,7 @@ configure_services(){
       for svc in ${start_systemd[@]}; do
 # 	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
 	      msg2 "Setting $svc ..."
-	      chroot-run $1 systemctl enable $svc
+	      chroot-run $1 systemctl enable $svc &> /dev/null
 # 	 fi
       done
    fi
