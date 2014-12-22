@@ -159,7 +159,7 @@ configure_displaymanager(){
 	;;
 	'kdm')
 	    sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" $1/usr/share/config/kdm/kdmrc
-	    sed -i -e "s/^.*AutoLoginPass=.*/AutoLoginPass=${username}/" $1/usr/share/config/kdm/kdmrc
+	    sed -i -e "s/^.*AutoLoginPass=.*/AutoLoginPass=${password}/" $1/usr/share/config/kdm/kdmrc
 	;;
 	'gdm')
 	    configure_accountsservice $1 "gdm"
@@ -623,10 +623,6 @@ make_pkgs_image() {
 	umount -l ${work_dir}/pkgs-image
 	rm -R ${work_dir}/pkgs-image/.wh*
 	
-# 	if ${xorg_overlays}; then
-# 	    make_free_image
-# 	    make_non_free_image
-# 	fi
 	: > ${work_dir}/build.${FUNCNAME}
 	msg "Done [pkgs-image]"
     fi
@@ -883,6 +879,9 @@ load_desktop_definition(){
     if [ -e Packages-PekWM ] ; then
 	pkgsfile="Packages-PekWM"
     fi
+    if [ -e Packages-Kf5 ] ; then
+	pkgsfile="Packages-Kf5"
+    fi
     if [ -e Packages-Custom ] ; then
     	pkgsfile="Packages-Custom"
     fi
@@ -936,64 +935,3 @@ get_pkglist_livecd(){
 	livecd_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
 }
-
-
-# make_free_image(){
-# 	msg "Prepare [pkgs-free-image]"
-# 	mkdir -p ${work_dir}/pkgs-free-image
-# 	if [ ! -z "$(mount -l | grep pkgs-free-image)" ]; then
-# 	  umount -l ${work_dir}/pkgs-free-image
-# 	fi
-# 
-# 	msg2 "mount root-image"
-# 	mount -t aufs -o br=${work_dir}/pkgs-free-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-free-image
-# 
-# 	if [ ! -z "${desktop}" ] ; then
-# 	  msg2 "mount ${desktop}-image"
-# 	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-free-image
-# 	fi
-# 
-# 	mkiso ${create_args[*]} -i "pkgs-free-image" -p "${packages_free}" create "${work_dir}"
-# 
-# 	# Clean up GnuPG keys
-# 	rm -rf "${work_dir}/pkgs-free-image/etc/pacman.d/gnupg"
-# 	
-# 	umount -l ${work_dir}/pkgs-free-image
-# 
-# 	if [ -e ${work_dir}/pkgs-free-image/etc/modules-load.d/*virtualbox*conf ] ; then
-# 	  rm ${work_dir}/pkgs-free-image/etc/modules-load.d/*virtualbox*conf
-# 	fi
-# 
-# 	rm -R ${work_dir}/pkgs-free-image/.wh*
-# 	msg "Done [pkgs-free-image]"
-# }
-# 
-# make_non_free_image(){
-# 	msg "Prepare [pkgs-nonfree-image]"
-# 	mkdir -p ${work_dir}/pkgs-nonfree-image
-#       
-# 	if [ ! -z "$(mount -l | grep pkgs-nonfree-image)" ]; then
-# 	  umount -l ${work_dir}/pkgs-nonfree-image
-# 	fi
-# 	
-# 	msg2 "mount root-image"
-# 	mount -t aufs -o br=${work_dir}/pkgs-nonfree-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-nonfree-image
-# 	
-# 	if [ ! -z "${desktop}" ] ; then
-# 	  msg2 "mount ${desktop}-image"
-# 	  mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-nonfree-image
-# 	fi
-# 	
-# 	mkiso ${create_args[*]} -i "pkgs-nonfree-image" -p "${packages_nonfree}" create "${work_dir}"
-# 	
-# 	rm -rf "${work_dir}/pkgs-nonfree-image/etc/pacman.d/gnupg"
-# 	
-# 	umount -l ${work_dir}/pkgs-nonfree-image
-# 	
-# 	if [ -e ${work_dir}/pkgs-nonfree-image/etc/modules-load.d/*virtualbox*conf ] ; then
-# 	  rm ${work_dir}/pkgs-nonfree-image/etc/modules-load.d/*virtualbox*conf
-# 	fi
-# 	
-# 	rm -R ${work_dir}/pkgs-nonfree-image/.wh*
-# 	msg "Done [pkgs-nonfree-image]"
-# }
