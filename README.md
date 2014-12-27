@@ -12,7 +12,7 @@ By default, the config is installed in /etc/manjaro-tools/manjaro-tools.conf
 A user config manjaro-tools.conf can be placed in $HOME/.config.
 If the userconfig is present, manjaro-tools will load userconfig values, however, if variables have been set in the systemwise /etc/manjaro-tools/manjaro-tools.conf, these values take precedence over the userconfig. Best practise is to leave systemwide file untouched, by default it is commented and shows just initialization values done in code.
 
-
+~~~
 ##############################################
 ########### manjaro-tools common #############
 ##############################################
@@ -134,7 +134,7 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # names must match openrc service names
 # services in start_openrc array don't need to be listed here
 # start_openrc_live=('bluetooth'  'networkmanager' 'connman')
-
+~~~
 
 
 
@@ -176,6 +176,7 @@ If you set PKGDEST all works fine, but be careful, that your PKGDEST is clean, o
 
 The help(for x86_64 and manjaro-tools.conf set):
 
+~~~
 $ buildpkg -h
 Usage: buildpkg [options] [--] [makepkg args]
     -p <profile>       Set profile or pkg [default: default]
@@ -188,7 +189,7 @@ Usage: buildpkg [options] [--] [makepkg args]
     -s                 Sign packages
     -q                 Query settings and pretend build
     -h                 This help
-
+~~~
 
 Example(assuming default manjaro-tools.conf):
 
@@ -227,6 +228,7 @@ but it can be configure in the conf file.
 mkset is a little helper tools to easily create sets.
 You run it just like buildpkg in the abs/pkgbuilds dir.
 
+~~~
 $ mkset -h
 Usage: mkset [options]
     -c <name>   Create set
@@ -234,6 +236,7 @@ Usage: mkset [options]
     -d <name>   Display set
     -q          Show sets
     -h          This help
+~~~
 
 Example: create a set for lxqt assuming a pure lxqt abs directory
 
@@ -265,6 +268,7 @@ manjaro-livecd-systemd (systemd units for livecd)
 
 The help:
 
+~~~
 $ buildiso -h
 Usage: buildiso [options]
     -a <arch>          Set arch
@@ -288,7 +292,7 @@ Usage: buildiso [options]
     -P                 Disable clean pkgs cache
     -L                 Disable clean lng cache
     -h                 This help
-
+~~~
 
 Example: build xfce iso profile for both arches and branch testing on x86_64 build system:
 
