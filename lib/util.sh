@@ -35,7 +35,7 @@ process_sofile() {
     if ! in_array "${soname}=${soversion}-$2" ${soobjects[@]}; then
 	# libfoo.so=1-64
 	msg "${soname}=${soversion}-$2"
-	soobjects=(${soobjects[@]} "${soname}=${soversion}-$2")
+	soobjects+=("${soname}=${soversion}-$2")
     fi
 }
 
