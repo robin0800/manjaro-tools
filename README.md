@@ -17,6 +17,7 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 ########### manjaro-tools common #############
 ##############################################
 
+~~~
 # unset defaults to given value
 # branch=stable
 
@@ -134,7 +135,7 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # names must match openrc service names
 # services in start_openrc array don't need to be listed here
 # start_openrc_live=('bluetooth'  'networkmanager' 'connman')
-
+~~~
 
 
 
