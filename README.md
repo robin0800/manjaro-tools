@@ -12,12 +12,11 @@ By default, the config is installed in /etc/manjaro-tools/manjaro-tools.conf
 A user config manjaro-tools.conf can be placed in $HOME/.config.
 If the userconfig is present, manjaro-tools will load userconfig values, however, if variables have been set in the systemwise /etc/manjaro-tools/manjaro-tools.conf, these values take precedence over the userconfig. Best practise is to leave systemwide file untouched, by default it is commented and shows just initialization values done in code.
 
-
+~~~
 ##############################################
 ########### manjaro-tools common #############
 ##############################################
 
-~~~
 # unset defaults to given value
 # branch=stable
 
