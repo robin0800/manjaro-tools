@@ -79,7 +79,7 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # iso_version=0.8.11
 
 # unset defaults to given value
-# manjaro_kernel="linux316"
+# manjaro_kernel="linux317"
 
 # unset defaults to given value, specify a date here of have it automatically set
 # manjaro_version="$(date +%Y.%m)"
@@ -136,10 +136,6 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # start_openrc_live=('bluetooth'  'networkmanager' 'connman')
 ~~~
 
-
-
-
-
 1.1. new config files in iso profiles
 
 Each iso profile must have these files or symlinks to shared:
@@ -165,14 +161,11 @@ It can be configure with manjaro-tools.conf or by args
 buildpackage creates by default a pkg cache dir in /var/cache/manjaro-tools/
 Subdirectories will be created when building for the brach and architecture.
 
-
 A word on makepkg.conf PKGDEST
 manjarotools.conf supports the makepkg.conf variables
 If you set PKGDEST all works fine, but be careful, that your PKGDEST is clean, or else buildpkg will move all files from PKGDEST to cache dir , not only the built package.
 
-
 2.1. Arguments
-
 
 The help(for x86_64 and manjaro-tools.conf set):
 
@@ -248,9 +241,6 @@ If you create a set manually, the set must have a .set extension.
 
  Example: /etc/manjaro-tools/sets/lxqt-0.8.set
 
-
-
-
 3. buildiso
 
 buildiso is used to build manjaro-iso-profiles. It is run insde a iso profile folder.
@@ -262,7 +252,6 @@ manjaro-livecd (shared livecd skeletton)
 manjaro-livecd-cli-installer 
 manjaro-livecd-openrc (openrc-run scripts for livecd)
 manjaro-livecd-systemd (systemd units for livecd)
-
 
 3.1 Arguments
 
@@ -302,7 +291,6 @@ buildiso -v -b testing
 
 the branch can be defined also in manjaro-tools.conf, but a manual parameter will always override conf settings.
 
-
 3.1.1 Default parameteres set
 
 -c
@@ -313,7 +301,6 @@ high compression
 
 -A
 auto service configuration
-
 
 3.1.2 Special parameters
 
