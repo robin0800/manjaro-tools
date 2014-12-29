@@ -258,7 +258,7 @@ load_config(){
     if [[ -n ${manjaro_kernel} ]];then
 	manjaro_kernel=${manjaro_kernel}
     else
-	manjaro_kernel="linux316"
+	manjaro_kernel="linux317"
     fi
 
     manjaro_kernel_ver=${manjaro_kernel#*linux}
