@@ -35,11 +35,7 @@ display_settings(){
     msg2 "branch: ${branch}"
     msg2 "work_dir: ${work_dir}"
     msg2 "target_dir: ${target_dir}"
-    msg2 "cache_pkgs: ${cache_pkgs}"
-    msg2 "cache_lng: ${cache_lng}"
-    msg2 "pacman_conf: ${pacman_conf}"
-    msg2 "pacman_mirrors: ${mirrors_conf}"
-
+   
     msg "ARGS:"
     msg2 "clean_first: ${clean_first}"
     msg2 "auto_svc_conf: ${auto_svc_conf}"
@@ -48,6 +44,13 @@ display_settings(){
     msg2 "clean_cache_lng: ${clean_cache_lng}"
     msg2 "images_only: ${images_only}"
     msg2 "iso_only: ${iso_only}"
+    msg2 "custom_pac_conf: ${custom_pac_conf}"
+    
+    msg "PATHS:"
+    msg2 "cache_pkgs: ${cache_pkgs}"
+    msg2 "cache_lng: ${cache_lng}"
+    msg2 "pacman_conf: ${pacman_conf}"
+    msg2 "pacman_mirrors: ${mirrors_conf}"
     
     msg "IMAGES SETTINGS:"
     msg2 "manjaro_kernel: ${manjaro_kernel}"
