@@ -29,6 +29,7 @@ display_settings(){
     else
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
     fi
+    msg2 "iso_profile: ${iso_profile}"
     
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
@@ -144,7 +145,7 @@ usage() {
     echo '                       Requires pre built images'
     echo '    -P                 Disable clean pkgs cache'
     echo '    -L                 Disable clean lng cache'
-    echo "    -C                 Use custom pacman-${pacman_conf_arch}.conf"
+    echo "    -C                 Use custom pacman.conf in iso profile"
     echo '    -h                 This help'
     echo ''
     echo ''
@@ -153,7 +154,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='a:b:r:t:i:cvzqABGPLCh'
+opts='a:b:r:t:cvzqABGPLCh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -161,7 +162,6 @@ while getopts "${opts}" arg; do
 	b) branch="$OPTARG" ;;
 	r) work_dir="$OPTARG" ;;
 	t) target_dir="$OPTARG" ;;
-	i) pacman_conf="$OPTARG" ;;
 	v) verbose=true; iso_args+=(-v) ;;
 	B) images_only=true ;;
 	G) iso_only=true ;;
@@ -209,7 +209,7 @@ load_packages
 ${pretend} && display_settings && exit 1
 
 if ${iso_only}; then
-    [[ ! -d ${work_dir} ]] && die "You need to create images first eg buildiso -B"
+    [[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -B"
     compress_images 
     exit 1
 fi
