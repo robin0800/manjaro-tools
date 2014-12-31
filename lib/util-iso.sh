@@ -936,3 +936,61 @@ get_pkglist_livecd(){
 	livecd_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
 }
+
+load_packages(){
+    get_pkglist
+
+    if [ -e Packages-Xorg ] ; then
+	get_pkglist_xorg
+    fi
+
+    if [ -e Packages-Lng ] ; then
+	get_pkglist_lng
+    fi
+
+    if [ -e "${pkgsfile}" ] ; then
+	get_pkglist_de
+    fi
+
+    if [[ -f Packages-Livecd ]]; then
+	get_pkglist_livecd
+    fi
+}
+
+compress_images(){
+    # install common
+    make_boot
+    if [ "${arch}" == "x86_64" ]; then
+	make_efi
+	make_efiboot
+    fi
+    make_isolinux
+
+    make_isomounts
+    make_iso
+}
+
+make_images(){
+    # install basic
+    make_root_image
+
+    # install DE(s)
+    if [ -e "${pkgsfile}" ] ; then
+	make_de_image
+    fi
+
+    # install xorg-drivers
+    if [ -e Packages-Xorg ] ; then
+	make_pkgs_image
+    fi
+    
+    # install translations
+    if [ -e Packages-Lng ] ; then
+	make_lng_image
+    fi
+    
+    # install overlay
+    if [[ -f Packages-Livecd ]]; then
+	make_livecd_image
+    fi
+}

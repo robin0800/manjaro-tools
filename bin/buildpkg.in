@@ -167,7 +167,7 @@ chrootdir=${chroots}/${branch}/${arch}
 pkg_dir_loaded=${pkg_dir}
 pkg_dir="${pkg_dir}/${branch}/${arch}"
 
-load_pacman_conf "${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 

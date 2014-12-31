@@ -368,16 +368,3 @@ load_config(){
     
     return 0
 }
-
-load_pacman_conf(){
-
-    [[ -f $1 ]] || return 1
-    
-    if [[ -n ${pacman_conf} ]];then
-	pacman_conf=${pacman_conf}
-    else
-	pacman_conf="$1"
-    fi
-    
-    return 0
-}

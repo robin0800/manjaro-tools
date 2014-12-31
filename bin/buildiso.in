@@ -117,6 +117,7 @@ pretend=false
 verbose=false
 images_only=false
 iso_only=false
+custom_pac_conf=false
 
 pacman_conf_arch='default'
 
@@ -130,8 +131,6 @@ usage() {
     echo "                       [default: ${work_dir}]"
     echo '    -t <dir>           Target iso directory'
     echo "                       [default: ${target_dir}]"
-    echo "    -i <file>          Config file for pacman"
-    echo "                       [default: ${PKGDATADIR}/pacman-${pacman_conf_arch}.conf]"
     echo '    -v                 Verbose iso compression'
     echo '    -q                 Query settings and pretend build'
     echo '    -c                 Disable clean work dir and target dir iso'
@@ -142,6 +141,7 @@ usage() {
     echo '                       Requires pre built images'
     echo '    -P                 Disable clean pkgs cache'
     echo '    -L                 Disable clean lng cache'
+    echo "    -C                 Use custom pacman-${pacman_conf_arch}.conf"
     echo '    -h                 This help'
     echo ''
     echo ''
@@ -150,7 +150,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='a:b:r:t:i:cvzqABGPLh'
+opts='a:b:r:t:i:cvzqABGPLCh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -163,6 +163,7 @@ while getopts "${opts}" arg; do
 	B) images_only=true ;;
 	G) iso_only=true ;;
 	q) pretend=true ;;
+	C) custom_pac_conf=true ;;
 	P) clean_cache_pkgs=false ;;
 	L) clean_cache_lng=false ;;
 	c) clean_first=false ;;
@@ -180,8 +181,11 @@ if [[ "$arch" == 'x86_64' ]]; then
     pacman_conf_arch='multilib'
 fi
 
-load_pacman_conf "${pacman_conf}"
-load_pacman_conf "${PKGDATADIR}/pacman-${pacman_conf_arch}.conf" 
+if ${custom_pac_conf};then
+    pacman_conf="${PWD}/pacman-${pacman_conf_arch}.conf"
+else
+    pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf" 
+fi
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_conf})
@@ -197,38 +201,9 @@ ${clean_first} && iso_args+=(-f)
 
 check_root "$0" "${orig_argv[@]}"
 
-get_pkglist
-
-if [ -e Packages-Xorg ] ; then
-    get_pkglist_xorg
-fi
-
-if [ -e Packages-Lng ] ; then
-    get_pkglist_lng
-fi
-
-if [ -e "${pkgsfile}" ] ; then
-    get_pkglist_de
-fi
-
-if [[ -f Packages-Livecd ]]; then
-    get_pkglist_livecd
-fi
+load_packages
 
 ${pretend} && display_settings && exit 1
-
-compress_images(){
-    # install common
-    make_boot
-    if [ "${arch}" == "x86_64" ]; then
-	make_efi
-	make_efiboot
-    fi
-    make_isolinux
-
-    make_isomounts
-    make_iso
-}
 
 if ${iso_only}; then
     [[ ! -d ${work_dir} ]] && die "You need to create images first eg buildiso -B"
@@ -242,31 +217,6 @@ ${clean_cache_pkgs} && clean_cache "${cache_pkgs}"
 ${clean_cache_lng} && clean_cache "${cache_lng}"
 
 prepare_buildiso
-
-make_images(){
-    # install basic
-    make_root_image
-
-    # install DE(s)
-    if [ -e "${pkgsfile}" ] ; then
-	make_de_image
-    fi
-
-    # install xorg-drivers
-    if [ -e Packages-Xorg ] ; then
-	make_pkgs_image
-    fi
-    
-    # install translations
-    if [ -e Packages-Lng ] ; then
-	make_lng_image
-    fi
-    
-    # install overlay
-    if [[ -f Packages-Livecd ]]; then
-	make_livecd_image
-    fi
-}
 
 if ${images_only}; then
     make_images
