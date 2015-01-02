@@ -15,6 +15,7 @@ version=@version@
 [[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
 
 working_dir=''
+build_locales=false
 
 usage() {
 	echo "Usage: ${0##*/} [options] working-dir package-list..."
@@ -29,12 +30,13 @@ usage() {
 
 orig_argv=("$@")
 
-while getopts 'hC:M:S:c:' arg; do
+while getopts 'hbC:M:S:c:' arg; do
 	case "$arg" in
 		C) pac_conf="$OPTARG" ;;
 		M) makepkg_conf="$OPTARG" ;;
 		S) mirrors_conf="$OPTARG" ;;
 		c) cache_dir="$OPTARG" ;;
+		b) build_locales=true ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -76,7 +78,7 @@ fi
 basestrap -GMcd ${pac_conf:+-C "$pac_conf"} "$working_dir" \
   "${cache_dirs[@]/#/--cachedir=}" "$@" || die 'Failed to install all packages'
 
-printf '%s.UTF-8 UTF-8\n' en_US de_DE > "$working_dir/etc/locale.gen"
+${build_locales} && printf '%s.UTF-8 UTF-8\n' en_US de_DE > "$working_dir/etc/locale.gen"
 echo 'LANG=C' > "$working_dir/etc/locale.conf"
 echo "$version" > "$working_dir/.manjaro-tools"
 
