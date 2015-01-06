@@ -30,6 +30,7 @@ display_settings(){
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
     fi
     msg2 "iso_profile: ${iso_profile}"
+    msg2 "initsys: ${initsys}"
     
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
@@ -60,7 +61,7 @@ display_settings(){
     msg2 "plymouth_theme: ${plymouth_theme}"
     
     if ${auto_svc_conf};then
-	if [[ ${initsys} == "systemd" ]];then
+	if [ ${initsys} == "systemd" ];then
 	    msg2 "start_systemd: ${start_systemd[*]}"
 	else
 	    msg2 "start_openrc: ${start_openrc[*]}"
@@ -74,18 +75,16 @@ display_settings(){
     msg2 "code_name: ${code_name}"
     msg2 "img_name: ${img_name}"
     msg2 "install_dir: ${install_dir}"
-    msg2 "compression: ${compression}"
     msg2 "iso_file: ${iso_file}"
 
     msg "LIVECD:"
     msg2 "username: ${username}"
     msg2 "password: ${password}"
-    msg2 "encrypted password: $(gen_pw)"
     msg2 "addgroups: ${addgroups}"
     msg2 "hostname: ${hostname}"
     
     if ${auto_svc_conf};then
-	if [[ ${initsys} == "systemd" ]];then
+	if [ ${initsys} == "systemd" ];then
 	    msg2 "start_systemd_live: ${start_systemd_live[*]}"
 	else
 	    msg2 "start_openrc_live: ${start_openrc_live[*]}"
@@ -107,9 +106,6 @@ load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 load_desktop_definition
-
-displaymanager=$(cat ${PWD}/displaymanager)
-initsys=$(cat ${PWD}/initsys)
 
 clean_first=true
 auto_svc_conf=true
@@ -198,6 +194,9 @@ iso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 iso_file="${target_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
 iso_profile=${PWD##*/}
+
+displaymanager=$(cat ${PWD}/displaymanager)
+initsys=$(cat ${PWD}/initsys)
 
 ${high_compression} && iso_args+=(-x)
 ${clean_first} && iso_args+=(-f)
