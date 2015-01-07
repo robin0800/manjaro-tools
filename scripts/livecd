@@ -11,11 +11,7 @@ CONSOLEFONT="$(kernel_cmdline vconsole.font)"
 CONSOLEMAP="$(kernel_cmdline vconsole.font.map)"
 PACMAN_LNG="pacman --config /opt/livecd/pacman-lng.conf --noconfirm --noprogressbar"
 arch=$(uname -m)
-_kernver=$(uname -r)
-_kernver=${_kernver%%-*}
-_kernver=${_kernver%%.[00-99].[00-99]}
-EXTRAMODULES=extramodules-${_kernver}-MANJARO
-
+_KV=$(uname -r)
 
 echo "update fstab for swap" > /tmp/livecd.log
 
@@ -48,7 +44,7 @@ configure_gnome_live
 configure_ping_live
 
 # depmod extramodules
-depmod $(cat /usr/lib/modules/$EXTRAMODULES/version)
+depmod $(cat /usr/lib/modules/${_KV}/extramodules/version)
 
 # check if we are running inside a virtual machine and unistall kalu
 DESTDIR="/"
