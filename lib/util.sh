@@ -339,7 +339,7 @@ load_config(){
     if [[ -n ${start_openrc} ]];then
 	start_openrc=${start_openrc}
     else
-	start_openrc=('cronie' 'cupsd' 'metalog')
+	start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
     fi
     
     if [[ -n ${start_systemd_live} ]];then
