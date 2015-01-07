@@ -60,10 +60,6 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # if unset, it defaults to the iso config dir
 # target_dir=/srv/manjaro-release-iso
 
-# custom pacman.conf
-# needed for custom repos, or use buildiso <args> -i /path/to/pacman.conf
-# pacman_conf="/usr/share/manjaro-tools/pacman-default.conf"
-
 # use custom cache, accessible with buildiso <args> -L
 # cache_lng=/var/cache/manjaro-tools/lng
 
@@ -108,7 +104,7 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 
 # unset defaults to given values, 
 # names must match openrc service names
-# start_openrc=('cronie' 'cupsd' 'metalog')
+# start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
 
 
 ########### livecd setup #############
@@ -268,8 +264,6 @@ Usage: buildiso [options]
                        [default: /srv/manjaroiso]
     -t <dir>           Target iso directory
                        [default: /srv/manjaro-release-iso]
-    -i <file>          Config file for pacman
-                       [default: /usr/share/manjaro-tools/pacman-default.conf]
     -v                 Verbose iso compression
     -q                 Query settings and pretend build
     -c                 Disable clean work dir and target dir iso
@@ -280,6 +274,7 @@ Usage: buildiso [options]
                        Requires pre built images
     -P                 Disable clean pkgs cache
     -L                 Disable clean lng cache
+    -C                 Use custom pacman.conf in iso profile
     -h                 This help
 ~~~
 
@@ -319,3 +314,6 @@ By default, xorg package cache is cleaned on every build. Disabling the xorg cac
 
 -L
 Disable lng cache, by default lng cache is cleaned on every build. Uning this option will enable lng packages from cache rather than downloading them again.
+
+-C
+Use custom pacman.conf located in profile
