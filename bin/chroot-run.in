@@ -87,18 +87,25 @@ build_mount_args() {
     track_mount "/etc/resolv.conf" "${working_dir}/etc/resolv.conf" -B
     track_mount "${cache_dirs[0]}" "${working_dir}${cache_dirs[0]}" -B
 
-    for cache_dir in ${cache_dirs[@]:1}; do
-	track_mount "$cache_dir" "${working_dir}${cache_dir}" -Br
-    done
+#     for cache_dir in ${cache_dirs[@]:1}; do
+# 	track_mount "$cache_dir" "${working_dir}${cache_dir}" -Br
+#     done
     
-    local IFS=','
-    for m in ${mountargs_ro[@]}; do
-	track_mount "${m%%:*}" "${working_dir}${m##*:}" -Br
-    done
-    for m in ${mountargs_rw[@]}; do
-	track_mount "${m%%:*}" "${working_dir}${m##*:}" -B
-    done
-    unset IFS
+    if [[ -n ${mountargs_ro[@]} ]];then
+	local IFS=','
+	for m in ${mountargs_ro[@]}; do
+	    track_mount "${m%%:*}" "${working_dir}${m##*:}" -Br
+	done
+	unset IFS
+    fi
+    
+    if [[ -n ${mountargs_rw[@]} ]];then
+	local IFS=','
+	for m in ${mountargs_rw[@]}; do
+	    track_mount "${m%%:*}" "${working_dir}${m##*:}" -B
+	done
+	unset IFS
+    fi
 }
 
 umask 0022
