@@ -345,17 +345,17 @@ get_release(){
     echo $(cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d= -f2)
 }
 
-configure_live_installer_live(){
-    local conf_file="/etc/live-installer/install.conf"
-    if [[ -f "$conf_file" ]] ; then
-        echo "configure live-installer" >> /tmp/livecd.log
-	local release=$(get_release)
-	sed -i "s|_version_|$release|g" $conf_file
-	sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
-	configure_live_image "$conf_file"
-    fi
-
-}
+# configure_live_installer_live(){
+#     local conf_file="/etc/live-installer/install.conf"
+#     if [[ -f "$conf_file" ]] ; then
+#         echo "configure live-installer" >> /tmp/livecd.log
+# 	local release=$(get_release)
+# 	sed -i "s|_version_|$release|g" $conf_file
+# 	sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
+# 	configure_live_image "$conf_file"
+#     fi
+# 
+# }
 
 configure_thus_live(){
     local conf_file="/etc/thus.conf"
@@ -379,9 +379,7 @@ configure_calamares_live(){
 
 fix_kdm(){
     xdg-icon-resource forceupdate --theme hicolor &> /dev/null
-    if [ -e "/usr/bin/update-desktop-database" ] ; then
-	update-desktop-database -q
-    fi
+    [[ -e "/usr/bin/update-desktop-database" ]] && update-desktop-database -q
 }
 
 fix_lightdm(){
@@ -390,18 +388,15 @@ fix_lightdm(){
     gpasswd -a ${username} autologin &> /dev/null
     
     getent group lightdm > /dev/null 2>&1 || groupadd -g 620 lightdm
-    getent passwd lightdm > /dev/null 2>&1 || useradd -c 'LightDM Display Manager' -u 620 -g lightdm -d /var/run/lightdm -s /usr/bin/nologin lightdm
+    getent passwd lightdm > /dev/null 2>&1 || useradd -c 'LightDM Display Manager' -u 620 -g lightdm -d /run/lightdm -s /usr/bin/nologin lightdm
     passwd -l lightdm > /dev/null
     
     mkdir -p /run/lightdm > /dev/null
     
     mkdir -p /var/lib/lightdm-data
     
-    #chown -R lightdm:lightdm /var/run/lightdm > /dev/null
-    #chown lightdm:lightdm /var/lib/lightdm-data
     chown lightdm:lightdm /run/lightdm
-    
-    
+        
     sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=1/' /etc/lightdm/lightdm.conf
     sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
        
