@@ -462,10 +462,6 @@ make_root_image() {
 	
 	# Clean up GnuPG keys
 	rm -rf "${work_dir}/root-image/etc/pacman.d/gnupg"
-	
-	# Change to given branch in options.conf
-	#sed -i -e "s/stable/$branch/" ${work_dir}/root-image/etc/pacman.d/mirrorlist
-	#sed -i -e "s/stable/$branch/" ${work_dir}/root-image/etc/pacman-mirrors.conf
 		
 	: > ${work_dir}/build.${FUNCNAME}
 	msg "Done [Base installation] (root-image)"
@@ -499,7 +495,7 @@ make_de_image() {
 	
 	umount -l ${work_dir}/${desktop}-image
 	
-	rm -R ${work_dir}/${desktop}-image/.wh*
+	#rm -R ${work_dir}/${desktop}-image/.wh*
 	: > ${work_dir}/build.${FUNCNAME}
 	msg "Done [${desktop} installation] (${desktop}-image)"
     fi
@@ -546,7 +542,7 @@ make_livecd_image() {
 	
 	umount -l ${work_dir}/livecd-image
 	
-	rm -R ${work_dir}/livecd-image/.wh*
+	#rm -R ${work_dir}/livecd-image/.wh*
 	
         : > ${work_dir}/build.${FUNCNAME}
 	msg "Done [livecd-image]"
