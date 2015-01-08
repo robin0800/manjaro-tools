@@ -17,14 +17,14 @@ gen_pw(){
 configure_machine_id(){
 # set unique machine-id
     msg2 "Setting machine-id ..."
-    chroot-run $1 dbus-uuidgen --ensure=/etc/machine-id
+    chroot $1 dbus-uuidgen --ensure=/etc/machine-id
 }
 
 # $1: chroot
 configure_user(){
     # set up user and password
     msg2 "Creating user: ${username} password: ${password} ..."
-    chroot-run $1 useradd -m -g users -G ${addgroups} -p $(gen_pw) ${username}
+    chroot $1 useradd -m -g users -G ${addgroups} -p $(gen_pw) ${username}
 }
 
 # $1: chroot
@@ -60,7 +60,7 @@ configure_services_live(){
       for svc in ${start_systemd_live[@]}; do
 # 	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
 	      msg2 "Setting $svc ..."
-	      chroot-run $1 systemctl enable $svc &> /dev/null
+	      chroot $1 systemctl enable $svc &> /dev/null
 # 	  fi
       done
    fi
@@ -81,7 +81,7 @@ configure_services(){
       for svc in ${start_systemd[@]}; do
 # 	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
 	      msg2 "Setting $svc ..."
-	      chroot-run $1 systemctl enable $svc &> /dev/null
+	      chroot $1 systemctl enable $svc &> /dev/null
 # 	 fi
       done
    fi
@@ -251,7 +251,7 @@ configure_displaymanager(){
 	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
 	ln -sf /etc/init.d/xdm $1/etc/runlevels/default/xdm
     else	
-	chroot-run $1 systemctl enable ${displaymanager} &> /dev/null
+	chroot $1 systemctl enable ${displaymanager} &> /dev/null
     fi
     
     msg2 "Configured: ${displaymanager}"
