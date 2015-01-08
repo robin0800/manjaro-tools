@@ -250,7 +250,10 @@ configure_displaymanager(){
 	sed -i -e "s|^.*DISPLAYMANAGER=.*|${_conf_xdm}|" $1/etc/conf.d/xdm
 	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
 	ln -sf /etc/init.d/xdm $1/etc/runlevels/default/xdm
-    else	
+    else
+	if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
+	    displaymanager=${displaymanager}-plymouth
+	fi
 	chroot $1 systemctl enable ${displaymanager} &> /dev/null
     fi
     
