@@ -172,9 +172,7 @@ _mkchroot(){
 command_create () {
     mkdir -p "${work_dir}/iso/${INSTALL_DIR}/${ARCH}"
 
-    if [ ! -z "${PKGLIST}" ]; then
-	_mkchroot "${PKGLIST}" #|| die "Failed to create chroot."
-    fi
+    [[ -n "${PKGLIST}" ]] && _mkchroot "${PKGLIST}"
     
     clean_up
 }
