@@ -78,10 +78,11 @@ fi
 
 basestrap -GMcd ${pac_conf:+-C "$pac_conf"} "$working_dir" \
   "${cache_dirs[@]/#/--cachedir=}" "$@" || die 'Failed to install all packages'
+  
+echo "$version" > "$working_dir/.manjaro-tools"
 
 ${build_locales} && printf '%s.UTF-8 UTF-8\n' en_US de_DE > "$working_dir/etc/locale.gen"
 ${build_locales} && echo 'LANG=C' > "$working_dir/etc/locale.conf"
-echo "$version" > "$working_dir/.manjaro-tools"
 
 exec chroot-run \
 	${pac_conf:+-C "$pac_conf"} \
