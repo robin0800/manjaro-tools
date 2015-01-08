@@ -71,7 +71,7 @@ alsactl -f /etc/asound.state store &>/dev/null
 
 [[ -e "/usr/bin/kalu" ]] && _rm_kalu
 
-configure_live_installer_live
+# configure_live_installer_live
 
 configure_thus_live
 
