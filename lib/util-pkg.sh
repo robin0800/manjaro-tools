@@ -52,7 +52,8 @@ chroot_clean(){
 
 chroot_update(){
     lock 9 "${chrootdir}/root.lock" "Locking clean chroot"
-    chroot-run ${mkchroot_args[*]} \
+    chrootrun_args="$(echo ${mkchroot_args[*]} | sed 's/-L//')"
+    chroot-run ${chrootrun_args} \
 	      "${chrootdir}/root" \
 	      pacman -Syu --noconfirm || abort
 }
