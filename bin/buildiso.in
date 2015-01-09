@@ -187,9 +187,10 @@ else
 fi
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
-create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_conf})
+# create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_conf})
+mkchroot_args+=(-C ${pacman_conf} -M ${mirrors_conf})
 
-iso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
+mkiso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 
 iso_file="${target_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
