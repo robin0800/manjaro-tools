@@ -16,6 +16,7 @@ version=@version@
 [[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
 
 working_dir=''
+build_locales=false
 
 usage() {
 	echo "Usage: ${0##*/} [options] working-dir [run arguments]"
@@ -29,13 +30,14 @@ usage() {
 	echo '    -r <list>     Bind mountargs ro'
 	echo '    -w <list>     Bind mountargs rw'
 	echo '                  List format [src1:target1,...,srcN:targetN]'
+	echo '    -L            Use mirrolist for pkgbuilding'
 	echo '    -h            This message'
 	exit 1
 }
 
 orig_argv=("$@")
 
-while getopts 'hC:M:S:c:r:w:' arg; do
+while getopts 'hLC:M:S:c:r:w:' arg; do
 	case "$arg" in
 		C) pac_conf="$OPTARG" ;;
 		M) makepkg_conf="$OPTARG" ;;
@@ -43,6 +45,7 @@ while getopts 'hC:M:S:c:r:w:' arg; do
 		c) cache_dir="$OPTARG" ;;
 		r) mountargs_ro="$OPTARG" ;;
 		w) mountargs_rw="$OPTARG" ;;
+		L) build_locales=true ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -63,9 +66,6 @@ else
 	cache_dirs=("$cache_dir")
 fi
 
-# host_mirror=$(pacman -Sddp community/manjaro-tools 2>/dev/null | sed -E "s#(.*/)(.*/)community/.*#\1branch/\$repo/\$arch#")
-# [[ $host_mirror == *file://* ]] && host_mirror_path=$(echo "$host_mirror" | sed -r 's#file://(/.*)/\$repo/os/\$arch#\1#g')
-
 copy_hostconf () {
 	cp -a /etc/pacman.d/gnupg "$working_dir/etc/pacman.d"
 
@@ -73,13 +73,19 @@ copy_hostconf () {
 	[[ -n $makepkg_conf ]] && cp $makepkg_conf "$working_dir/etc/makepkg.conf"
 	[[ -n $mirrors_conf ]] && cp ${mirrors_conf} "${working_dir}/etc/pacman-mirrors.conf"
 	
-	#local branch=$(cat "${working_dir}/etc/pacman-mirrors.conf" | grep '^Branch=' | sed 's/Branch=\s*//g')
-	source ${working_dir}/etc/pacman-mirrors.conf
-	#host_mirror=$(echo "$host_mirror" | sed -E "s#/branch/#/${branch}/#")
-		
-	#echo "Server = $host_mirror" >"$working_dir/etc/pacman.d/mirrorlist"
-	sed -e "s|/stable|/${Branch}|g" -i "$working_dir/etc/pacman.d/mirrorlist"
-	
+	if ${build_locales};then
+	    host_mirror=$(pacman -Sddp community/manjaro-tools 2>/dev/null | sed -E "s#(.*/)(.*/)community/.*#\1branch/\$repo/\$arch#")
+	    [[ $host_mirror == *file://* ]] && host_mirror_path=$(echo "$host_mirror" | sed -r 's#file://(/.*)/\$repo/os/\$arch#\1#g')
+	    
+	    local branch=$(cat "${working_dir}/etc/pacman-mirrors.conf" | grep '^Branch=' | sed 's/Branch=\s*//g')
+	    
+	    host_mirror=$(echo "$host_mirror" | sed -E "s#/branch/#/${branch}/#")
+	    echo "Server = $host_mirror" > "$working_dir/etc/pacman.d/mirrorlist"
+	else
+	    source ${working_dir}/etc/pacman-mirrors.conf	
+	    sed -e "s|/stable|/${Branch}|g" -i "$working_dir/etc/pacman.d/mirrorlist"
+	fi
+
 	sed -r "s|^#?\\s*CacheDir.+|CacheDir = $(echo -n ${cache_dirs[@]})|g" -i "$working_dir/etc/pacman.conf"
 }
 
