@@ -440,6 +440,26 @@ make_iso() {
     msg "Done [Build ISO]"
 }
 
+# $1: new branch
+aufs_mount_root_image(){
+    msg2 "mount root-image"
+    mount -t aufs -o br=$1:${work_dir}/root-image=ro none $1
+}
+
+# $1: del branch
+aufs_remove_image(){
+    if mountpoint -q $1;then
+	mount -o remount,mod:$1=ro ${work_dir}/root-image
+	mount -o remount,del:$1 ${work_dir}/root-image
+    fi
+}
+
+# $1: add branch
+aufs_append_de_image(){
+    msg2 "mount ${desktop}-image"
+    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none $1
+}
+
 # Base installation (root-image)
 make_root_image() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
@@ -450,13 +470,14 @@ make_root_image() {
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 		
-	cp ${work_dir}/root-image/etc/locale.gen.bak ${work_dir}/root-image/etc/locale.gen
+# 	cp ${work_dir}/root-image/etc/locale.gen.bak ${work_dir}/root-image/etc/locale.gen
+	
 	if [ -e ${work_dir}/root-image/boot/grub/grub.cfg ] ; then
 	    rm ${work_dir}/root-image/boot/grub/grub.cfg
 	fi
-	if [ -e ${work_dir}/root-image/etc/plymouth/plymouthd.conf ] ; then
-	    sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" ${work_dir}/root-image/etc/plymouth/plymouthd.conf
-	fi
+# 	if [ -e ${work_dir}/root-image/etc/plymouth/plymouthd.conf ] ; then
+# 	    sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" ${work_dir}/root-image/etc/plymouth/plymouthd.conf
+# 	fi
 	if [ -e ${work_dir}/root-image/etc/lsb-release ] ; then
 	    sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" ${work_dir}/root-image/etc/lsb-release
 	fi
@@ -481,7 +502,7 @@ make_de_image() {
 	    umount -l ${work_dir}/${desktop}-image
 	fi
 	
-	mount -t aufs -o br=${work_dir}/${desktop}-image:${work_dir}/root-image=ro none ${work_dir}/${desktop}-image
+	aufs_mount_root_image "${work_dir}/${desktop}-image"
 
 	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting."
 
@@ -496,9 +517,12 @@ make_de_image() {
 	# Clean up GnuPG keys
 	rm -rf "${work_dir}/${desktop}-image/etc/pacman.d/gnupg"
 	
+# 	sleep 10
+	
 	umount -l ${work_dir}/${desktop}-image
 	
-	#rm -R ${work_dir}/${desktop}-image/.wh*
+	rm -R ${work_dir}/${desktop}-image/.wh*
+	
 	: > ${work_dir}/build.${FUNCNAME}
 	msg "Done [${desktop} installation] (${desktop}-image)"
     fi
@@ -514,12 +538,10 @@ make_livecd_image() {
 	    umount -l ${work_dir}/livecd-image
 	fi
 	
-	msg2 "mount root-image"
-	mount -t aufs -o br=${work_dir}/livecd-image:${work_dir}/root-image=ro none ${work_dir}/livecd-image
+	aufs_mount_root_image "${work_dir}/livecd-image"
 	
 	if [ -n "${desktop}" ] ; then
-	    msg2 "mount ${desktop}-image"
-	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/livecd-image
+	    aufs_append_de_image "${work_dir}/livecd-image"
 	fi
 	
 	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting."
@@ -529,9 +551,7 @@ make_livecd_image() {
 	copy_overlay_livecd "${work_dir}/livecd-image"
 	
 	configure_livecd_image "${work_dir}/livecd-image"
-	
-        #wget -O ${work_dir}/overlay/etc/pacman.d/mirrorlist http://git.manjaro.org/packages-sources/basis/blobs/raw/master/pacman-mirrorlist/mirrorlist    
-        
+
         # copy over setup helpers and config loader
         copy_livecd_helpers "${work_dir}/livecd-image/opt/livecd"
         
@@ -545,7 +565,7 @@ make_livecd_image() {
 	
 	umount -l ${work_dir}/livecd-image
 	
-	#rm -R ${work_dir}/livecd-image/.wh*
+	rm -R ${work_dir}/livecd-image/.wh*
 	
         : > ${work_dir}/build.${FUNCNAME}
 	msg "Done [livecd-image]"
@@ -589,18 +609,17 @@ configure_xorg_drivers(){
 make_pkgs_image() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 	msg "Prepare [pkgs-image]"
+	
 	mkdir -p ${work_dir}/pkgs-image/opt/livecd/pkgs
 	
 	if [[ -n "$(mount -l | grep pkgs-image)" ]]; then
 	    umount -l ${work_dir}/pkgs-image
 	fi
-	
-	msg2 "mount root-image"
-	mount -t aufs -o br=${work_dir}/pkgs-image:${work_dir}/root-image=ro none ${work_dir}/pkgs-image
+
+	aufs_mount_root_image "${work_dir}/pkgs-image"
 	
 	if [[ -n "${desktop}" ]] ; then
-	    msg2 "mount ${desktop}-image"
-	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/pkgs-image
+	    aufs_append_de_image "${work_dir}/pkgs-image"
 	fi
 	
 	download_to_cache "${work_dir}/pkgs-image" "${cache_pkgs}" "${packages_xorg}"
@@ -620,6 +639,7 @@ make_pkgs_image() {
 	configure_xorg_drivers
 	
 	umount -l ${work_dir}/pkgs-image
+	
 	rm -R ${work_dir}/pkgs-image/.wh*
 	
 	: > ${work_dir}/build.${FUNCNAME}
@@ -636,12 +656,10 @@ make_lng_image() {
 	    umount -l ${work_dir}/lng-image
 	fi
 	
-	msg2 "mount root-image"
-	mount -t aufs -o br=${work_dir}/lng-image:${work_dir}/root-image=ro none ${work_dir}/lng-image
+	aufs_mount_root_image "${work_dir}/lng-image"
 	
 	if [[ -n "${desktop}" ]] ; then
-	    msg2 "mount ${desktop}-image"
-	    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/lng-image
+	    aufs_append_de_image "${work_dir}/lng-image"
 	fi
 
 	if [[ -n ${packages_lng_kde} ]]; then
@@ -666,6 +684,7 @@ make_lng_image() {
 	umount -l ${work_dir}/lng-image
 	
 	rm -R ${work_dir}/lng-image/.wh*
+	
 	: > ${work_dir}/build.${FUNCNAME}
 	msg "Done [lng-image]"
     fi
