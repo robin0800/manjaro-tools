@@ -30,7 +30,7 @@ usage() {
 	echo '    -r <list>     Bind mountargs ro'
 	echo '    -w <list>     Bind mountargs rw'
 	echo '                  List format [src1:target1,...,srcN:targetN]'
-	echo '    -L            Use mirrolist for pkgbuilding'
+	echo '    -L            Use fast mirrorlist for pkgbuilding'
 	echo '    -h            This message'
 	exit 1
 }
