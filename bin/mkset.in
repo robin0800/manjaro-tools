@@ -11,10 +11,23 @@
 
 version=@version@
 
+SYSCONFDIR='@sysconfdir@'
+
 [[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
 [[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
 
-load_config '@sysconfdir@' '@pkgdatadir@'
+set_owner=${SUDO_USER:-$USER}
+
+if [[ -n $SUDO_USER ]]; then
+    eval "USER_HOME=~$SUDO_USER"
+else
+    USER_HOME=$HOME
+fi
+
+USER_CONFIG="$USER_HOME/.config"
+
+load_config "${USER_CONFIG}/manjaro-tools.conf"  
+load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 create_set(){
     msg "Creating [${profiledir}/${name}.set] ..."
