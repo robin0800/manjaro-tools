@@ -969,6 +969,9 @@ load_desktop_definition(){
     if [ -e Packages-Kf5 ] ; then
 	pkgsfile="Packages-Kf5"
     fi
+    if [ -e Packages-i3 ] ; then
+	pkgsfile="Packages-i3"
+    fi
     if [ -e Packages-Custom ] ; then
     	pkgsfile="Packages-Custom"
     fi
