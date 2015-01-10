@@ -18,6 +18,7 @@ configure_machine_id(){
 # set unique machine-id
     msg2 "Setting machine-id ..."
     chroot $1 dbus-uuidgen --ensure=/etc/machine-id
+    chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
 }
 
 # $1: chroot
@@ -405,7 +406,7 @@ configure_livecd_image(){
     
     ${auto_svc_conf} && configure_services_live "$1"
     
-    configure_machine_id "$1"
+#     configure_machine_id "$1"
     
     configure_hostname "$1"
     
@@ -526,6 +527,8 @@ make_root_image() {
 	msg "Prepare [Base installation] (root-image)"
 	
 	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting." 
+	
+	configure_machine_id "${work_dir}/root-image"
 	
 # 	mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
 # 	
