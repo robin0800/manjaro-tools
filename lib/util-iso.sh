@@ -19,12 +19,12 @@ configure_machine_id(){
     msg2 "Setting machine-id ..."
     if [[ -z "$(echo $1 | grep root-image)" ]];then
 	chroot $1 dbus-uuidgen --ensure=/etc/machine-id
-	chroot $1 ln -s /etc/machine-id /var/lib/dbus/machine-id
+	chroot $1 cp /etc/machine-id /var/lib/dbus/machine-id
     else
 	mkdir -p $1/etc
         mkdir -p $1/var/lib/dbus
 	dbus-uuidgen --ensure=$1/etc/machine-id
-	ln -s /etc/machine-id $1/var/lib/dbus/machine-id
+	cp /etc/machine-id $1/var/lib/dbus/machine-id
     fi
 }
 

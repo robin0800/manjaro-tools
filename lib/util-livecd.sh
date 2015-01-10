@@ -19,7 +19,7 @@ configure_machine_id_live(){
 # set unique machine-id
     echo "Setting machine-id ..." >> /tmp/livecd.log
     dbus-uuidgen --ensure=/etc/machine-id
-    ln -s /etc/machine-id /var/lib/dbus/machine-id
+    ln -sf /etc/machine-id /var/lib/dbus/machine-id
 }
 
 configure_translation_pkgs_live(){
