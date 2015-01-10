@@ -15,6 +15,13 @@ check_ping(){
     echo $(LC_ALL=C ping -c 1 www.manjaro.org | grep "1 received")
 }
 
+configure_machine_id_live(){
+# set unique machine-id
+    echo "Setting machine-id ..." >> /tmp/livecd.log
+    dbus-uuidgen --ensure=/etc/machine-id
+    ln -s /etc/machine-id /var/lib/dbus/machine-id
+}
+
 configure_translation_pkgs_live(){
     # Determind which language we are using
     local LNG_INST=$(cat $1/etc/locale.conf | grep LANG= | cut -d= -f2 | cut -d. -f1)
