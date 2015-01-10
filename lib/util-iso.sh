@@ -18,7 +18,11 @@ configure_machine_id(){
 # set unique machine-id
     msg2 "Setting machine-id ..."
     chroot $1 dbus-uuidgen --ensure=/etc/machine-id
-    chroot $1 ln -s /etc/machine-id /var/lib/dbus/machine-id
+    if [[ -z "$(echo $1 | grep root-image)" ]];then
+	chroot $1 ln -s /etc/machine-id /var/lib/dbus/machine-id
+    else
+	chroot $1 cp /etc/machine-id /var/lib/dbus/machine-id
+    fi
 }
 
 # $1: chroot
