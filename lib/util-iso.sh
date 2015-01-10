@@ -18,7 +18,7 @@ configure_machine_id(){
 # set unique machine-id
     msg2 "Setting machine-id ..."
     chroot $1 dbus-uuidgen --ensure=/etc/machine-id
-    chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
+    chroot $1 cp /etc/machine-id /var/lib/dbus/machine-id
 }
 
 # $1: chroot
@@ -412,7 +412,7 @@ configure_livecd_image(){
     
     ${auto_svc_conf} && configure_services_live "$1"
     
-#     configure_machine_id "$1"
+    configure_machine_id "$1"
     
     configure_hostname "$1"
     
@@ -473,6 +473,14 @@ download_to_cache(){
 
 # Build ISO
 make_iso() {
+    # cleanup machine-id
+    if [[ -e ${work_dir}/root-image/etc/machine-id ]]; then
+        rm ${work_dir}/root-image/etc/machine-id &> /dev/null
+    fi
+    if [[ -e ${work_dir}/root-image/var/lib/dbus/machine-id ]]; then
+        rm ${work_dir}/root-image/var/lib/dbus/machine-id &> /dev/null
+    fi
+
     msg "Start [Build ISO]"
     touch "${work_dir}/iso/.miso"
     
@@ -531,10 +539,12 @@ make_root_image() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
     
 	msg "Prepare [Base installation] (root-image)"
-	
-	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting." 
-	
+
+	mkdir -p ${work_dir}/root-image/etc
+	mkdir -p ${work_dir}/root-image/var/lib/dbus
 	configure_machine_id "${work_dir}/root-image"
+	
+	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting."
 	
 # 	mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
 # 	
