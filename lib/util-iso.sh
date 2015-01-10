@@ -155,6 +155,9 @@ configure_displaymanager(){
 	    if [ -e "$1/usr/bin/pekwm" ] ; then
 		  sed -i -e 's/^.*user-session=.*/user-session=pekwm/' $1/etc/lightdm/lightdm.conf
 	    fi
+	    if [ -e "$1/usr/bin/i3" ] ; then
+		  sed -i -e 's/^.*user-session=.*/user-session=i3/' $1/etc/lightdm/lightdm.conf
+	    fi
 	;;
 	'kdm')
 	    sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" $1/usr/share/config/kdm/kdmrc
@@ -238,6 +241,9 @@ configure_displaymanager(){
 	    fi
 	    if [ -e "$1/usr/bin/pekwm" ] ; then
 		sed -i -e 's|^.*session=.*|session=/usr/bin/pekwm|' $1/etc/lxdm/lxdm.conf
+	    fi
+	    if [ -e "$1/usr/bin/i3" ] ; then
+		sed -i -e 's|^.*session=.*|session=/usr/bin/i3|' $1/etc/lxdm/lxdm.conf
 	    fi
 	;;
 	*) 
