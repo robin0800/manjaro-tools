@@ -480,14 +480,6 @@ download_to_cache(){
 
 # Build ISO
 make_iso() {
-    # cleanup machine-id
-    if [[ -e ${work_dir}/root-image/etc/machine-id ]]; then
-        rm ${work_dir}/root-image/etc/machine-id &> /dev/null
-    fi
-    if [[ -e ${work_dir}/root-image/var/lib/dbus/machine-id ]]; then
-        rm ${work_dir}/root-image/var/lib/dbus/machine-id &> /dev/null
-    fi
-
     msg "Start [Build ISO]"
     touch "${work_dir}/iso/.miso"
     
