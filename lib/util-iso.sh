@@ -547,12 +547,13 @@ make_root_image() {
     
 	msg "Prepare [Base installation] (root-image)"
 
-	mkdir -p ${work_dir}/root-image/etc
-	mkdir -p ${work_dir}/root-image/var/lib/dbus
-	configure_machine_id "${work_dir}/root-image"
+	
 	
 	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting."
 	
+	#mkdir -p ${work_dir}/root-image/etc
+	#mkdir -p ${work_dir}/root-image/var/lib/dbus
+	configure_machine_id "${work_dir}/root-image"
 # 	mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
 # 	
 # 	setarch ${arch} \
