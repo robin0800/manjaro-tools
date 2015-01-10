@@ -372,6 +372,7 @@ configure_thus_live(){
 	sed -i "s|_version_|$release|g" $conf_file
 	sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
 	configure_live_image "$conf_file"
+	cp /usr/share/applications/thus.desktop /etc/skel/Desktop/thus.desktop
     fi
 }
 
@@ -381,6 +382,7 @@ configure_calamares_live(){
         echo "configure calamares" >> /tmp/livecd.log
 	sed -i "s|_kernel_|$manjaro_kernel|g" "/usr/share/calamares/modules/initcpio.conf"
 	configure_live_image "$conf_file"
+	cp /usr/share/applications/calamares.desktop /etc/skel/Desktop/calamares.desktop
     fi
 }
 
