@@ -78,3 +78,7 @@ configure_machine_id_live
 configure_thus_live
 
 configure_calamares_live
+
+# configure documentation
+[[ -e "/etc/skel/Manjaro/Beginner_User_Guide.pdf" ]] && ln -sf \
+/etc/skel/Manjaro/Beginner_User_Guide.pdf "/etc/skel/Desktop/Beginner User Guide.pdf"
