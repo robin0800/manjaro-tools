@@ -474,29 +474,29 @@ make_iso() {
     msg "Done [Build ISO]"
 }
 
-clean_image(){
-    msg2 "Cleaning up what we can"
-    
-    find "$1/etc" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-    
-    if [ -d "$1/boot/" ]; then
-	# remove the initcpio images that were generated for the host system
-	find "$1/boot" -name 'initramfs*.img' -delete &>/dev/null
-    fi
-
-    # Delete pacman database sync cache files (*.tar.gz)
-    find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
-    # Delete pacman database sync cache
-    find "$1/var/lib/pacman/sync" -delete &>/dev/null
-    # Delete pacman package cache
-    find "$1/var/cache/pacman/pkg" -type f -delete &>/dev/null
-    # Delete all log files, keeps empty dirs.
-    find "$1/var/log" -type f -delete &>/dev/null
-    # Delete all temporary files and dirs
-    find "$1/var/tmp" -mindepth 1 -delete &>/dev/null
-    # Delete all temporary files and dirs
-    find "$1/tmp" -mindepth 1 -delete &>/dev/null
-}
+# clean_image(){
+#     msg2 "Cleaning up what we can"
+#     
+#     find "$1/etc" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+#     
+#     if [ -d "$1/boot/" ]; then
+# 	# remove the initcpio images that were generated for the host system
+# 	find "$1/boot" -name 'initramfs*.img' -delete &>/dev/null
+#     fi
+# 
+#     # Delete pacman database sync cache files (*.tar.gz)
+#     find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
+#     # Delete pacman database sync cache
+#     find "$1/var/lib/pacman/sync" -delete &>/dev/null
+#     # Delete pacman package cache
+#     find "$1/var/cache/pacman/pkg" -type f -delete &>/dev/null
+#     # Delete all log files, keeps empty dirs.
+#     find "$1/var/log" -type f -delete &>/dev/null
+#     # Delete all temporary files and dirs
+#     find "$1/var/tmp" -mindepth 1 -delete &>/dev/null
+#     # Delete all temporary files and dirs
+#     find "$1/tmp" -mindepth 1 -delete &>/dev/null
+# }
 
 # $1: new branch
 aufs_mount_root_image(){
@@ -525,14 +525,14 @@ make_root_image() {
     
 	msg "Prepare [Base installation] (root-image)"
 	
-# 	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting." 
+	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting." 
 	
-	mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
-	
-	setarch ${arch} \
-	mkchroot ${mkchroot_args[*]} ${work_dir}/root-image ${packages} || die "Please check you Packages file! Exiting." 
-	
-	clean_image "${work_dir}/root-image"
+# 	mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
+# 	
+# 	setarch ${arch} \
+# 	mkchroot ${mkchroot_args[*]} ${work_dir}/root-image ${packages} || die "Please check you Packages file! Exiting." 
+# 	
+# 	clean_image "${work_dir}/root-image"
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 		
@@ -571,12 +571,12 @@ make_de_image() {
 	
 	aufs_mount_root_image "${work_dir}/${desktop}-image"
 
-# 	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting."
+	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting."
 	
-	setarch ${arch} \
-	mkchroot ${mkchroot_args[*]} ${work_dir}/${desktop}-image ${packages_de} || die "Please check you Packages-${desktop} file! Exiting." && aufs_remove_image "${work_dir}/${desktop}-image"
-	
-	clean_image "${work_dir}/${desktop}-image"
+# 	setarch ${arch} \
+# 	mkchroot ${mkchroot_args[*]} ${work_dir}/${desktop}-image ${packages_de} || die "Please check you Packages-${desktop} file! Exiting." && aufs_remove_image "${work_dir}/${desktop}-image"
+# 	
+# 	clean_image "${work_dir}/${desktop}-image"
 	
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
@@ -619,12 +619,12 @@ make_livecd_image() {
 	    aufs_append_de_image "${work_dir}/livecd-image"
 	fi
 	
-# 	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting."
+	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting."
 	
-	setarch ${arch} \
-	mkchroot ${mkchroot_args[*]} ${work_dir}/livecd-image ${livecd_packages} || die "Please check you Packages-Livecd file! Exiting." && aufs_remove_image "${work_dir}/livecd-image"
-	
-	clean_image "${work_dir}/livecd-image"
+# 	setarch ${arch} \
+# 	mkchroot ${mkchroot_args[*]} ${work_dir}/livecd-image ${livecd_packages} || die "Please check you Packages-Livecd file! Exiting." && aufs_remove_image "${work_dir}/livecd-image"
+# 	
+# 	clean_image "${work_dir}/livecd-image"
 	
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
