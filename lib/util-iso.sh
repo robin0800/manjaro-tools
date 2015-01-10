@@ -24,7 +24,7 @@ configure_machine_id(){
 	mkdir -p $1/etc
         mkdir -p $1/var/lib/dbus
 	dbus-uuidgen --ensure=$1/etc/machine-id
-	cp /etc/machine-id $1/var/lib/dbus/machine-id
+	cp $1/etc/machine-id $1/var/lib/dbus/machine-id
     fi
 }
 
