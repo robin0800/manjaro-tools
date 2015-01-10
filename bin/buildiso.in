@@ -174,7 +174,7 @@ done
 
 shift $(($OPTIND - 1))
 
-work_dir=${work_dir}/${desktop}/${arch}
+# work_dir=${work_dir}/${desktop}/${arch}
 
 if [[ "$arch" == 'x86_64' ]]; then
     pacman_conf_arch='multilib'
@@ -195,6 +195,8 @@ mkiso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 iso_file="${target_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
 iso_profile=${PWD##*/}
+
+work_dir=${work_dir}/${iso_profile}/${arch}
 
 displaymanager=$(cat ${PWD}/displaymanager)
 initsys=$(cat ${PWD}/initsys)
