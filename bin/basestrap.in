@@ -97,6 +97,13 @@ if ! pacman -r "$newroot" -Sy "${pacman_args[@]}"; then
   die 'Failed to install packages to new root'
 fi
 
+# enable to have more debug info
+#msg "machine-id (etc): $(cat $newroot/etc/machine-id)"
+#[[ -e $newroot/var/lib/dbus/machine-id ]] && msg "machine-id (lib): $(cat $newroot/var/lib/dbus/machine-id)"
+#msg "running processes: "
+#lsof | grep $newroot
+
+# kill chroot process if needed (TODO: check if needed at all)
 PREFIX="$newroot"
 for ROOT in /proc/*/root; do
   LINK=$(readlink $ROOT)

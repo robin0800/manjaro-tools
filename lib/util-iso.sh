@@ -19,12 +19,12 @@ configure_machine_id(){
     msg2 "Setting machine-id ..."
     if [[ -z "$(echo $1 | grep root-image)" ]];then
 	chroot $1 dbus-uuidgen --ensure=/etc/machine-id
-	chroot $1 cp /etc/machine-id /var/lib/dbus/machine-id
+	chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
     else
 	mkdir -p $1/etc
         mkdir -p $1/var/lib/dbus
 	dbus-uuidgen --ensure=$1/etc/machine-id
-	cp $1/etc/machine-id $1/var/lib/dbus/machine-id
+	dbus-uuidgen --ensure=$1/var/lib/dbus/machine-id
     fi
 }
 
@@ -511,9 +511,29 @@ make_root_image() {
     
 	msg "Prepare [Base installation] (root-image)"
 
-	configure_machine_id "${work_dir}/root-image"
-	
+# 	configure_machine_id "${work_dir}/root-image"
+
+#	mkdir -p "${work_dir}/root-image"/etc
+#	mkdir -p "${work_dir}/root-image"/var/lib/dbus
+#	ln -sf /etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
+
+#	cp /etc/machine-id "${work_dir}/root-image"/etc/machine-id
+#	cp "${work_dir}/root-image"/etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
+
 	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting."
+
+#	cp /etc/machine-id "${work_dir}/root-image"/etc/machine-id
+#	cp /etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
+#	cp "${work_dir}/root-image"/etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
+
+# 	configure_machine_id "${work_dir}/root-image"
+
+# 	mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
+# 	
+# 	setarch ${arch} \
+# 	mkchroot ${mkchroot_args[*]} ${work_dir}/root-image ${packages} || die "Please check you Packages file! Exiting." 
+# 	
+# 	clean_image "${work_dir}/root-image"
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 		
