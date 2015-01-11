@@ -528,17 +528,10 @@ make_root_image() {
 #	cp "${work_dir}/root-image"/etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
 
 # 	configure_machine_id "${work_dir}/root-image"
-
-# 	mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
-# 	
-# 	setarch ${arch} \
-# 	mkchroot ${mkchroot_args[*]} ${work_dir}/root-image ${packages} || die "Please check you Packages file! Exiting." 
-# 	
-# 	clean_image "${work_dir}/root-image"
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 		
-# 	cp ${work_dir}/root-image/etc/locale.gen.bak ${work_dir}/root-image/etc/locale.gen
+	cp ${work_dir}/root-image/etc/locale.gen.bak ${work_dir}/root-image/etc/locale.gen
 	
 	if [ -e ${work_dir}/root-image/boot/grub/grub.cfg ] ; then
 	    rm ${work_dir}/root-image/boot/grub/grub.cfg

@@ -93,9 +93,9 @@ build_mount_args() {
     track_mount "/etc/resolv.conf" "${working_dir}/etc/resolv.conf" -B
     track_mount "${cache_dirs[0]}" "${working_dir}${cache_dirs[0]}" -B
 
-#     for cache_dir in ${cache_dirs[@]:1}; do
-# 	track_mount "$cache_dir" "${working_dir}${cache_dir}" -Br
-#     done
+    for cache_dir in ${cache_dirs[@]:1}; do
+	track_mount "$cache_dir" "${working_dir}${cache_dir}" -Br
+    done
     
     if [[ -n ${mountargs_ro[@]} ]];then
 	local IFS=','

@@ -188,7 +188,6 @@ fi
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_conf})
-# mkchroot_args+=(-C ${pacman_conf} -M ${mirrors_conf})
 
 mkiso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 
