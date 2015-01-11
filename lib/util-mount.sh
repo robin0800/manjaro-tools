@@ -57,10 +57,10 @@ ignore_error() {
 }
 
 track_mount() {
-# 	if [[ -z $CHROOT_ACTIVE_MOUNTS ]]; then
-# 	  CHROOT_ACTIVE_MOUNTS=()
-# 	  trap 'chroot_umount' EXIT
-# 	fi
+	if [[ -z $CHROOT_ACTIVE_MOUNTS ]]; then
+	  CHROOT_ACTIVE_MOUNTS=()
+	  trap 'chroot_umount' EXIT
+	fi
 
 	mount "$@" && CHROOT_ACTIVE_MOUNTS=("$2" "${CHROOT_ACTIVE_MOUNTS[@]}")
 }
@@ -73,9 +73,9 @@ mount_conditionally() {
 }
 
 api_fs_mount() {
-	CHROOT_ACTIVE_MOUNTS=()
-	[[ $(trap -p EXIT) ]] && die '(BUG): attempting to overwrite existing EXIT trap'
-	trap 'chroot_umount' EXIT
+# 	CHROOT_ACTIVE_MOUNTS=()
+# 	[[ $(trap -p EXIT) ]] && die '(BUG): attempting to overwrite existing EXIT trap'
+# 	trap 'chroot_umount' EXIT
 	mount_conditionally "! mountpoint -q '$1'" "$1" "$1" --bind &&
 	track_mount proc "$1/proc" -t proc -o nosuid,noexec,nodev &&
 	track_mount sys "$1/sys" -t sysfs -o nosuid,noexec,nodev,ro &&
@@ -90,7 +90,7 @@ api_fs_mount() {
 
 chroot_umount() {
 	umount "${CHROOT_ACTIVE_MOUNTS[@]}"
-	unset CHROOT_ACTIVE_MOUNTS
+# 	unset CHROOT_ACTIVE_MOUNTS
 }
 
 fstype_is_pseudofs() {
