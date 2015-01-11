@@ -480,7 +480,8 @@ make_iso() {
     touch "${work_dir}/iso/.miso"
     
     mkiso ${mkiso_args[*]} iso "${work_dir}" "${iso_file}"
-    chown -R "${iso_owner}:users" "${target_dir}"
+#    FIXME: why do we need this?
+#    chown -R "${iso_owner}:users" "${target_dir}"
     msg "Done [Build ISO]"
 }
 
