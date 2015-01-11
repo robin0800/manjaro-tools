@@ -106,15 +106,16 @@ fi
 # kill chroot process if needed (TODO: check if needed at all)
 PREFIX="$newroot"
 for ROOT in /proc/*/root; do
-  LINK=$(readlink $ROOT)
-  if [ "x$LINK" != "x" ]; then
-    if [ "x${LINK:0:${#PREFIX}}" = "x$PREFIX" ]; then
-      # this process is in the chroot...
-      PID=$(basename $(dirname "$ROOT"))
-      msg "Killing chroot process: $PID"
-      kill -9 "$PID"
+    LINK=$(readlink $ROOT)
+    if [ "x$LINK" != "x" ]; then
+        if [ "x${LINK:0:${#PREFIX}}" = "x$PREFIX" ]; then
+            # this process is in the chroot...
+            PID=$(basename $(dirname "$ROOT"))
+            NAME=$(ps -p $PID -o comm=)
+            msg "Killing chroot process: $NAME ($PID)"
+            kill -9 "$PID"
+        fi
     fi
-  fi
 done
 
 if (( copykeyring )); then
