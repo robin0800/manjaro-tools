@@ -97,6 +97,19 @@ if ! pacman -r "$newroot" -Sy "${pacman_args[@]}"; then
   die 'Failed to install packages to new root'
 fi
 
+PREFIX="$newroot"
+for ROOT in /proc/*/root; do
+  LINK=$(readlink $ROOT)
+  if [ "x$LINK" != "x" ]; then
+    if [ "x${LINK:0:${#PREFIX}}" = "x$PREFIX" ]; then
+      # this process is in the chroot...
+      PID=$(basename $(dirname "$ROOT"))
+      msg "Killing chroot process: $PID"
+      kill -9 "$PID"
+    fi
+  fi
+done
+
 if (( copykeyring )); then
   # if there's a keyring on the host, copy it into the new root, unless it exists already
   if [[ -d /etc/pacman.d/gnupg && ! -d $newroot/etc/pacman.d/gnupg ]]; then
