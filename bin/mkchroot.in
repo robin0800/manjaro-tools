@@ -37,7 +37,7 @@ while getopts 'hLC:M:S:c:' arg; do
 		M) makepkg_conf="$OPTARG" ;;
 		S) mirrors_conf="$OPTARG" ;;
 		c) cache_dir="$OPTARG" ;;
-		L) build_locales=true ;;
+		L) build_locales=true; bl_args+=(-L) ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -91,5 +91,6 @@ exec chroot-run \
 	${makepkg_conf:+-M "$makepkg_conf"} \
 	${mirrors_conf:+-S "$mirrors_conf"} \
 	${cache_dir:+-c "$cache_dir"} \
+	${bl_args[*]} \
 	"$working_dir" locale-gen
 
