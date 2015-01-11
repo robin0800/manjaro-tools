@@ -415,7 +415,7 @@ configure_livecd_image(){
     
     ${auto_svc_conf} && configure_services_live "$1"
     
-    #configure_machine_id "$1"
+#    configure_machine_id "$1"
     
     configure_hostname "$1"
     
@@ -620,8 +620,8 @@ make_livecd_image() {
         
         copy_startup_scripts "${work_dir}/livecd-image/usr/bin"
         
-#         cp ${work_dir}/root-image/etc/pacman.d/mirrorlist ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
-#         sed -i "s/#Server/Server/g" ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
+#        cp ${work_dir}/root-image/etc/pacman.d/mirrorlist ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
+#        sed -i "s/#Server/Server/g" ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
        	
 	# Clean up GnuPG keys?
 	rm -rf "${work_dir}/livecd-image/etc/pacman.d/gnupg"

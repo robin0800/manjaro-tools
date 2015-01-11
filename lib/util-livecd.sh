@@ -246,7 +246,7 @@ configure_user_root_live(){
 }
 
 configure_alsa_live(){
-    #set_alsa
+    echo "configure alsa" >> /tmp/livecd.log
     # amixer binary
     local alsa_amixer="chroot $1 /usr/bin/amixer"
 
@@ -372,8 +372,9 @@ configure_thus_live(){
 	sed -i "s|_version_|$release|g" $conf_file
 	sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
 	configure_live_image "$conf_file"
-	cp /usr/share/applications/thus.desktop /etc/skel/Desktop/thus.desktop
-	chmod a+x /etc/skel/Desktop/thus.desktop
+	mkdir -p /home/${username}/Desktop
+	cp /usr/share/applications/thus.desktop /home/${username}/Desktop/thus.desktop
+	chmod a+x /home/${username}/Desktop/thus.desktop
     fi
 }
 
@@ -383,8 +384,9 @@ configure_calamares_live(){
         echo "configure calamares" >> /tmp/livecd.log
 	sed -i "s|_kernel_|$manjaro_kernel|g" "/usr/share/calamares/modules/initcpio.conf"
 	configure_live_image "$conf_file"
-	cp /usr/share/applications/calamares.desktop /etc/skel/Desktop/calamares.desktop
-	chmod a+x /etc/skel/Desktop/calamares.desktop
+	mkdir -p /home/${username}/Desktop
+	cp /usr/share/applications/calamares.desktop /home/${username}/Desktop/calamares.desktop
+	chmod a+x /home/${username}/Desktop/calamares.desktop
     fi
 }
 
@@ -408,7 +410,7 @@ fix_lightdm(){
     
     chown lightdm:lightdm /run/lightdm
         
-    sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=1/' /etc/lightdm/lightdm.conf
+    sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
     sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
        
 }

@@ -43,11 +43,14 @@ configure_gnome_live
 # fix_ping_installation
 configure_ping_live
 
+echo "depmod extramodules" >> /tmp/livecd.log
+
 # depmod extramodules
 depmod $(cat /usr/lib/modules/${_KV}/extramodules/version)
 
 # check if we are running inside a virtual machine and unistall kalu
 DESTDIR="/"
+[[ -e "/usr/bin/kalu" ]] && _rm_kalu
 
 install_localization_live "${DESTDIR}"
 
@@ -59,18 +62,6 @@ echo "configure root password" >> /tmp/livecd.log
 configure_user_root_live "${DESTDIR}"
 cp -a /etc/skel/. /root/
 
-echo "configure alsa" >> /tmp/livecd.log
-
-# configure pulse
-[[ -e "/usr/bin/pulseaudio-ctl" ]] && pulseaudio-ctl normal
-
-configure_alsa_live "${DESTDIR}"
-
-# save settings
-alsactl -f /etc/asound.state store &>/dev/null
-
-[[ -e "/usr/bin/kalu" ]] && _rm_kalu
-
 configure_machine_id_live
 
 # configure_live_installer_live
@@ -81,4 +72,12 @@ configure_calamares_live
 
 # configure documentation
 [[ -e "/etc/skel/Manjaro/Beginner_User_Guide.pdf" ]] && ln -sf \
-/etc/skel/Manjaro/Beginner_User_Guide.pdf "/etc/skel/Desktop/Beginner User Guide.pdf"
+/etc/skel/Manjaro/Beginner_User_Guide.pdf "/home/${username}/Desktop/Beginner User Guide.pdf"
+
+configure_alsa_live "${DESTDIR}"
+
+# save settings
+alsactl -f /etc/asound.state store &>/dev/null
+
+# configure pulse
+[[ -e "/usr/bin/pulseaudio-ctl" ]] && /opt/livecd/pulseaudio-ctl-normal
