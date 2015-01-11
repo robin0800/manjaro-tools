@@ -17,6 +17,7 @@ eval_profile(){
 }
 
 chroot_create(){
+    msg "Creating chroot for [${branch}] (${arch})..."
     mkdir -p "${chrootdir}"
     setarch "${arch}" mkchroot \
 	    ${mkchroot_args[*]} \
@@ -42,6 +43,7 @@ chroot_clean(){
 }
 
 chroot_update(){
+    msg "Updating chroot for [${branch}] (${arch})..."
     lock 9 "${chrootdir}/root.lock" "Locking clean chroot"
     chroot-run ${mkchroot_args[*]} \
 	      "${chrootdir}/root" \
@@ -119,12 +121,12 @@ chroot_build(){
 }
 
 chroot_init(){
-    if ${clean_first} || [[ ! -d "${chrootdir}" ]]; then
-	msg "Creating chroot for [${branch}] (${arch})..."
+    if ${clean_first}; then
 	chroot_clean
 	chroot_create
+    elif [[ ! -d "${chrootdir}" ]]; then
+	chroot_create
     else
-	msg "Updating chroot for [${branch}] (${arch})..."
 	chroot_update
     fi
 }
