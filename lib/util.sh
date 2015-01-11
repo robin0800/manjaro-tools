@@ -368,3 +368,12 @@ load_config(){
     
     return 0
 }
+
+load_sets(){
+    local prof temp
+    for item in $(ls ${profiledir}/*.set); do
+	temp=${item##*/}
+	prof=${prof:-}${prof:+|}${temp%.set}
+    done
+    echo $prof
+}

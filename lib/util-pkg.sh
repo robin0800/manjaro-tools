@@ -9,15 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-load_sets(){
-    local prof temp
-    for item in $(ls ${profiledir}/*.set); do
-	temp=${item##*/}
-	prof=${prof:-}${prof:+|}${temp%.set}
-    done
-    echo $prof
-}
-
 eval_profile(){
     eval "case $1 in
 	    $(load_sets)) is_profile=true ;;
