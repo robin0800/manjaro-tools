@@ -66,10 +66,8 @@ configure_services_live(){
    else
       msg2 "Congiguring SystemD ...."
       for svc in ${start_systemd_live[@]}; do
-# 	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
-	      msg2 "Setting $svc ..."
-	      chroot $1 systemctl enable $svc &> /dev/null
-# 	  fi
+	  msg2 "Setting $svc ..."
+	  chroot $1 systemctl enable $svc &> /dev/null
       done
    fi
 }
@@ -87,10 +85,8 @@ configure_services(){
    else
       msg2 "Congiguring SystemD ...."
       for svc in ${start_systemd[@]}; do
-# 	  if [[ -f $1/usr/lib/systemd/system/$svc ]];then
-	      msg2 "Setting $svc ..."
-	      chroot $1 systemctl enable $svc &> /dev/null
-# 	 fi
+	  msg2 "Setting $svc ..."
+	  chroot $1 systemctl enable $svc &> /dev/null
       done
    fi
 }
@@ -488,30 +484,6 @@ make_iso() {
     msg "Done [Build ISO]"
 }
 
-# clean_image(){
-#     msg2 "Cleaning up what we can"
-#     
-#     find "$1/etc" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-#     
-#     if [ -d "$1/boot/" ]; then
-# 	# remove the initcpio images that were generated for the host system
-# 	find "$1/boot" -name 'initramfs*.img' -delete &>/dev/null
-#     fi
-# 
-#     # Delete pacman database sync cache files (*.tar.gz)
-#     find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
-#     # Delete pacman database sync cache
-#     find "$1/var/lib/pacman/sync" -delete &>/dev/null
-#     # Delete pacman package cache
-#     find "$1/var/cache/pacman/pkg" -type f -delete &>/dev/null
-#     # Delete all log files, keeps empty dirs.
-#     find "$1/var/log" -type f -delete &>/dev/null
-#     # Delete all temporary files and dirs
-#     find "$1/var/tmp" -mindepth 1 -delete &>/dev/null
-#     # Delete all temporary files and dirs
-#     find "$1/tmp" -mindepth 1 -delete &>/dev/null
-# }
-
 # $1: new branch
 aufs_mount_root_image(){
     msg2 "mount root-image"
@@ -540,14 +512,8 @@ make_root_image() {
 	msg "Prepare [Base installation] (root-image)"
 
 	configure_machine_id "${work_dir}/root-image"
+	
 	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting."
-
-# 	mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
-# 	
-# 	setarch ${arch} \
-# 	mkchroot ${mkchroot_args[*]} ${work_dir}/root-image ${packages} || die "Please check you Packages file! Exiting." 
-# 	
-# 	clean_image "${work_dir}/root-image"
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 		
@@ -575,24 +541,17 @@ make_root_image() {
 
 make_de_image() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+    
 	msg "Prepare [${desktop} installation] (${desktop}-image)"
 	
 	mkdir -p ${work_dir}/${desktop}-image
 	
-# 	if [[ -n "$(mount -l | grep ${desktop}-image)" ]]; then
-# 	    umount -l ${work_dir}/${desktop}-image
-# 	fi
 	aufs_remove_image "${work_dir}/${desktop}-image"
 	
 	aufs_mount_root_image "${work_dir}/${desktop}-image"
 
 	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting."
-	
-# 	setarch ${arch} \
-# 	mkchroot ${mkchroot_args[*]} ${work_dir}/${desktop}-image ${packages_de} || die "Please check you Packages-${desktop} file! Exiting." && aufs_remove_image "${work_dir}/${desktop}-image"
-# 	
-# 	clean_image "${work_dir}/${desktop}-image"
-	
+
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
 	cp "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt" ${target_dir}/${img_name}-${desktop}-${iso_version}-${arch}-pkgs.txt
@@ -604,9 +563,6 @@ make_de_image() {
 	# Clean up GnuPG keys
 	rm -rf "${work_dir}/${desktop}-image/etc/pacman.d/gnupg"
 	
-# 	sleep 10
-	
-# 	umount -l ${work_dir}/${desktop}-image
 	aufs_remove_image "${work_dir}/${desktop}-image"
 	
 	rm -R ${work_dir}/${desktop}-image/.wh*
@@ -618,13 +574,10 @@ make_de_image() {
 
 make_livecd_image() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+    
 	msg "Prepare [livecd-image]"
 	
 	mkdir -p ${work_dir}/livecd-image
-	
-# 	if [ -n "$(mount -l | grep livecd-image)" ]; then
-# 	    umount -l ${work_dir}/livecd-image
-# 	fi
 	
 	aufs_remove_image "${work_dir}/livecd-image"
 	
@@ -635,11 +588,6 @@ make_livecd_image() {
 	fi
 	
 	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting."
-	
-# 	setarch ${arch} \
-# 	mkchroot ${mkchroot_args[*]} ${work_dir}/livecd-image ${livecd_packages} || die "Please check you Packages-Livecd file! Exiting." && aufs_remove_image "${work_dir}/livecd-image"
-# 	
-# 	clean_image "${work_dir}/livecd-image"
 	
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
@@ -658,7 +606,6 @@ make_livecd_image() {
 	# Clean up GnuPG keys?
 	rm -rf "${work_dir}/livecd-image/etc/pacman.d/gnupg"
 	
-# 	umount -l ${work_dir}/livecd-image
 	aufs_remove_image "${work_dir}/livecd-image"
 	
 	rm -R ${work_dir}/livecd-image/.wh*
@@ -674,10 +621,6 @@ make_pkgs_image() {
 	msg "Prepare [pkgs-image]"
 	
 	mkdir -p ${work_dir}/pkgs-image/opt/livecd/pkgs
-	
-# 	if [[ -n "$(mount -l | grep pkgs-image)" ]]; then
-# 	    umount -l ${work_dir}/pkgs-image
-# 	fi
 	
 	aufs_remove_image "${work_dir}/pkgs-image"
 	
@@ -703,7 +646,6 @@ make_pkgs_image() {
 	
 	configure_xorg_drivers
 	
-# 	umount -l ${work_dir}/pkgs-image
 	aufs_remove_image "${work_dir}/pkgs-image"
 	
 	rm -R ${work_dir}/pkgs-image/.wh*
@@ -718,9 +660,6 @@ make_lng_image() {
 	msg "Prepare [lng-image]"
 	mkdir -p ${work_dir}/lng-image/opt/livecd/lng
 	
-# 	if [[ -n "$(mount -l | grep lng-image)" ]]; then
-# 	    umount -l ${work_dir}/lng-image
-# 	fi
 	aufs_remove_image "${work_dir}/lng-image"
 	
 	aufs_mount_root_image "${work_dir}/lng-image"
@@ -748,7 +687,6 @@ make_lng_image() {
 	
 	make_repo ${work_dir}/lng-image/opt/livecd/lng/lng-pkgs ${work_dir}/lng-image/opt/livecd/lng
 	
-# 	umount -l ${work_dir}/lng-image
 	aufs_remove_image "${work_dir}/lng-image"
 	
 	rm -R ${work_dir}/lng-image/.wh*
@@ -778,19 +716,11 @@ make_boot() {
 	cp ${work_dir}/root-image/boot/vmlinuz* ${work_dir}/iso/${install_dir}/boot/${arch}/${manjaroiso}
         mkdir -p ${work_dir}/boot-image
         
-#         if [ ! -z "$(mount -l | grep boot-image)" ]; then
-#            umount -l ${work_dir}/boot-image/{proc,sys,dev}
-#            umount ${work_dir}/boot-image
-#         fi
 	aufs_remove_image "${work_dir}/boot-image"
         
-#         msg2 "mount root-image"
-#         mount -t aufs -o br=${work_dir}/boot-image:${work_dir}/root-image=ro none ${work_dir}/boot-image
         aufs_mount_root_image "${work_dir}/boot-image"
         
         if [ ! -z "${desktop}" ] ; then
-#              msg2 "mount ${desktop}-image"
-#              mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none ${work_dir}/boot-image
 	    aufs_append_de_image "${work_dir}/boot-image"
         fi
         
@@ -802,7 +732,6 @@ make_boot() {
         cp ${work_dir}/boot-image/boot/intel-ucode.img ${work_dir}/iso/${install_dir}/boot/intel_ucode.img
         cp ${work_dir}/boot-image/usr/share/licenses/intel-ucode/LICENSE ${work_dir}/iso/${install_dir}/boot/intel_ucode.LICENSE
                 
-#         umount ${work_dir}/boot-image
         aufs_remove_image "${work_dir}/boot-image"
         
         rm -R ${work_dir}/boot-image
@@ -988,12 +917,8 @@ load_desktop_definition(){
 get_pkglist_xorg(){
     if [ "${arch}" == "i686" ]; then
 	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-# 	packages_free=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-# 	packages_nonfree=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni.*||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|^.*catalyst-legacy.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
 	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-# 	packages_free=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni.*||g" | sed "s|>nonfree_x64.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-# 	packages_nonfree=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g" | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni.*||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|^.*catalyst-legacy.*||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
     packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 }

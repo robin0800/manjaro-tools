@@ -158,7 +158,7 @@ while getopts "${opts}" arg; do
 	b) branch="$OPTARG" ;;
 	r) work_dir="$OPTARG" ;;
 	t) target_dir="$OPTARG" ;;
-	v) verbose=true; iso_args+=(-v) ;;
+	v) verbose=true; mkiso_args+=(-v) ;;
 	B) images_only=true ;;
 	G) iso_only=true ;;
 	q) pretend=true ;;
