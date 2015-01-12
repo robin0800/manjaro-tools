@@ -35,7 +35,7 @@ usage: ${0##*/} [options] root [packages...]
 
     -h             Print this help message
 
-pacstrap installs packages to the specified new root directory. If no packages
+basestrap installs packages to the specified new root directory. If no packages
 are given, pacstrap defaults to the "base" group.
 
 EOF
@@ -104,6 +104,8 @@ fi
 #lsof | grep $newroot
 
 # kill chroot process if needed (TODO: check if needed at all)
+# TODO: test if old manjaroiso code in mkiso produces also the umount error
+# if not, comment out the pid kill
 PREFIX="$newroot"
 for ROOT in /proc/*/root; do
     LINK=$(readlink $ROOT)

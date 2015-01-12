@@ -147,6 +147,47 @@ clean_up(){
     find "${work_dir}/${IMAGE_FOLDER}/tmp" -mindepth 1 -delete &>/dev/null
 }
 
+### TODO: test if basestrap also produces the unmount error;
+# if it doesn't, we drop mkchroot and create a file in basestrap chroot to acces it later with chroot-run
+# this is then manjaroiso bahaviour
+
+# usage: _pacman <packages>...
+# _pacman ()
+# {
+#     local ret
+#     mkdir -p "${work_dir}/${IMAGE_FOLDER}/var/lib/pacman"
+#     if "${QUIET}"; then
+#         basestrap -GMcd "${work_dir}/${IMAGE_FOLDER}" --config "$PACCONFIG" $* &> /dev/null
+#         ret=$?
+#     else
+#         basestrap -GMcd "${work_dir}/${IMAGE_FOLDER}" --config "$PACCONFIG" $*
+#         ret=$?
+#     fi
+# 
+#     if [ -e "${work_dir}/root-image/etc/locale.gen" ]; then
+#         cp ${work_dir}/root-image/etc/locale.gen ${work_dir}/root-image/etc/locale.gen.bak
+#     fi
+# 
+#     # Cleanup
+#     find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+# 
+#     if [ $ret -ne 0 ]; then
+#         exit 1
+#     fi
+# }
+
+# command_create () {
+#     echo "====> Creating working directory: ${work_dir}"
+#     mkdir -p "${work_dir}/iso/${INSTALL_DIR}/${ARCH}"
+#     mkdir -p "${work_dir}/${IMAGE_FOLDER}/"
+# 
+#     if [ ! -z "${PKGLIST}" ]; then
+#         echo "====> Installing packages to '${work_dir}/${IMAGE_FOLDER}/'"
+#         _pacman "${PKGLIST}"
+# 	  clean_up
+#     fi
+# }
+
 _mkchroot(){
 	#local ret
 	if "${QUIET}"; then
@@ -172,9 +213,7 @@ _mkchroot(){
 command_create () {
     mkdir -p "${work_dir}/iso/${INSTALL_DIR}/${ARCH}"
 
-    [[ -n "${PKGLIST}" ]] && _mkchroot "${PKGLIST}"
-    
-    clean_up
+    [[ -n "${PKGLIST}" ]] && _mkchroot "${PKGLIST}" && clean_up
 }
 
 # _mksquash dirname

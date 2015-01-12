@@ -533,8 +533,9 @@ make_root_image() {
 # 	configure_machine_id "${work_dir}/root-image"
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
-		
-	cp ${work_dir}/root-image/etc/locale.gen.bak ${work_dir}/root-image/etc/locale.gen
+	
+	# TODO: we only need this if we use old manjaroiso coe in mkiso
+	# cp ${work_dir}/root-image/etc/locale.gen.bak ${work_dir}/root-image/etc/locale.gen
 	
 	if [ -e ${work_dir}/root-image/boot/grub/grub.cfg ] ; then
 	    rm ${work_dir}/root-image/boot/grub/grub.cfg
