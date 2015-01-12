@@ -197,6 +197,10 @@ iso_profile=${PWD##*/}
 
 work_dir=${work_dir}/${iso_profile}/${arch}
 
+cache_lng="${cache_dir}/lng"
+    
+cache_pkgs="${cache_dir}/pkgs"
+
 displaymanager=$(cat ${PWD}/displaymanager)
 initsys=$(cat ${PWD}/initsys)
 

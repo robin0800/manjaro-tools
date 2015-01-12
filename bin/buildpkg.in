@@ -164,8 +164,8 @@ if [[ "$arch" == 'multilib' ]]; then
 fi
 
 chrootdir=${chroots}/${branch}/${arch}
-pkg_dir_loaded=${pkg_dir}
-pkg_dir="${pkg_dir}/${branch}/${arch}"
+
+pkg_dir="${cache_dir}/${branch}/${arch}"
 
 pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
