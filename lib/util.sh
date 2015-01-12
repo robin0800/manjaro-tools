@@ -170,7 +170,7 @@ load_config(){
     [[ -r ${manjaro_tools_conf} ]] && source ${manjaro_tools_conf}
     
     ######################
-    # manjaro-tools common
+    # common
     ######################
     
     if [[ -n ${branch} ]];then
@@ -192,7 +192,7 @@ load_config(){
     fi
     
     ###################
-    # manjaro-tools-pkg
+    # buildpkg
     ###################
     
     if [[ -n ${profiledir} ]];then
@@ -226,7 +226,7 @@ load_config(){
     fi
     
     ###################
-    # manjaro-tools-iso
+    # buildiso
     ###################
     
     if [[ -n ${work_dir} ]];then

@@ -14,19 +14,19 @@ gen_pw(){
 }
 
 # $1: chroot
-configure_machine_id(){
-# set unique machine-id
-    msg2 "Setting machine-id ..."
-    if [[ -z "$(echo $1 | grep root-image)" ]];then
-	chroot $1 dbus-uuidgen --ensure=/etc/machine-id
-	chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
-    else
-	mkdir -p $1/etc
-        mkdir -p $1/var/lib/dbus
-	dbus-uuidgen --ensure=$1/etc/machine-id
-	dbus-uuidgen --ensure=$1/var/lib/dbus/machine-id
-    fi
-}
+# configure_machine_id(){
+# # set unique machine-id
+#     msg2 "Setting machine-id ..."
+#     if [[ -z "$(echo $1 | grep root-image)" ]];then
+# 	chroot $1 dbus-uuidgen --ensure=/etc/machine-id
+# 	chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
+#     else
+# 	mkdir -p $1/etc
+#         mkdir -p $1/var/lib/dbus
+# 	dbus-uuidgen --ensure=$1/etc/machine-id
+# 	dbus-uuidgen --ensure=$1/var/lib/dbus/machine-id
+#     fi
+# }
 
 # $1: chroot
 configure_user(){
@@ -414,9 +414,7 @@ configure_livecd_image(){
     configure_calamares "$1"
     
     ${auto_svc_conf} && configure_services_live "$1"
-    
-#    configure_machine_id "$1"
-    
+        
     configure_hostname "$1"
     
     configure_hosts "$1"
@@ -515,22 +513,7 @@ make_root_image() {
     
 	msg "Prepare [Base installation] (root-image)"
 
-# 	configure_machine_id "${work_dir}/root-image"
-
-#	mkdir -p "${work_dir}/root-image"/etc
-#	mkdir -p "${work_dir}/root-image"/var/lib/dbus
-#	ln -sf /etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
-
-#	cp /etc/machine-id "${work_dir}/root-image"/etc/machine-id
-#	cp "${work_dir}/root-image"/etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
-
 	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting."
-
-#	cp /etc/machine-id "${work_dir}/root-image"/etc/machine-id
-#	cp /etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
-#	cp "${work_dir}/root-image"/etc/machine-id "${work_dir}/root-image"/var/lib/dbus/machine-id
-
-# 	configure_machine_id "${work_dir}/root-image"
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 	
