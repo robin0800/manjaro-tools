@@ -77,7 +77,7 @@ blacklist_pkg(){
 
 prepare_cachedir(){
     mkdir -p "${pkg_dir}"
-    #chown -R "${pkg_owner}:users" "${cache_dir}"
+    chown -R "${pkg_owner}:users" "${pkg_dir}"
 }
 
 move_pkg(){
@@ -87,7 +87,7 @@ move_pkg(){
     else
 	mv *.${ext} ${pkg_dir}
     fi
-    #chown -R "${pkg_owner}:users" "${cache_dir}"
+    chown -R "${pkg_owner}:users" "${pkg_dir}"
 }
 
 chroot_build(){
@@ -132,7 +132,7 @@ chroot_init(){
 }
 
 sign_pkgs(){
-    cd $pkg_dir
+    cd ${pkg_dir}
     su "${pkg_owner}" <<'EOF'
 signpkgs
 EOF
