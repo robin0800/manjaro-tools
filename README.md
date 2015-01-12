@@ -23,19 +23,18 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # unset defaults to given value
 # arch=$(uname -m)
 
+# cache dir where buildpkg or buildiso cache packages
+# cache_dir=/var/cache/manjaro-tools
+
 ################################################
 ########### manjaro-tools buildpkg #############
 ################################################
 
-# path to sets
-# uncomment if you use a manjaro-tools.conf in your $HOME/.config
+# custom path to sets
 # profiledir=/etc/manjaro-tools/sets
 
 # default chroot path
-# chroots=/srv/manjarobuild
-
-# pkg cache where to move built pkgs
-# pkg_dir=/var/cache/manjaro-tools
+# chroots=/opt/buildpkg
 
 # default set; name without .set extension
 # profile=default
@@ -53,26 +52,18 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 ################################################
 
 # default work dir
-# if unset, it defaults to the iso config dir
-# work_dir=/srv/manjaroiso
+# work_dir=/opt/buildiso
 
 # default iso target dir
-# if unset, it defaults to the iso config dir
-# target_dir=/srv/manjaro-release-iso
-
-# use custom cache, accessible with buildiso <args> -L
-# cache_lng=/var/cache/manjaro-tools/lng
-
-# use custom cache, accessible with buildiso <args> -P
-# cache_pkgs=/var/cache/manjaro-tools/pkgs
+# target_dir=/opt/manjaro-iso
 
 ################ iso settings ################
 
 # unset defaults to given value
-# iso_label="MJRO0811"
+# iso_label="MJRO090"
 
 # unset defaults to given value
-# iso_version=0.8.11
+# iso_version=0.9.0
 
 # unset defaults to given value
 # manjaro_kernel="linux317"
@@ -106,7 +97,6 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # names must match openrc service names
 # start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
 
-
 ########### livecd setup #############
 
 # unset defaults to given value
@@ -119,12 +109,12 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # password="manjaro"
 
 # unset defaults to given values
-# addgroups="video,audio,power,disk,storage,optical,network,lp,scanner,wheel"
+# addgroups="video,audio,power,disk,storage,optical,network,lp,scanner"
 
 # unset defaults to given values
 # names must match systemd service names
 # services in start_systemd array don't need to be listed here
-# start_systemd_live=('bluez' 'NetworkManager' 'ModemManager')
+# start_systemd_live=('bluetooth' 'NetworkManager' 'ModemManager')
 
 # unset defaults to given values, 
 # names must match openrc service names
