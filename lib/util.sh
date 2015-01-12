@@ -185,6 +185,12 @@ load_config(){
 	arch=$(uname -m)
     fi
     
+    if [[ -n ${cache_dir} ]];then
+	cache_dir=${cache_dir}
+    else
+	cache_dir='/var/cache/manjaro-tools'
+    fi
+    
     ###################
     # manjaro-tools-pkg
     ###################
@@ -192,7 +198,7 @@ load_config(){
     if [[ -n ${profiledir} ]];then
 	profiledir=${profiledir}
     else
-	profiledir="$(dirname $1)/sets"
+	profiledir="${SYSCONFDIR}/sets" #"$(dirname $1)/sets"
     fi
 
     if [[ -n ${profile} ]];then
@@ -204,15 +210,9 @@ load_config(){
     if [[ -n ${chroots} ]];then
 	chroots=${chroots}
     else
-	chroots='/srv/manjarobuild'
+	chroots='/opt/buildpkg'
     fi
-    
-    if [[ -n ${pkg_dir} ]];then
-	pkg_dir=${pkg_dir}
-    else
-	pkg_dir='/var/cache/manjaro-tools'
-    fi
-    
+       
     if [[ -n ${blacklist_trigger[@]} ]];then
 	blacklist_trigger=${blacklist_trigger[@]}
     else
@@ -232,20 +232,20 @@ load_config(){
     if [[ -n ${work_dir} ]];then
 	work_dir=${work_dir}
     else
-	work_dir=${PWD}
+	work_dir='/opt/buildiso' #${PWD}
     fi
     
     if [[ -n ${target_dir} ]];then
 	target_dir=${target_dir}
     else
-	target_dir=${PWD}
+	target_dir='/opt/manjaro-iso' #${PWD}
     fi
     
     if [[ -n ${iso_label} ]];then
 	iso_label=${iso_label}
     else
 	source /etc/lsb-release
-	iso_label="MJRO0${DISTRIB_RELEASE//.}"
+	iso_label="MJRO${DISTRIB_RELEASE//.}"
     fi
 
     if [[ -n ${iso_version} ]];then
@@ -352,18 +352,6 @@ load_config(){
 	start_openrc_live=${start_openrc_live}
     else
 	start_openrc_live=('bluetooth' 'networkmanager' 'connman')
-    fi
-
-    if [[ -n ${cache_lng} ]];then
-	cache_lng=${cache_lng}
-    else
-	cache_lng='/var/cache/manjaro-tools/lng'
-    fi
-    
-    if [[ -n ${cache_pkgs} ]];then
-	cache_pkgs=${cache_pkgs}
-    else
-	cache_pkgs='/var/cache/manjaro-tools/pkgs'
     fi
     
     return 0
