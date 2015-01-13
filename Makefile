@@ -42,7 +42,8 @@ LIBS = \
 	lib/util-msg.sh \
 	lib/util-pkg.sh \
 	lib/util-livecd.sh \
-	lib/util-iso.sh
+	lib/util-iso.sh \
+	lib/util-fstab.sh
 
 CPIOHOOKS = \
 	initcpio/hooks/miso \
