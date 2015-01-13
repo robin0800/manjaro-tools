@@ -14,7 +14,7 @@ version=@version@
 shopt -s extglob
 
 [[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
-[[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
+[[ -r @libdir@/util-fstab.sh ]] && source @libdir@/util-fstab.sh
 
 write_source() {
   local src=$1 spec= label= uuid= comment=()
@@ -54,19 +54,45 @@ write_source() {
   fi
 }
 
+optstring_apply_quirks() {
+  local varname=$1 fstype=$2
+
+  # SELinux displays a 'seclabel' option in /proc/self/mountinfo. We can't know
+  # if the system we're generating the fstab for has any support for SELinux (as
+  # one might install Arch from a Fedora environment), so let's remove it.
+  optstring_remove_option "$varname" seclabel
+
+  case $fstype in
+    f2fs)
+      # These are Kconfig options for f2fs. Kernels supporting the options will
+      # only provide the negative versions of these (e.g. noacl), and vice versa
+      # for kernels without support.
+      optstring_remove_option "$varname" noacl,acl,nouser_xattr,user_xattr
+      ;;
+    vfat)
+      # Before Linux v3.8, "cp" is prepended to the value of the codepage.
+      if optstring_get_option "$varname" codepage && [[ $codepage = cp* ]]; then
+        optstring_remove_option "$varname" codepage
+        optstring_append_option "$varname" "codepage=${codepage#cp}"
+      fi
+      ;;
+  esac
+}
+
 usage() {
   cat <<EOF
 usage: ${0##*/} [options] root
 
   Options:
     -L             Use labels for source identifiers (shortcut for -t LABEL)
-    -p             Avoid printing pseudofs mounts
+    -p             Exclude pseudofs mounts (default behavior)
+    -P             Include printing mounts
     -t TAG         Use TAG for source identifiers
     -U             Use UUIDs for source identifiers (shortcut for -t UUID)
 
     -h             Print this help message
 
-genfstab generates output suitable for addition to an fstab file based on the
+fstabgen generates output suitable for addition to an fstab file based on the
 devices mounted under the mountpoint specified by the given root.
 
 EOF
@@ -77,7 +103,7 @@ if [[ -z $1 || $1 = @(-h|--help) ]]; then
   exit $(( $# ? 0 : 1 ))
 fi
 
-while getopts ':Lpt:U' flag; do
+while getopts ':LPpt:U' flag; do
   case $flag in
     L)
       bytag=LABEL
@@ -85,8 +111,11 @@ while getopts ':Lpt:U' flag; do
     U)
       bytag=UUID
       ;;
+    P)
+      pseudofs=1
+      ;;
     p)
-      nopseudofs=1
+      pseudofs=0
       ;;
     t)
       bytag=${OPTARG^^}
@@ -111,7 +140,7 @@ fi
 # handle block devices
 findmnt -Recvruno SOURCE,TARGET,FSTYPE,OPTIONS,FSROOT "$root" |
     while read -r src target fstype opts fsroot; do
-  if (( nopseudofs )) && fstype_is_pseudofs "$fstype"; then
+  if (( !pseudofs )) && fstype_is_pseudofs "$fstype"; then
     continue
   fi
 
@@ -165,6 +194,8 @@ findmnt -Recvruno SOURCE,TARGET,FSTYPE,OPTIONS,FSROOT "$root" |
       ;;
   esac
 
+  optstring_apply_quirks "opts" "$fstype"
+
   # write one line
   write_source "$src"
   printf '\t%-10s' "/$(mangle "${target#/}")" "$fstype" "$opts"
@@ -200,5 +231,3 @@ done
     printf '\t%-10s\t%-10s\t%-10s\t0 0\n\n' 'none' 'swap' "$options"
   done
 } </proc/swaps
-
-# vim: et ts=2 sw=2 ft=sh:
