@@ -359,7 +359,7 @@ load_config(){
 
 load_sets(){
     local prof temp
-    for item in $(ls ${sets_dir}/*.set); do
+    for item in $(ls ${profile_dir_pkg}/*.set); do
 	temp=${item##*/}
 	prof=${prof:-}${prof:+|}${temp%.set}
     done
