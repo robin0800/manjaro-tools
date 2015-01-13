@@ -31,7 +31,7 @@ display_settings(){
     fi
     
     msg "PROFILE:"
-    msg2 "iso_profile: ${iso_profile}"
+    msg2 "profile_iso: ${profile_iso}"
     msg2 "initsys: ${initsys}"
     msg2 "displaymanager: ${displaymanager}"
     
@@ -98,15 +98,7 @@ display_settings(){
     fi
 }
 
-iso_owner=${SUDO_USER:-$USER}
-
-if [[ -n $SUDO_USER ]]; then
-    eval "USER_HOME=~$SUDO_USER"
-else
-    USER_HOME=$HOME
-fi
-
-USER_CONFIG="$USER_HOME/.config"
+load_user_info
 
 load_config "${USER_CONFIG}/manjaro-tools.conf"  
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
@@ -129,13 +121,13 @@ pacman_conf_arch='default'
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo '    -a <arch>          Set arch'
+    echo '    -a <arch>          Arch'
     echo "                       [default: ${arch}]"
-    echo '    -b <branch>        Set branch'
+    echo '    -b <branch>        Branch'
     echo "                       [default: ${branch}]"
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
-    echo '    -t <dir>           Target iso directory'
+    echo '    -t <dir>           Iso directory'
     echo "                       [default: ${iso_dir}]"
     echo '    -v                 Verbose iso compression'
     echo '    -q                 Query settings and pretend build'
@@ -197,9 +189,9 @@ mkiso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 
 iso_file="${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
-iso_profile=${PWD##*/}
+profile_iso=${PWD##*/}
 
-work_dir=${chroots_iso}/${iso_profile}/${arch}
+work_dir=${chroots_iso}/${profile_iso}/${arch}
 
 cache_lng="${cache_dir}/lng"
     

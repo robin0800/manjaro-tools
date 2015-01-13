@@ -13,9 +13,9 @@ A user config manjaro-tools.conf can be placed in $HOME/.config.
 If the userconfig is present, manjaro-tools will load userconfig values, however, if variables have been set in the systemwise /etc/manjaro-tools/manjaro-tools.conf, these values take precedence over the userconfig. Best practise is to leave systemwide file untouched, by default it is commented and shows just initialization values done in code.
 
 ~~~
-##############################################
-########### manjaro-tools common #############
-##############################################
+##########################################
+################ common ##################
+##########################################
 
 # unset defaults to given value
 # branch=stable
@@ -26,47 +26,47 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # cache dir where buildpkg or buildiso cache packages
 # cache_dir=/var/cache/manjaro-tools
 
-################################################
-########### manjaro-tools buildpkg #############
-################################################
-
-# custom path to sets
-# profiledir=/etc/manjaro-tools/sets
+##########################################
+################ buildpkg ################
+##########################################
 
 # default chroot path
-# chroots=/opt/buildpkg
+# chroots_pkg=/opt/buildpkg
+
+# custom path to pkg sets
+# profile_dir_pkg=/etc/manjaro-tools/sets
 
 # default set; name without .set extension
-# profile=default
+# profile_pkg=default
 
-############ eudev specific ###############
+############# eudev specific #############
+
+# This is only useful if you compile packages against eudev
 
 # default packages to trigger blacklist
-# blacklist_trigger=('eudev' 'lib32-eudev' 'upower-pm-utils' 'eudev-systemdcompat' 'lib32-eudev-systemdcompat')
+# blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
 
 # default blacklisted packages to remove from chroot
 # blacklist=('libsystemd')
 
-################################################
-########### manjaro-tools buildiso #############
-################################################
+##########################################
+################ buildiso ################
+##########################################
 
-# default work dir
-# work_dir=/opt/buildiso
+# default work dir where the image chroots are located
+# chroots_iso=/opt/buildiso
 
-# default iso target dir
-# target_dir=/opt/manjaro-iso
+# default iso dir where the iso file will be stored
+# iso_dir=/opt/manjaro-iso
 
-################ iso settings ################
+##########################################
+############## iso settings ##############
 
 # unset defaults to given value
 # iso_label="MJRO090"
 
 # unset defaults to given value
 # iso_version=0.9.0
-
-# unset defaults to given value
-# manjaro_kernel="linux317"
 
 # unset defaults to given value, specify a date here of have it automatically set
 # manjaro_version="$(date +%Y.%m)"
@@ -84,10 +84,18 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # install_dir=manjaro
 
 # unset defaults to given value
-# plymouth_theme=manjaro-elegant
+# compression=xz
+
+################ install ################
+
+# These settings are inherited in live session
+# Settings will be installed
 
 # unset defaults to given value
-# compression=xz
+# manjaro_kernel="linux317"
+
+# unset defaults to given value
+# plymouth_theme=manjaro-elegant
 
 # unset defaults to given values
 # names must match systemd service names
@@ -97,7 +105,10 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # names must match openrc service names
 # start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
 
-########### livecd setup #############
+################# livecd #################
+
+# These settings are specific to live session
+# Settings will not be installed
 
 # unset defaults to given value
 # hostname="manjaro"
@@ -119,7 +130,7 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # unset defaults to given values, 
 # names must match openrc service names
 # services in start_openrc array don't need to be listed here
-# start_openrc_live=('bluetooth'  'networkmanager' 'connman')
+# start_openrc_live=('bluetooth'  'networkmanager')
 ~~~
 
 1.1. new config files in iso profiles

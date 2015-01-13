@@ -31,6 +31,11 @@ display_settings(){
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
     fi
 
+    msg "PROFILE:"
+    msg2 "sets_pkg: $(load_sets)"
+    msg2 "profile_pkg: ${profile_pkg}"
+    msg2 "is_profile ${is_profile}"
+    
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
     msg2 "branch: ${branch}"
@@ -42,11 +47,11 @@ display_settings(){
     msg2 "namcap: ${namcap}"
     msg2 "sign: ${sign}"
     msg2 "makepkg_args: ${makepkg_args[*]}"
-    msg2 "mkchrootpkg_args: ${mkchrootpkg_args[*]}"
+#     msg2 "mkchrootpkg_args: ${mkchrootpkg_args[*]}"
 
     msg "PATHS:"
     msg2 "work_dir: ${work_dir}"
-    msg2 "sets_dir: ${sets_dir}"
+    msg2 "profile_dir_pkg: ${profile_dir_pkg}"
     msg2 "pkg_dir: ${pkg_dir}"
     #     msg2 "pacman_conf: ${pacman_conf}"
     #     msg2 "makepkg_conf: ${makepkg_conf}"
@@ -60,20 +65,14 @@ display_settings(){
 	msg "PKG:"
 	msg2 "base_packages: ${base_packages[*]}"
     fi
-
-    msg "SETS:"
-    msg2 "profiles: $(load_sets)"
-    msg2 "profile: ${profile}"
-    msg2 "is_profile: ${is_profile}"
-
+    
+    msg "BUILD QUEUE:"
     if ${is_profile};then
-	msg "Build queue:"
-	local list=$(cat ${sets_dir}/${profile}.set)
+	local list=$(cat ${profile_dir_pkg}/${profile_pkg}.set)
 	for item in ${list[@]}; do
 	    msg2 "$item"
 	done
     else
-	msg "Build queue:"
 	for arg in "${makepkg_args[@]}"; do
 	    case ${arg} in
 		--pkg) continue ;;
@@ -88,22 +87,12 @@ display_settings(){
 	    done
 	    unset IFS
 	else
-	    msg2 "${profile}"
+	    msg2 "${profile_pkg}"
 	fi
     fi
 }
 
-export LC_MESSAGES=C
-
-pkg_owner=${SUDO_USER:-$USER}
-
-if [[ -n $SUDO_USER ]]; then
-    eval "USER_HOME=~$SUDO_USER"
-else
-    USER_HOME=$HOME
-fi
-
-USER_CONFIG="$USER_HOME/.config"
+load_user_info
 
 load_config "${USER_CONFIG}/manjaro-tools.conf"  
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
@@ -123,9 +112,9 @@ sign=false
 
 usage() {
     echo "Usage: ${0##*/} [options] [--] [makepkg args]"
-    echo "    -p <profile>       Set profile or pkg [default: ${profile}]"
-    echo "    -a <arch>          Set arch  [default: ${arch}]"
-    echo "    -b <branch>        Set branch [default: ${branch}]"
+    echo "    -p <pkg>           Set or pkg [default: ${profile_pkg}]"
+    echo "    -a <arch>          Arch [default: ${arch}]"
+    echo "    -b <branch>        Branch [default: ${branch}]"
     echo "    -r <dir>           Chroots directory [default: ${chroots_pkg}]"
     echo '    -c                 Recreate chroot'
     echo '    -w                 Clean up'
@@ -144,7 +133,7 @@ opts='p:a:b:r:cwnsqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
-	p) profile="$OPTARG" ;;
+	p) profile_pkg="$OPTARG" ;;
 	a) arch="$OPTARG" ;;
 	b) branch="$OPTARG" ;;
 	r) chroots_pkg="$OPTARG" ;;
@@ -181,7 +170,7 @@ check_root "$0" "${orig_argv[@]}"
 
 [[ -d "${pkg_dir}" ]] || prepare_cachedir
 
-eval_profile "${profile}"
+eval_profile "${profile_pkg}"
 
 ${pretend} && display_settings && exit
 

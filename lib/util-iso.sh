@@ -490,7 +490,7 @@ make_iso() {
     # You may want to move generated iso to some other place
     # its ugly if you set target dir to $HOME
     # you need to use root privs to move iso otherwise
-    chown "${iso_owner}:users" "${iso_file}"
+    chown "${OWNER}:users" "${iso_file}"
     msg "Done [Build ISO]"
 }
 

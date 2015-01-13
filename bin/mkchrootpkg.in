@@ -111,11 +111,7 @@ for arg in "${@:OPTIND}"; do
     esac
 done
 
-if [[ -n $SUDO_USER ]]; then
-	eval "USER_HOME=~$SUDO_USER"
-else
-	USER_HOME=$HOME
-fi
+load_user_info
 
 # {{{ functions
 

@@ -195,24 +195,24 @@ load_config(){
     # buildpkg
     ###################
     
-    if [[ -n ${sets_dir} ]];then
-	sets_dir=${sets_dir}
-    else
-	sets_dir="${SYSCONFDIR}/sets" #"$(dirname $1)/sets"
-    fi
-
-    if [[ -n ${profile} ]];then
-	profile=${profile}
-    else
-	profile='default'
-    fi
-
     if [[ -n ${chroots_pkg} ]];then
 	chroots_pkg=${chroots_pkg}
     else
 	chroots_pkg='/opt/buildpkg'
     fi
-       
+    
+    if [[ -n ${profile_dir_pkg} ]];then
+	profile_dir_pkg=${profile_dir_pkg}
+    else
+	profile_dir_pkg="${SYSCONFDIR}/sets"
+    fi
+
+    if [[ -n ${profile_pkg} ]];then
+	profile_pkg=${profile_pkg}
+    else
+	profile_pkg='default'
+    fi
+
     if [[ -n ${blacklist_trigger[@]} ]];then
 	blacklist_trigger=${blacklist_trigger[@]}
     else
@@ -232,13 +232,13 @@ load_config(){
     if [[ -n ${chroots_iso} ]];then
 	chroots_iso=${chroots_iso}
     else
-	chroots_iso='/opt/buildiso' #${PWD}
+	chroots_iso='/opt/buildiso'
     fi
     
     if [[ -n ${iso_dir} ]];then
 	iso_dir=${iso_dir}
     else
-	iso_dir='/opt/manjaro-iso' #${PWD}
+	iso_dir='/opt/manjaro-iso'
     fi
     
     if [[ -n ${iso_label} ]];then
@@ -364,4 +364,16 @@ load_sets(){
 	prof=${prof:-}${prof:+|}${temp%.set}
     done
     echo $prof
+}
+
+load_user_info(){
+    OWNER=${SUDO_USER:-$USER}
+
+    if [[ -n $SUDO_USER ]]; then
+	eval "USER_HOME=~$SUDO_USER"
+    else
+	USER_HOME=$HOME
+    fi
+    
+    USER_CONFIG="$USER_HOME/.config"
 }

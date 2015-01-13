@@ -77,7 +77,7 @@ blacklist_pkg(){
 
 prepare_cachedir(){
     mkdir -p "${pkg_dir}"
-    chown -R "${pkg_owner}:users" "${pkg_dir}"
+    chown -R "${OWNER}:users" "${pkg_dir}"
 }
 
 move_pkg(){
@@ -87,13 +87,13 @@ move_pkg(){
     else
 	mv *.${ext} ${pkg_dir}
     fi
-    chown -R "${pkg_owner}:users" "${pkg_dir}"
+    chown -R "${OWNER}:users" "${pkg_dir}"
 }
 
 chroot_build(){
     if ${is_profile};then
-	msg "Start building profile: [${profile}]"
-	for pkg in $(cat ${sets_dir}/${profile}.set); do
+	msg "Start building profile_pkg [${profile_pkg}]"
+	for pkg in $(cat ${profile_dir_pkg}/${profile_pkg}.set); do
 	    cd $pkg
 	    for p in ${blacklist_trigger[@]}; do
 		[[ $pkg == $p ]] && blacklist_pkg "${work_dir}"
@@ -103,11 +103,11 @@ chroot_build(){
 	    move_pkg
 	    cd ..
 	done
-	msg "Finished building profile: [${profile}]"
+	msg "Finished building profile_pkg [${profile_pkg}]"
     else
-	cd ${profile}
+	cd ${profile_pkg}
 	for p in ${blacklist_trigger[@]}; do
-	    [[ ${profile} == $p ]] && blacklist_pkg "${work_dir}"
+	    [[ ${profile_pkg} == $p ]] && blacklist_pkg "${work_dir}"
 	done
 	setarch "${arch}" \
 	    mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
@@ -129,7 +129,7 @@ chroot_init(){
 
 sign_pkgs(){
     cd ${pkg_dir}
-    su "${pkg_owner}" <<'EOF'
+    su "${OWNER}" <<'EOF'
 signpkgs
 EOF
 }

@@ -16,44 +16,36 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
 [[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
 
-set_owner=${SUDO_USER:-$USER}
-
-if [[ -n $SUDO_USER ]]; then
-    eval "USER_HOME=~$SUDO_USER"
-else
-    USER_HOME=$HOME
-fi
-
-USER_CONFIG="$USER_HOME/.config"
+load_user_info
 
 load_config "${USER_CONFIG}/manjaro-tools.conf"  
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 create_set(){
-    msg "Creating [${sets_dir}/${name}.set] ..."
-    if [[ -f ${sets_dir}/${name}.set ]];then
-	msg2 "Backing up ${sets_dir}/${name}.set.orig"
-	mv "${sets_dir}/${name}.set" "${sets_dir}/${name}.set.orig"
+    msg "Creating [${profile_dir_pkg}/${name}.set] ..."
+    if [[ -f ${profile_dir_pkg}/${name}.set ]];then
+	msg2 "Backing up ${profile_dir_pkg}/${name}.set.orig"
+	mv "${profile_dir_pkg}/${name}.set" "${profile_dir_pkg}/${name}.set.orig"
     fi
     local list=$(find * -maxdepth 0 -type d | sort)
     for item in ${list[@]};do
 	cd $item
 	if [[ -f PKGBUILD ]];then
 	    msg2 "Adding ${item##*/}"
-	    echo ${item##*/} >> ${sets_dir}/${name}.set || break
+	    echo ${item##*/} >> ${profile_dir_pkg}/${name}.set || break
 	fi
 	cd ..
     done
 }
 
 remove_set(){
-    msg "Removing [${sets_dir}/${name}.set] ..."
-    rm ${sets_dir}/${name}.set
+    msg "Removing [${profile_dir_pkg}/${name}.set] ..."
+    rm ${profile_dir_pkg}/${name}.set
 }
 
 show_set(){
-    local list=$(cat ${sets_dir}/${name}.set)
-    msg "Content of [${sets_dir}/${name}.set] ..."
+    local list=$(cat ${profile_dir_pkg}/${name}.set)
+    msg "Content of [${profile_dir_pkg}/${name}.set] ..."
     for item in ${list[@]}; do
 	msg2 "$item"
     done
