@@ -384,7 +384,7 @@ copy_cache_pkgs(){
 }
 
 prepare_buildiso(){
-    mkdir -p "${target_dir}"
+    mkdir -p "${iso_dir}"
     mkdir -p "${cache_pkgs}"
     mkdir -p "${cache_lng}"
 }
@@ -482,7 +482,7 @@ make_iso() {
     # You may want to move generated iso to some other place
     # its ugly if you set target dir to $HOME
     # you need to use root privs to move iso otherwise
-    chown  "${iso_owner}:users" "${iso_file}"
+    chown "${iso_owner}:users" "${iso_file}"
     msg "Done [Build ISO]"
 }
 
@@ -513,7 +513,7 @@ make_root_image() {
     
 	msg "Prepare [Base installation] (root-image)"
 
-	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting."
+	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting." && aufs_remove_image "${work_dir}/root-image"
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 	
@@ -551,7 +551,7 @@ make_de_image() {
 	
 	aufs_mount_root_image "${work_dir}/${desktop}-image"
 
-	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting."
+	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting." && aufs_remove_image "${work_dir}/${desktop}-image"
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
@@ -588,7 +588,7 @@ make_livecd_image() {
 	    aufs_append_de_image "${work_dir}/livecd-image"
 	fi
 	
-	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting."
+	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting." && aufs_remove_image "${work_dir}/livecd-image"
 	
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
