@@ -37,20 +37,20 @@ display_settings(){
     msg2 "chroots: ${chroots}"
     
     msg "ARGS:"
-    msg2 "mkchrootpkg_args: ${mkchrootpkg_args[*]}"
-    msg2 "makepkg_args: ${makepkg_args[*]}"
+#     msg2 "mkchrootpkg_args: ${mkchrootpkg_args[*]}"
+#     msg2 "makepkg_args: ${makepkg_args[*]}"
     msg2 "clean_first: ${clean_first}"
     msg2 "wipe_clean: ${wipe_clean}"
     msg2 "namcap: ${namcap}"
     msg2 "sign: ${sign}"
     
     msg "PATHS:"
-    msg2 "chrootdir: ${chrootdir}"
-    msg2 "profiledir: ${profiledir}"
+    msg2 "chroot_dir: ${chroot_dir}"
+    msg2 "sets_dir: ${sets_dir}"
     msg2 "pkg_dir: ${pkg_dir}"
-    msg2 "pacman_conf: ${pacman_conf}"
-    msg2 "makepkg_conf: ${makepkg_conf}"
-    msg2 "mirrors_conf: ${mirrors_conf}"
+#     msg2 "pacman_conf: ${pacman_conf}"
+#     msg2 "makepkg_conf: ${makepkg_conf}"
+#     msg2 "mirrors_conf: ${mirrors_conf}"
     
     msg "BLACKLIST:"
     msg2 "blacklist_trigger: ${blacklist_trigger[*]}"
@@ -68,7 +68,7 @@ display_settings(){
 
     if ${is_profile};then
 	msg "Build queue:"
-	local list=$(cat ${profiledir}/${profile}.set)
+	local list=$(cat ${sets_dir}/${profile}.set)
 	for item in ${list[@]}; do
 	    msg2 "$item"
 	done
@@ -163,7 +163,7 @@ if [[ "$arch" == 'multilib' ]]; then
     arch='x86_64'
 fi
 
-chrootdir=${chroots}/${branch}/${arch}
+chroot_dir=${chroots}/${branch}/${arch}
 
 pkg_dir="${cache_dir}/${branch}/${arch}"
 
@@ -173,7 +173,7 @@ mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 mkchroot_args+=(-L -C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf})
 
-mkchrootpkg_args+=(-r ${chrootdir})
+mkchrootpkg_args+=(-r ${chroot_dir})
 
 makepkg_args+=("${@:$OPTIND}")
 

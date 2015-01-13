@@ -29,8 +29,11 @@ display_settings(){
     else
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
     fi
+    
+    msg "PROFILE:"
     msg2 "iso_profile: ${iso_profile}"
     msg2 "initsys: ${initsys}"
+    msg2 "displaymanager: ${displaymanager}"
     
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
@@ -40,24 +43,24 @@ display_settings(){
    
     msg "ARGS:"
     msg2 "clean_first: ${clean_first}"
-    msg2 "auto_svc_conf: ${auto_svc_conf}"
-    msg2 "high_compression: ${high_compression}"
+#     msg2 "auto_svc_conf: ${auto_svc_conf}"
+#     msg2 "high_compression: ${high_compression}"
     msg2 "clean_cache_pkgs: ${clean_cache_pkgs}"
     msg2 "clean_cache_lng: ${clean_cache_lng}"
-    msg2 "images_only: ${images_only}"
-    msg2 "iso_only: ${iso_only}"
+#     msg2 "images_only: ${images_only}"
+#     msg2 "iso_only: ${iso_only}"
     msg2 "custom_pac_conf: ${custom_pac_conf}"
     
     msg "PATHS:"
     msg2 "cache_pkgs: ${cache_pkgs}"
     msg2 "cache_lng: ${cache_lng}"
-    msg2 "pacman_conf: ${pacman_conf}"
-    msg2 "pacman_mirrors: ${mirrors_conf}"
+#     msg2 "pacman_conf: ${pacman_conf}"
+#     msg2 "pacman_mirrors: ${mirrors_conf}"
     
     msg "IMAGES SETTINGS:"
     msg2 "manjaro_kernel: ${manjaro_kernel}"
     msg2 "manjaro_version: ${manjaro_version}"
-    msg2 "displaymanager: ${displaymanager}"
+    
     msg2 "plymouth_theme: ${plymouth_theme}"
     
     if ${auto_svc_conf};then
@@ -204,8 +207,8 @@ cache_pkgs="${cache_dir}/pkgs"
 displaymanager=$(cat ${PWD}/displaymanager)
 initsys=$(cat ${PWD}/initsys)
 
-${high_compression} && iso_args+=(-x)
-${clean_first} && iso_args+=(-f)
+${high_compression} && mkiso_args+=(-x)
+${clean_first} && mkiso_args+=(-f)
 
 check_root "$0" "${orig_argv[@]}"
 

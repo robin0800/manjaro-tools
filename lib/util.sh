@@ -195,10 +195,10 @@ load_config(){
     # buildpkg
     ###################
     
-    if [[ -n ${profiledir} ]];then
-	profiledir=${profiledir}
+    if [[ -n ${sets_dir} ]];then
+	sets_dir=${sets_dir}
     else
-	profiledir="${SYSCONFDIR}/sets" #"$(dirname $1)/sets"
+	sets_dir="${SYSCONFDIR}/sets" #"$(dirname $1)/sets"
     fi
 
     if [[ -n ${profile} ]];then
@@ -216,7 +216,7 @@ load_config(){
     if [[ -n ${blacklist_trigger[@]} ]];then
 	blacklist_trigger=${blacklist_trigger[@]}
     else
-	blacklist_trigger=('eudev' 'lib32-eudev' 'upower-pm-utils' 'eudev-systemdcompat' 'lib32-eudev-systemdcompat')
+	blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
     fi
     
     if [[ -n ${blacklist[@]} ]];then
@@ -351,7 +351,7 @@ load_config(){
     if [[ -n ${start_openrc_live} ]];then
 	start_openrc_live=${start_openrc_live}
     else
-	start_openrc_live=('bluetooth' 'networkmanager' 'connman')
+	start_openrc_live=('bluetooth' 'networkmanager')
     fi
     
     return 0
@@ -359,7 +359,7 @@ load_config(){
 
 load_sets(){
     local prof temp
-    for item in $(ls ${profiledir}/*.set); do
+    for item in $(ls ${sets_dir}/*.set); do
 	temp=${item##*/}
 	prof=${prof:-}${prof:+|}${temp%.set}
     done

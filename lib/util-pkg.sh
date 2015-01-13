@@ -18,15 +18,15 @@ eval_profile(){
 
 chroot_create(){
     msg "Creating chroot for [${branch}] (${arch})..."
-    mkdir -p "${chrootdir}"
+    mkdir -p "${chroot_dir}"
     setarch "${arch}" mkchroot \
 	    ${mkchroot_args[*]} \
-	    "${chrootdir}/root" \
+	    "${chroot_dir}/root" \
 	    ${base_packages[*]} || abort
 }
 
 chroot_clean(){
-    for copy in "${chrootdir}"/*; do
+    for copy in "${chroot_dir}"/*; do
 	[[ -d ${copy} ]] || continue
 	msg2 "Deleting chroot copy '$(basename "${copy}")'..."
 
@@ -39,14 +39,14 @@ chroot_clean(){
     done
     exec 9>&-
     
-    rm -rf --one-file-system "${chrootdir}"
+    rm -rf --one-file-system "${chroot_dir}"
 }
 
 chroot_update(){
     msg "Updating chroot for [${branch}] (${arch})..."
-    lock 9 "${chrootdir}/root.lock" "Locking clean chroot"
+    lock 9 "${chroot_dir}/root.lock" "Locking clean chroot"
     chroot-run ${mkchroot_args[*]} \
-	      "${chrootdir}/root" \
+	      "${chroot_dir}/root" \
 	      pacman -Syu --noconfirm || abort
 }
 
@@ -93,12 +93,10 @@ move_pkg(){
 chroot_build(){
     if ${is_profile};then
 	msg "Start building profile: [${profile}]"
-	for pkg in $(cat ${profiledir}/${profile}.set); do
+	for pkg in $(cat ${sets_dir}/${profile}.set); do
 	    cd $pkg
 	    for p in ${blacklist_trigger[@]}; do
-		if [[ $pkg == $p ]]; then
-		    blacklist_pkg "${chrootdir}"
-		fi
+		[[ $pkg == $p ]] && blacklist_pkg "${chroot_dir}"
 	    done
 	    setarch "${arch}" \
 		mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || break
@@ -109,9 +107,7 @@ chroot_build(){
     else
 	cd ${profile}
 	for p in ${blacklist_trigger[@]}; do
-	    if [[ ${profile} == $p ]]; then
-		blacklist_pkg "${chrootdir}"
-	    fi
+	    [[ ${profile} == $p ]] && blacklist_pkg "${chroot_dir}"
 	done
 	setarch "${arch}" \
 	    mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
@@ -124,7 +120,7 @@ chroot_init(){
     if ${clean_first}; then
 	chroot_clean
 	chroot_create
-    elif [[ ! -d "${chrootdir}" ]]; then
+    elif [[ ! -d "${chroot_dir}" ]]; then
 	chroot_create
     else
 	chroot_update
