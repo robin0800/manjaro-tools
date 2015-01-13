@@ -90,17 +90,17 @@ copy_hostconf () {
 }
 
 build_mount_args() {
-    track_mount "/etc/resolv.conf" "${working_dir}/etc/resolv.conf" -B
-    track_mount "${cache_dirs[0]}" "${working_dir}${cache_dirs[0]}" -B
+    chroot_mount "/etc/resolv.conf" "${working_dir}/etc/resolv.conf" -B
+    chroot_mount "${cache_dirs[0]}" "${working_dir}${cache_dirs[0]}" -B
 
     for cache_dir in ${cache_dirs[@]:1}; do
-	track_mount "$cache_dir" "${working_dir}${cache_dir}" -Br
+	chroot_mount "$cache_dir" "${working_dir}${cache_dir}" -Br
     done
     
     if [[ -n ${mountargs_ro[@]} ]];then
 	local IFS=','
 	for m in ${mountargs_ro[@]}; do
-	    track_mount "${m%%:*}" "${working_dir}${m##*:}" -Br
+	    chroot_mount "${m%%:*}" "${working_dir}${m##*:}" -Br
 	done
 	unset IFS
     fi
@@ -108,7 +108,7 @@ build_mount_args() {
     if [[ -n ${mountargs_rw[@]} ]];then
 	local IFS=','
 	for m in ${mountargs_rw[@]}; do
-	    track_mount "${m%%:*}" "${working_dir}${m##*:}" -B
+	    chroot_mount "${m%%:*}" "${working_dir}${m##*:}" -B
 	done
 	unset IFS
     fi
@@ -123,7 +123,7 @@ elif [[ $(cat "$working_dir/.manjaro-tools") != $version ]]; then
 	die "chroot '%s' is not at version %s. Please rebuild." "$working_dir" "$version"
 fi
 
-api_fs_mount "${working_dir}" || die "failed to setup API filesystems in chroot %s" "${working_dir}"
+chroot_api_mount "${working_dir}" || die "failed to setup API filesystems in chroot %s" "${working_dir}"
 
 build_mount_args
 
