@@ -24,38 +24,38 @@ SYSCONFDIR='@sysconfdir@'
 display_settings(){
     msg "manjaro-tools"
     msg2 "version: ${version}"
-    
+
     if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
 	msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
     else
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
     fi
-    
+
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
     msg2 "branch: ${branch}"
     msg2 "chroots_pkg: ${chroots_pkg}"
-    
+
     msg "ARGS:"
-#     msg2 "mkchrootpkg_args: ${mkchrootpkg_args[*]}"
-#     msg2 "makepkg_args: ${makepkg_args[*]}"
     msg2 "clean_first: ${clean_first}"
     msg2 "wipe_clean: ${wipe_clean}"
     msg2 "namcap: ${namcap}"
     msg2 "sign: ${sign}"
-    
+    msg2 "makepkg_args: ${makepkg_args[*]}"
+    msg2 "mkchrootpkg_args: ${mkchrootpkg_args[*]}"
+
     msg "PATHS:"
     msg2 "work_dir: ${work_dir}"
     msg2 "sets_dir: ${sets_dir}"
     msg2 "pkg_dir: ${pkg_dir}"
-#     msg2 "pacman_conf: ${pacman_conf}"
-#     msg2 "makepkg_conf: ${makepkg_conf}"
-#     msg2 "mirrors_conf: ${mirrors_conf}"
-    
+    #     msg2 "pacman_conf: ${pacman_conf}"
+    #     msg2 "makepkg_conf: ${makepkg_conf}"
+    #     msg2 "mirrors_conf: ${mirrors_conf}"
+
     msg "BLACKLIST:"
     msg2 "blacklist_trigger: ${blacklist_trigger[*]}"
     msg2 "blacklist: ${blacklist[*]}"
-    
+
     if ${clean_first};then
 	msg "PKG:"
 	msg2 "base_packages: ${base_packages[*]}"
