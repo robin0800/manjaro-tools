@@ -38,22 +38,24 @@ display_settings(){
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
     msg2 "branch: ${branch}"
-    msg2 "work_dir: ${work_dir}"
-    msg2 "target_dir: ${target_dir}"
-   
+    msg2 "chroots_iso: ${chroots_iso}"
+    
     msg "ARGS:"
     msg2 "clean_first: ${clean_first}"
-#     msg2 "auto_svc_conf: ${auto_svc_conf}"
-#     msg2 "high_compression: ${high_compression}"
     msg2 "clean_cache_pkgs: ${clean_cache_pkgs}"
     msg2 "clean_cache_lng: ${clean_cache_lng}"
-#     msg2 "images_only: ${images_only}"
-#     msg2 "iso_only: ${iso_only}"
     msg2 "custom_pac_conf: ${custom_pac_conf}"
-    
-    msg "PATHS:"
+    msg2 "images_only: ${images_only}"
+    msg2 "iso_only: ${iso_only}"
+    msg2 "auto_svc_conf: ${auto_svc_conf}"
+    msg2 "high_compression: ${high_compression}"
+
+    msg "PATHS:" 
+    msg2 "work_dir: ${work_dir}"
+    msg2 "iso_dir: ${iso_dir}"
     msg2 "cache_pkgs: ${cache_pkgs}"
     msg2 "cache_lng: ${cache_lng}"
+   
 #     msg2 "pacman_conf: ${pacman_conf}"
 #     msg2 "pacman_mirrors: ${mirrors_conf}"
     
@@ -79,7 +81,8 @@ display_settings(){
     msg2 "img_name: ${img_name}"
     msg2 "install_dir: ${install_dir}"
     msg2 "iso_file: ${iso_file}"
-
+    msg2 "compression: ${compression}"
+    
     msg "LIVECD:"
     msg2 "username: ${username}"
     msg2 "password: ${password}"
@@ -130,10 +133,10 @@ usage() {
     echo "                       [default: ${arch}]"
     echo '    -b <branch>        Set branch'
     echo "                       [default: ${branch}]"
-    echo '    -r <dir>           Work directory'
-    echo "                       [default: ${work_dir}]"
+    echo '    -r <dir>           Chroots directory'
+    echo "                       [default: ${chroots_iso}]"
     echo '    -t <dir>           Target iso directory'
-    echo "                       [default: ${target_dir}]"
+    echo "                       [default: ${iso_dir}]"
     echo '    -v                 Verbose iso compression'
     echo '    -q                 Query settings and pretend build'
     echo '    -c                 Disable clean work dir and target dir iso'
@@ -159,8 +162,8 @@ while getopts "${opts}" arg; do
     case "${arg}" in
 	a) arch="$OPTARG" ;;
 	b) branch="$OPTARG" ;;
-	r) work_dir="$OPTARG" ;;
-	t) target_dir="$OPTARG" ;;
+	r) chroots_iso="$OPTARG" ;;
+	t) iso_dir="$OPTARG" ;;
 	v) verbose=true; mkiso_args+=(-v) ;;
 	B) images_only=true ;;
 	G) iso_only=true ;;
@@ -177,8 +180,6 @@ done
 
 shift $(($OPTIND - 1))
 
-# work_dir=${work_dir}/${desktop}/${arch}
-
 if [[ "$arch" == 'x86_64' ]]; then
     pacman_conf_arch='multilib'
 fi
@@ -194,11 +195,11 @@ create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_con
 
 mkiso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 
-iso_file="${target_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
+iso_file="${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
 iso_profile=${PWD##*/}
 
-work_dir=${work_dir}/${iso_profile}/${arch}
+work_dir=${chroots_iso}/${iso_profile}/${arch}
 
 cache_lng="${cache_dir}/lng"
     

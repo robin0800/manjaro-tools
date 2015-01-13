@@ -207,10 +207,10 @@ load_config(){
 	profile='default'
     fi
 
-    if [[ -n ${chroots} ]];then
-	chroots=${chroots}
+    if [[ -n ${chroots_pkg} ]];then
+	chroots_pkg=${chroots_pkg}
     else
-	chroots='/opt/buildpkg'
+	chroots_pkg='/opt/buildpkg'
     fi
        
     if [[ -n ${blacklist_trigger[@]} ]];then
@@ -229,16 +229,16 @@ load_config(){
     # buildiso
     ###################
     
-    if [[ -n ${work_dir} ]];then
-	work_dir=${work_dir}
+    if [[ -n ${chroots_iso} ]];then
+	chroots_iso=${chroots_iso}
     else
-	work_dir='/opt/buildiso' #${PWD}
+	chroots_iso='/opt/buildiso' #${PWD}
     fi
     
-    if [[ -n ${target_dir} ]];then
-	target_dir=${target_dir}
+    if [[ -n ${iso_dir} ]];then
+	iso_dir=${iso_dir}
     else
-	target_dir='/opt/manjaro-iso' #${PWD}
+	iso_dir='/opt/manjaro-iso' #${PWD}
     fi
     
     if [[ -n ${iso_label} ]];then

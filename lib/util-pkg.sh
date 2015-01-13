@@ -18,15 +18,15 @@ eval_profile(){
 
 chroot_create(){
     msg "Creating chroot for [${branch}] (${arch})..."
-    mkdir -p "${chroot_dir}"
+    mkdir -p "${work_dir}"
     setarch "${arch}" mkchroot \
 	    ${mkchroot_args[*]} \
-	    "${chroot_dir}/root" \
+	    "${work_dir}/root" \
 	    ${base_packages[*]} || abort
 }
 
 chroot_clean(){
-    for copy in "${chroot_dir}"/*; do
+    for copy in "${work_dir}"/*; do
 	[[ -d ${copy} ]] || continue
 	msg2 "Deleting chroot copy '$(basename "${copy}")'..."
 
@@ -39,14 +39,14 @@ chroot_clean(){
     done
     exec 9>&-
     
-    rm -rf --one-file-system "${chroot_dir}"
+    rm -rf --one-file-system "${work_dir}"
 }
 
 chroot_update(){
     msg "Updating chroot for [${branch}] (${arch})..."
-    lock 9 "${chroot_dir}/root.lock" "Locking clean chroot"
+    lock 9 "${work_dir}/root.lock" "Locking clean chroot"
     chroot-run ${mkchroot_args[*]} \
-	      "${chroot_dir}/root" \
+	      "${work_dir}/root" \
 	      pacman -Syu --noconfirm || abort
 }
 
@@ -96,7 +96,7 @@ chroot_build(){
 	for pkg in $(cat ${sets_dir}/${profile}.set); do
 	    cd $pkg
 	    for p in ${blacklist_trigger[@]}; do
-		[[ $pkg == $p ]] && blacklist_pkg "${chroot_dir}"
+		[[ $pkg == $p ]] && blacklist_pkg "${work_dir}"
 	    done
 	    setarch "${arch}" \
 		mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || break
@@ -107,7 +107,7 @@ chroot_build(){
     else
 	cd ${profile}
 	for p in ${blacklist_trigger[@]}; do
-	    [[ ${profile} == $p ]] && blacklist_pkg "${chroot_dir}"
+	    [[ ${profile} == $p ]] && blacklist_pkg "${work_dir}"
 	done
 	setarch "${arch}" \
 	    mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
@@ -120,7 +120,7 @@ chroot_init(){
     if ${clean_first}; then
 	chroot_clean
 	chroot_create
-    elif [[ ! -d "${chroot_dir}" ]]; then
+    elif [[ ! -d "${work_dir}" ]]; then
 	chroot_create
     else
 	chroot_update

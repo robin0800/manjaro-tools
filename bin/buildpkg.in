@@ -34,7 +34,7 @@ display_settings(){
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
     msg2 "branch: ${branch}"
-    msg2 "chroots: ${chroots}"
+    msg2 "chroots_pkg: ${chroots_pkg}"
     
     msg "ARGS:"
 #     msg2 "mkchrootpkg_args: ${mkchrootpkg_args[*]}"
@@ -45,7 +45,7 @@ display_settings(){
     msg2 "sign: ${sign}"
     
     msg "PATHS:"
-    msg2 "chroot_dir: ${chroot_dir}"
+    msg2 "work_dir: ${work_dir}"
     msg2 "sets_dir: ${sets_dir}"
     msg2 "pkg_dir: ${pkg_dir}"
 #     msg2 "pacman_conf: ${pacman_conf}"
@@ -126,7 +126,7 @@ usage() {
     echo "    -p <profile>       Set profile or pkg [default: ${profile}]"
     echo "    -a <arch>          Set arch  [default: ${arch}]"
     echo "    -b <branch>        Set branch [default: ${branch}]"
-    echo "    -r <dir>           Chroots directory [default: ${chroots}]"
+    echo "    -r <dir>           Chroots directory [default: ${chroots_pkg}]"
     echo '    -c                 Recreate chroot'
     echo '    -w                 Clean up'
     echo '    -n                 Install and run namcap check'
@@ -147,7 +147,7 @@ while getopts "${opts}" arg; do
 	p) profile="$OPTARG" ;;
 	a) arch="$OPTARG" ;;
 	b) branch="$OPTARG" ;;
-	r) chroots="$OPTARG" ;;
+	r) chroots_pkg="$OPTARG" ;;
 	c) clean_first=true ;;
 	w) wipe_clean=true ;;
 	n) namcap=true; mkchrootpkg_args+=(-n) ;;
@@ -163,7 +163,7 @@ if [[ "$arch" == 'multilib' ]]; then
     arch='x86_64'
 fi
 
-chroot_dir=${chroots}/${branch}/${arch}
+work_dir=${chroots_pkg}/${branch}/${arch}
 
 pkg_dir="${cache_dir}/${branch}/${arch}"
 
@@ -173,7 +173,7 @@ mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 mkchroot_args+=(-L -C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf})
 
-mkchrootpkg_args+=(-r ${chroot_dir})
+mkchrootpkg_args+=(-r ${work_dir})
 
 makepkg_args+=("${@:$OPTIND}")
 
