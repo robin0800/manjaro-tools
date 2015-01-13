@@ -213,8 +213,6 @@ ${clean_first} && mkiso_args+=(-f)
 
 check_root "$0" "${orig_argv[@]}"
 
-load_packages
-
 ${pretend} && display_settings && exit 1
 
 if ${iso_only}; then

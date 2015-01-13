@@ -9,10 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-gen_pw(){
-    echo $(perl -e 'print crypt($ARGV[0], "password")' ${password})
-}
-
 # $1: chroot
 # configure_machine_id(){
 # # set unique machine-id
@@ -27,6 +23,10 @@ gen_pw(){
 # 	dbus-uuidgen --ensure=$1/var/lib/dbus/machine-id
 #     fi
 # }
+
+gen_pw(){
+    echo $(perl -e 'print crypt($ARGV[0], "password")' ${password})
+}
 
 # $1: chroot
 configure_user(){
@@ -458,6 +458,14 @@ configure_xorg_drivers(){
 	fi
 }
 
+gen_boot_img(){
+	local _kernver=$(cat ${work_dir}/boot-image/usr/lib/modules/*-MANJARO/version)
+        chroot-run ${work_dir}/boot-image \
+		  /usr/bin/mkinitcpio -k ${_kernver} \
+		  -c /etc/mkinitcpio-${manjaroiso}.conf \
+		  -g /boot/${img_name}.img
+}
+
 make_repo(){
     repo-add ${work_dir}/pkgs-image/opt/livecd/pkgs/gfx-pkgs.db.tar.gz ${work_dir}/pkgs-image/opt/livecd/pkgs/*pkg*z
 }
@@ -501,19 +509,17 @@ aufs_append_de_image(){
 # $1: del branch
 aufs_remove_image(){
     if mountpoint -q $1;then
-# 	mount -o remount,mod:$1=ro ${work_dir}/root-image
-# 	mount -o remount,del:$1 ${work_dir}/root-image
 	umount $1
     fi
 }
 
 # Base installation (root-image)
-make_root_image() {
+make_image_root() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
     
 	msg "Prepare [Base installation] (root-image)"
 
-	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting." && aufs_remove_image "${work_dir}/root-image"
+	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || die "Please check you Packages file! Exiting."
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 	
@@ -531,16 +537,13 @@ make_root_image() {
 	fi
 	
 	copy_overlay_root "${work_dir}/root-image"
-	
-	# Clean up GnuPG keys
-	rm -rf "${work_dir}/root-image/etc/pacman.d/gnupg"
 		
 	: > ${work_dir}/build.${FUNCNAME}
 	msg "Done [Base installation] (root-image)"
     fi
 }
 
-make_de_image() {
+make_image_de() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
     
 	msg "Prepare [${desktop} installation] (${desktop}-image)"
@@ -551,18 +554,15 @@ make_de_image() {
 	
 	aufs_mount_root_image "${work_dir}/${desktop}-image"
 
-	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting." && aufs_remove_image "${work_dir}/${desktop}-image"
+	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || die "Please check you Packages-${desktop} file! Exiting."
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
-	cp "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt" ${target_dir}/${img_name}-${desktop}-${iso_version}-${arch}-pkgs.txt
+	cp "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt" ${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}-pkgs.txt
 	
 	[[ -d ${desktop}-overlay ]] && copy_overlay_desktop
 	
 	${auto_svc_conf} && configure_services "${work_dir}/${desktop}-image"
-	
-	# Clean up GnuPG keys
-	rm -rf "${work_dir}/${desktop}-image/etc/pacman.d/gnupg"
 	
 	aufs_remove_image "${work_dir}/${desktop}-image"
 	
@@ -573,7 +573,7 @@ make_de_image() {
     fi
 }
 
-make_livecd_image() {
+make_image_livecd() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
     
 	msg "Prepare [livecd-image]"
@@ -588,7 +588,7 @@ make_livecd_image() {
 	    aufs_append_de_image "${work_dir}/livecd-image"
 	fi
 	
-	mkiso ${create_args[*]} -i "livecd-image" -p "${livecd_packages}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting." && aufs_remove_image "${work_dir}/livecd-image"
+	mkiso ${create_args[*]} -i "livecd-image" -p "${packages_livecd}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting." 
 	
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
@@ -616,8 +616,7 @@ make_livecd_image() {
     fi
 }
 
-
-make_pkgs_image() {
+make_image_xorg() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 	msg "Prepare [pkgs-image]"
 	
@@ -656,7 +655,7 @@ make_pkgs_image() {
     fi
 }
 
-make_lng_image() {
+make_image_lng() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 	msg "Prepare [lng-image]"
 	mkdir -p ${work_dir}/lng-image/opt/livecd/lng
@@ -697,16 +696,8 @@ make_lng_image() {
     fi
 }
 
-gen_boot_img(){
-	local _kernver=$(cat ${work_dir}/boot-image/usr/lib/modules/*-MANJARO/version)
-        chroot-run ${work_dir}/boot-image \
-		  /usr/bin/mkinitcpio -k ${_kernver} \
-		  -c /etc/mkinitcpio-${manjaroiso}.conf \
-		  -g /boot/${img_name}.img
-}
-
 # Prepare ${install_dir}/boot/
-make_boot() {
+make_image_boot() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
     
 	msg "Prepare [${install_dir}/boot]"
@@ -915,7 +906,7 @@ load_desktop_definition(){
     desktop=${desktop,,}
 }
 
-get_pkglist_xorg(){
+load_pkgs_xorg(){
     if [ "${arch}" == "i686" ]; then
 	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
@@ -924,7 +915,7 @@ get_pkglist_xorg(){
     packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
-get_pkglist_lng(){
+load_pkgs_lng(){
     if [ "${arch}" == "i686" ]; then
 	packages_lng=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
@@ -934,7 +925,7 @@ get_pkglist_lng(){
     packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
-get_pkglist_de(){
+load_pkgs_de(){
     if [ "${arch}" == "i686" ]; then
 	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
@@ -942,7 +933,7 @@ get_pkglist_de(){
     fi
 }
 
-get_pkglist(){
+load_pkgs_root(){
     if [ "${arch}" == "i686" ]; then
 	packages=$(sed "s|#.*||g" Packages | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
@@ -950,37 +941,17 @@ get_pkglist(){
     fi
 }
 
-get_pkglist_livecd(){
+load_pkgs_livecd(){
     if [ "${arch}" == "i686" ]; then
-	livecd_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_livecd=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
-	livecd_packages=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    fi
-}
-
-load_packages(){
-    get_pkglist
-
-    if [ -e Packages-Xorg ] ; then
-	get_pkglist_xorg
-    fi
-
-    if [ -e Packages-Lng ] ; then
-	get_pkglist_lng
-    fi
-
-    if [ -e "${pkgsfile}" ] ; then
-	get_pkglist_de
-    fi
-
-    if [[ -f Packages-Livecd ]]; then
-	get_pkglist_livecd
+	packages_livecd=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
 }
 
 compress_images(){
-    # install common
-    make_boot
+    # install common    
+    make_image_boot
     if [ "${arch}" == "x86_64" ]; then
 	make_efi
 	make_efiboot
@@ -993,25 +964,31 @@ compress_images(){
 
 make_images(){
     # install basic
-    make_root_image
+    load_pkgs_root
+    make_image_root
 
     # install DE(s)
     if [ -e "${pkgsfile}" ] ; then
-	make_de_image
+	load_pkgs_de
+	make_image_de
     fi
 
     # install xorg-drivers
     if [ -e Packages-Xorg ] ; then
-	make_pkgs_image
+	load_pkgs_xorg
+	make_image_xorg
     fi
     
     # install translations
     if [ -e Packages-Lng ] ; then
-	make_lng_image
+	load_pkgs_lng
+	make_image_lng
     fi
     
     # install overlay
     if [[ -f Packages-Livecd ]]; then
-	make_livecd_image
+	load_pkgs_livecd
+	make_image_livecd
     fi
+
 }
