@@ -22,30 +22,30 @@ load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 create_set(){
-    msg "Creating [${profile_dir_pkg}/${name}.set] ..."
-    if [[ -f ${profile_dir_pkg}/${name}.set ]];then
-	msg2 "Backing up ${profile_dir_pkg}/${name}.set.orig"
-	mv "${profile_dir_pkg}/${name}.set" "${profile_dir_pkg}/${name}.set.orig"
+    msg "Creating [${sets_dir_pkg}/${name}.set] ..."
+    if [[ -f ${sets_dir_pkg}/${name}.set ]];then
+	msg2 "Backing up ${sets_dir_pkg}/${name}.set.orig"
+	mv "${sets_dir_pkg}/${name}.set" "${sets_dir_pkg}/${name}.set.orig"
     fi
     local list=$(find * -maxdepth 0 -type d | sort)
     for item in ${list[@]};do
 	cd $item
 	if [[ -f PKGBUILD ]];then
 	    msg2 "Adding ${item##*/}"
-	    echo ${item##*/} >> ${profile_dir_pkg}/${name}.set || break
+	    echo ${item##*/} >> ${sets_dir_pkg}/${name}.set || break
 	fi
 	cd ..
     done
 }
 
 remove_set(){
-    msg "Removing [${profile_dir_pkg}/${name}.set] ..."
-    rm ${profile_dir_pkg}/${name}.set
+    msg "Removing [${sets_dir_pkg}/${name}.set] ..."
+    rm ${sets_dir_pkg}/${name}.set
 }
 
 show_set(){
-    local list=$(cat ${profile_dir_pkg}/${name}.set)
-    msg "Content of [${profile_dir_pkg}/${name}.set] ..."
+    local list=$(cat ${sets_dir_pkg}/${name}.set)
+    msg "Content of [${sets_dir_pkg}/${name}.set] ..."
     for item in ${list[@]}; do
 	msg2 "$item"
     done
@@ -85,6 +85,8 @@ done
 
 shift $(($OPTIND - 1))
 
+sets_dir_pkg="${sets_dir}/pkg"
+
 check_root "$0" "${orig_argv[@]}"
 
 if ${create};then
@@ -94,5 +96,5 @@ elif ${remove};then
 elif ${display};then
     show_set
 else
-    msg "Available sets: $(load_sets)"
+    msg "Available sets: $(load_sets ${sets_dir_pkg})"
 fi

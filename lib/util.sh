@@ -201,16 +201,16 @@ load_config(){
 	chroots_pkg='/opt/buildpkg'
     fi
     
-    if [[ -n ${profile_dir_pkg} ]];then
-	profile_dir_pkg=${profile_dir_pkg}
+    if [[ -n ${sets_dir} ]];then
+	sets_dir=${sets_dir}
     else
-	profile_dir_pkg="${SYSCONFDIR}/sets"
+	sets_dir="${SYSCONFDIR}/sets"
     fi
 
-    if [[ -n ${profile_pkg} ]];then
-	profile_pkg=${profile_pkg}
+    if [[ -n ${buildset_pkg} ]];then
+	buildset_pkg=${buildset_pkg}
     else
-	profile_pkg='default'
+	buildset_pkg='default'
     fi
 
     if [[ -n ${blacklist_trigger[@]} ]];then
@@ -357,13 +357,23 @@ load_config(){
     return 0
 }
 
+# $1: sets_dir
 load_sets(){
     local prof temp
-    for item in $(ls ${profile_dir_pkg}/*.set); do
+    for item in $(ls $1/*.set); do
 	temp=${item##*/}
 	prof=${prof:-}${prof:+|}${temp%.set}
     done
     echo $prof
+}
+
+# $1: sets_dir
+# $2: buildset
+eval_buildset(){
+    eval "case $1 in
+	    $(load_sets $2)) is_buildset=true ;;
+	    *) is_buildset=false ;;
+	esac"
 }
 
 load_user_info(){

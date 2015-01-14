@@ -31,7 +31,9 @@ display_settings(){
     fi
     
     msg "PROFILE:"
-    msg2 "profile_iso: ${profile_iso}"
+    msg2 "buildsets: $(load_sets ${sets_dir_iso})"
+    msg2 "buildset_iso: ${buildset_iso}"
+    msg2 "is_buildset: ${is_buildset}"
     msg2 "initsys: ${initsys}"
     msg2 "displaymanager: ${displaymanager}"
     
@@ -127,8 +129,6 @@ usage() {
     echo "                       [default: ${branch}]"
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
-    echo '    -t <dir>           Iso directory'
-    echo "                       [default: ${iso_dir}]"
     echo '    -v                 Verbose iso compression'
     echo '    -q                 Query settings and pretend build'
     echo '    -c                 Disable clean work dir and target dir iso'
@@ -148,14 +148,13 @@ usage() {
 
 orig_argv=("$@")
 
-opts='a:b:r:t:cvzqABGPLCh'
+opts='a:b:r:cvzqABGPLCh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
 	a) arch="$OPTARG" ;;
 	b) branch="$OPTARG" ;;
 	r) chroots_iso="$OPTARG" ;;
-	t) iso_dir="$OPTARG" ;;
 	v) verbose=true; mkiso_args+=(-v) ;;
 	B) images_only=true ;;
 	G) iso_only=true ;;
@@ -187,11 +186,15 @@ create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_con
 
 mkiso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 
+sets_dir_iso="${sets_dir}/iso"
+
+buildset_iso=${PWD##*/}
+
+iso_dir="${cache_dir}/iso/${buildset_iso}"
+
 iso_file="${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
-profile_iso=${PWD##*/}
-
-work_dir=${chroots_iso}/${profile_iso}/${arch}
+work_dir=${chroots_iso}/${buildset_iso}/${arch}
 
 cache_lng="${cache_dir}/lng"
     
@@ -204,6 +207,8 @@ ${high_compression} && mkiso_args+=(-x)
 ${clean_first} && mkiso_args+=(-f)
 
 check_root "$0" "${orig_argv[@]}"
+
+eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
 ${pretend} && display_settings && exit 1
 

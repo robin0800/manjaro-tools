@@ -9,13 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-eval_profile(){
-    eval "case $1 in
-	    $(load_sets)) is_profile=true ;;
-	    *) is_profile=false ;;
-	esac"
-}
-
 chroot_create(){
     msg "Creating chroot for [${branch}] (${arch})..."
     mkdir -p "${work_dir}"
@@ -91,9 +84,9 @@ move_pkg(){
 }
 
 chroot_build(){
-    if ${is_profile};then
-	msg "Start building profile_pkg [${profile_pkg}]"
-	for pkg in $(cat ${profile_dir_pkg}/${profile_pkg}.set); do
+    if ${is_buildset};then
+	msg "Start building [${buildset_pkg}]"
+	for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
 	    cd $pkg
 	    for p in ${blacklist_trigger[@]}; do
 		[[ $pkg == $p ]] && blacklist_pkg "${work_dir}"
@@ -103,11 +96,11 @@ chroot_build(){
 	    move_pkg
 	    cd ..
 	done
-	msg "Finished building profile_pkg [${profile_pkg}]"
+	msg "Finished building [${buildset_pkg}]"
     else
-	cd ${profile_pkg}
+	cd ${buildset_pkg}
 	for p in ${blacklist_trigger[@]}; do
-	    [[ ${profile_pkg} == $p ]] && blacklist_pkg "${work_dir}"
+	    [[ ${buildset_pkg} == $p ]] && blacklist_pkg "${work_dir}"
 	done
 	setarch "${arch}" \
 	    mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
