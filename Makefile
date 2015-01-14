@@ -24,9 +24,12 @@ BINPROGS = \
 SYSCONFIGFILES = \
 	conf/manjaro-tools.conf
 
-SETS = \
-	sets/default.set
-
+SETS_PKG = \
+	sets/pkg/default.set
+	
+SETS_ISO = \
+	sets/iso/default.set
+	
 CONFIGFILES = \
 	conf/makepkg-i686.conf \
 	conf/makepkg-x86_64.conf \
@@ -82,7 +85,10 @@ install:
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
 	install -m0644 ${SYSCONFIGFILES} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets
-	install -m0644 ${SETS} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets
+	
+	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
+	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
+	
 	install -dm0755 $(DESTDIR)$(PREFIX)/bin
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/manjaro-tools
@@ -109,7 +115,10 @@ install:
 
 uninstall:
 	for f in ${SYSCONFIGFILES}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/$$f; done
-	for f in ${SETS}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/$$f; done
+	
+	for f in ${SETS_PKG}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg/$$f; done
+	for f in ${SETS_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso/$$f; done
+	
 	for f in ${BINPROGS}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${CONFIGFILES}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/bin/find-libprovides
