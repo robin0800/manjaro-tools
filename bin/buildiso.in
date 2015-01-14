@@ -31,9 +31,9 @@ display_settings(){
     fi
     
     msg "PROFILE:"
-    msg2 "buildsets: $(load_sets ${sets_dir_iso})"
+#     msg2 "buildsets: $(load_sets ${sets_dir_iso})"
     msg2 "buildset_iso: ${buildset_iso}"
-    msg2 "is_buildset: ${is_buildset}"
+#     msg2 "is_buildset: ${is_buildset}"
     msg2 "initsys: ${initsys}"
     msg2 "displaymanager: ${displaymanager}"
     
@@ -44,7 +44,7 @@ display_settings(){
     
     msg "ARGS:"
     msg2 "clean_first: ${clean_first}"
-    msg2 "clean_cache_pkgs: ${clean_cache_pkgs}"
+    msg2 "clean_cache_xorg: ${clean_cache_xorg}"
     msg2 "clean_cache_lng: ${clean_cache_lng}"
     msg2 "custom_pac_conf: ${custom_pac_conf}"
     msg2 "images_only: ${images_only}"
@@ -55,9 +55,8 @@ display_settings(){
     msg "PATHS:" 
     msg2 "work_dir: ${work_dir}"
     msg2 "iso_dir: ${iso_dir}"
-    msg2 "cache_pkgs: ${cache_pkgs}"
-    msg2 "cache_lng: ${cache_lng}"
-   
+    msg2 "cache_dir_xorg: ${cache_dir_xorg}"
+    msg2 "cache_dir_lng: ${cache_dir_lng}"
 #     msg2 "pacman_conf: ${pacman_conf}"
 #     msg2 "pacman_mirrors: ${mirrors_conf}"
     
@@ -110,7 +109,7 @@ load_desktop_definition
 clean_first=true
 auto_svc_conf=true
 high_compression=true
-clean_cache_pkgs=true
+clean_cache_xorg=true
 clean_cache_lng=true
 
 pretend=false
@@ -160,7 +159,7 @@ while getopts "${opts}" arg; do
 	G) iso_only=true ;;
 	q) pretend=true ;;
 	C) custom_pac_conf=true ;;
-	P) clean_cache_pkgs=false ;;
+	P) clean_cache_xorg=false ;;
 	L) clean_cache_lng=false ;;
 	c) clean_first=false ;;
 	z) high_compression=false ;;
@@ -196,9 +195,9 @@ iso_file="${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
 work_dir=${chroots_iso}/${buildset_iso}/${arch}
 
-cache_lng="${cache_dir}/lng"
+cache_dir_lng="${cache_dir}/lng"
     
-cache_pkgs="${cache_dir}/pkgs"
+cache_dir_xorg="${cache_dir}/xorg"
 
 displaymanager=$(cat ${PWD}/displaymanager)
 initsys=$(cat ${PWD}/initsys)
@@ -208,7 +207,7 @@ ${clean_first} && mkiso_args+=(-f)
 
 check_root "$0" "${orig_argv[@]}"
 
-eval_buildset "${buildset_iso}" "${sets_dir_iso}"
+#eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
 ${pretend} && display_settings && exit 1
 
@@ -220,8 +219,8 @@ fi
 
 ${clean_first} && clean_up
 
-${clean_cache_pkgs} && clean_cache "${cache_pkgs}"
-${clean_cache_lng} && clean_cache "${cache_lng}"
+${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
+${clean_cache_lng} && clean_cache "${cache_dir_lng}"
 
 prepare_buildiso
 

@@ -375,18 +375,18 @@ copy_livecd_helpers(){
 
 copy_cache_lng(){
     msg2 "Copying lng cache ..."
-    cp ${cache_lng}/* ${work_dir}/lng-image/opt/livecd/lng
+    cp ${cache_dir_lng}/* ${work_dir}/lng-image/opt/livecd/lng
 }
 
-copy_cache_pkgs(){
-    msg2 "Copying pkgs cache ..."
-    cp ${cache_pkgs}/* ${work_dir}/pkgs-image/opt/livecd/pkgs
+copy_cache_xorg(){
+    msg2 "Copying xorg pkgs cache ..."
+    cp ${cache_dir_xorg}/* ${work_dir}/pkgs-image/opt/livecd/pkgs
 }
 
 prepare_buildiso(){
     mkdir -p "${iso_dir}"
-    mkdir -p "${cache_pkgs}"
-    mkdir -p "${cache_lng}"
+    mkdir -p "${cache_dir_xorg}"
+    mkdir -p "${cache_dir_lng}"
 }
 
 clean_cache(){
@@ -490,7 +490,7 @@ make_iso() {
     # You may want to move generated iso to some other place
     # its ugly if you set target dir to $HOME
     # you need to use root privs to move iso otherwise
-    chown "${OWNER}:users" "${iso_file}"
+    chown -R "${OWNER}:users" "${iso_dir}"
     msg "Done [Build ISO]"
 }
 
@@ -630,8 +630,8 @@ make_image_xorg() {
 	    aufs_append_de_image "${work_dir}/pkgs-image"
 	fi
 	
-	download_to_cache "${work_dir}/pkgs-image" "${cache_pkgs}" "${packages_xorg}"
-	copy_cache_pkgs	
+	download_to_cache "${work_dir}/pkgs-image" "${cache_dir_xorg}" "${packages_xorg}"
+	copy_cache_xorg
 	
 	if [[ -n "${packages_xorg_cleanup}" ]]; then
 	    for xorg_clean in ${packages_xorg_cleanup}; do  
@@ -669,10 +669,10 @@ make_image_lng() {
 	fi
 
 	if [[ -n ${packages_lng_kde} ]]; then
-	    download_to_cache "${work_dir}/lng-image" "${cache_lng}" "${packages_lng} ${packages_lng_kde}"
+	    download_to_cache "${work_dir}/lng-image" "${cache_dir_lng}" "${packages_lng} ${packages_lng_kde}"
 	    copy_cache_lng
 	else
-	    download_to_cache "${work_dir}/lng-image" "${cache_lng}" "${packages_lng}"
+	    download_to_cache "${work_dir}/lng-image" "${cache_dir_lng}" "${packages_lng}"
 	    copy_cache_lng
 	fi
 	
