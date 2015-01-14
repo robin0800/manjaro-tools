@@ -84,13 +84,10 @@ clean:
 install:
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
 	install -m0644 ${SYSCONFIGFILES} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
-	
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
-	
 	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
-	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
-	
+	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso	
 	install -dm0755 $(DESTDIR)$(PREFIX)/bin
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/manjaro-tools
@@ -98,46 +95,30 @@ install:
 	install -m0644 ${CONFIGFILES} $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	ln -sf find-libdeps $(DESTDIR)$(PREFIX)/bin/find-libprovides
 	install -m0644 ${LIBS} $(DESTDIR)$(PREFIX)/lib/manjaro-tools
-	
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/initcpio/hooks
 	install -m0755 ${CPIOHOOKS} $(DESTDIR)$(PREFIX)/lib/initcpio/hooks
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/initcpio/install
 	install -m0755 ${CPIOINST} $(DESTDIR)$(PREFIX)/lib/initcpio/install
-	
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
 	install -m0644 ${SCRIPTS} $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
 	
 	#install -Dm0644 bin/bash_completion $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 	#install -Dm0644 bin/zsh_completion $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
-	
-	# compat symlink for manjaroiso
-	#ln -sf basestrap $(DESTDIR)$(PREFIX)/bin/pacstrap
-	#ln -sf fstabgen $(DESTDIR)$(PREFIX)/bin/genfstab
-	#ln -sf manjaro-chroot $(DESTDIR)$(PREFIX)/bin/arch-chroot
 
 uninstall:
 	for f in ${SYSCONFIGFILES}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/$$f; done
-	
 	for f in ${SETS_PKG}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg/$$f; done
 	for f in ${SETS_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso/$$f; done
-	
 	for f in ${BINPROGS}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${CONFIGFILES}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/bin/find-libprovides
 	for f in ${LIBS}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
-	
 	for f in ${CPIOHOOKS}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/hooks/$$f; done
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
-	
 	for f in ${SCRIPTS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts/$$f; done
 	
 	#rm $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 	#rm $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
-	
-	# compat symlink for manjaroiso
-	#rm -f $(DESTDIR)$(PREFIX)/bin/pacstrap
-	#rm -f $(DESTDIR)$(PREFIX)/bin/genfstab
-	#rm -f $(DESTDIR)$(PREFIX)/bin/arch-chroot
 
 dist:
 	git archive --format=tar --prefix=manjaro-tools-$(V)/ $(V) | gzip -9 > manjaro-tools-$(V).tar.gz
