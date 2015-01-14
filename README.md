@@ -26,6 +26,9 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # cache dir where buildpkg or buildiso cache packages
 # cache_dir=/var/cache/manjaro-tools
 
+# custom path to sets
+# sets_dir=/etc/manjaro-tools/sets
+
 ##########################################
 ################ buildpkg ################
 ##########################################
@@ -33,11 +36,8 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # default chroot path
 # chroots_pkg=/opt/buildpkg
 
-# custom path to pkg sets
-# profile_dir_pkg=/etc/manjaro-tools/sets
-
-# default set; name without .set extension
-# profile_pkg=default
+# default pkg buildset; name without .set extension
+# buildset_pkg=default
 
 ############# eudev specific #############
 
@@ -56,10 +56,10 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 # default work dir where the image chroots are located
 # chroots_iso=/opt/buildiso
 
-# default iso dir where the iso file will be stored
-# iso_dir=/opt/manjaro-iso
+# default iso buildset; name without .set extension
+# currently unused
+# buildset_iso=default
 
-##########################################
 ############## iso settings ##############
 
 # unset defaults to given value
