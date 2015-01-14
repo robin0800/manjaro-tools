@@ -403,25 +403,25 @@ clean_up(){
 
 # $1: chroot
 configure_livecd_image(){
-    msg2 "Configuring [$1]"
+    msg2 "Configuring [livecd-image]"
     
-    configure_displaymanager "$1"
+    configure_displaymanager "${work_dir}/livecd-image"
     
-    configure_accountsservice "$1" "${username}"
+    configure_accountsservice "${work_dir}/livecd-image" "${username}"
     
-    configure_user "$1"
+    configure_user "${work_dir}/livecd-image"
     
-    configure_calamares "$1"
+    configure_calamares "${work_dir}/livecd-image"
     
-    ${auto_svc_conf} && configure_services_live "$1"
+    ${auto_svc_conf} && configure_services_live "${work_dir}/livecd-image"
         
-    configure_hostname "$1"
+    configure_hostname "${work_dir}/livecd-image"
     
-    configure_hosts "$1"
+    configure_hosts "${work_dir}/livecd-image"
     
-    configure_plymouth "$1"
+    configure_plymouth "${work_dir}/livecd-image"
     
-    msg2 "Done configuring [$1]"
+    msg2 "Done configuring [livecd-image]"
 }
 
 configure_xorg_drivers(){
@@ -486,10 +486,7 @@ make_iso() {
     touch "${work_dir}/iso/.miso"
     
     mkiso ${mkiso_args[*]} iso "${work_dir}" "${iso_file}"
-#    FIXME: why do we need this?
-    # You may want to move generated iso to some other place
-    # its ugly if you set target dir to $HOME
-    # you need to use root privs to move iso otherwise
+
     chown -R "${OWNER}:users" "${iso_dir}"
     msg "Done [Build ISO]"
 }
@@ -593,14 +590,13 @@ make_image_livecd() {
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
 	copy_overlay_livecd "${work_dir}/livecd-image"
-	
-	configure_livecd_image "${work_dir}/livecd-image"
-
-        # copy over setup helpers and config loader
+	# copy over setup helpers and config loader
         copy_livecd_helpers "${work_dir}/livecd-image/opt/livecd"
         
         copy_startup_scripts "${work_dir}/livecd-image/usr/bin"
         
+	configure_livecd_image
+
 #        cp ${work_dir}/root-image/etc/pacman.d/mirrorlist ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
 #        sed -i "s/#Server/Server/g" ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
        	
