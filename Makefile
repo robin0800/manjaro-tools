@@ -84,7 +84,9 @@ clean:
 install:
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
 	install -m0644 ${SYSCONFIGFILES} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
-	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets
+	
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
 	
 	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
 	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
