@@ -1002,14 +1002,14 @@ build_profile(){
     ${clean_cache_lng} && clean_cache "${cache_dir_lng}"
 
     if ${iso_only}; then
-	[[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -B"
+	[[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -p <name> -i"
 	compress_images
 	exit 1
     fi
 
     if ${images_only}; then
 	build_images
-	warning "Continue with eg. buildiso -Gv ..."
+	warning "Continue with eg. buildiso -p <name> -s ..."
 	exit 1
     else
 	build_images
