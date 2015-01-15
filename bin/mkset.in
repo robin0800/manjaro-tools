@@ -25,9 +25,6 @@ write_set(){
 	msg2 "Adding ${1##*/}"
 	echo ${1##*/} >> ${2}/${name}.set || break
 }
-write_set_iso(){
-
-}
 
 create_set(){
     msg "Creating [$1/${name}.set] ..."
@@ -38,9 +35,8 @@ create_set(){
     local list=$(find * -maxdepth 0 -type d | sort)
     for item in ${list[@]};do
 	cd $item
-	    if ${iso_mode}; then
-		
-		if [[ -f displaymanager ]] && [[ -f initsys ]];then
+	    if ${iso_mode}; then		
+		if [[ -f initsys ]];then
 		    write_set "$item" "${sets_dir_iso}"
 		fi
 	    else
@@ -50,7 +46,6 @@ create_set(){
 	    fi
 	cd ..
     done
-
 }
 
 remove_set(){
@@ -88,15 +83,15 @@ usage() {
 
 orig_argv=("$@")
 
-opts='c:r:d:qh'
+opts='c:r:d:qih'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
 	c) name="$OPTARG"; create=true ;;
 	r) name="$OPTARG"; remove=true ;;
-	q) query=true ;;
-	i) iso_mode=true ;;
 	d) name="$OPTARG"; display=true;;
+	i) iso_mode=true ;;
+	q) query=true ;;
 	h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
     esac
@@ -112,9 +107,22 @@ check_root "$0" "${orig_argv[@]}"
 if ${create};then
     create_set
 elif ${remove};then
-    remove_set
+    if ${iso_mode}; then
+        remove_set ${sets_dir_iso}
+    else
+        remove_set ${sets_dir_pkg}
+    fi
 elif ${display};then
-    show_set
+    if ${iso_mode}; then
+        show_set ${sets_dir_iso}
+    else
+        show_set ${sets_dir_pkg}
+    fi
 else
-    msg "Available sets: $(load_sets ${sets_dir_pkg})"
+    if ${iso_mode}; then
+        msg "Available sets: $(load_sets ${sets_dir_iso})"
+    else
+        msg "Available sets: $(load_sets ${sets_dir_pkg})"
+    fi
+
 fi
