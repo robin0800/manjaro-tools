@@ -38,7 +38,7 @@ usage() {
 
 orig_argv=("$@")
 
-while getopts 'hBC:M:S:c:r:w:' arg; do
+while getopts 'hC:M:S:c:r:w:B:' arg; do
 	case "$arg" in
 		C) pac_conf="$OPTARG" ;;
 		M) makepkg_conf="$OPTARG" ;;
