@@ -101,7 +101,7 @@ If the userconfig is present, manjaro-tools will load userconfig values, however
 
 # unset defaults to given values
 # names must match systemd service names
-# start_systemd=('cronie' 'cupsd' 'tlp' 'tlp-sleep')
+# start_systemd=('cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 
 # unset defaults to given values, 
 # names must match openrc service names
