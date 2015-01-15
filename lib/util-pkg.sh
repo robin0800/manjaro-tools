@@ -99,7 +99,7 @@ chroot_build(){
 	done
 	msg "Finished building [${buildset_pkg}]"
     else
-	[[ -f ${buildset_pkg}/PKGBUILD ]] || die "No PKGBUILD found in $pkg!"
+	[[ -f ${buildset_pkg}/PKGBUILD ]] || die "${buildset_pkg} is not a valid profile!"
 	cd ${buildset_pkg}
 	for p in ${blacklist_trigger[@]}; do
 	    [[ ${buildset_pkg} == $p ]] && blacklist_pkg "${work_dir}"

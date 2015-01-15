@@ -1032,7 +1032,7 @@ build_iso(){
 	msg "Finished building [${buildset_iso}]"
     else
 	cd ${buildset_iso}
-	    [[ -f ${buildset_iso}/initsys ]] || die "${buildset_iso} is not a vlaid iso profile!"
+	    [[ -f ${buildset_iso}/initsys ]] || die "${buildset_iso} is not a valid profile!"
 	    load_desktop_definition
 	    load_profile
 	    work_dir=${chroots_iso}/${buildset_iso}/${arch}
