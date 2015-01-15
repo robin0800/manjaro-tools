@@ -16,7 +16,6 @@ version=@version@
 [[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
 
 working_dir=''
-build_locales=false
 
 usage() {
 	echo "Usage: ${0##*/} [options] working-dir [run arguments]"
@@ -30,7 +29,6 @@ usage() {
 	echo '    -r <list>     Bind mountargs ro'
 	echo '    -w <list>     Bind mountargs rw'
 	echo '                  List format [src1:target1,...,srcN:targetN]'
-# 	echo '    -L            Use fast mirrorlist for pkgbuilding'
 	echo '    -B            Use custom  build mirror'
 	echo '    -h            This message'
 	exit 1
@@ -46,7 +44,6 @@ while getopts 'hC:M:S:c:r:w:B:' arg; do
 		c) cache_dir="$OPTARG" ;;
 		r) mountargs_ro="$OPTARG" ;;
 		w) mountargs_rw="$OPTARG" ;;
-# 		L) build_locales=true ;;
 		B) build_mirror="$OPTARG" ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
