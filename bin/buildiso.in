@@ -23,61 +23,42 @@ SYSCONFDIR='@sysconfdir@'
 display_settings(){
     msg "manjaro-tools"
     msg2 "version: ${version}"
-    
+
     if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
 	msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
     else
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
     fi
-    
-    msg "PROFILE:"
-    msg2 "buildsets: $(load_sets ${sets_dir_iso})"
-    msg2 "buildset_iso: ${buildset_iso}"
-    msg2 "is_buildset: ${is_buildset}"
-    msg2 "initsys: ${initsys}"
-    msg2 "displaymanager: ${displaymanager}"
-    
+
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
     msg2 "branch: ${branch}"
     msg2 "chroots_iso: ${chroots_iso}"
-    
+
+    msg "PROFILE:"
+    msg2 "buildsets: $(load_sets ${sets_dir_iso})"
+    msg2 "buildset_iso: ${buildset_iso}"
+    msg2 "is_buildset: ${is_buildset}"
+
     msg "ARGS:"
     msg2 "clean_first: ${clean_first}"
     msg2 "auto_svc_conf: ${auto_svc_conf}"
-    msg2 "custom_pac_conf: ${custom_pac_conf}"
-    if ${is_buildset}; then
-	msg2 "clean_cache_xorg: ${clean_cache_xorg}"
-	msg2 "clean_cache_lng: ${clean_cache_lng}"
-	msg2 "images_only: ${images_only}"
-	msg2 "iso_only: ${iso_only}"
-    fi
-#     msg2 "high_compression: ${high_compression}"
+    msg2 "clean_cache_xorg: ${clean_cache_xorg}"
+    msg2 "clean_cache_lng: ${clean_cache_lng}"
+    msg2 "images_only: ${images_only}"
+    msg2 "iso_only: ${iso_only}"
 
-    msg "PATHS:" 
-    msg2 "work_dir: ${work_dir}"
-    msg2 "iso_dir: ${iso_dir}"
-    if ${is_buildset}; then
-	msg2 "cache_dir_xorg: ${cache_dir_xorg}"
-	msg2 "cache_dir_lng: ${cache_dir_lng}"
-    fi
-    msg2 "pacman_conf: ${pacman_conf}"
-    msg2 "pacman_mirrors: ${mirrors_conf}"
-    
+    msg "PATHS:"
+    msg2 "cache_dir_iso: ${cache_dir_iso}"
+    msg2 "cache_dir_xorg: ${cache_dir_xorg}"
+    msg2 "cache_dir_lng: ${cache_dir_lng}"
+
     msg "IMAGES SETTINGS:"
     msg2 "manjaro_kernel: ${manjaro_kernel}"
     msg2 "manjaro_version: ${manjaro_version}"
-    
+
     msg2 "plymouth_theme: ${plymouth_theme}"
-    
-    if ${auto_svc_conf};then
-	if [ ${initsys} == "systemd" ];then
-	    msg2 "start_systemd: ${start_systemd[*]}"
-	else
-	    msg2 "start_openrc: ${start_openrc[*]}"
-	fi
-    fi
-    
+
     msg "ISO SETTINGS:"
     msg2 "iso_label: ${iso_label}"
     msg2 "iso_version: ${iso_version}"
@@ -85,85 +66,65 @@ display_settings(){
     msg2 "code_name: ${code_name}"
     msg2 "img_name: ${img_name}"
     msg2 "install_dir: ${install_dir}"
-    msg2 "iso_file: ${iso_file}"
     msg2 "compression: ${compression}"
-    
+
     msg "LIVECD:"
     msg2 "username: ${username}"
     msg2 "password: ${password}"
     msg2 "addgroups: ${addgroups}"
     msg2 "hostname: ${hostname}"
-    
-    if ${auto_svc_conf};then
-	if [ ${initsys} == "systemd" ];then
-	    msg2 "start_systemd_live: ${start_systemd_live[*]}"
-	else
-	    msg2 "start_openrc_live: ${start_openrc_live[*]}"
-	fi
-    fi
-}
 
-build_profile(){
-    load_desktop_definition
-    
-    displaymanager=$(cat displaymanager)
-    initsys=$(cat initsys)
-    
-    work_dir=${chroots_iso}/${buildset_iso}/${arch}
-    iso_file="${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
-    
-    if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
-	pacman_conf="pacman-${pacman_conf_arch}.conf"
-    else
-	pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
-    fi
-    
-    ${pretend} && display_settings && exit 1
-    
-    ${clean_first} && clean_up
-    
-    ${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
-    ${clean_cache_lng} && clean_cache "${cache_dir_lng}"
-    
-    if ${iso_only}; then
-	[[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -B"
-	compress_images 
-	exit 1
-    fi
-    
-    if ${images_only}; then
-	build_images
-	warning "Continue with eg. buildiso -Gv ..."
-	exit 1
-    else
-	build_images
-	compress_images
-    fi
-}
-
-build_iso(){
+    msg "BUILD QUEUE:"
     if ${is_buildset};then
-	msg "Start building [${buildset_iso}]"
-	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-	    cd $prof
-		build_profile
+	local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
+	for item in ${list[@]}; do
+	    msg3 "$item"
+	    cd $item
+	    load_desktop_definition
+	    load_profile
+	    work_dir=${chroots_iso}/$item/${arch}
+	    msg2 "initsys: ${initsys}"
+	    msg2 "displaymanager: ${displaymanager}"
+	    msg2 "pacman_conf: ${pacman_conf}"
+	    msg2 "work_dir: ${work_dir}"
+	    msg2 "iso_file: ${iso_file}"
+	    if [ ${initsys} == "systemd" ];then
+		msg2 "start_systemd: ${start_systemd[*]}"
+		msg2 "start_systemd_live: ${start_systemd_live[*]}"
+	    else
+		msg2 "start_openrc: ${start_openrc[*]}"
+		msg2 "start_openrc_live: ${start_openrc_live[*]}"
+	    fi
 	    cd ..
 	done
-	msg "Finished building [${buildset_iso}]"
     else
+	msg3 "${buildset_iso}"
 	cd ${buildset_iso}
-	    build_profile
+	load_desktop_definition
+	load_profile
+	work_dir=${chroots_iso}/${buildset_iso}/${arch}
+	msg2 "initsys: ${initsys}"
+	msg2 "displaymanager: ${displaymanager}"
+	msg2 "pacman_conf: ${pacman_conf}"
+	msg2 "work_dir: ${work_dir}"
+	msg2 "iso_file: ${iso_file}"
+	if [ ${initsys} == "systemd" ];then
+	    msg2 "start_systemd: ${start_systemd[*]}"
+	    msg2 "start_systemd_live: ${start_systemd_live[*]}"
+	else
+	    msg2 "start_openrc: ${start_openrc[*]}"
+	    msg2 "start_openrc_live: ${start_openrc_live[*]}"
+	fi
 	cd ..
     fi
 }
 
 load_user_info
 
-load_config "${USER_CONFIG}/manjaro-tools.conf"  
+load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 clean_first=true
-auto_svc_conf=true
 clean_cache_xorg=true
 clean_cache_lng=true
 
@@ -184,7 +145,6 @@ usage() {
     echo '    -v                 Verbose iso compression'
     echo '    -q                 Query settings and pretend build'
     echo '    -c                 Disable clean work dir and target dir iso'
-    echo '    -A                 Disable auto configure services'
     echo '    -B                 Build images only'
     echo '    -G                 Generate iso only'
     echo '                       Requires pre built images'
@@ -198,7 +158,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:cvqAXLBGh'
+opts='p:a:b:r:cvqXLBGh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -209,7 +169,6 @@ while getopts "${opts}" arg; do
 	v) verbose=true; iso_args+=(-v) ;;
 	q) pretend=true ;;
 	c) clean_first=false ;;
-	A) auto_svc_conf=false ;;
 	X) clean_cache_xorg=false ;;
 	L) clean_cache_lng=false ;;
 	B) images_only=true ;;
@@ -227,7 +186,7 @@ fi
 sets_dir_iso="${sets_dir}/iso"
 cache_dir_lng="${cache_dir}/lng"
 cache_dir_xorg="${cache_dir}/xorg"
-iso_dir="${cache_dir}/iso"
+cache_dir_iso="${cache_dir}/iso"
 
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
@@ -240,5 +199,7 @@ check_root "$0" "${orig_argv[@]}"
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
 prepare_cachedirs
+
+${pretend} && display_settings && exit 1
 
 build_iso

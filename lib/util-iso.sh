@@ -384,7 +384,7 @@ copy_cache_xorg(){
 }
 
 prepare_cachedirs(){
-    [[ ! -d "${iso_dir}" ]] && mkdir -p "${iso_dir}"
+    [[ ! -d "${cache_dir_iso}" ]] && mkdir -p "${cache_dir_iso}"
     [[ ! -d "${cache_dir_xorg}" ]] && mkdir -p "${cache_dir_xorg}"
     [[ ! -d "${cache_dir_lng}" ]] && mkdir -p "${cache_dir_lng}"
 }
@@ -485,9 +485,9 @@ make_iso() {
     msg "Start [Build ISO]"
     touch "${work_dir}/iso/.miso"
     
-    mkiso ${mkiso_args[*]} iso "${work_dir}" "${iso_file}"
+    mkiso ${iso_args[*]} iso "${work_dir}" "${iso_file}"
 
-    chown -R "${OWNER}:users" "${iso_dir}"
+    chown -R "${OWNER}:users" "${cache_dir_iso}"
     msg "Done [Build ISO]"
 }
 
@@ -555,7 +555,7 @@ make_image_de() {
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
-	cp "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt" ${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}-pkgs.txt
+	cp "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt" ${cache_dir_iso}/${img_name}-${desktop}-${iso_version}-${arch}-pkgs.txt
 	
 	[[ -d ${desktop}-overlay ]] && copy_overlay_desktop
 	
@@ -855,6 +855,19 @@ make_isomounts() {
     fi
 }
 
+load_profile(){
+    displaymanager=$(cat displaymanager)
+    initsys=$(cat initsys)
+
+    iso_file="${cache_dir_iso}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
+
+    if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
+	pacman_conf="pacman-${pacman_conf_arch}.conf"
+    else
+	pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+    fi
+}
+
 load_desktop_definition(){
     if [ -e Packages-Xfce ] ; then
 	pkgsfile="Packages-Xfce"
@@ -980,4 +993,48 @@ build_images(){
 	make_efiboot
     fi
     make_isolinux
+}
+
+build_profile(){
+    ${clean_first} && clean_up
+
+    ${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
+    ${clean_cache_lng} && clean_cache "${cache_dir_lng}"
+
+    if ${iso_only}; then
+	[[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -B"
+	compress_images
+	exit 1
+    fi
+
+    if ${images_only}; then
+	build_images
+	warning "Continue with eg. buildiso -Gv ..."
+	exit 1
+    else
+	build_images
+	compress_images
+    fi
+}
+
+build_iso(){
+    if ${is_buildset};then
+	msg "Start building [${buildset_iso}]"
+	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
+	    cd $prof
+		load_desktop_definition
+		load_profile
+		work_dir=${chroots_iso}/$prof/${arch}
+		build_profile
+	    cd ..
+	done
+	msg "Finished building [${buildset_iso}]"
+    else
+	cd ${buildset_iso}
+	    load_desktop_definition
+	    load_profile
+	    work_dir=${chroots_iso}/${buildset_iso}/${arch}
+	    build_profile
+	cd ..
+    fi
 }
