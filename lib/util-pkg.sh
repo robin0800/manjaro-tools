@@ -88,6 +88,7 @@ chroot_build(){
 	msg "Start building [${buildset_pkg}]"
 	for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
 	    cd $pkg
+	    check_dir_pkg
 	    for p in ${blacklist_trigger[@]}; do
 		[[ $pkg == $p ]] && blacklist_pkg "${work_dir}"
 	    done
@@ -99,6 +100,7 @@ chroot_build(){
 	msg "Finished building [${buildset_pkg}]"
     else
 	cd ${buildset_pkg}
+	check_dir_pkg
 	for p in ${blacklist_trigger[@]}; do
 	    [[ ${buildset_pkg} == $p ]] && blacklist_pkg "${work_dir}"
 	done

@@ -1022,6 +1022,7 @@ build_iso(){
 	msg "Start building [${buildset_iso}]"
 	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
 	    cd $prof
+		check_dir_iso
 		load_desktop_definition
 		load_profile
 		work_dir=${chroots_iso}/$prof/${arch}
@@ -1031,6 +1032,7 @@ build_iso(){
 	msg "Finished building [${buildset_iso}]"
     else
 	cd ${buildset_iso}
+	    check_dir_iso
 	    load_desktop_definition
 	    load_profile
 	    work_dir=${chroots_iso}/${buildset_iso}/${arch}
