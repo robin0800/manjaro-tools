@@ -339,7 +339,7 @@ load_config(){
     if [[ -n ${start_systemd} ]];then
 	start_systemd=${start_systemd}
     else
-	start_systemd=('cronie' 'cupsd' 'tlp' 'tlp-sleep')
+	start_systemd=('cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
     fi
     
     if [[ -n ${start_openrc} ]];then
