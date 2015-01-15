@@ -46,7 +46,7 @@ chroot_update(){
 clean_up(){
     msg "Cleaning up ..."
     
-    local query=$(find ${pkg_dir} -maxdepth 1 -name "*.*")
+    local query=$(find ${cache_dir_pkg} -maxdepth 1 -name "*.*")
     
     [[ -n $query ]] && rm -v $query
     
@@ -69,18 +69,18 @@ blacklist_pkg(){
 }
 
 prepare_cachedir(){
-    [[ ! -d "${pkg_dir}" ]] && mkdir -p "${pkg_dir}"
-    chown -R "${OWNER}:users" "${pkg_dir}"
+    [[ ! -d "${cache_dir_pkg}" ]] && mkdir -p "${cache_dir_pkg}"
+    chown -R "${OWNER}:users" "${cache_dir_pkg}"
 }
 
 move_pkg(){
     local ext='pkg.tar.xz'
     if [[ -n $PKGDEST ]];then
-	mv $PKGDEST/*{any,$arch}.${ext} ${pkg_dir}/
+	mv $PKGDEST/*{any,$arch}.${ext} ${cache_dir_pkg}/
     else
-	mv *.${ext} ${pkg_dir}
+	mv *.${ext} ${cache_dir_pkg}
     fi
-    chown -R "${OWNER}:users" "${pkg_dir}"
+    chown -R "${OWNER}:users" "${cache_dir_pkg}"
 }
 
 chroot_build(){
@@ -121,7 +121,7 @@ chroot_init(){
 }
 
 sign_pkgs(){
-    cd ${pkg_dir}
+    cd ${cache_dir_pkg}
     su "${OWNER}" <<'EOF'
 signpkgs
 EOF
