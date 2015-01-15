@@ -51,7 +51,7 @@ usage ()
     echo "                      Default $IMAGE_FOLDER"
     echo "    -d                Create default user directory /home/manjaro"
     echo "    -v                Enable verbose output"
-    echo "    -M                Pass pacman-morrors.conf"
+    echo "    -M                Pass pacman-mirrors.conf"
     echo "    -h                This message"
     echo " commands:"
     echo "   create <dir>"
