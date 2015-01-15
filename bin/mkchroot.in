@@ -25,19 +25,21 @@ usage() {
 	echo '    -S <file>     Location of a pacman-mirrors config file'
 	echo '    -c <dir>      Set pacman cache'
 	echo '    -L            Use build locale.gen en/de'
+	echo '    -B            Use custom build mirror'
 	echo '    -h            This message'
 	exit 1
 }
 
 orig_argv=("$@")
 
-while getopts 'hLC:M:S:c:' arg; do
+while getopts 'hLC:M:S:c:B:' arg; do
 	case "$arg" in
 		C) pac_conf="$OPTARG" ;;
 		M) makepkg_conf="$OPTARG" ;;
 		S) mirrors_conf="$OPTARG" ;;
 		c) cache_dir="$OPTARG" ;;
-		L) build_locales=true; bl_args+=(-L) ;;
+		L) build_locales=true ;;
+		B) build_mirror="$OPTARG" ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -90,7 +92,7 @@ exec chroot-run \
 	${pac_conf:+-C "$pac_conf"} \
 	${makepkg_conf:+-M "$makepkg_conf"} \
 	${mirrors_conf:+-S "$mirrors_conf"} \
+	${build_mirror:+-B "$build_mirror"} \
 	${cache_dir:+-c "$cache_dir"} \
-	${bl_args[*]} \
 	"$working_dir" locale-gen
 

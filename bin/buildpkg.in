@@ -53,6 +53,7 @@ display_settings(){
     msg2 "work_dir: ${work_dir}"
     msg2 "sets_dir_pkg: ${sets_dir_pkg}"
     msg2 "cache_dir_pkg: ${cache_dir_pkg}"
+    msg2 "build_mirror: ${build_mirror}/${branch}"
     #     msg2 "pacman_conf: ${pacman_conf}"
     #     msg2 "makepkg_conf: ${makepkg_conf}"
     #     msg2 "mirrors_conf: ${mirrors_conf}"
@@ -163,7 +164,7 @@ pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
-mkchroot_args+=(-L -C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf})
+mkchroot_args+=(-L -C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}")
 
 mkchrootpkg_args+=(-r ${work_dir})
 

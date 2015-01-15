@@ -30,14 +30,15 @@ usage() {
 	echo '    -r <list>     Bind mountargs ro'
 	echo '    -w <list>     Bind mountargs rw'
 	echo '                  List format [src1:target1,...,srcN:targetN]'
-	echo '    -L            Use fast mirrorlist for pkgbuilding'
+# 	echo '    -L            Use fast mirrorlist for pkgbuilding'
+	echo '    -B            Use custom  build mirror'
 	echo '    -h            This message'
 	exit 1
 }
 
 orig_argv=("$@")
 
-while getopts 'hLC:M:S:c:r:w:' arg; do
+while getopts 'hBC:M:S:c:r:w:' arg; do
 	case "$arg" in
 		C) pac_conf="$OPTARG" ;;
 		M) makepkg_conf="$OPTARG" ;;
@@ -45,7 +46,8 @@ while getopts 'hLC:M:S:c:r:w:' arg; do
 		c) cache_dir="$OPTARG" ;;
 		r) mountargs_ro="$OPTARG" ;;
 		w) mountargs_rw="$OPTARG" ;;
-		L) build_locales=true ;;
+# 		L) build_locales=true ;;
+		B) build_mirror="$OPTARG" ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -73,14 +75,18 @@ copy_hostconf () {
 	[[ -n $makepkg_conf ]] && cp $makepkg_conf "$1/etc/makepkg.conf"
 	[[ -n $mirrors_conf ]] && cp ${mirrors_conf} "$1/etc/pacman-mirrors.conf"
 	
-	if ${build_locales};then
-	    local host_mirror=$(pacman -Sddp community/manjaro-tools 2>/dev/null | sed -E "s#(.*/)(.*/)community/.*#\1branch/\$repo/\$arch#")
-	    [[ $host_mirror == *file://* ]] && host_mirror_path=$(echo "$host_mirror" | sed -r 's#file://(/.*)/\$repo/os/\$arch#\1#g')
-	    
-	    local branch=$(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch=' | sed 's/Branch=\s*//g')
-	    
-	    host_mirror=$(echo "$host_mirror" | sed -E "s#/branch/#/${branch}/#")
-	    echo "Server = $host_mirror" > "$1/etc/pacman.d/mirrorlist"
+# 	if ${build_locales};then
+# 	    local host_mirror=$(pacman -Sddp community/manjaro-tools 2>/dev/null | sed -E "s#(.*/)(.*/)community/.*#\1branch/\$repo/\$arch#")
+# 	    [[ $host_mirror == *file://* ]] && host_mirror_path=$(echo "$host_mirror" | sed -r 's#file://(/.*)/\$repo/os/\$arch#\1#g')
+# 	    
+# 	    local branch=$(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch=' | sed 's/Branch=\s*//g')
+# 	    
+# 	    host_mirror=$(echo "$host_mirror" | sed -E "s#/branch/#/${branch}/#")
+# 	    echo "Server = $host_mirror" > "$1/etc/pacman.d/mirrorlist"
+	if [[ -n ${build_mirror} ]];then
+# 	    source $1/etc/pacman-mirrors.conf
+	    build_mirror=${build_mirror}'/$repo/$arch'
+	    echo "Server = ${build_mirror}" > "$1/etc/pacman.d/mirrorlist"
 	else
 	    source $1/etc/pacman-mirrors.conf	
 	    sed -e "s|/stable|/${Branch}|g" -i "$1/etc/pacman.d/mirrorlist"

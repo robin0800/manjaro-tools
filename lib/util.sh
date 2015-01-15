@@ -213,6 +213,12 @@ load_config(){
 	buildset_pkg='default'
     fi
 
+    if [[ -n ${build_mirror} ]];then
+	build_mirror=${build_mirror}
+    else
+	build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
+    fi
+    
     if [[ -n ${blacklist_trigger[@]} ]];then
 	blacklist_trigger=${blacklist_trigger[@]}
     else
