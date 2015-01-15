@@ -30,15 +30,15 @@ display_settings(){
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
     fi
 
-    msg "OPTIONS:"
-    msg2 "arch: ${arch}"
-    msg2 "branch: ${branch}"
-    msg2 "chroots_iso: ${chroots_iso}"
-
     msg "PROFILE:"
     msg2 "buildsets: $(load_sets ${sets_dir_iso})"
     msg2 "buildset_iso: ${buildset_iso}"
     msg2 "is_buildset: ${is_buildset}"
+
+    msg "OPTIONS:"
+    msg2 "arch: ${arch}"
+    msg2 "branch: ${branch}"
+    msg2 "chroots_iso: ${chroots_iso}"
 
     msg "ARGS:"
     msg2 "clean_first: ${clean_first}"
