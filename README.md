@@ -1,4 +1,4 @@
-manjaro-tools
+﻿manjaro-tools
 =============
 
 Manjaro-tools-0.9.6
@@ -148,17 +148,17 @@ if no DM is used, set it to 'none'
 
 Packages-Livecd 
 contains packages you only want on livecd but not installed on the target system with installer
-dault files are in shared folderand can be symlinked or defined in a real file
+default files are in shared folder and can be symlinked or defined in a real file
 
 If you need a custom livecd-overlay, create a overlay-livecd folder in your profile, and symlink from shared/overlay-livecd/<your_selection> and add your modification. 
 
 2. buildpkg
 
 buildpkg is the chroot build script oi manjaro-tools.
-It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD
-It can be configure with manjaro-tools.conf or by args
-buildpackage creates by default a pkg cache dir in /var/cache/manjaro-tools/
-Subdirectories will be created when building for the brach and architecture.
+It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
+It can be configured with manjaro-tools.conf or by args.
+buildpkg creates by default a pkg cache dir in /var/cache/manjaro-tools/
+Subdirectories will be created when building for the branch and architecture.
 
 A word on makepkg.conf PKGDEST
 manjarotools.conf supports the makepkg.conf variables
