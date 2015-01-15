@@ -235,10 +235,10 @@ load_config(){
 	chroots_iso='/opt/buildiso'
     fi
     
-    if [[ -n ${iso_dir} ]];then
-	iso_dir=${iso_dir}
+    if [[ -n ${buildset_iso} ]];then
+	buildset_iso=${buildset_iso}
     else
-	iso_dir='/opt/manjaro-iso'
+	buildset_iso='default'
     fi
     
     if [[ -n ${iso_label} ]];then
