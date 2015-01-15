@@ -383,10 +383,10 @@ copy_cache_xorg(){
     cp ${cache_dir_xorg}/* ${work_dir}/pkgs-image/opt/livecd/pkgs
 }
 
-prepare_buildiso(){
-    mkdir -p "${iso_dir}"
-    mkdir -p "${cache_dir_xorg}"
-    mkdir -p "${cache_dir_lng}"
+prepare_cachedirs(){
+    [[ ! -d "${iso_dir}" ]] && mkdir -p "${iso_dir}"
+    [[ ! -d "${cache_dir_xorg}" ]] && mkdir -p "${cache_dir_xorg}"
+    [[ ! -d "${cache_dir_lng}" ]] && mkdir -p "${cache_dir_lng}"
 }
 
 clean_cache(){
@@ -946,45 +946,38 @@ load_pkgs_livecd(){
 }
 
 compress_images(){
-    # install common    
+    make_isomounts
+    make_iso
+}
+
+build_images(){
+    load_pkgs_root
+    make_image_root
+    
+    if [ -e "${pkgsfile}" ] ; then
+	load_pkgs_de
+	make_image_de
+    fi
+
+    if [ -e Packages-Xorg ] ; then
+	load_pkgs_xorg
+	make_image_xorg
+    fi
+    
+    if [ -e Packages-Lng ] ; then
+	load_pkgs_lng
+	make_image_lng
+    fi
+    
+    if [[ -f Packages-Livecd ]]; then
+	load_pkgs_livecd
+	make_image_livecd
+    fi   
+    
     make_image_boot
     if [ "${arch}" == "x86_64" ]; then
 	make_efi
 	make_efiboot
     fi
     make_isolinux
-
-    make_isomounts
-    make_iso
-}
-
-make_images(){
-    # install basic
-    load_pkgs_root
-    make_image_root
-
-    # install DE(s)
-    if [ -e "${pkgsfile}" ] ; then
-	load_pkgs_de
-	make_image_de
-    fi
-
-    # install xorg-drivers
-    if [ -e Packages-Xorg ] ; then
-	load_pkgs_xorg
-	make_image_xorg
-    fi
-    
-    # install translations
-    if [ -e Packages-Lng ] ; then
-	load_pkgs_lng
-	make_image_lng
-    fi
-    
-    # install overlay
-    if [[ -f Packages-Livecd ]]; then
-	load_pkgs_livecd
-	make_image_livecd
-    fi
-
 }

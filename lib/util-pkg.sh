@@ -69,7 +69,7 @@ blacklist_pkg(){
 }
 
 prepare_cachedir(){
-    mkdir -p "${pkg_dir}"
+    [[ ! -d "${pkg_dir}" ]] && mkdir -p "${pkg_dir}"
     chown -R "${OWNER}:users" "${pkg_dir}"
 }
 

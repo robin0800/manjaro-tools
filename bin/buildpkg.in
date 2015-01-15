@@ -115,7 +115,8 @@ usage() {
     echo "    -p <pkg>           Set or pkg [default: ${buildset_pkg}]"
     echo "    -a <arch>          Arch [default: ${arch}]"
     echo "    -b <branch>        Branch [default: ${branch}]"
-    echo "    -r <dir>           Chroots directory [default: ${chroots_pkg}]"
+    echo '    -r <dir>           Chroots directory'
+    echo "                       [default: ${chroots_pkg}]"
     echo '    -c                 Recreate chroot'
     echo '    -w                 Clean up'
     echo '    -n                 Install and run namcap check'
@@ -169,7 +170,7 @@ makepkg_args+=("${@:$OPTIND}")
 
 check_root "$0" "${orig_argv[@]}"
 
-[[ -d "${pkg_dir}" ]] || prepare_cachedir
+prepare_cachedir
 
 eval_buildset "${buildset_pkg}" "${sets_dir_pkg}"
 

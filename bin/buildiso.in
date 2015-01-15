@@ -31,9 +31,9 @@ display_settings(){
     fi
     
     msg "PROFILE:"
-#     msg2 "buildsets: $(load_sets ${sets_dir_iso})"
+    msg2 "buildsets: $(load_sets ${sets_dir_iso})"
     msg2 "buildset_iso: ${buildset_iso}"
-#     msg2 "is_buildset: ${is_buildset}"
+    msg2 "is_buildset: ${is_buildset}"
     msg2 "initsys: ${initsys}"
     msg2 "displaymanager: ${displaymanager}"
     
@@ -44,19 +44,23 @@ display_settings(){
     
     msg "ARGS:"
     msg2 "clean_first: ${clean_first}"
-    msg2 "clean_cache_xorg: ${clean_cache_xorg}"
-    msg2 "clean_cache_lng: ${clean_cache_lng}"
-    msg2 "custom_pac_conf: ${custom_pac_conf}"
-    msg2 "images_only: ${images_only}"
-    msg2 "iso_only: ${iso_only}"
     msg2 "auto_svc_conf: ${auto_svc_conf}"
-    msg2 "high_compression: ${high_compression}"
+    msg2 "custom_pac_conf: ${custom_pac_conf}"
+    if ${is_buildset}; then
+	msg2 "clean_cache_xorg: ${clean_cache_xorg}"
+	msg2 "clean_cache_lng: ${clean_cache_lng}"
+	msg2 "images_only: ${images_only}"
+	msg2 "iso_only: ${iso_only}"
+    fi
+#     msg2 "high_compression: ${high_compression}"
 
     msg "PATHS:" 
     msg2 "work_dir: ${work_dir}"
     msg2 "iso_dir: ${iso_dir}"
-    msg2 "cache_dir_xorg: ${cache_dir_xorg}"
-    msg2 "cache_dir_lng: ${cache_dir_lng}"
+    if ${is_buildset}; then
+	msg2 "cache_dir_xorg: ${cache_dir_xorg}"
+	msg2 "cache_dir_lng: ${cache_dir_lng}"
+    fi
 #     msg2 "pacman_conf: ${pacman_conf}"
 #     msg2 "pacman_mirrors: ${mirrors_conf}"
     
@@ -99,6 +103,82 @@ display_settings(){
     fi
 }
 
+build_iso(){
+    if ${is_buildset};then
+	msg "Start building [${buildset_iso}]"
+	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
+	    cd $prof
+		
+		work_dir=${chroots_iso}/${prof}/${arch}
+		displaymanager=$(cat ${prof}/displaymanager)
+		initsys=$(cat ${prof}/initsys)
+		iso_file="${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
+		
+		if [[ -f ${prof}/pacman-${pacman_conf_arch}.conf ]]; then
+		    pacman_conf="${prof}/pacman-${pacman_conf_arch}.conf"
+		else
+		    pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+		fi
+		
+		${clean_first} && clean_up
+		
+		${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
+		${clean_cache_lng} && clean_cache "${cache_dir_lng}"
+		
+		if ${iso_only}; then
+		    [[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -B"
+		    compress_images 
+		    break
+		fi
+		
+		if ${images_only}; then
+		    build_images
+		    warning "Continue with eg. buildiso -Gv ..."
+		    break
+		else
+		    build_images
+		    compress_images
+		fi
+	    cd ..
+	done
+	msg "Finished building [${buildset_iso}]"
+    else
+	cd ${buildset_iso}
+	    
+	    work_dir=${chroots_iso}/${buildset_iso}/${arch}
+	    displaymanager=$(cat ${buildset_iso}/displaymanager)
+	    initsys=$(cat ${buildset_iso}/initsys)
+	    iso_file="${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
+	    
+	    if [[ -f ${buildset_iso}/pacman-${pacman_conf_arch}.conf ]]; then
+		pacman_conf="${buildset_iso}/pacman-${pacman_conf_arch}.conf"
+	    else
+		pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+	    fi
+	    
+	    ${clean_first} && clean_up
+	    
+	    ${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
+	    ${clean_cache_lng} && clean_cache "${cache_dir_lng}"
+	    
+	    if ${iso_only}; then
+		[[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -B"
+		compress_images 
+		exit 1
+	    fi
+	    
+	    if ${images_only}; then
+		build_images
+		warning "Continue with eg. buildiso -Gv ..."
+		exit 1
+	    else
+		build_images
+		compress_images
+	    fi
+	cd ..
+    fi
+}
+
 load_user_info
 
 load_config "${USER_CONFIG}/manjaro-tools.conf"  
@@ -108,7 +188,7 @@ load_desktop_definition
 
 clean_first=true
 auto_svc_conf=true
-high_compression=true
+# high_compression=true
 clean_cache_xorg=true
 clean_cache_lng=true
 
@@ -116,29 +196,28 @@ pretend=false
 verbose=false
 images_only=false
 iso_only=false
-custom_pac_conf=false
+# custom_pac_conf=false
 
 pacman_conf_arch='default'
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo '    -a <arch>          Arch'
-    echo "                       [default: ${arch}]"
-    echo '    -b <branch>        Branch'
-    echo "                       [default: ${branch}]"
+    echo "    -p <iso>           Set or iso [default: ${buildset_iso}]"
+    echo "    -a <arch>          Arch [default: ${arch}]"
+    echo "    -b <branch>        Branch [default: ${branch}]"
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
     echo '    -v                 Verbose iso compression'
     echo '    -q                 Query settings and pretend build'
     echo '    -c                 Disable clean work dir and target dir iso'
-    echo '    -z                 Disable high compression'
+#     echo '    -z                 Disable high compression'
     echo '    -A                 Disable auto configure services'
     echo '    -B                 Build images only'
     echo '    -G                 Generate iso only'
     echo '                       Requires pre built images'
     echo '    -P                 Disable clean pkgs cache'
     echo '    -L                 Disable clean lng cache'
-    echo "    -C                 Use custom pacman.conf in iso profile"
+#     echo "    -C                 Use custom pacman.conf in iso profile"
     echo '    -h                 This help'
     echo ''
     echo ''
@@ -147,23 +226,24 @@ usage() {
 
 orig_argv=("$@")
 
-opts='a:b:r:cvzqABGPLCh'
+opts='p:a:b:r:cvqAXLBGh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
+	p) buildset_iso="$OPTARG" ;;
 	a) arch="$OPTARG" ;;
 	b) branch="$OPTARG" ;;
 	r) chroots_iso="$OPTARG" ;;
-	v) verbose=true; mkiso_args+=(-v) ;;
+	v) verbose=true; iso_args+=(-v) ;;
+	q) pretend=true ;;
+	c) clean_first=false ;;
+# 	z) high_compression=false ;;
+	A) auto_svc_conf=false ;;
+# 	C) custom_pac_conf=true ;;
+	X) clean_cache_xorg=false ;;
+	L) clean_cache_lng=false ;;
 	B) images_only=true ;;
 	G) iso_only=true ;;
-	q) pretend=true ;;
-	C) custom_pac_conf=true ;;
-	P) clean_cache_xorg=false ;;
-	L) clean_cache_lng=false ;;
-	c) clean_first=false ;;
-	z) high_compression=false ;;
-	A) auto_svc_conf=false ;;
 	h) usage ;;
     esac
 done
@@ -174,62 +254,38 @@ if [[ "$arch" == 'x86_64' ]]; then
     pacman_conf_arch='multilib'
 fi
 
-if ${custom_pac_conf};then
-    pacman_conf="${PWD}/pacman-${pacman_conf_arch}.conf"
-else
-    pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf" 
-fi
+sets_dir_iso="${sets_dir}/iso"
+cache_dir_lng="${cache_dir}/lng"
+cache_dir_xorg="${cache_dir}/xorg"
+iso_dir="${cache_dir}/iso"
+
+# if ${custom_pac_conf};then
+#     pacman_conf="${PWD}/pacman-${pacman_conf_arch}.conf"
+# else
+#     pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+# fi
+# if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
+#     pacman_conf="${PWD}/pacman-${pacman_conf_arch}.conf"
+# else
+#     pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+# fi
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
-create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_conf})
+create_args+=(-f -x -v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_conf})
 
-mkiso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
+iso_args+=(-a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 
-sets_dir_iso="${sets_dir}/iso"
+#buildset_iso=${PWD##*/}
 
-buildset_iso=${PWD##*/}
-
-iso_dir="${cache_dir}/iso/${buildset_iso}"
-
-iso_file="${iso_dir}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
-
-work_dir=${chroots_iso}/${buildset_iso}/${arch}
-
-cache_dir_lng="${cache_dir}/lng"
-    
-cache_dir_xorg="${cache_dir}/xorg"
-
-displaymanager=$(cat ${PWD}/displaymanager)
-initsys=$(cat ${PWD}/initsys)
-
-${high_compression} && mkiso_args+=(-x)
-${clean_first} && mkiso_args+=(-f)
+# ${high_compression} && iso_args+=(-x)
+# ${clean_first} && iso_args+=(-f)
 
 check_root "$0" "${orig_argv[@]}"
 
-#eval_buildset "${buildset_iso}" "${sets_dir_iso}"
+eval_buildset "${buildset_iso}" "${sets_dir_iso}"
+
+prepare_cachedirs
 
 ${pretend} && display_settings && exit 1
 
-if ${iso_only}; then
-    [[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -B"
-    compress_images 
-    exit 1
-fi
-
-${clean_first} && clean_up
-
-${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
-${clean_cache_lng} && clean_cache "${cache_dir_lng}"
-
-prepare_buildiso
-
-if ${images_only}; then
-    make_images
-    warning "Continue with eg. buildiso -Gv ..."
-    exit 1
-else
-    make_images
-fi
-
-compress_images
+build_iso
