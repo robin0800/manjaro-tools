@@ -47,16 +47,12 @@ display_settings(){
     msg2 "namcap: ${namcap}"
     msg2 "sign: ${sign}"
     msg2 "makepkg_args: ${makepkg_args[*]}"
-#     msg2 "mkchrootpkg_args: ${mkchrootpkg_args[*]}"
 
     msg "PATHS:"
     msg2 "work_dir: ${work_dir}"
     msg2 "sets_dir_pkg: ${sets_dir_pkg}"
     msg2 "cache_dir_pkg: ${cache_dir_pkg}"
     msg2 "build_mirror: ${build_mirror}/${branch}"
-    #     msg2 "pacman_conf: ${pacman_conf}"
-    #     msg2 "makepkg_conf: ${makepkg_conf}"
-    #     msg2 "mirrors_conf: ${mirrors_conf}"
 
     msg "BLACKLIST:"
     msg2 "blacklist_trigger: ${blacklist_trigger[*]}"
@@ -139,7 +135,7 @@ while getopts "${opts}" arg; do
 	a) arch="$OPTARG" ;;
 	b) branch="$OPTARG" ;;
 	r) chroots_pkg="$OPTARG" ;;
-	c) clean_first=true ;;
+	c) clean_first=true; mkchroot_args+=(-L) ;;
 	w) wipe_clean=true ;;
 	n) namcap=true; mkchrootpkg_args+=(-n) ;;
 	s) sign=true ;;
@@ -164,7 +160,7 @@ pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
-mkchroot_args+=(-L -C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}")
+mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}")
 
 mkchrootpkg_args+=(-r ${work_dir})
 

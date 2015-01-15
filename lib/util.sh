@@ -393,19 +393,3 @@ load_user_info(){
     
     USER_CONFIG="$USER_HOME/.config"
 }
-
-check_dir_pkg(){
-    if [[ -f PKGBUILD ]]; then
-	continue
-    else
-	break
-    fi
-}
-
-check_dir_iso(){
-    if [[ -f displaymanager ]] && [[ -f initsys ]]; then
-	continue
-    else
-	break
-    fi
-}

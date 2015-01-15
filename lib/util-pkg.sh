@@ -87,8 +87,8 @@ chroot_build(){
     if ${is_buildset};then
 	msg "Start building [${buildset_pkg}]"
 	for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
+	    [[ -f $pkg/PKGBUILD ]] || break
 	    cd $pkg
-	    check_dir_pkg
 	    for p in ${blacklist_trigger[@]}; do
 		[[ $pkg == $p ]] && blacklist_pkg "${work_dir}"
 	    done
@@ -99,8 +99,8 @@ chroot_build(){
 	done
 	msg "Finished building [${buildset_pkg}]"
     else
+	[[ -f ${buildset_pkg}/PKGBUILD ]] || die "No PKGBUILD found in $pkg!"
 	cd ${buildset_pkg}
-	check_dir_pkg
 	for p in ${blacklist_trigger[@]}; do
 	    [[ ${buildset_pkg} == $p ]] && blacklist_pkg "${work_dir}"
 	done
