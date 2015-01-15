@@ -42,7 +42,6 @@ display_settings(){
 
     msg "ARGS:"
     msg2 "clean_first: ${clean_first}"
-    msg2 "auto_svc_conf: ${auto_svc_conf}"
     msg2 "clean_cache_xorg: ${clean_cache_xorg}"
     msg2 "clean_cache_lng: ${clean_cache_lng}"
     msg2 "images_only: ${images_only}"
@@ -129,7 +128,6 @@ clean_cache_xorg=true
 clean_cache_lng=true
 
 pretend=false
-verbose=false
 images_only=false
 iso_only=false
 
@@ -142,9 +140,9 @@ usage() {
     echo "    -b <branch>        Branch [default: ${branch}]"
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
-    echo '    -v                 Verbose iso compression'
+    echo '    -c                 Disable clean work dir'
+    
     echo '    -q                 Query settings and pretend build'
-    echo '    -c                 Disable clean work dir and target dir iso'
     echo '    -B                 Build images only'
     echo '    -G                 Generate iso only'
     echo '                       Requires pre built images'
@@ -153,12 +151,12 @@ usage() {
     echo '    -h                 This help'
     echo ''
     echo ''
-    exit 1
+    exit $1
 }
 
 orig_argv=("$@")
 
-opts='p:a:b:r:cvqXLBGh'
+opts='p:a:b:r:cqXLBGh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -166,14 +164,14 @@ while getopts "${opts}" arg; do
 	a) arch="$OPTARG" ;;
 	b) branch="$OPTARG" ;;
 	r) chroots_iso="$OPTARG" ;;
-	v) verbose=true; iso_args+=(-v) ;;
-	q) pretend=true ;;
-	c) clean_first=false ;;
+	c) clean_first=false; iso_args+=(-f) ;;
 	X) clean_cache_xorg=false ;;
 	L) clean_cache_lng=false ;;
 	B) images_only=true ;;
 	G) iso_only=true ;;
-	h) usage ;;
+	q) pretend=true ;;
+	h|?) usage 0 ;;
+        *) echo "invalid argument '${arg}'"; usage 1 ;;
     esac
 done
 
@@ -192,7 +190,7 @@ mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_conf})
 
-iso_args+=(-f -x -a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
+iso_args+=(-v -x -a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 
 check_root "$0" "${orig_argv[@]}"
 
