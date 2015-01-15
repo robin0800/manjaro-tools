@@ -143,11 +143,11 @@ usage() {
     echo '    -c                 Disable clean work dir'
     
     echo '    -q                 Query settings and pretend build'
-    echo '    -B                 Build images only'
-    echo '    -G                 Generate iso only'
+    echo '    -i                 Build images only'
+    echo '    -s                 Generate iso only'
     echo '                       Requires pre built images'
-    echo '    -P                 Disable clean pkgs cache'
-    echo '    -L                 Disable clean lng cache'
+    echo '    -x                 Disable clean xorg cache'
+    echo '    -l                 Disable clean lng cache'
     echo '    -h                 This help'
     echo ''
     echo ''
@@ -156,7 +156,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:cqXLBGh'
+opts='p:a:b:r:cxlisqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -165,10 +165,10 @@ while getopts "${opts}" arg; do
 	b) branch="$OPTARG" ;;
 	r) chroots_iso="$OPTARG" ;;
 	c) clean_first=false; iso_args+=(-f) ;;
-	X) clean_cache_xorg=false ;;
-	L) clean_cache_lng=false ;;
-	B) images_only=true ;;
-	G) iso_only=true ;;
+	x) clean_cache_xorg=false ;;
+	l) clean_cache_lng=false ;;
+	i) images_only=true ;;
+	s) iso_only=true ;;
 	q) pretend=true ;;
 	h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
