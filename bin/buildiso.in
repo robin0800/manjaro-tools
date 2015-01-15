@@ -141,14 +141,13 @@ usage() {
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
     echo '    -c                 Disable clean work dir'
-    
-    echo '    -q                 Query settings and pretend build'
+    echo '    -x                 Disable clean xorg cache'
+    echo '    -l                 Disable clean lng cache'
     echo '    -i                 Build images only'
     echo '    -s                 Generate iso only'
     echo '                       Requires pre built images'
-    echo '    -x                 Disable clean xorg cache'
-    echo '    -l                 Disable clean lng cache'
     echo '    -h                 This help'
+    echo '    -q                 Query settings and pretend build'
     echo ''
     echo ''
     exit $1
