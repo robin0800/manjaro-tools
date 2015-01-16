@@ -84,7 +84,7 @@ while getopts "${opts}" arg; do
     case "${arg}" in
 	c) name="$OPTARG"; create=true ;;
 	r) name="$OPTARG"; remove=true ;;
-	d) name="$OPTARG"; show=true;;
+	s) name="$OPTARG"; show=true;;
 	i) iso_mode=true ;;
 	q) query=true ;;
 	h|?) usage 0 ;;
