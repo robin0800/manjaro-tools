@@ -194,7 +194,7 @@ configure_swap_live(){
     local swapdev="$(fdisk -l 2>/dev/null | grep swap | cut -d' ' -f1)"
     if [ -e "${swapdev}" ]; then
 	swapon ${swapdev}
-	echo "${swapdev} swap swap defaults 0 0 #configured by manjaroiso" >>/etc/fstab
+	echo "${swapdev} swap swap defaults 0 0 #configured by manjaro-tools" >>/etc/fstab
     fi
 }
 

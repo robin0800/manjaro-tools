@@ -104,8 +104,6 @@ fi
 #lsof | grep $newroot
 
 # kill chroot process if needed (TODO: check if needed at all)
-# TODO: test if old manjaroiso code in mkiso produces also the umount error
-# if not, comment out the pid kill
 PREFIX="$newroot"
 for ROOT in /proc/*/root; do
     LINK=$(readlink $ROOT)
@@ -114,7 +112,7 @@ for ROOT in /proc/*/root; do
             # this process is in the chroot...
             PID=$(basename $(dirname "$ROOT"))
             NAME=$(ps -p $PID -o comm=)
-            msg "Killing chroot process: $NAME ($PID)"
+            msg3 "Killing chroot process: $NAME ($PID)"
             kill -9 "$PID"
         fi
     fi
