@@ -16,30 +16,46 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
 [[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
 
-create_set(){
-    msg "Creating [$1/${name}.set] ..."
-    if [[ -f $1/${name}.set ]];then
-	msg2 "Backing up $1/${name}.set.orig"
-	mv "$1/${name}.set" "$1/${name}.set.orig"
+create_set_pkg(){
+    msg "[${sets_dir_pkg}/${name}.set]"
+    if [[ -f ${sets_dir_pkg}/${name}.set ]];then
+	msg3 "Backing up ${sets_dir_pkg}/${name}.set.orig"
+	mv "${sets_dir_pkg}/${name}.set" "${sets_dir_pkg}/${name}.set.orig"
+    fi
+    local list=$(find * -maxdepth 0 -type d | sort)
+
+    for item in ${list[@]};do
+	if [[ -f $item/PKGBUILD ]];then
+	    cd $item
+		msg2 "Adding ${item##*/}"
+		echo ${item##*/} >> ${sets_dir_pkg}/${name}.set || break
+	    cd ..
+	fi
+    done
+}
+
+create_set_iso(){
+    msg "[${sets_dir_iso}/${name}.set]"
+    if [[ -f ${sets_dir_iso}/${name}.set ]];then
+	msg3 "Backing up ${sets_dir_iso}/${name}.set.orig"
+	mv "${sets_dir_iso}/${name}.set" "${sets_dir_iso}/${name}.set.orig"
     fi
     local list=$(find * -maxdepth 0 -type d | sort)
     for item in ${list[@]};do
-	cd $item
-	    if [[ -f initsys ]];then
+	if [[ -f $item/initsys ]];then
+	    cd $item
 		msg2 "Adding ${item##*/}"
-		echo ${item##*/} >> $1/${name}.set || break
-	    fi	
-	    if [[ -f PKGBUILD ]];then
-		msg2 "Adding ${item##*/}"
-		echo ${item##*/} >> $1/${name}.set || break
-	    fi
-	cd ..
+		echo ${item##*/} >> ${sets_dir_iso}/${name}.set || break
+	    cd ..
+	fi
     done
 }
 
 remove_set(){
-    msg "Removing [$1/${name}.set] ..."
-    rm $1/${name}.set
+    if [[ -f $1/${name}.set ]]; then
+	msg "Removing [$1/${name}.set] ..."
+	rm $1/${name}.set
+    fi
 }
 
 show_set(){
@@ -52,7 +68,7 @@ show_set(){
 
 load_user_info
 
-load_config "${USER_CONFIG}/manjaro-tools.conf"  
+load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 query=false
@@ -101,10 +117,10 @@ check_root "$0" "${orig_argv[@]}"
 
 if ${create};then
     if ${iso_mode}; then
-	create_set "${sets_dir_iso}" 
+	create_set_iso
     else
-	create_set "${sets_dir_pkg}"
-    fi 
+	create_set_pkg
+    fi
 elif ${remove};then
     if ${iso_mode}; then
         remove_set "${sets_dir_iso}"
