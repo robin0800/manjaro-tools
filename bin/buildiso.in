@@ -79,9 +79,8 @@ display_settings(){
 	for item in ${list[@]}; do
 	    msg3 "$item"
 	    cd $item
-	    load_desktop_definition
 	    load_profile
-	    work_dir=${chroots_iso}/$item/${arch}
+	    set_work_dir "$item"
 	    msg2 "initsys: ${initsys}"
 	    msg2 "displaymanager: ${displaymanager}"
 	    msg2 "pacman_conf: ${pacman_conf}"
@@ -99,9 +98,8 @@ display_settings(){
     else
 	msg3 "${buildset_iso}"
 	cd ${buildset_iso}
-	load_desktop_definition
 	load_profile
-	work_dir=${chroots_iso}/${buildset_iso}/${arch}
+	set_work_dir "${buildset_iso}"
 	msg2 "initsys: ${initsys}"
 	msg2 "displaymanager: ${displaymanager}"
 	msg2 "pacman_conf: ${pacman_conf}"

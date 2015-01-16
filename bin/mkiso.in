@@ -161,9 +161,9 @@ _mkchroot(){
 		"${work_dir}/${IMAGE_FOLDER}" $@ || die "Failed to retrieve one or more packages!"
 	fi
 	
-	if [ -e "${work_dir}/root-image/etc/locale.gen" ]; then
-	    cp ${work_dir}/root-image/etc/locale.gen ${work_dir}/root-image/etc/locale.gen.bak
-	fi
+# 	if [ -e "${work_dir}/root-image/etc/locale.gen" ]; then
+# 	    cp ${work_dir}/root-image/etc/locale.gen ${work_dir}/root-image/etc/locale.gen.bak
+# 	fi
 	
 	 # Cleanup
 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete

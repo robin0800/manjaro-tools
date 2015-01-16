@@ -49,7 +49,8 @@ configure_hostname(){
 # $1: chroot
 configure_plymouth(){
     if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
-	    sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" $1/etc/plymouth/plymouthd.conf
+	msg2 "Setting plymouth $plymouth_theme ...."
+	sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" $1/etc/plymouth/plymouthd.conf
     fi
 }
 
@@ -60,7 +61,8 @@ configure_services_live(){
 	  if [[ -f $1/etc/init.d/$svc ]]; then
 	      msg2 "Setting $svc ..."
 	      [[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
-	      ln -sf /etc/init.d/$svc $1/etc/runlevels/default/$svc
+# 	      ln -sf /etc/init.d/$svc $1/etc/runlevels/default/$svc
+	      chroot $1 rc-update add $svc default 
 	  fi
       done
    else
@@ -79,7 +81,8 @@ configure_services(){
 	  if [[ -f $1/etc/init.d/$svc ]]; then
 	      msg2 "Setting $svc ..."
 	      [[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
-	      ln -sf /etc/init.d/$svc $1/etc/runlevels/default/$svc
+# 	      ln -sf /etc/init.d/$svc $1/etc/runlevels/default/$svc
+	      chroot $1 rc-update add $svc default
 	  fi
       done
    else
@@ -259,7 +262,8 @@ configure_displaymanager(){
 	local _conf_xdm='DISPLAYMANAGER="'${displaymanager}'"'
 	sed -i -e "s|^.*DISPLAYMANAGER=.*|${_conf_xdm}|" $1/etc/conf.d/xdm
 	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
-	ln -sf /etc/init.d/xdm $1/etc/runlevels/default/xdm
+# 	ln -sf /etc/init.d/xdm $1/etc/runlevels/default/xdm
+	chroot $1 rc-update add $svc default
     else
 	if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
 	    displaymanager=${displaymanager}-plymouth
@@ -335,7 +339,7 @@ copy_overlay_livecd(){
 	if [[ -L overlay-livecd ]];then
 	    cp -a --no-preserve=ownership overlay-livecd/* $1
 	else
-	    msg2 "Custom overlay-livecd found ..."
+	    msg2 "Copying custom overlay-livecd ..."
 	    cp -LR overlay-livecd/* $1
 	fi
 }
@@ -401,11 +405,26 @@ clean_up(){
     fi
 }
 
-# $1: chroot
-configure_livecd_image(){
-    msg2 "Configuring [livecd-image]"
+configure_desktop_image(){
+    msg3 "Configuring [${desktop}-image]"
     
-    configure_displaymanager "${work_dir}/livecd-image"
+    configure_plymouth "${work_dir}/${desktop}-image"
+	
+    configure_displaymanager "${work_dir}/${desktop}-image"
+	
+    configure_services "${work_dir}/${desktop}-image"
+	
+    msg3 "Done configuring [${desktop}-image]"
+}
+
+configure_livecd_image(){
+    msg3 "Configuring [livecd-image]"
+    
+#     configure_displaymanager "${work_dir}/livecd-image"
+    
+    configure_hostname "${work_dir}/livecd-image"
+    
+    configure_hosts "${work_dir}/livecd-image"
     
     configure_accountsservice "${work_dir}/livecd-image" "${username}"
     
@@ -413,15 +432,11 @@ configure_livecd_image(){
     
     configure_calamares "${work_dir}/livecd-image"
     
-    ${auto_svc_conf} && configure_services_live "${work_dir}/livecd-image"
-        
-    configure_hostname "${work_dir}/livecd-image"
+    configure_services_live "${work_dir}/livecd-image"    
     
-    configure_hosts "${work_dir}/livecd-image"
+#     configure_plymouth "${work_dir}/livecd-image"
     
-    configure_plymouth "${work_dir}/livecd-image"
-    
-    msg2 "Done configuring [livecd-image]"
+    msg3 "Done configuring [livecd-image]"
 }
 
 configure_xorg_drivers(){
@@ -520,7 +535,6 @@ make_image_root() {
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 	
-	# TODO: we only need this if we use old manjaroiso coe in mkiso
 	# cp ${work_dir}/root-image/etc/locale.gen.bak ${work_dir}/root-image/etc/locale.gen
 	
 	if [ -e ${work_dir}/root-image/boot/grub/grub.cfg ] ; then
@@ -559,7 +573,7 @@ make_image_de() {
 	
 	[[ -d ${desktop}-overlay ]] && copy_overlay_desktop
 	
-	${auto_svc_conf} && configure_services "${work_dir}/${desktop}-image"
+	configure_desktop_image
 	
 	aufs_remove_image "${work_dir}/${desktop}-image"
 	
@@ -855,18 +869,47 @@ make_isomounts() {
     fi
 }
 
-load_profile(){
-    displaymanager=$(cat displaymanager)
-    initsys=$(cat initsys)
-
-    iso_file="${cache_dir_iso}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
-
-    if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
-	pacman_conf="pacman-${pacman_conf_arch}.conf"
-    else
-	pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+load_pkgs_xorg(){
+    if [ "${arch}" == "i686" ]; then
+	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    elif [ "${arch}" == "x86_64" ]; then
+	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
-    create_args+=(-C ${pacman_conf})
+    packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+}
+
+load_pkgs_lng(){
+    if [ "${arch}" == "i686" ]; then
+	packages_lng=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
+    elif [ "${arch}" == "x86_64" ]; then
+	packages_lng=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
+    fi
+    packages_lng_cleanup=$(sed "s|#.*||g" Packages-Lng | grep cleanup | sed "s|>cleanup||g")
+    packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
+}
+
+load_pkgs_de(){
+    if [ "${arch}" == "i686" ]; then
+	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    elif [ "${arch}" == "x86_64" ]; then
+	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    fi
+}
+
+load_pkgs_root(){
+    if [ "${arch}" == "i686" ]; then
+	packages=$(sed "s|#.*||g" Packages | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    elif [ "${arch}" == "x86_64" ]; then
+	packages=$(sed "s|#.*||g" Packages | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    fi
+}
+
+load_pkgs_livecd(){
+    if [ "${arch}" == "i686" ]; then
+	packages_livecd=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    elif [ "${arch}" == "x86_64" ]; then
+	packages_livecd=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    fi
 }
 
 load_desktop_definition(){
@@ -916,47 +959,21 @@ load_desktop_definition(){
     desktop=${desktop,,}
 }
 
-load_pkgs_xorg(){
-    if [ "${arch}" == "i686" ]; then
-	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    elif [ "${arch}" == "x86_64" ]; then
-	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    fi
-    packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-}
+load_profile(){
 
-load_pkgs_lng(){
-    if [ "${arch}" == "i686" ]; then
-	packages_lng=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
-    elif [ "${arch}" == "x86_64" ]; then
-	packages_lng=$(sed "s|#.*||g" Packages-Lng | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>kde.*||g" | sed ':a;N;$!ba;s/\n/ /g')
-    fi
-    packages_lng_cleanup=$(sed "s|#.*||g" Packages-Lng | grep cleanup | sed "s|>cleanup||g")
-    packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
-}
+    load_desktop_definition
+    
+    displaymanager=$(cat displaymanager)
+    initsys=$(cat initsys)
 
-load_pkgs_de(){
-    if [ "${arch}" == "i686" ]; then
-	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    elif [ "${arch}" == "x86_64" ]; then
-	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    fi
-}
+    iso_file="${cache_dir_iso}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
-load_pkgs_root(){
-    if [ "${arch}" == "i686" ]; then
-	packages=$(sed "s|#.*||g" Packages | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    elif [ "${arch}" == "x86_64" ]; then
-	packages=$(sed "s|#.*||g" Packages | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
+	pacman_conf="pacman-${pacman_conf_arch}.conf"
+    else
+	pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
     fi
-}
-
-load_pkgs_livecd(){
-    if [ "${arch}" == "i686" ]; then
-	packages_livecd=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    elif [ "${arch}" == "x86_64" ]; then
-	packages_livecd=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    fi
+    create_args+=(-C ${pacman_conf})
 }
 
 compress_images(){
@@ -1018,15 +1035,18 @@ build_profile(){
     fi
 }
 
+set_work_dir(){
+    work_dir=${chroots_iso}/$1/${arch}
+}
+
 build_iso(){
     if ${is_buildset};then
 	msg "Start building [${buildset_iso}]"
 	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
 	    [[ -f $prof/initsys ]] || break
 	    cd $prof
-		load_desktop_definition
 		load_profile
-		work_dir=${chroots_iso}/$prof/${arch}
+		set_work_dir "$prof"
 		build_profile
 	    cd ..
 	done
@@ -1034,9 +1054,8 @@ build_iso(){
     else
 	[[ -f ${buildset_iso}/initsys ]] || die "${buildset_iso} is not a valid profile!"
 	cd ${buildset_iso}    
-	    load_desktop_definition
 	    load_profile
-	    work_dir=${chroots_iso}/${buildset_iso}/${arch}
+	    set_work_dir "${buildset_iso}"
 	    build_profile
 	cd ..
     fi
