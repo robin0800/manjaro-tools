@@ -187,7 +187,7 @@ cache_dir_iso="${cache_dir}/iso"
 
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
-create_args+=(-v -a ${arch} -D ${install_dir} -C ${pacman_conf} -M ${mirrors_conf})
+create_args+=(-v -a ${arch} -D ${install_dir} -M ${mirrors_conf})
 
 iso_args+=(-v -x -a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 

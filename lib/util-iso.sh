@@ -866,6 +866,7 @@ load_profile(){
     else
 	pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
     fi
+    create_args+=(-C ${pacman_conf})
 }
 
 load_desktop_definition(){
