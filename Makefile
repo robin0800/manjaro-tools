@@ -1,4 +1,4 @@
-V=0.9.6
+V=0.9.6.1
 
 PREFIX = $(PREFIX)/local
 
@@ -87,7 +87,7 @@ install:
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
 	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
-	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso	
+	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
 	install -dm0755 $(DESTDIR)$(PREFIX)/bin
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/manjaro-tools
