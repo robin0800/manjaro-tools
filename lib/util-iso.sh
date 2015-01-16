@@ -1022,8 +1022,8 @@ build_iso(){
     if ${is_buildset};then
 	msg "Start building [${buildset_iso}]"
 	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
+	    [[ -f $prof/initsys ]] || break
 	    cd $prof
-		[[ -f $1/initsys ]] || break
 		load_desktop_definition
 		load_profile
 		work_dir=${chroots_iso}/$prof/${arch}
@@ -1032,8 +1032,8 @@ build_iso(){
 	done
 	msg "Finished building [${buildset_iso}]"
     else
-	cd ${buildset_iso}
-	    [[ -f ${buildset_iso}/initsys ]] || die "${buildset_iso} is not a valid profile!"
+	[[ -f ${buildset_iso}/initsys ]] || die "${buildset_iso} is not a valid profile!"
+	cd ${buildset_iso}    
 	    load_desktop_definition
 	    load_profile
 	    work_dir=${chroots_iso}/${buildset_iso}/${arch}
