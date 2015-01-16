@@ -78,7 +78,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='c:r:d:qih'
+opts='c:r:s:qih'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
