@@ -16,16 +16,6 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
 [[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
 
-load_user_info
-
-load_config "${USER_CONFIG}/manjaro-tools.conf"  
-load_config "${SYSCONFDIR}/manjaro-tools.conf"
-
-write_set(){
-	msg2 "Adding ${1##*/}"
-	echo ${1##*/} >> ${2}/${name}.set || break
-}
-
 create_set(){
     msg "Creating [$1/${name}.set] ..."
     if [[ -f $1/${name}.set ]];then
@@ -35,14 +25,13 @@ create_set(){
     local list=$(find * -maxdepth 0 -type d | sort)
     for item in ${list[@]};do
 	cd $item
-	    if ${iso_mode}; then		
-		if [[ -f initsys ]];then
-		    write_set "$item" "${sets_dir_iso}"
-		fi
-	    else
-		if [[ -f PKGBUILD ]];then
-		    write_set "$item" "${sets_dir_pkg}"
-		fi
+	    if [[ -f initsys ]];then
+		msg2 "Adding ${item##*/}"
+		echo ${item##*/} >> $1/${name}.set || break
+	    fi	
+	    if [[ -f PKGBUILD ]];then
+		msg2 "Adding ${item##*/}"
+		echo ${item##*/} >> $1/${name}.set || break
 	    fi
 	cd ..
     done
@@ -61,18 +50,24 @@ show_set(){
     done
 }
 
+load_user_info
+
+load_config "${USER_CONFIG}/manjaro-tools.conf"  
+load_config "${SYSCONFDIR}/manjaro-tools.conf"
+
 query=false
 create=false
 remove=false
-display=false
-name='default'
+show=false
 iso_mode=false
+
+name='default'
 
 usage() {
     echo "Usage: ${0##*/} [options]"
     echo "    -c <name>   Create set"
     echo "    -r <name>   Remove set"
-    echo "    -d <name>   Display set"
+    echo "    -s <name>   Show set"
     echo "    -i          Iso mode"
     echo "    -q          Query sets"
     echo '    -h          This help'
@@ -89,7 +84,7 @@ while getopts "${opts}" arg; do
     case "${arg}" in
 	c) name="$OPTARG"; create=true ;;
 	r) name="$OPTARG"; remove=true ;;
-	d) name="$OPTARG"; display=true;;
+	d) name="$OPTARG"; show=true;;
 	i) iso_mode=true ;;
 	q) query=true ;;
 	h|?) usage 0 ;;
@@ -105,18 +100,22 @@ sets_dir_iso="${sets_dir}/iso"
 check_root "$0" "${orig_argv[@]}"
 
 if ${create};then
-    create_set
+    if ${iso_mode}; then
+	create_set "${sets_dir_iso}" 
+    else
+	create_set "${sets_dir_pkg}"
+    fi 
 elif ${remove};then
     if ${iso_mode}; then
-        remove_set ${sets_dir_iso}
+        remove_set "${sets_dir_iso}"
     else
-        remove_set ${sets_dir_pkg}
+        remove_set "${sets_dir_pkg}"
     fi
-elif ${display};then
+elif ${show};then
     if ${iso_mode}; then
-        show_set ${sets_dir_iso}
+        show_set "${sets_dir_iso}"
     else
-        show_set ${sets_dir_pkg}
+        show_set "${sets_dir_pkg}"
     fi
 else
     if ${iso_mode}; then
