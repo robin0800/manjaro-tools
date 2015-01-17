@@ -4,7 +4,8 @@
 Manjaro-tools-0.9.6
 
 User manual
-<ol><li>manjaro.tools.conf</li>
+<ol>
+<li>manjaro.tools.conf</li>
 
 manjaro-tools.conf is the central configuration file for manjaro-tools.
 By default, the config is installed in /etc/manjaro-tools/manjaro-tools.conf
@@ -12,7 +13,135 @@ A user config manjaro-tools.conf can be placed in $HOME/.config.
 If the userconfig is present, manjaro-tools will load userconfig values, however, if variables have been set in the systemwide /etc/manjaro-tools/manjaro-tools.conf, these values take precedence over the userconfig. 
 Best practise is to leave systemwide file untouched, by default it is commented and shows just initialization values done in code.
 
-<ol><li>config files in iso profiles</li></ol>
+~~~
+##########################################
+################ common ##################
+##########################################
+
+# unset defaults to given value
+# branch=stable
+
+# unset defaults to given value
+# arch=$(uname -m)
+
+# cache dir where buildpkg or buildiso cache packages
+# cache_dir=/var/cache/manjaro-tools
+
+##########################################
+################ buildpkg ################
+##########################################
+
+# default chroot path
+# chroots_pkg=/opt/buildpkg
+
+# custom path to pkg sets
+# sets_dir_pkg=/etc/manjaro-tools/sets/pkg
+
+# default pkg buildset; name without .set extension
+# buildset_pkg=default
+
+# custom build mirror server
+# build_mirror=http://mirror.netzspielplatz.de/manjaro/packages
+
+############# eudev specific #############
+
+# This is only useful if you compile packages against eudev
+
+# default packages to trigger blacklist
+# blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
+
+# default blacklisted packages to remove from chroot
+# blacklist=('libsystemd')
+
+##########################################
+################ buildiso ################
+##########################################
+
+# default work dir where the image chroots are located
+# chroots_iso=/opt/buildiso
+
+# custom path to iso sets
+# sets_dir_iso=/etc/manjaro-tools/sets/iso
+
+# default iso buildset; name without .set extension
+# buildset_iso=default
+
+############## iso settings ##############
+
+# unset defaults to given value
+# iso_label="MJRO090"
+
+# unset defaults to given value
+# iso_version=0.9.0
+
+# unset defaults to given value, specify a date here of have it automatically set
+# manjaro_version="$(date +%Y.%m)"
+
+# unset defaults to given value
+# manjaroiso="manjaroiso"
+
+# unset defaults to value sourced from /etc/lsb-release
+# code_name="Bellatrix"
+
+# unset defaults to given value
+# img_name=manjaro
+
+# unset defaults to given value
+# install_dir=manjaro
+
+# unset defaults to given value
+# compression=xz
+
+################ install ################
+
+# These settings are inherited in live session
+# Settings will be installed
+
+# unset defaults to given value
+# manjaro_kernel="linux317"
+
+# unset defaults to given value
+# plymouth_theme=manjaro-elegant
+
+# unset defaults to given values
+# names must match systemd service names
+# start_systemd=('cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+
+# unset defaults to given values, 
+# names must match openrc service names
+# start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
+
+################# livecd #################
+
+# These settings are specific to live session
+# Settings will not be installed
+
+# unset defaults to given value
+# hostname="manjaro"
+
+# unset defaults to given value
+# username="manjaro"
+
+# unset defaults to given value
+# password="manjaro"
+
+# unset defaults to given values
+# addgroups="video,audio,power,disk,storage,optical,network,lp,scanner"
+
+# unset defaults to given values
+# names must match systemd service names
+# services in start_systemd array don't need to be listed here
+# start_systemd_live=('bluetooth' 'NetworkManager' 'ModemManager')
+
+# unset defaults to given values, 
+# names must match openrc service names
+# services in start_openrc array don't need to be listed here
+# start_openrc_live=('bluetooth'  'networkmanager')
+~~~
+
+<ol>
+<li>Config files in iso profiles</li>
+</ol>
 
 Each iso profile must have these files or symlinks to shared:
 
@@ -41,9 +170,9 @@ A word on makepkg.conf PKGDEST
 manjarotools.conf supports the makepkg.conf variables
 If you set PKGDEST all works fine, but be careful, that your PKGDEST is clean, or else buildpkg will move all files from PKGDEST to cache dir , not only the built package.
 
-<ol><li>Arguments</li></ol>
-
-The help(for x86_64 and manjaro-tools.conf set):
+<ol>
+<li>Arguments</li>
+</ol>
 
 ~~~
 $ buildpkg -h
@@ -61,18 +190,20 @@ Usage: buildpkg [options] [--] [makepkg args]
     -h                 This help
 ~~~
 
-Example(assuming default manjaro-tools.conf):
-
 * build sysvinit package for both arches and branch testing:
 
 first i686(buildsystem is x86_64)
+
 ~~~
 buildpkg -p sysvinit -a i686 -b testing -cwsn
 ~~~
+
 for x86_64 and testing
+
 ~~~
 buildpkg -p sysvinit -b testing -cswn
 ~~~
+
 You can drop the branch arg if you set the branch in manjaro-tools.conf
 the arch can also be set in manjaro-tools.conf, but under normal conditions, it is better to specify the non native arch by -a parameter.
 
@@ -100,7 +231,8 @@ openrc-run scripts for livecd
 systemd units for livecd
 
 
-<ol><li>Arguments</li>
+<ol>
+<li>Arguments</li>
 
 ~~~
 $ buildiso -h
@@ -120,14 +252,18 @@ Usage: buildiso [options]
     -h                 This help
 ~~~
 
-Example: build xfce iso profile for both arches and branch testing on x86_64 build system:
+* build xfce iso profile for both arches and branch testing on x86_64 build system
+
 ~~~
 buildiso -p xfce -a i686 -b testing 
 ~~~
+
 for x86_64 and testing
+
 ~~~
 buildiso -p xfce -b testing
 ~~~
+
 The branch can be defined also in manjaro-tools.conf, but a manual parameter will always override conf settings.
 
 <li>Special parameters</li>
@@ -141,21 +277,26 @@ By default, xorg package cache is cleaned on every build. Disabling the xorg cac
 Disable lng cache, by default lng cache is cleaned on every build. Uning this option will enable lng packages from cache rather than downloading them again.
 
 </ol>
+
 <li>mkset</li>
 
 buildpkg and buildiso support building from buildsets
 
 Default location of sets is:
+
 ~~~
 /etc/manjaro-tools/manjaro-tools/sets/pkg
 /etc/manjaro-tools/manjaro-tools/sets/iso
 ~~~
+
 but it can be configured in the manjaro-tools.conf file.
 
 mkset is a little helper tools to easily create sets.
 It is run inside the abs/pkgbuilds or iso profiles directory.
 
-<ol><li>Arguments</li></ol>
+<ol>
+<li>Arguments</li>
+</ol>
 
 ~~~
 $ mkset -h
