@@ -266,9 +266,10 @@ configure_displaymanager(){
 	chroot $1 rc-update add xdm default &> /dev/null
     else
 	if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
-	    displaymanager=${displaymanager}-plymouth
+	    chroot $1 systemctl enable ${displaymanager}-plymouth &> /dev/null
+	else
+	    chroot $1 systemctl enable ${displaymanager} &> /dev/null
 	fi
-	chroot $1 systemctl enable ${displaymanager} &> /dev/null
     fi
     
     msg2 "Configured: ${displaymanager}"
