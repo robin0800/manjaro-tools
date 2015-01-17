@@ -191,12 +191,6 @@ load_config(){
 	cache_dir='/var/cache/manjaro-tools'
     fi
     
-    if [[ -n ${sets_dir} ]];then
-	sets_dir=${sets_dir}
-    else
-	sets_dir="${SYSCONFDIR}/sets"
-    fi
-    
     ###################
     # buildpkg
     ###################
@@ -205,6 +199,12 @@ load_config(){
 	chroots_pkg=${chroots_pkg}
     else
 	chroots_pkg='/opt/buildpkg'
+    fi
+        
+    if [[ -n ${sets_dir_pkg} ]];then
+	sets_dir_pkg=${sets_dir_pkg}
+    else
+	sets_dir_pkg="${SYSCONFDIR}/sets/pkg"
     fi
     
     if [[ -n ${buildset_pkg} ]];then
@@ -239,6 +239,12 @@ load_config(){
 	chroots_iso=${chroots_iso}
     else
 	chroots_iso='/opt/buildiso'
+    fi
+        
+    if [[ -n ${sets_dir_iso} ]];then
+	sets_dir_iso=${sets_dir_iso}
+    else
+	sets_dir_iso="${SYSCONFDIR}/sets/iso"
     fi
     
     if [[ -n ${buildset_iso} ]];then

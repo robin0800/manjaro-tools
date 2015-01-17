@@ -85,7 +85,7 @@ move_pkg(){
 
 chroot_build(){
     if ${is_buildset};then
-	msg "Start building [${buildset_pkg}]"
+	msg3 "Start building [${buildset_pkg}]"
 	for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
 	    [[ -f $pkg/PKGBUILD ]] || break
 	    cd $pkg
@@ -97,7 +97,7 @@ chroot_build(){
 	    move_pkg
 	    cd ..
 	done
-	msg "Finished building [${buildset_pkg}]"
+	msg3 "Finished building [${buildset_pkg}]"
     else
 	[[ -f ${buildset_pkg}/PKGBUILD ]] || die "${buildset_pkg} is not a valid profile!"
 	cd ${buildset_pkg}

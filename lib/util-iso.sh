@@ -912,7 +912,8 @@ load_pkgs_livecd(){
     fi
 }
 
-load_desktop_definition(){
+load_profile(){
+
     if [ -e Packages-Xfce ] ; then
 	pkgsfile="Packages-Xfce"
     fi
@@ -957,11 +958,6 @@ load_desktop_definition(){
     fi
     desktop=${pkgsfile#*-}
     desktop=${desktop,,}
-}
-
-load_profile(){
-
-    load_desktop_definition
     
     displaymanager=$(cat displaymanager)
     initsys=$(cat initsys)
@@ -1041,7 +1037,7 @@ set_work_dir(){
 
 build_iso(){
     if ${is_buildset};then
-	msg "Start building [${buildset_iso}]"
+	msg3 "Start building [${buildset_iso}]"
 	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
 	    [[ -f $prof/initsys ]] || break
 	    cd $prof
@@ -1050,7 +1046,7 @@ build_iso(){
 		build_profile
 	    cd ..
 	done
-	msg "Finished building [${buildset_iso}]"
+	msg3 "Finished building [${buildset_iso}]"
     else
 	[[ -f ${buildset_iso}/initsys ]] || die "${buildset_iso} is not a valid profile!"
 	cd ${buildset_iso}    

@@ -154,7 +154,6 @@ fi
 work_dir=${chroots_pkg}/${branch}/${arch}
 
 cache_dir_pkg="${cache_dir}/${branch}/${arch}"
-sets_dir_pkg="${sets_dir}/pkg"
 
 pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"

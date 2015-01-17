@@ -16,36 +16,18 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
 [[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
 
-create_set_pkg(){
-    msg "[${sets_dir_pkg}/${name}.set]"
-    if [[ -f ${sets_dir_pkg}/${name}.set ]];then
-	msg3 "Backing up ${sets_dir_pkg}/${name}.set.orig"
-	mv "${sets_dir_pkg}/${name}.set" "${sets_dir_pkg}/${name}.set.orig"
-    fi
-    local list=$(find * -maxdepth 0 -type d | sort)
-
-    for item in ${list[@]};do
-	if [[ -f $item/PKGBUILD ]];then
-	    cd $item
-		msg2 "Adding ${item##*/}"
-		echo ${item##*/} >> ${sets_dir_pkg}/${name}.set || break
-	    cd ..
-	fi
-    done
-}
-
-create_set_iso(){
-    msg "[${sets_dir_iso}/${name}.set]"
-    if [[ -f ${sets_dir_iso}/${name}.set ]];then
-	msg3 "Backing up ${sets_dir_iso}/${name}.set.orig"
-	mv "${sets_dir_iso}/${name}.set" "${sets_dir_iso}/${name}.set.orig"
+create_set(){
+    msg "[$1/${name}.set]"
+    if [[ -f $1/${name}.set ]];then
+	msg3 "Backing up $1/${name}.set.orig"
+	mv "$1/${name}.set" "$1/${name}.set.orig"
     fi
     local list=$(find * -maxdepth 0 -type d | sort)
     for item in ${list[@]};do
-	if [[ -f $item/initsys ]];then
+	if [[ -f $item/$2 ]];then
 	    cd $item
 		msg2 "Adding ${item##*/}"
-		echo ${item##*/} >> ${sets_dir_iso}/${name}.set || break
+		echo ${item##*/} >> $1/${name}.set || break
 	    cd ..
 	fi
     done
@@ -110,16 +92,13 @@ done
 
 shift $(($OPTIND - 1))
 
-sets_dir_pkg="${sets_dir}/pkg"
-sets_dir_iso="${sets_dir}/iso"
-
 check_root "$0" "${orig_argv[@]}"
 
 if ${create};then
     if ${iso_mode}; then
-	create_set_iso
+	create_set "${sets_dir_iso}" "initsys"
     else
-	create_set_pkg
+	create_set "${sets_dir_pkg}" "PKGBUILD"
     fi
 elif ${remove};then
     if ${iso_mode}; then
