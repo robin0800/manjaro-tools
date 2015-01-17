@@ -60,9 +60,9 @@ configure_services_live(){
       for svc in ${start_openrc_live[@]}; do
 	  if [[ -f $1/etc/init.d/$svc ]]; then
 	      msg2 "Setting $svc ..."
-	      [[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
+	      [[ ! -d  $1/etc/runlevels/{boot,default} ]] && mkdir -p $1/etc/runlevels/{boot,default}
 # 	      ln -sf /etc/init.d/$svc $1/etc/runlevels/default/$svc
-	      chroot $1 rc-update add $svc default 
+	      chroot $1 rc-update add $svc default &> /dev/null
 	  fi
       done
    else
@@ -80,9 +80,9 @@ configure_services(){
       for svc in ${start_openrc[@]}; do
 	  if [[ -f $1/etc/init.d/$svc ]]; then
 	      msg2 "Setting $svc ..."
-	      [[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
+	      [[ ! -d  $1/etc/runlevels/{boot,default} ]] && mkdir -p $1/etc/runlevels/{boot,default}
 # 	      ln -sf /etc/init.d/$svc $1/etc/runlevels/default/$svc
-	      chroot $1 rc-update add $svc default
+	      chroot $1 rc-update add $svc default &> /dev/null
 	  fi
       done
    else
@@ -263,7 +263,7 @@ configure_displaymanager(){
 	sed -i -e "s|^.*DISPLAYMANAGER=.*|${_conf_xdm}|" $1/etc/conf.d/xdm
 	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
 # 	ln -sf /etc/init.d/xdm $1/etc/runlevels/default/xdm
-	chroot $1 rc-update add $svc default
+	chroot $1 rc-update add xdm default &> /dev/null
     else
 	if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
 	    displaymanager=${displaymanager}-plymouth
