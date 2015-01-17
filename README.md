@@ -4,8 +4,8 @@
 Manjaro-tools-0.9.6
 
 User manual
-<ol>
-<li>manjaro.tools.conf</li>
+
+1. manjaro.tools.conf
 
 manjaro-tools.conf is the central configuration file for manjaro-tools.
 By default, the config is installed in /etc/manjaro-tools/manjaro-tools.conf
@@ -139,9 +139,7 @@ Best practise is to leave systemwide file untouched, by default it is commented 
 # start_openrc_live=('bluetooth'  'networkmanager')
 ~~~
 
-<ol>
-<li>Config files in iso profiles</li>
-</ol>
+####Config files in iso profiles
 
 Each iso profile must have these files or symlinks to shared:
 
@@ -158,7 +156,7 @@ default files are in shared folder and can be symlinked or defined in a real fil
 
     If you need a custom livecd-overlay, create a  overlay-livecd folder in your profile, and  symlink from shared/overlay-livecd/your_selection  and add your modification
 
-<li>buildpkg</li>
+2. buildpkg
 
 buildpkg is the chroot build script oi manjaro-tools.
 It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
@@ -170,9 +168,7 @@ A word on makepkg.conf PKGDEST
 manjarotools.conf supports the makepkg.conf variables
 If you set PKGDEST all works fine, but be careful, that your PKGDEST is clean, or else buildpkg will move all files from PKGDEST to cache dir , not only the built package.
 
-<ol>
-<li>Arguments</li>
-</ol>
+####Arguments
 
 ~~~
 $ buildpkg -h
@@ -217,8 +213,7 @@ signs the package when built
 * -n
 installs the built package in the chroot and runs a namcap check
 
-<li>buildiso</li>
-
+3. buildiso
 
 buildiso is used to build manjaro-iso-profiles. It is run insde the profiles folder.
 
@@ -230,9 +225,7 @@ openrc-run scripts for livecd
 * manjaro-livecd-systemd
 systemd units for livecd
 
-
-<ol>
-<li>Arguments</li>
+####Arguments
 
 ~~~
 $ buildiso -h
@@ -266,7 +259,8 @@ buildiso -p xfce -b testing
 
 The branch can be defined also in manjaro-tools.conf, but a manual parameter will always override conf settings.
 
-<li>Special parameters</li>
+####Special parameters
+
 * -i
 Build images only will stop after all packages have been installed. No iso sqfs compression will be executed
 * -s
@@ -276,9 +270,7 @@ By default, xorg package cache is cleaned on every build. Disabling the xorg cac
 * -l
 Disable lng cache, by default lng cache is cleaned on every build. Uning this option will enable lng packages from cache rather than downloading them again.
 
-</ol>
-
-<li>mkset</li>
+4. mkset
 
 buildpkg and buildiso support building from buildsets
 
@@ -294,9 +286,7 @@ but it can be configured in the manjaro-tools.conf file.
 mkset is a little helper tools to easily create sets.
 It is run inside the abs/pkgbuilds or iso profiles directory.
 
-<ol>
-<li>Arguments</li>
-</ol>
+####Arguments
 
 ~~~
 $ mkset -h
@@ -331,4 +321,3 @@ Examples
 /etc/manjaro-tools/sets/pkg/lxqt-0.8.set
 /etc/manjaro-tools/sets/iso/manjaro-0.9.0.set
 ~~~
-</ol>
