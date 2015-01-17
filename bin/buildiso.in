@@ -48,6 +48,7 @@ display_settings(){
     msg2 "iso_only: ${iso_only}"
 
     msg "PATHS:"
+    msg2 "sets_dir_iso: ${sets_dir_iso}"
     msg2 "cache_dir_iso: ${cache_dir_iso}"
     msg2 "cache_dir_xorg: ${cache_dir_xorg}"
     msg2 "cache_dir_lng: ${cache_dir_lng}"
