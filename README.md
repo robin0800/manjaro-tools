@@ -5,7 +5,7 @@ Manjaro-tools-0.9.6
 
 User manual
 
-1. manjaro.tools.conf
+###1. manjaro.tools.conf
 
 manjaro-tools.conf is the central configuration file for manjaro-tools.
 By default, the config is installed in /etc/manjaro-tools/manjaro-tools.conf
@@ -156,7 +156,7 @@ default files are in shared folder and can be symlinked or defined in a real fil
 
     If you need a custom livecd-overlay, create a  overlay-livecd folder in your profile, and  symlink from shared/overlay-livecd/your_selection  and add your modification
 
-2. buildpkg
+###2. buildpkg
 
 buildpkg is the chroot build script oi manjaro-tools.
 It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
@@ -213,7 +213,7 @@ signs the package when built
 * -n
 installs the built package in the chroot and runs a namcap check
 
-3. buildiso
+###3. buildiso
 
 buildiso is used to build manjaro-iso-profiles. It is run insde the profiles folder.
 
