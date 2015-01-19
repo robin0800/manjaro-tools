@@ -26,11 +26,12 @@ display_settings(){
     else
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
     fi
-    
+
     msg "ARGS:"
     msg2 "sync: ${sync}"
     msg2 "abs: ${abs}"
-    
+    msg2 "clean: ${clean}"
+
     msg "PATHS:"
     msg2 "tree_dir: ${tree_dir}"
     msg2 "repo_tree: ${repo_tree[*]}"
@@ -43,35 +44,59 @@ prepare_dir(){
 }
 
 sync_tree(){
-    cd $1
+    cd ${tree_dir}
     for repo in ${repo_tree[@]};do
-	msg "Syncing $repo ..."
-	git clone ${host_tree}/packages-$repo.git #branch=$branch
+	if [[ -d packages-$repo ]];then
+	    cd packages-$repo
+	    msg "Syncing $repo ..."
+	    git pull origin master
+	    cd ..
+	else
+	    msg "Cloning $repo ..."
+	    git clone --depth 1 ${host_tree}/packages-$repo.git
+	fi
     done
     cd ..
-    if ${abs}; then
-	cd $1/abs
-	    msg "Syncing abs ..."
-	    git clone ${host_tree_abs}.git
+}
+
+sync_tree_abs(){
+    cd ${tree_dir}/abs
+    if [[ -d packages ]];then
+	cd packages
+	msg "Syncing abs ..."
+	git pull origin master
 	cd ..
+    else
+	msg "Cloning abs ..."
+	git clone --depth 1 ${host_tree_abs}.git
+    fi
+    cd ..
+}
+
+clean_tree_dir(){
+    if [[ -d ${tree_dir} ]]; then
+	msg "Cleaning ${tree_dir} ..."
+	rm -r ${tree_dir}/*
     fi
 }
 
 load_user_info
 
-load_config "${USER_CONFIG}/manjaro-tools.conf"  
+load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
-sync=true
+sync=false
 pretend=false
 abs=false
+clean=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
     echo "    -s            Sync tree"
     echo "    -a            Include arch abs"
-    echo '    -h            This help'
+    echo '    -c            Clean package tree'
     echo '    -q            Query settings'
+    echo '    -h            This help'
     echo ''
     echo ''
     exit $1
@@ -79,12 +104,13 @@ usage() {
 
 orig_argv=("$@")
 
-opts='saqh'
+opts='sacqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
-	s) sync=false ;;
+	s) sync=true ;;
 	a) abs=true ;;
+	c) clean=true ;;
 	q) pretend=true ;;
 	h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -101,4 +127,8 @@ prepare_dir "${tree_dir}/abs"
 
 ${pretend} && display_settings && exit 1
 
-${sync} && sync_tree "${tree_dir}"
+${clean} && clean_tree_dir && exit 1
+
+${sync} && sync_tree
+
+${abs} && sync_tree_abs
