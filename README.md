@@ -28,6 +28,17 @@ Best practise is to leave systemwide file untouched, by default it is commented 
 # cache_dir=/var/cache/manjaro-tools
 
 ##########################################
+################ buildtree ###############
+##########################################
+
+# manjaro package tree
+# repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
+
+# host_tree=https://github.com/manjaro
+
+# host_tree_abs=https://projects.archlinux.org/git/svntogit/packages
+
+##########################################
 ################ buildpkg ################
 ##########################################
 
@@ -320,4 +331,26 @@ Examples
 ~~~
 /etc/manjaro-tools/sets/pkg/lxqt-0.8.set
 /etc/manjaro-tools/sets/iso/manjaro-0.9.0.set
+~~~
+
+5. buildtree
+
+builtree is a little tools to sync arch abs and manjaro packages git repos.
+
+####Arguments
+
+~~~
+$ buildtree -h
+Usage: buildtree [options]
+    -s            Sync manjaro tree
+    -a            Sync arch abs
+    -c            Clean package tree
+    -q            Query settings
+    -h            This help
+~~~
+
+* sync arch and manjaro trees
+
+~~~
+buildtree -as
 ~~~
