@@ -125,7 +125,7 @@ load_config "${SYSCONFDIR}/manjaro-tools.conf"
 clean_first=true
 clean_cache_xorg=true
 clean_cache_lng=true
-clean_cache_iso=false
+clean_cache_iso=true
 
 pretend=false
 images_only=false
@@ -141,7 +141,7 @@ usage() {
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
     echo '    -c                 Disable clean work dir'
-    echo '    -w                 Clean iso cache'
+    echo '    -w                 Disable clean iso cache'
     echo '    -x                 Disable clean xorg cache'
     echo '    -l                 Disable clean lng cache'
     echo '    -i                 Build images only'
@@ -165,7 +165,7 @@ while getopts "${opts}" arg; do
 	b) branch="$OPTARG" ;;
 	r) chroots_iso="$OPTARG" ;;
 	c) clean_first=false ;;
-	w) clean_cache_iso=true; iso_args+=(-f) ;;
+	w) clean_cache_iso=false; iso_args+=(-f) ;;
 	x) clean_cache_xorg=false ;;
 	l) clean_cache_lng=false ;;
 	i) images_only=true ;;
