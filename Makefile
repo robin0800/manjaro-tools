@@ -19,7 +19,8 @@ BINPROGS = \
 	bin/chroot-run \
 	bin/mkiso \
 	bin/buildiso \
-	bin/testiso
+	bin/testiso \
+	bin/buildtree
 
 SYSCONFIGFILES = \
 	conf/manjaro-tools.conf
@@ -102,8 +103,8 @@ install:
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
 	install -m0644 ${SCRIPTS} $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
 	
-	#install -Dm0644 bin/bash_completion $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
-	#install -Dm0644 bin/zsh_completion $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
+# 	install -Dm0644 bin/bash_completion $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
+# 	install -Dm0644 bin/zsh_completion $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
 
 uninstall:
 	for f in ${SYSCONFIGFILES}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/$$f; done
@@ -117,8 +118,8 @@ uninstall:
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
 	for f in ${SCRIPTS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts/$$f; done
 	
-	#rm $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
-	#rm $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
+# 	rm $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
+# 	rm $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
 
 dist:
 	git archive --format=tar --prefix=manjaro-tools-$(V)/ $(V) | gzip -9 > manjaro-tools-$(V).tar.gz

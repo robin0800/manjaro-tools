@@ -192,6 +192,28 @@ load_config(){
     fi
     
     ###################
+    # buildtree
+    ###################
+    
+    if [[ -n ${repo_tree} ]];then
+	repo_tree=${repo_tree}
+    else
+	repo_tree=(core extra community multilib openrc)
+    fi
+    
+    if [[ -n ${host_tree} ]];then
+	host_tree=${host_tree}
+    else
+	host_tree='https://github.com/manjaro'
+    fi   
+    
+    if [[ -n ${host_tree_abs} ]];then
+	host_tree_abs=${host_tree_abs}
+    else
+	host_tree_abs='https://projects.archlinux.org/git/svntogit/packages'
+    fi   
+    
+    ###################
     # buildpkg
     ###################
     

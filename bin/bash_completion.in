@@ -1,15 +1,3 @@
-# _manjaro_tools_compgen() {
-#   local i r
-#   COMPREPLY=($(compgen -W '$*' -- "$cur"))
-#   for ((i=1; i < ${#COMP_WORDS[@]}-1; i++)); do
-#     for r in ${!COMPREPLY[@]}; do
-#       if [[ ${COMP_WORDS[i]} = ${COMPREPLY[r]} ]]; then
-#         unset 'COMPREPLY[r]'; break
-#       fi
-#     done
-#   done
-# }
-
 _mkchrootpkg() {
   local cur
   COMPREPLY=()
@@ -36,7 +24,7 @@ _mkchroot() {
 
   case $cur in
     -*)
-       COMPREPLY=( $( compgen -W '-C -M -S -c -h' -- "$cur" ) )
+       COMPREPLY=( $( compgen -W '-C -M -S -c -L -B -h' -- "$cur" ) )
        ;;
     *)
       _filedir
@@ -55,7 +43,7 @@ _chroot_run() {
 
   case $cur in
     -*)
-       COMPREPLY=( $( compgen -W '-C -M -S -c -h' -- "$cur" ) )
+       COMPREPLY=( $( compgen -W '-C -M -S -c -B -h' -- "$cur" ) )
        ;;
     *)
       _filedir
@@ -67,14 +55,14 @@ _chroot_run() {
 } &&
 complete -F _chroot_run chroot-run
 
-_build_set() {
+_buildpkg() {
   local cur
   COMPREPLY=()
   _get_comp_words_by_ref cur
 
   case $cur in
     -*)
-       COMPREPLY=( $( compgen -W '-a -b -p -c -r -w -s -h' -- "$cur" ) )
+       COMPREPLY=( $( compgen -W '-a -b -p -c -r -w -s -q -h' -- "$cur" ) )
        ;;
     *)
       _filedir
@@ -84,7 +72,23 @@ _build_set() {
 
   true
 } &&
-complete -F _build_set build-set
+complete -F _buildpkg buildpkg
 
+_buildiso() {
+  local cur
+  COMPREPLY=()
+  _get_comp_words_by_ref cur
 
-# ex:et ts=2 sw=2 ft=sh
+  case $cur in
+    -*)
+       COMPREPLY=( $( compgen -W '-a -b -p -c -r -i -s -x -l -q -h' -- "$cur" ) )
+       ;;
+    *)
+      _filedir
+      return 0
+      ;;
+  esac
+
+  true
+} &&
+complete -F _buildiso buildiso

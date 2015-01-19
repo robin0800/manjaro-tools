@@ -1,0 +1,104 @@
+#!/bin/bash
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+version=@version@
+
+LIBDIR='@libdir@'
+SYSCONFDIR='@sysconfdir@'
+
+[[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
+[[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
+
+display_settings(){
+    msg "manjaro-tools"
+    msg2 "version: ${version}"
+
+    if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
+	msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
+    else
+	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
+    fi
+    
+    msg "ARGS:"
+    msg2 "sync: ${sync}"
+    msg2 "abs: ${abs}"
+    
+    msg "PATHS:"
+    msg2 "tree_dir: ${tree_dir}"
+    msg2 "repo_tree: ${repo_tree[*]}"
+    msg2 "host_tree: ${host_tree}"
+    msg2 "host_tree_abs: ${host_tree_abs}"
+}
+
+prepare_dir(){
+    [[ ! -d $1 ]] && mkdir -p $1
+}
+
+sync_tree(){
+    cd $1
+    for repo in ${repo_tree[@]};do
+	msg "Syncing $repo ..."
+	git clone ${host_tree}/packages-$repo.git #branch=$branch
+    done
+    cd ..
+    if ${abs}; then
+	cd $1/abs
+	    msg "Syncing abs ..."
+	    git clone ${host_tree_abs}.git
+	cd ..
+    fi
+}
+
+load_user_info
+
+load_config "${USER_CONFIG}/manjaro-tools.conf"  
+load_config "${SYSCONFDIR}/manjaro-tools.conf"
+
+sync=true
+pretend=false
+abs=false
+
+usage() {
+    echo "Usage: ${0##*/} [options]"
+    echo "    -s            Sync tree"
+    echo "    -a            Include arch abs"
+    echo '    -h            This help'
+    echo '    -q            Query settings'
+    echo ''
+    echo ''
+    exit $1
+}
+
+orig_argv=("$@")
+
+opts='saqh'
+
+while getopts "${opts}" arg; do
+    case "${arg}" in
+	s) sync=false ;;
+	a) abs=true ;;
+	q) pretend=true ;;
+	h|?) usage 0 ;;
+        *) echo "invalid argument '${arg}'"; usage 1 ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+
+tree_dir=${cache_dir}/pkgtree
+
+check_root "$0" "${orig_argv[@]}"
+
+prepare_dir "${tree_dir}/abs"
+
+${pretend} && display_settings && exit 1
+
+${sync} && sync_tree "${tree_dir}"
