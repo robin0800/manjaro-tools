@@ -92,8 +92,8 @@ clean=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo "    -s            Sync tree"
-    echo "    -a            Include arch abs"
+    echo "    -s            Sync manjaro tree"
+    echo "    -a            Sync arch abs"
     echo '    -c            Clean package tree'
     echo '    -q            Query settings'
     echo '    -h            This help'
