@@ -514,9 +514,15 @@ aufs_mount_root_image(){
 }
 
 # $1: add branch
-aufs_append_de_image(){
+aufs_append_root_image(){
+    msg2 "append root-image"
+    mount -t aufs -o remount,append:${work_dir}/root-image=ro none $1
+}
+
+# $1: add branch
+aufs_mount_de_image(){
     msg2 "mount ${desktop}-image"
-    mount -t aufs -o remount,append:${work_dir}/${desktop}-image=ro none $1
+    mount -t aufs -o br=$1:${work_dir}/${desktop}-image=ro none $1
 }
 
 # $1: del branch
@@ -594,10 +600,11 @@ make_image_livecd() {
 	
 	aufs_remove_image "${work_dir}/livecd-image"
 	
-	aufs_mount_root_image "${work_dir}/livecd-image"
-	
 	if [ -n "${desktop}" ] ; then
-	    aufs_append_de_image "${work_dir}/livecd-image"
+	    aufs_mount_de_image "${work_dir}/livecd-image"
+	    aufs_append_root_image "${work_dir}/livecd-image"
+	else
+	    aufs_mount_root_image "${work_dir}/livecd-image"
 	fi
 	
 	mkiso ${create_args[*]} -i "livecd-image" -p "${packages_livecd}" create "${work_dir}" || die "Please check you Packages-Livecd file! Exiting." 
@@ -635,10 +642,11 @@ make_image_xorg() {
 	
 	aufs_remove_image "${work_dir}/pkgs-image"
 	
-	aufs_mount_root_image "${work_dir}/pkgs-image"
-	
 	if [[ -n "${desktop}" ]] ; then
-	    aufs_append_de_image "${work_dir}/pkgs-image"
+	    aufs_mount_de_image "${work_dir}/pkgs-image"
+	    aufs_append_root_image "${work_dir}/pkgs-image"
+	else
+	    aufs_mount_root_image "${work_dir}/pkgs-image"
 	fi
 	
 	download_to_cache "${work_dir}/pkgs-image" "${cache_dir_xorg}" "${packages_xorg}"
@@ -673,10 +681,11 @@ make_image_lng() {
 	
 	aufs_remove_image "${work_dir}/lng-image"
 	
-	aufs_mount_root_image "${work_dir}/lng-image"
-	
 	if [[ -n "${desktop}" ]] ; then
-	    aufs_append_de_image "${work_dir}/lng-image"
+	    aufs_mount_de_image "${work_dir}/lng-image"
+	    aufs_append_root_image "${work_dir}/lng-image"
+	else
+	    aufs_mount_root_image "${work_dir}/lng-image"
 	fi
 
 	if [[ -n ${packages_lng_kde} ]]; then
@@ -720,11 +729,12 @@ make_image_boot() {
         mkdir -p ${work_dir}/boot-image
         
 	aufs_remove_image "${work_dir}/boot-image"
-        
-        aufs_mount_root_image "${work_dir}/boot-image"
-        
+            
         if [ ! -z "${desktop}" ] ; then
-	    aufs_append_de_image "${work_dir}/boot-image"
+	    aufs_mount_de_image "${work_dir}/boot-image"
+	    aufs_append_root_image "${work_dir}/boot-image"
+	else
+	    aufs_mount_root_image "${work_dir}/boot-image"
         fi
         
         copy_initcpio
