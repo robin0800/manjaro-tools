@@ -85,9 +85,11 @@ basestrap -GMcd ${pac_conf:+-C "$pac_conf"} "$working_dir" \
 echo "$version" > "$working_dir/.manjaro-tools"
 
 if ${build_locales};then
-    printf '%s.UTF-8 UTF-8\n en_US.UTF-8 UTF-8\n de_DE.UTF-8 UTF-8\n' > "$working_dir/etc/locale.gen"
-    echo 'LANG=en_US.UTF-8' > "$working_dir/etc/locale.conf"
-    echo 'LC_MESSAGES=C' >> "$working_dir/etc/locale.conf"
+    cp "$working_dir/etc/locale.gen" "$working_dir/etc/locale.gen.bak"
+    cp "$working_dir/etc/locale.conf" "$working_dir/etc/locale.conf.bak"
+    printf '%s.UTF-8 UTF-8\n' en_US de_DE > "$working_dir/etc/locale.gen"
+    printf '%s.UTF-8' en_US > "$working_dir/etc/locale.conf"
+    printf 'LC_MESSAGES=C' >> "$working_dir/etc/locale.conf"
 fi
 
 exec chroot-run \
@@ -97,4 +99,9 @@ exec chroot-run \
 	${build_mirror:+-B "$build_mirror"} \
 	${cache_dir:+-c "$cache_dir"} \
 	"$working_dir" locale-gen
+
+if ${build_locales};then
+    cp "$working_dir/etc/locale.gen.bak" "$working_dir/etc/locale.gen"
+    cp "$working_dir/etc/locale.conf.bak" "$working_dir/etc/locale.conf"
+fi
 
