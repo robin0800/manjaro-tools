@@ -165,7 +165,7 @@ while getopts "${opts}" arg; do
 	b) branch="$OPTARG" ;;
 	r) chroots_iso="$OPTARG" ;;
 	c) clean_first=false ;;
-	w) clean_cache_iso=false; iso_args+=(-f) ;;
+	w) clean_cache_iso=false ;;
 	x) clean_cache_xorg=false ;;
 	l) clean_cache_lng=false ;;
 	i) images_only=true ;;
@@ -189,6 +189,10 @@ cache_dir_iso="${cache_dir}/iso"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 create_args+=(-v -a ${arch} -D ${install_dir} -M ${mirrors_conf})
+
+if [[ "$clean_cache_iso" == 'true' ]]; then
+    iso_args+=(-f)
+fi
 
 iso_args+=(-v -x -a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
 
