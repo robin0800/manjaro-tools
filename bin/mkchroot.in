@@ -100,8 +100,3 @@ exec chroot-run \
 	${cache_dir:+-c "$cache_dir"} \
 	"$working_dir" locale-gen
 
-if ${build_locales};then
-    mv "$working_dir/etc/locale.gen.bak" "$working_dir/etc/locale.gen"
-    mv "$working_dir/etc/locale.conf.bak" "$working_dir/etc/locale.conf"
-fi
-

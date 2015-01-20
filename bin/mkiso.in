@@ -134,6 +134,11 @@ clean_up(){
 	fi
     fi
 
+    [[ -f "${work_dir}/${IMAGE_FOLDER}/etc/locale.gen.bak" ]] \
+	&& mv "${work_dir}/${IMAGE_FOLDER}/etc/locale.gen.bak" "${work_dir}/${IMAGE_FOLDER}/etc/locale.gen"
+    [[ -f "${work_dir}/${IMAGE_FOLDER}/etc/locale.conf.bak" ]] \
+	&& mv "${work_dir}/${IMAGE_FOLDER}/etc/locale.conf.bak" "${work_dir}/${IMAGE_FOLDER}/etc/locale.conf"
+
     # Delete pacman database sync cache files (*.tar.gz)
     find "${work_dir}/${IMAGE_FOLDER}/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
     # Delete pacman database sync cache
