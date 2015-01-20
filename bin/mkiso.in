@@ -148,16 +148,23 @@ clean_up(){
 }
 
 _mkchroot(){
+	#set locale.gen
+	if [ "${IMAGE_FOLDER}" == "livecd-image" ]; then
+	    LOCALE="-L"
+	fi
+
 	#local ret
 	if "${QUIET}"; then
 	    setarch "${ARCH}" \
 		mkchroot -C ${PACCONFIG} \
 		-S ${MIRRORS} \
+		${LOCALE} \
 		"${work_dir}/${IMAGE_FOLDER}" $@ &> /dev/null || die "Failed to retrieve one or more packages!"
 	else
 	    setarch "${ARCH}" \
 		mkchroot -C ${PACCONFIG} \
 		-S ${MIRRORS} \
+		${LOCALE} \
 		"${work_dir}/${IMAGE_FOLDER}" $@ || die "Failed to retrieve one or more packages!"
 	fi
 	
@@ -165,7 +172,7 @@ _mkchroot(){
 # 	    cp ${work_dir}/root-image/etc/locale.gen ${work_dir}/root-image/etc/locale.gen.bak
 # 	fi
 	
-	 # Cleanup
+	# Cleanup
 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
 }
 
