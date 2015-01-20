@@ -61,7 +61,6 @@ configure_services_live(){
 	  if [[ -f $1/etc/init.d/$svc ]]; then
 	      msg2 "Setting $svc ..."
 	      [[ ! -d  $1/etc/runlevels/{boot,default} ]] && mkdir -p $1/etc/runlevels/{boot,default}
-# 	      ln -sf /etc/init.d/$svc $1/etc/runlevels/default/$svc
 	      chroot $1 rc-update add $svc default &> /dev/null
 	  fi
       done
@@ -81,7 +80,6 @@ configure_services(){
 	  if [[ -f $1/etc/init.d/$svc ]]; then
 	      msg2 "Setting $svc ..."
 	      [[ ! -d  $1/etc/runlevels/{boot,default} ]] && mkdir -p $1/etc/runlevels/{boot,default}
-# 	      ln -sf /etc/init.d/$svc $1/etc/runlevels/default/$svc
 	      chroot $1 rc-update add $svc default &> /dev/null
 	  fi
       done
@@ -165,10 +163,6 @@ configure_displaymanager(){
 		  sed -i -e 's/^.*user-session=.*/user-session=i3/' $1/etc/lightdm/lightdm.conf
 	    fi
 	;;
-	'kdm')
-	    sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" $1/usr/share/config/kdm/kdmrc
-	    sed -i -e "s/^.*AutoLoginPass=.*/AutoLoginPass=${password}/" $1/usr/share/config/kdm/kdmrc
-	;;
 	'gdm')
 	    configure_accountsservice $1 "gdm"
 	;;
@@ -196,7 +190,6 @@ configure_displaymanager(){
 	    fi
 	;;
 	'sddm')
-	    sed -i -e "s|^User=.*|User=${username}|" $1/etc/sddm.conf
 	    if [ -e "$1/usr/bin/startxfce4" ] ; then
 		sed -i -e 's|^Session=.*|Session=xfce.desktop|' $1/etc/sddm.conf
 	    fi
@@ -223,7 +216,6 @@ configure_displaymanager(){
 	    fi
 	;;
 	'lxdm')
-	    sed -i -e "s/^.*autologin=.*/autologin=${username}/" $1/etc/lxdm/lxdm.conf
 	    if [ -e "$1/usr/bin/openbox-session" ] ; then
 		sed -i -e 's|^.*session=.*|session=/usr/bin/openbox-session|' $1/etc/lxdm/lxdm.conf
 	    fi
@@ -253,7 +245,6 @@ configure_displaymanager(){
 	    fi
 	;;
 	*) 
-	    msg2 "No displaymanager used"
 	    break
 	;;
     esac
@@ -262,7 +253,6 @@ configure_displaymanager(){
 	local _conf_xdm='DISPLAYMANAGER="'${displaymanager}'"'
 	sed -i -e "s|^.*DISPLAYMANAGER=.*|${_conf_xdm}|" $1/etc/conf.d/xdm
 	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
-# 	ln -sf /etc/init.d/xdm $1/etc/runlevels/default/xdm
 	chroot $1 rc-update add xdm default &> /dev/null
     else
 	if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
@@ -420,9 +410,7 @@ configure_desktop_image(){
 
 configure_livecd_image(){
     msg3 "Configuring [livecd-image]"
-    
-#     configure_displaymanager "${work_dir}/livecd-image"
-    
+        
     configure_hostname "${work_dir}/livecd-image"
     
     configure_hosts "${work_dir}/livecd-image"
@@ -434,9 +422,7 @@ configure_livecd_image(){
     configure_calamares "${work_dir}/livecd-image"
     
     configure_services_live "${work_dir}/livecd-image"    
-    
-#     configure_plymouth "${work_dir}/livecd-image"
-    
+        
     msg3 "Done configuring [livecd-image]"
 }
 

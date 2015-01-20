@@ -54,8 +54,7 @@ DESTDIR="/"
 
 install_localization_live "${DESTDIR}"
 
-# [[ -f /usr/bin/lightdm ]] && fix_lightdm
-[[ -f /usr/bin/kdm ]] && fix_kdm
+configure_displaymanager_live
 
 echo "configure root password" >> /tmp/livecd.log
 
@@ -63,8 +62,6 @@ configure_user_root_live "${DESTDIR}"
 cp -a /etc/skel/. /root/
 
 configure_machine_id_live
-
-# configure_live_installer_live
 
 configure_thus_live
 

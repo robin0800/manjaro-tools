@@ -360,18 +360,6 @@ get_release(){
     echo $(cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d= -f2)
 }
 
-# configure_live_installer_live(){
-#     local conf_file="/etc/live-installer/install.conf"
-#     if [[ -f "$conf_file" ]] ; then
-#         echo "configure live-installer" >> /tmp/livecd.log
-# 	local release=$(get_release)
-# 	sed -i "s|_version_|$release|g" $conf_file
-# 	sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
-# 	configure_live_image "$conf_file"
-#     fi
-# 
-# }
-
 configure_thus_live(){
     local conf_file="/etc/thus.conf"
     if [[ -f "$conf_file" ]];then 
@@ -398,27 +386,18 @@ configure_calamares_live(){
     fi
 }
 
-fix_kdm(){
-    xdg-icon-resource forceupdate --theme hicolor &> /dev/null
-    [[ -e "/usr/bin/update-desktop-database" ]] && update-desktop-database -q
-}
-
-fix_lightdm(){
-    
-    groupadd -r autologin
-    gpasswd -a ${username} autologin &> /dev/null
-    
-    getent group lightdm > /dev/null 2>&1 || groupadd -g 620 lightdm
-    getent passwd lightdm > /dev/null 2>&1 || useradd -c 'LightDM Display Manager' -u 620 -g lightdm -d /run/lightdm -s /usr/bin/nologin lightdm
-    passwd -l lightdm > /dev/null
-    
-    mkdir -p /run/lightdm > /dev/null
-    
-    mkdir -p /var/lib/lightdm-data
-    
-    chown lightdm:lightdm /run/lightdm
-        
-    sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
-    sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
-       
+configure_displaymanager_live(){
+    if [[ -f /usr/bin/lightdm ]];then
+	sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
+	sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
+    elif [[ -f /usr/bin/kdm ]];then
+	sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" /usr/share/config/kdm/kdmrc
+	sed -i -e "s/^.*AutoLoginPass=.*/AutoLoginPass=${password}/" /usr/share/config/kdm/kdmrc
+	xdg-icon-resource forceupdate --theme hicolor &> /dev/null
+	[[ -e "/usr/bin/update-desktop-database" ]] && update-desktop-database -q
+    elif [[ -f /usr/bin/sddm ]];then
+	sed -i -e "s|^User=.*|User=${username}|" $1/etc/sddm.conf
+    elif [[ -f /usr/bin/lxdm ]];then
+	sed -i -e "s/^.*autologin=.*/autologin=${username}/" /etc/lxdm/lxdm.conf
+    fi
 }
