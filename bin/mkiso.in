@@ -149,7 +149,7 @@ clean_up(){
 
 _mkchroot(){
 	#set locale.gen
-	if [ "${IMAGE_FOLDER}" == "livecd-image" ]; then
+	if [ "${IMAGE_FOLDER}" == "root-image" ]; then
 	    LOCALE="-L"
 	fi
 
