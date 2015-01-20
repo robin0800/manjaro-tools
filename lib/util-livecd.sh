@@ -396,7 +396,7 @@ configure_displaymanager_live(){
 	xdg-icon-resource forceupdate --theme hicolor &> /dev/null
 	[[ -e "/usr/bin/update-desktop-database" ]] && update-desktop-database -q
     elif [[ -f /usr/bin/sddm ]];then
-	sed -i -e "s|^User=.*|User=${username}|" $1/etc/sddm.conf
+	sed -i -e "s|^User=.*|User=${username}|" /etc/sddm.conf
     elif [[ -f /usr/bin/lxdm ]];then
 	sed -i -e "s/^.*autologin=.*/autologin=${username}/" /etc/lxdm/lxdm.conf
     fi
