@@ -80,4 +80,6 @@ configure_alsa_live "${DESTDIR}"
 alsactl -f /etc/asound.state store &>/dev/null
 
 # configure pulse
-[[ -e "/usr/bin/pulseaudio-ctl" ]] && /opt/livecd/pulseaudio-ctl-normal
+if [[ -f /usr/bin/pulseaudio-ctl ]];then
+    /opt/livecd/pulseaudio-ctl-normal
+fi
