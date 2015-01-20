@@ -88,12 +88,6 @@ if ${build_locales};then
     printf '%s.UTF-8 UTF-8\n en_US.UTF-8 UTF-8\n de_DE.UTF-8 UTF-8\n' > "$working_dir/etc/locale.gen"
     echo 'LANG=en_US.UTF-8' > "$working_dir/etc/locale.conf"
     echo 'LC_MESSAGES=C' >> "$working_dir/etc/locale.conf"
-else
-    # this is the buildiso case
-    # is this correct or do we want iso default to standard locales?
-    sed -e 's|#en_US.UTF-8 UTF-8|en_US.UTF-8 UTF-8|' -i "$working_dir/etc/locale.gen"
-    echo 'LANG=en_US.UTF-8' > "$working_dir/etc/locale.conf"
-    echo 'LC_MESSAGES=C' >> "$working_dir/etc/locale.conf"
 fi
 
 exec chroot-run \
