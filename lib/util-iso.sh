@@ -120,7 +120,7 @@ configure_displaymanager(){
     
     case ${displaymanager} in
 	'lightdm')
-	    groupadd -r autologin
+	    chroot $1 groupadd -r autologin
 	    if [ -e "$1/usr/bin/openbox-session" ] ; then
 		  sed -i -e 's/^.*user-session=.*/user-session=openbox/' $1/etc/lightdm/lightdm.conf
 	    fi
