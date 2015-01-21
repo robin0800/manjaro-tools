@@ -140,8 +140,8 @@ usage() {
     echo "    -b <branch>        Branch [default: ${branch}]"
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
+    echo '    -w                 Enable clean iso cache'
     echo '    -c                 Disable clean work dir'
-    echo '    -w                 Disable clean iso cache'
     echo '    -x                 Disable clean xorg cache'
     echo '    -l                 Disable clean lng cache'
     echo '    -i                 Build images only'
