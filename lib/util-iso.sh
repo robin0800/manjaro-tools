@@ -528,14 +528,9 @@ make_image_root() {
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 	
-	# cp ${work_dir}/root-image/etc/locale.gen.bak ${work_dir}/root-image/etc/locale.gen
-	
 	if [ -e ${work_dir}/root-image/boot/grub/grub.cfg ] ; then
 	    rm ${work_dir}/root-image/boot/grub/grub.cfg
 	fi
-# 	if [ -e ${work_dir}/root-image/etc/plymouth/plymouthd.conf ] ; then
-# 	    sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" ${work_dir}/root-image/etc/plymouth/plymouthd.conf
-# 	fi
 	if [ -e ${work_dir}/root-image/etc/lsb-release ] ; then
 	    sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" ${work_dir}/root-image/etc/lsb-release
 	fi
@@ -598,15 +593,13 @@ make_image_livecd() {
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
 	copy_overlay_livecd "${work_dir}/livecd-image"
+
 	# copy over setup helpers and config loader
         copy_livecd_helpers "${work_dir}/livecd-image/opt/livecd"
         
         copy_startup_scripts "${work_dir}/livecd-image/usr/bin"
         
 	configure_livecd_image
-
-#        cp ${work_dir}/root-image/etc/pacman.d/mirrorlist ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
-#        sed -i "s/#Server/Server/g" ${work_dir}/livecd-image/etc/pacman.d/mirrorlist
        	
 	# Clean up GnuPG keys?
 	rm -rf "${work_dir}/livecd-image/etc/pacman.d/gnupg"
