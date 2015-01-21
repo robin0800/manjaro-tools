@@ -373,9 +373,8 @@ configure_calamares_live(){
 }
 
 configure_displaymanager_live(){
-    groupadd -r autologin
-    gpasswd -a ${username} autologin &> /dev/null
     if [[ -f /usr/bin/lightdm ]];then
+	gpasswd -a ${username} autologin &> /dev/null
 	sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
 	sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
     elif [[ -f /usr/bin/kdm ]];then
