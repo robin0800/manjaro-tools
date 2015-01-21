@@ -9,21 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# $1: chroot
-# configure_machine_id(){
-# # set unique machine-id
-#     msg2 "Setting machine-id ..."
-#     if [[ -z "$(echo $1 | grep root-image)" ]];then
-# 	chroot $1 dbus-uuidgen --ensure=/etc/machine-id
-# 	chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
-#     else
-# 	mkdir -p $1/etc
-#         mkdir -p $1/var/lib/dbus
-# 	dbus-uuidgen --ensure=$1/etc/machine-id
-# 	dbus-uuidgen --ensure=$1/var/lib/dbus/machine-id
-#     fi
-# }
-
 gen_pw(){
     echo $(perl -e 'print crypt($ARGV[0], "password")' ${password})
 }
@@ -135,6 +120,7 @@ configure_displaymanager(){
     
     case ${displaymanager} in
 	'lightdm')
+	    groupadd -r autologin
 	    if [ -e "$1/usr/bin/openbox-session" ] ; then
 		  sed -i -e 's/^.*user-session=.*/user-session=openbox/' $1/etc/lightdm/lightdm.conf
 	    fi
