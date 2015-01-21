@@ -198,20 +198,6 @@ configure_swap_live(){
     fi
 }
 
-configure_ping_live(){
-    setcap cap_net_raw=ep /usr/bin/ping &> /dev/null
-    setcap cap_net_raw=ep /usr/bin/ping6 &> /dev/null
-}
-
-configure_gnome_live(){
-    glib-compile-schemas /usr/share/glib-2.0/schemas
-    gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor
-    [[ -f /usr/bin/gdm ]] && dconf update
-    if [ -e "/usr/bin/gnome-keyring-daemon" ] ; then
-      setcap cap_ipc_lock=ep /usr/bin/gnome-keyring-daemon &> /dev/null
-    fi
-}
-
 # TODO: review sudoers
 configure_sudo_live(){
     chown root:root /etc/sudoers

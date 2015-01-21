@@ -35,14 +35,6 @@ echo "configure sudoers" >> /tmp/livecd.log
 # do_fix_perms
 configure_sudo_live
 
-echo "configure applications" >> /tmp/livecd.log
-
-# fix_gnome_apps
-configure_gnome_live
-
-# fix_ping_installation
-configure_ping_live
-
 echo "depmod extramodules" >> /tmp/livecd.log
 
 # depmod extramodules
