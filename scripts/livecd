@@ -67,6 +67,7 @@ configure_calamares_live
 if [[ -e "/usr/bin/lightdm" ]]; then
      for eth in $(ifconfig | grep ': ' | cut -d: -f1); do
          ifconfig $eth down
+         echo "$eth" >> /tmp/ifconfig.devices
      done
 fi
 
