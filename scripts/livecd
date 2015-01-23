@@ -63,6 +63,13 @@ configure_calamares_live
 [[ -e "/etc/skel/Manjaro/Beginner_User_Guide.pdf" ]] && ln -sf \
 /etc/skel/Manjaro/Beginner_User_Guide.pdf "/home/${username}/Desktop/Beginner User Guide.pdf"
 
+# disable network (workaround for lightdm)
+if [[ -e "/usr/bin/lightdm" ]]; then
+     for eth in $(ifconfig | grep ': ' | cut -d: -f1); do
+         ifconfig $eth down
+     done
+fi
+
 configure_alsa_live "${DESTDIR}"
 
 # save settings
