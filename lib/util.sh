@@ -319,7 +319,7 @@ load_config(){
     fi
     
     if [[ -z ${start_openrc_live} ]];then
-	start_openrc_live=('bluetooth' 'networkmanager')
+	start_openrc_live=('bluetooth' 'NetworkManager')
     fi
     
     return 0
