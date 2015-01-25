@@ -241,15 +241,11 @@ load_config(){
 	build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
     fi
     
-    if [[ -n ${blacklist_trigger[@]} ]];then
-	blacklist_trigger=${blacklist_trigger[@]}
-    else
+    if [[ -z ${blacklist_trigger} ]];then
 	blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
     fi
     
-    if [[ -n ${blacklist[@]} ]];then
-	blacklist=${blacklist[@]}
-    else
+    if [[ -z ${blacklist} ]];then
 	blacklist=('libsystemd')
     fi
     
