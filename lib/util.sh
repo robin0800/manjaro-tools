@@ -241,14 +241,6 @@ load_config(){
 	build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
     fi
     
-    if [[ -z ${blacklist_trigger} ]];then
-	blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
-    fi
-    
-    if [[ -z ${blacklist} ]];then
-	blacklist=('libsystemd')
-    fi
-    
     ###################
     # buildiso
     ###################
