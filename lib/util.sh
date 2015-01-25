@@ -173,21 +173,15 @@ load_config(){
     # common
     ######################
     
-    if [[ -n ${branch} ]];then
-	branch=${branch}
-    else
+    if [[ -z ${branch} ]];then
 	branch='stable'
     fi
     
-    if [[ -n ${arch} ]]; then
-	arch=${arch}
-    else
+    if [[ -z ${arch} ]]; then
 	arch=$(uname -m)
     fi
     
-    if [[ -n ${cache_dir} ]];then
-	cache_dir=${cache_dir}
-    else
+    if [[ -z ${cache_dir} ]];then
 	cache_dir='/var/cache/manjaro-tools'
     fi
     
@@ -195,21 +189,15 @@ load_config(){
     # buildtree
     ###################
     
-    if [[ -n ${repo_tree} ]];then
-	repo_tree=${repo_tree}
-    else
+    if [[ -z ${repo_tree} ]];then
 	repo_tree=(core extra community multilib openrc)
     fi
     
-    if [[ -n ${host_tree} ]];then
-	host_tree=${host_tree}
-    else
+    if [[ -z ${host_tree} ]];then
 	host_tree='https://github.com/manjaro'
     fi   
     
-    if [[ -n ${host_tree_abs} ]];then
-	host_tree_abs=${host_tree_abs}
-    else
+    if [[ -z ${host_tree_abs} ]];then
 	host_tree_abs='https://projects.archlinux.org/git/svntogit/packages'
     fi   
     
@@ -217,162 +205,120 @@ load_config(){
     # buildpkg
     ###################
     
-    if [[ -n ${chroots_pkg} ]];then
-	chroots_pkg=${chroots_pkg}
-    else
+    if [[ -z ${chroots_pkg} ]];then
 	chroots_pkg='/opt/buildpkg'
     fi
         
-    if [[ -n ${sets_dir_pkg} ]];then
-	sets_dir_pkg=${sets_dir_pkg}
-    else
+    if [[ -z ${sets_dir_pkg} ]];then
 	sets_dir_pkg="${SYSCONFDIR}/sets/pkg"
     fi
     
-    if [[ -n ${buildset_pkg} ]];then
-	buildset_pkg=${buildset_pkg}
-    else
+    if [[ -z ${buildset_pkg} ]];then
 	buildset_pkg='default'
     fi
 
-    if [[ -n ${build_mirror} ]];then
-	build_mirror=${build_mirror}
-    else
+    if [[ -z ${build_mirror} ]];then
 	build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
+    fi
+
+    if [[ -z ${blacklist_trigger[@]} ]];then
+	blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
+    fi
+    
+    if [[ -z ${blacklist[@]} ]];then
+	blacklist=('libsystemd')
     fi
     
     ###################
     # buildiso
     ###################
     
-    if [[ -n ${chroots_iso} ]];then
-	chroots_iso=${chroots_iso}
-    else
+    if [[ -z ${chroots_iso} ]];then
 	chroots_iso='/opt/buildiso'
     fi
         
-    if [[ -n ${sets_dir_iso} ]];then
-	sets_dir_iso=${sets_dir_iso}
-    else
+    if [[ -z ${sets_dir_iso} ]];then
 	sets_dir_iso="${SYSCONFDIR}/sets/iso"
     fi
     
-    if [[ -n ${buildset_iso} ]];then
-	buildset_iso=${buildset_iso}
-    else
+    if [[ -z ${buildset_iso} ]];then
 	buildset_iso='default'
     fi
     
-    if [[ -n ${iso_label} ]];then
-	iso_label=${iso_label}
-    else
+    if [[ -z ${iso_label} ]];then
 	source /etc/lsb-release
 	iso_label="MJRO${DISTRIB_RELEASE//.}"
     fi
 
-    if [[ -n ${iso_version} ]];then
-	iso_version=${iso_version}
-    else	
+    if [[ -z ${iso_version} ]];then	
 	source /etc/lsb-release
 	iso_version=${DISTRIB_RELEASE}
     fi
 
-    if [[ -n ${manjaro_kernel} ]];then
-	manjaro_kernel=${manjaro_kernel}
-    else
-	manjaro_kernel="linux317"
+    if [[ -z ${manjaro_kernel} ]];then
+	manjaro_kernel="linux318"
     fi
 
     manjaro_kernel_ver=${manjaro_kernel#*linux}
     
-    if [[ -n ${manjaro_version} ]];then
-	manjaro_version=${manjaro_version}
-    else
+    if [[ -z ${manjaro_version} ]];then
 	manjaro_version=$(date +%Y.%m)
     fi
     
-    if [[ -n ${manjaroiso} ]];then
-	manjaroiso=${manjaroiso}
-    else
+    if [[ -z ${manjaroiso} ]];then
 	manjaroiso="manjaroiso"
     fi
     
-    if [[ -n ${code_name} ]];then
-	code_name=${code_name}
-    else
+    if [[ -z ${code_name} ]];then
 	source /etc/lsb-release
 	code_name="${DISTRIB_CODENAME}"
     fi
     
-    if [[ -n ${img_name} ]];then
-	img_name=${img_name}
-    else
+    if [[ -z ${img_name} ]];then
 	img_name=manjaro
     fi
     
-    if [[ -n ${hostname} ]];then
-	hostname=${hostname}
-    else
+    if [[ -z ${hostname} ]];then
 	hostname="manjaro"
     fi
     
-    if [[ -n ${username} ]];then
-	username=${username}
-    else
+    if [[ -z ${username} ]];then
 	username="manjaro"
     fi
     
-    if [[ -n ${install_dir} ]];then
-	install_dir=${install_dir}
-    else
+    if [[ -z ${install_dir} ]];then
 	install_dir=manjaro
     fi
     
-    if [[ -n ${plymouth_theme} ]];then
-	plymouth_theme=${plymouth_theme}
-    else
+    if [[ -z ${plymouth_theme} ]];then
 	plymouth_theme=manjaro-elegant
     fi
     
-    if [[ -n ${compression} ]];then
-	compression=${compression}
-    else
+    if [[ -z ${compression} ]];then
 	compression=xz
     fi
     
-    if [[ -n ${password} ]];then
-	password=${password}
-    else
+    if [[ -z ${password} ]];then
 	password="manjaro"
     fi
     
-    if [[ -n ${addgroups} ]];then
-	addgroups=${addgroups}
-    else
+    if [[ -z ${addgroups} ]];then
 	addgroups="video,audio,power,disk,storage,optical,network,lp,scanner"
     fi
 
-    if [[ -n ${start_systemd} ]];then
-	start_systemd=${start_systemd}
-    else
+    if [[ -z ${start_systemd} ]];then
 	start_systemd=('cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
     fi
     
-    if [[ -n ${start_openrc} ]];then
-	start_openrc=${start_openrc}
-    else
+    if [[ -z ${start_openrc} ]];then
 	start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
     fi
     
-    if [[ -n ${start_systemd_live} ]];then
-	start_systemd_live=${start_systemd_live}
-    else
+    if [[ -z ${start_systemd_live} ]];then
 	start_systemd_live=('bluez' 'NetworkManager' 'ModemManager')
     fi
     
-    if [[ -n ${start_openrc_live} ]];then
-	start_openrc_live=${start_openrc_live}
-    else
+    if [[ -z ${start_openrc_live} ]];then
 	start_openrc_live=('bluetooth' 'networkmanager')
     fi
     
