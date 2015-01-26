@@ -496,7 +496,7 @@ create_checksum(){
         msg "Creating [${checksum_mode}sum] ..."
         local cs=$(${checksum_mode}sum $1)
         msg2 "${checksum_mode}sum: ${cs}"
-        "${cs}" > $1.sha256
+        "${cs}" > $1.${checksum_mode}
         msg "Done [${checksum_mode}sum]"
     cd ..
 }
