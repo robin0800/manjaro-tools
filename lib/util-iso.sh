@@ -490,6 +490,11 @@ make_iso() {
     msg "Done [Build ISO]"
 }
 
+# $1: file
+create_checksum(){
+    sha256sum $1 > $1.sha256
+}
+
 # $1: new branch
 aufs_mount_root_image(){
     msg2 "mount root-image"
@@ -985,6 +990,7 @@ load_profile(){
 compress_images(){
     make_isomounts
     make_iso
+    create_checksum "${iso_file}"
 }
 
 build_images(){
