@@ -68,6 +68,7 @@ display_settings(){
     msg2 "img_name: ${img_name}"
     msg2 "install_dir: ${install_dir}"
     msg2 "compression: ${compression}"
+    msg2 "checksum_mode: ${checksum_mode}"
 
     msg "LIVECD:"
     msg2 "username: ${username}"
