@@ -530,14 +530,18 @@ umount_image_handler(){
     aufs_remove_image "${work_dir}/boot-image"
 }
 
+mkiso_error_handler(){
+    umount_image_handler
+    die "Exiting..."
+}
+
 # Base installation (root-image)
 make_image_root() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
     
 	msg "Prepare [Base installation] (root-image)"
 
-	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || \
-	die "Please check your Packages file! Exiting."
+	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || mkiso_error_handler
 	
 	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
 	
@@ -567,8 +571,7 @@ make_image_de() {
 	
 	aufs_mount_root_image "${work_dir}/${desktop}-image"
 
-	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || \
-	umount_image_handler && die "Please check your Packages-${desktop} file! Exiting."
+	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || mkiso_error_handler
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
@@ -605,8 +608,7 @@ make_image_livecd() {
 	    aufs_mount_root_image "${work_dir}/livecd-image"
 	fi
 	
-	mkiso ${create_args[*]} -i "livecd-image" -p "${packages_livecd}" create "${work_dir}" || \
-	umount_image_handler && die "Please check your Packages-Livecd file! Exiting." 
+	mkiso ${create_args[*]} -i "livecd-image" -p "${packages_livecd}" create "${work_dir}" || mkiso_error_handler
 	
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
