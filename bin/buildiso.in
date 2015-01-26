@@ -191,11 +191,9 @@ mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 create_args+=(-v -a ${arch} -D ${install_dir} -M ${mirrors_conf})
 
-if [[ "$clean_cache_iso" == 'true' ]]; then
-    iso_args+=(-f)
-fi
-
 iso_args+=(-v -x -a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
+
+${clean_cache_iso} && iso_args+=(-f)
 
 check_root "$0" "${orig_argv[@]}"
 
