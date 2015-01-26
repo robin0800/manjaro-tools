@@ -493,9 +493,11 @@ make_iso() {
 # $1: file
 create_checksum(){
     cd ${cache_dir_iso}
-        msg "Creating sha256sum ..."
-        sha256sum $1 > $1.sha256
-        msg "Done"
+        msg "Creating [${checksum_mode}sum] ..."
+        local cs=$(${checksum_mode}sum $1)
+        msg2 "${checksum_mode}sum: ${cs}"
+        "${cs}" > $1.sha256
+        msg "Done [${checksum_mode}sum]"
     cd ..
 }
 

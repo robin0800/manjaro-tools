@@ -322,6 +322,10 @@ load_config(){
 	start_openrc_live=('bluetooth' 'NetworkManager')
     fi
     
+    if [[ -z ${checksum_mode} ]];then
+        checksum_mode='md5'
+    fi
+    
     return 0
 }
 
