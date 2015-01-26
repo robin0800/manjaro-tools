@@ -484,7 +484,7 @@ make_iso() {
     msg "Start [Build ISO]"
     touch "${work_dir}/iso/.miso"
     
-    mkiso ${iso_args[*]} iso "${work_dir}" "${iso_file}"
+    mkiso ${iso_args[*]} iso "${work_dir}" "${cache_dir_iso}/${iso_file}"
 
     chown -R "${OWNER}:users" "${cache_dir_iso}"
     msg "Done [Build ISO]"
@@ -492,7 +492,11 @@ make_iso() {
 
 # $1: file
 create_checksum(){
-    sha256sum $1 > $1.sha256
+    cd ${cache_dir_iso}
+        msg "Creating sha256sum ..."
+        sha256sum $1 > $1.sha256
+        msg "Done"
+    cd ..
 }
 
 # $1: new branch
@@ -979,7 +983,7 @@ load_profile(){
     displaymanager=$(cat displaymanager)
     initsys=$(cat initsys)
 
-    iso_file="${cache_dir_iso}/${img_name}-${desktop}-${iso_version}-${arch}.iso"
+    iso_file="${img_name}-${desktop}-${iso_version}-${arch}.iso"
 
     if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
 	pacman_conf="pacman-${pacman_conf_arch}.conf"
