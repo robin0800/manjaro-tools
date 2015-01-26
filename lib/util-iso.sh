@@ -500,6 +500,7 @@ aufs_mount_de_image(){
 # $1: del branch
 aufs_remove_image(){
     if mountpoint -q $1;then
+        msg2 "Unmount $1"
 	umount $1
     fi
 }
@@ -551,7 +552,6 @@ make_image_de() {
 	aufs_mount_root_image "${work_dir}/${desktop}-image"
 
 	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || \
-	umount_image_handler && \
 	die "Please check your Packages-${desktop} file! Exiting."
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
@@ -562,7 +562,8 @@ make_image_de() {
 	
 	configure_desktop_image
 	
-	aufs_remove_image "${work_dir}/${desktop}-image"
+# 	aufs_remove_image "${work_dir}/${desktop}-image"
+        umount_image_handler
 	
 	rm -R ${work_dir}/${desktop}-image/.wh*
 	
@@ -589,7 +590,6 @@ make_image_livecd() {
 	fi
 	
 	mkiso ${create_args[*]} -i "livecd-image" -p "${packages_livecd}" create "${work_dir}" || \
-	umount_image_handler && \
 	die "Please check your Packages-Livecd file! Exiting." 
 	
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
@@ -606,7 +606,8 @@ make_image_livecd() {
 	# Clean up GnuPG keys?
 	rm -rf "${work_dir}/livecd-image/etc/pacman.d/gnupg"
 	
-	aufs_remove_image "${work_dir}/livecd-image"
+# 	aufs_remove_image "${work_dir}/livecd-image"
+        umount_image_handler
 	
 	rm -R ${work_dir}/livecd-image/.wh*
 	
@@ -647,7 +648,8 @@ make_image_xorg() {
 	
 	configure_xorg_drivers
 	
-	aufs_remove_image "${work_dir}/pkgs-image"
+# 	aufs_remove_image "${work_dir}/pkgs-image"
+        umount_image_handler
 	
 	rm -R ${work_dir}/pkgs-image/.wh*
 	
@@ -690,7 +692,8 @@ make_image_lng() {
 	
 	make_repo ${work_dir}/lng-image/opt/livecd/lng/lng-pkgs ${work_dir}/lng-image/opt/livecd/lng
 	
-	aufs_remove_image "${work_dir}/lng-image"
+	umount_image_handler
+# 	aufs_remove_image "${work_dir}/lng-image"
 	
 	rm -R ${work_dir}/lng-image/.wh*
 	
@@ -711,8 +714,9 @@ make_image_boot() {
 	cp ${work_dir}/root-image/boot/vmlinuz* ${work_dir}/iso/${install_dir}/boot/${arch}/${manjaroiso}
         mkdir -p ${work_dir}/boot-image
         
-	aufs_remove_image "${work_dir}/boot-image"
-            
+# 	aufs_remove_image "${work_dir}/boot-image"
+        umount_image_handler
+        
         if [ ! -z "${desktop}" ] ; then
 	    aufs_mount_de_image "${work_dir}/boot-image"
 	    aufs_append_root_image "${work_dir}/boot-image"
@@ -728,7 +732,8 @@ make_image_boot() {
         cp ${work_dir}/boot-image/boot/intel-ucode.img ${work_dir}/iso/${install_dir}/boot/intel_ucode.img
         cp ${work_dir}/boot-image/usr/share/licenses/intel-ucode/LICENSE ${work_dir}/iso/${install_dir}/boot/intel_ucode.LICENSE
                 
-        aufs_remove_image "${work_dir}/boot-image"
+#         aufs_remove_image "${work_dir}/boot-image"
+        umount_image_handler
         
         rm -R ${work_dir}/boot-image
         
