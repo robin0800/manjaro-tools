@@ -252,6 +252,14 @@ configure_displaymanager(){
     
 }
 
+write_calamares_machineid_conf(){
+        local _conf="$1/etc/calamares/modules/machineid.conf"
+        
+        echo "systemd: false" > $_conf
+        echo "dbus: true" >> $_conf
+        echo "symlink: false" >> $_conf
+}
+
 write_calamares_dm_conf(){
     # write the conf to overlay-image/etc/calamares ?
     local cdm="$1/etc/calamares/modules/displaymanager.conf"
@@ -292,6 +300,9 @@ configure_calamares(){
 	
 	write_calamares_dm_conf $1
 	write_calamares_initcpio_conf $1
+	if [ ${initsys} == 'openrc' ];then
+            write_calamares_machineid_conf $1
+	fi
     fi
 }
 
