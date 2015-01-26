@@ -516,7 +516,7 @@ aufs_mount_de_image(){
 # $1: del branch
 aufs_remove_image(){
     if mountpoint -q $1;then
-        msg2 "Unmount $1"
+        msg2 "Unmount ${1##*/}"
 	umount $1
     fi
 }
