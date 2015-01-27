@@ -993,6 +993,13 @@ load_profile(){
 	pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
     fi
     create_args+=(-C ${pacman_conf})
+    
+    
+    # test logging here
+    # this should send stdout and stderr to logfile and to console at fd3
+    logfile=${cache_dir_iso}/${iso_file}.log
+    exec 3>&1 1>>${logfile} 2>&1
+#     tail -f ${logfile} >/dev/tty8 &
 }
 
 compress_images(){
