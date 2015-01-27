@@ -993,13 +993,6 @@ load_profile(){
 	pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
     fi
     create_args+=(-C ${pacman_conf})
-    
-    
-    # test logging here
-    # this should send stdout and stderr to logfile and to console at fd3
-    logfile=${cache_dir_iso}/${iso_file}.log
-    exec 3>&1 1>>${logfile} 2>&1
-#     tail -f ${logfile} >/dev/tty8 &
 }
 
 compress_images(){
@@ -1054,13 +1047,29 @@ build_profile(){
 
     if ${images_only}; then
 	build_images
-	warning "Continue with eg. buildiso -p <name> -s ..."
+	warning "Continue with eg. buildiso -p <name> -sc ..."
 	exit 1
     else
 	build_images
 	compress_images
     fi
 }
+
+# run_log(){
+# 
+#     logfile=${cache_dir_iso}/${buildset_iso}.log
+#     
+#     logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
+#     mkfifo "$logpipe"
+#     
+#     tee "$logfile" < "$logpipe" &
+#     local teepid=$!
+# 
+#     $1 2>&1"$logpipe"
+# 
+#     wait $teepid
+#     rm "$logpipe"
+# }
 
 set_work_dir(){
     work_dir=${chroots_iso}/$1/${arch}
