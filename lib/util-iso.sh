@@ -249,7 +249,7 @@ make_image_desktop() {
 	
 	aufs_mount_root_image "${work_dir}/${desktop}-image"
 
-	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages_de}" create "${work_dir}" || mkiso_error_handler
+	mkiso ${create_args[*]} -i "${desktop}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 
 	pacman -Qr "${work_dir}/${desktop}-image" > "${work_dir}/${desktop}-image/${desktop}-image-pkgs.txt"
 	
@@ -284,7 +284,7 @@ make_image_livecd() {
 	    aufs_mount_root_image "${work_dir}/livecd-image"
 	fi
 	
-	mkiso ${create_args[*]} -i "livecd-image" -p "${packages_livecd}" create "${work_dir}" || mkiso_error_handler
+	mkiso ${create_args[*]} -i "livecd-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 	
 	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
 	
@@ -560,9 +560,9 @@ load_pkgs(){
     msg "Loading Packages: [$1] ..."
     
     if [ "${arch}" == "i686" ]; then
-	packages_livecd=$(sed "s|#.*||g" $1 | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages=$(sed "s|#.*||g" $1 | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     elif [ "${arch}" == "x86_64" ]; then
-	packages_livecd=$(sed "s|#.*||g" $1 | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages=$(sed "s|#.*||g" $1 | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
     fi
 }
 
@@ -593,56 +593,56 @@ load_pkgs_lng(){
 load_profile(){
     msg "Loading Profile [$1] ..."
 
-#     local files=$(ls Packages*)
-#     
-#     for f in ${files[@]};do
-#         case $f in
-#             Packages|Packages-Livecd) continue ;;
-#             *) pkgsfile="$f"; msg2 "desktop list: $f" ;;
-#         esac
-#     done
-    if [ -e Packages-Xfce ] ; then
-	pkgsfile="Packages-Xfce"
-    fi
-    if [ -e Packages-Kde ] ; then
-    	pkgsfile="Packages-Kde"
-    fi
-    if [ -e Packages-Gnome ] ; then
-   	pkgsfile="Packages-Gnome" 
-    fi
-    if [ -e Packages-Cinnamon ] ; then
-   	pkgsfile="Packages-Cinnamon" 
-    fi
-    if [ -e Packages-Openbox ] ; then
-  	pkgsfile="Packages-Openbox"  
-    fi
-    if [ -e Packages-Lxde ] ; then
- 	pkgsfile="Packages-Lxde"   
-    fi
-    if [ -e Packages-Lxqt ] ; then
-    	pkgsfile="Packages-Lxqt"
-    fi
-    if [ -e Packages-Mate ] ; then
-    	pkgsfile="Packages-Mate"
-    fi
-    if [ -e Packages-Enlightenment ] ; then
-    	pkgsfile="Packages-Enlightenment"
-    fi
-    if [ -e Packages-Net ] ; then
-   	pkgsfile="Packages-Net" 
-    fi
-    if [ -e Packages-PekWM ] ; then
-	pkgsfile="Packages-PekWM"
-    fi
-    if [ -e Packages-Kf5 ] ; then
-	pkgsfile="Packages-Kf5"
-    fi
-    if [ -e Packages-i3 ] ; then
-	pkgsfile="Packages-i3"
-    fi
-    if [ -e Packages-Custom ] ; then
-    	pkgsfile="Packages-Custom"
-    fi
+    local files=$(ls Packages*)
+    
+    for f in ${files[@]};do
+        case $f in
+            Packages|Packages-Livecd) continue ;;
+            *) pkgsfile="$f"; msg2 "desktop list: $f" ;;
+        esac
+    done
+#     if [ -e Packages-Xfce ] ; then
+# 	pkgsfile="Packages-Xfce"
+#     fi
+#     if [ -e Packages-Kde ] ; then
+#     	pkgsfile="Packages-Kde"
+#     fi
+#     if [ -e Packages-Gnome ] ; then
+#    	pkgsfile="Packages-Gnome" 
+#     fi
+#     if [ -e Packages-Cinnamon ] ; then
+#    	pkgsfile="Packages-Cinnamon" 
+#     fi
+#     if [ -e Packages-Openbox ] ; then
+#   	pkgsfile="Packages-Openbox"  
+#     fi
+#     if [ -e Packages-Lxde ] ; then
+#  	pkgsfile="Packages-Lxde"   
+#     fi
+#     if [ -e Packages-Lxqt ] ; then
+#     	pkgsfile="Packages-Lxqt"
+#     fi
+#     if [ -e Packages-Mate ] ; then
+#     	pkgsfile="Packages-Mate"
+#     fi
+#     if [ -e Packages-Enlightenment ] ; then
+#     	pkgsfile="Packages-Enlightenment"
+#     fi
+#     if [ -e Packages-Net ] ; then
+#    	pkgsfile="Packages-Net" 
+#     fi
+#     if [ -e Packages-PekWM ] ; then
+# 	pkgsfile="Packages-PekWM"
+#     fi
+#     if [ -e Packages-Kf5 ] ; then
+# 	pkgsfile="Packages-Kf5"
+#     fi
+#     if [ -e Packages-i3 ] ; then
+# 	pkgsfile="Packages-i3"
+#     fi
+#     if [ -e Packages-Custom ] ; then
+#     	pkgsfile="Packages-Custom"
+#     fi
 
     desktop=${pkgsfile#*-}
     desktop=${desktop,,}
