@@ -103,6 +103,9 @@ Best practise is to leave systemwide file untouched, by default it is commented 
 # unset defaults to given value
 # compression=xz
 
+# valid: md5, sha1, sha256, sha384, sha512
+# checksum_mode=md5
+
 ################ install ################
 
 # These settings are inherited in live session
