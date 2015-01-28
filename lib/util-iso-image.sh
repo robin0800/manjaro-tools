@@ -249,5 +249,40 @@ configure_displaymanager(){
     fi
     
     msg2 "Configured: ${displaymanager}"
-    
 }
+
+
+configure_xorg_drivers(){
+	# Disable Catalyst if not present
+	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
+	    msg2 "Disabling Catalyst driver"
+	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/
+	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/MHWDCONFIG
+	fi
+	
+	# Disable Nvidia if not present
+	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
+	    msg2 "Disabling Nvidia driver"
+	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/
+	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/MHWDCONFIG
+	fi
+	
+	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
+	    msg2 "Disabling Nvidia Bumblebee driver"
+	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/
+	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
+	fi
+	
+	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-304xx-utils 2> /dev/null)" ]; then
+	    msg2 "Disabling Nvidia 304xx driver"
+	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/
+	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/MHWDCONFIG
+	fi
+	
+	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-340xx-utils 2> /dev/null)" ]; then
+	    msg2 "Disabling Nvidia 340xx driver"
+	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/
+	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/MHWDCONFIG
+	fi
+}
+

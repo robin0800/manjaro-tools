@@ -13,9 +13,9 @@
 [[ -r ${LIBDIR}/util-iso-image.sh ]] && source ${LIBDIR}/util-iso-image.sh
 
 copy_initcpio(){
-    cp /usr/lib/initcpio/hooks/miso* ${work_dir}/boot-image/usr/lib/initcpio/hooks
-    cp /usr/lib/initcpio/install/miso* ${work_dir}/boot-image/usr/lib/initcpio/install
-    cp mkinitcpio.conf ${work_dir}/boot-image/etc/mkinitcpio-${manjaroiso}.conf
+    cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
+    cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
+    cp mkinitcpio.conf $1/etc/mkinitcpio-${manjaroiso}.conf
 }
 
 copy_overlay_root(){
@@ -129,43 +129,10 @@ configure_livecd_image(){
     msg3 "Done configuring [livecd-image]"
 }
 
-configure_xorg_drivers(){
-	# Disable Catalyst if not present
-	if  [ -z "$(ls ${work_dir}/pkgs-image/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
-	    msg2 "Disabling Catalyst driver"
-	    mkdir -p ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/catalyst/
-	    touch ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/catalyst/MHWDCONFIG
-	fi
-	
-	# Disable Nvidia if not present
-	if  [ -z "$(ls ${work_dir}/pkgs-image/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
-	    msg2 "Disabling Nvidia driver"
-	    mkdir -p ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/nvidia/
-	    touch ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/nvidia/MHWDCONFIG
-	fi
-	
-	if  [ -z "$(ls ${work_dir}/pkgs-image/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
-	    msg2 "Disabling Nvidia Bumblebee driver"
-	    mkdir -p ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/
-	    touch ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
-	fi
-	
-	if  [ -z "$(ls ${work_dir}/pkgs-image/opt/livecd/pkgs/ | grep nvidia-304xx-utils 2> /dev/null)" ]; then
-	    msg2 "Disabling Nvidia 304xx driver"
-	    mkdir -p ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/
-	    touch ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/MHWDCONFIG
-	fi
-	
-	if  [ -z "$(ls ${work_dir}/pkgs-image/opt/livecd/pkgs/ | grep nvidia-340xx-utils 2> /dev/null)" ]; then
-	    msg2 "Disabling Nvidia 340xx driver"
-	    mkdir -p ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/
-	    touch ${work_dir}/pkgs-image/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/MHWDCONFIG
-	fi
-}
-
-gen_boot_img(){
-	local _kernver=$(cat ${work_dir}/boot-image/usr/lib/modules/*-MANJARO/version)
-        chroot-run ${work_dir}/boot-image \
+# $1: work_dir
+gen_boot_image(){
+	local _kernver=$(cat $1/usr/lib/modules/*-MANJARO/version)
+        chroot-run $1 \
 		  /usr/bin/mkinitcpio -k ${_kernver} \
 		  -c /etc/mkinitcpio-${manjaroiso}.conf \
 		  -g /boot/${img_name}.img
@@ -197,7 +164,7 @@ make_iso() {
 }
 
 # $1: file
-create_checksum(){
+make_checksum(){
     cd ${cache_dir_iso}
         msg "Creating [${checksum_mode}sum] ..."
         local cs=$(${checksum_mode}sum $1)
@@ -271,14 +238,13 @@ make_image_root() {
     fi
 }
 
-make_image_de() {
+make_image_desktop() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
     
 	msg "Prepare [${desktop} installation] (${desktop}-image)"
 	
 	mkdir -p ${work_dir}/${desktop}-image
 	
-# 	aufs_remove_image "${work_dir}/${desktop}-image"
 	umount_image_handler
 	
 	aufs_mount_root_image "${work_dir}/${desktop}-image"
@@ -293,7 +259,6 @@ make_image_de() {
 	
 	configure_desktop_image
 	
-# 	aufs_remove_image "${work_dir}/${desktop}-image"
         umount_image_handler
 	
 	rm -R ${work_dir}/${desktop}-image/.wh*
@@ -310,7 +275,6 @@ make_image_livecd() {
 	
 	mkdir -p ${work_dir}/livecd-image
 	
-# 	aufs_remove_image "${work_dir}/livecd-image"
         umount_image_handler
 	
 	if [ -n "${desktop}" ] ; then
@@ -336,7 +300,6 @@ make_image_livecd() {
 	# Clean up GnuPG keys?
 	rm -rf "${work_dir}/livecd-image/etc/pacman.d/gnupg"
 	
-# 	aufs_remove_image "${work_dir}/livecd-image"
         umount_image_handler
 	
 	rm -R ${work_dir}/livecd-image/.wh*
@@ -352,7 +315,6 @@ make_image_xorg() {
 	
 	mkdir -p ${work_dir}/pkgs-image/opt/livecd/pkgs
 	
-# 	aufs_remove_image "${work_dir}/pkgs-image"
 	umount_image_handler
 	
 	if [[ -n "${desktop}" ]] ; then
@@ -376,9 +338,8 @@ make_image_xorg() {
 	
 	make_repo "${work_dir}/pkgs-image/opt/livecd/pkgs/gfx-pkgs" "${work_dir}/pkgs-image/opt/livecd/pkgs"
 	
-	configure_xorg_drivers
+	configure_xorg_drivers "${work_dir}/pkgs-image"
 	
-# 	aufs_remove_image "${work_dir}/pkgs-image"
         umount_image_handler
 	
 	rm -R ${work_dir}/pkgs-image/.wh*
@@ -393,7 +354,6 @@ make_image_lng() {
 	msg "Prepare [lng-image]"
 	mkdir -p ${work_dir}/lng-image/opt/livecd/lng
 	
-# 	aufs_remove_image "${work_dir}/lng-image"
 	umount_image_handler
 	
 	if [[ -n "${desktop}" ]] ; then
@@ -423,7 +383,6 @@ make_image_lng() {
 	make_repo ${work_dir}/lng-image/opt/livecd/lng/lng-pkgs ${work_dir}/lng-image/opt/livecd/lng
 	
 	umount_image_handler
-# 	aufs_remove_image "${work_dir}/lng-image"
 	
 	rm -R ${work_dir}/lng-image/.wh*
 	
@@ -444,7 +403,6 @@ make_image_boot() {
 	cp ${work_dir}/root-image/boot/vmlinuz* ${work_dir}/iso/${install_dir}/boot/${arch}/${manjaroiso}
         mkdir -p ${work_dir}/boot-image
         
-# 	aufs_remove_image "${work_dir}/boot-image"
         umount_image_handler
         
         if [ ! -z "${desktop}" ] ; then
@@ -454,15 +412,14 @@ make_image_boot() {
 	    aufs_mount_root_image "${work_dir}/boot-image"
         fi
         
-        copy_initcpio
+        copy_initcpio "${work_dir}/boot-image"
         
-        gen_boot_img
+        gen_boot_image "${work_dir}/boot-image"
         
         mv ${work_dir}/boot-image/boot/${img_name}.img ${work_dir}/iso/${install_dir}/boot/${arch}/${img_name}.img
         cp ${work_dir}/boot-image/boot/intel-ucode.img ${work_dir}/iso/${install_dir}/boot/intel_ucode.img
         cp ${work_dir}/boot-image/usr/share/licenses/intel-ucode/LICENSE ${work_dir}/iso/${install_dir}/boot/intel_ucode.LICENSE
                 
-#         aufs_remove_image "${work_dir}/boot-image"
         umount_image_handler
         
         rm -R ${work_dir}/boot-image
@@ -598,6 +555,15 @@ make_isomounts() {
     fi
 }
 
+# $1: file name
+load_pkgs(){
+    if [ "${arch}" == "i686" ]; then
+	packages_livecd=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    elif [ "${arch}" == "x86_64" ]; then
+	packages_livecd=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+    fi
+}
+
 load_pkgs_xorg(){
     if [ "${arch}" == "i686" ]; then
 	packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
@@ -617,74 +583,61 @@ load_pkgs_lng(){
     packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
-load_pkgs_de(){
-    if [ "${arch}" == "i686" ]; then
-	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    elif [ "${arch}" == "x86_64" ]; then
-	packages_de=$(sed "s|#.*||g" "${pkgsfile}" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    fi
-}
-
-load_pkgs_root(){
-    if [ "${arch}" == "i686" ]; then
-	packages=$(sed "s|#.*||g" Packages | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    elif [ "${arch}" == "x86_64" ]; then
-	packages=$(sed "s|#.*||g" Packages | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    fi
-}
-
-load_pkgs_livecd(){
-    if [ "${arch}" == "i686" ]; then
-	packages_livecd=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    elif [ "${arch}" == "x86_64" ]; then
-	packages_livecd=$(sed "s|#.*||g" "Packages-Livecd" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-    fi
-}
-
+# $1: profile
 load_profile(){
+    local files=$(ls Packages*)
+    
+    for f in ${files[@]};do
+        case $f in
+            Packages|Packages-Livecd) continue ;;
+            *) pkgsfile="$f" ;;
+        esac
+    done
+#     if [ -e Packages-Xfce ] ; then
+# 	pkgsfile="Packages-Xfce"
+#     fi
+#     if [ -e Packages-Kde ] ; then
+#     	pkgsfile="Packages-Kde"
+#     fi
+#     if [ -e Packages-Gnome ] ; then
+#    	pkgsfile="Packages-Gnome" 
+#     fi
+#     if [ -e Packages-Cinnamon ] ; then
+#    	pkgsfile="Packages-Cinnamon" 
+#     fi
+#     if [ -e Packages-Openbox ] ; then
+#   	pkgsfile="Packages-Openbox"  
+#     fi
+#     if [ -e Packages-Lxde ] ; then
+#  	pkgsfile="Packages-Lxde"   
+#     fi
+#     if [ -e Packages-Lxqt ] ; then
+#     	pkgsfile="Packages-Lxqt"
+#     fi
+#     if [ -e Packages-Mate ] ; then
+#     	pkgsfile="Packages-Mate"
+#     fi
+#     if [ -e Packages-Enlightenment ] ; then
+#     	pkgsfile="Packages-Enlightenment"
+#     fi
+#     if [ -e Packages-Net ] ; then
+#    	pkgsfile="Packages-Net" 
+#     fi
+#     if [ -e Packages-PekWM ] ; then
+# 	pkgsfile="Packages-PekWM"
+#     fi
+#     if [ -e Packages-Kf5 ] ; then
+# 	pkgsfile="Packages-Kf5"
+#     fi
+#     if [ -e Packages-i3 ] ; then
+# 	pkgsfile="Packages-i3"
+#     fi
+#     if [ -e Packages-Custom ] ; then
+#     	pkgsfile="Packages-Custom"
+#     fi
 
-    if [ -e Packages-Xfce ] ; then
-	pkgsfile="Packages-Xfce"
-    fi
-    if [ -e Packages-Kde ] ; then
-    	pkgsfile="Packages-Kde"
-    fi
-    if [ -e Packages-Gnome ] ; then
-   	pkgsfile="Packages-Gnome" 
-    fi
-    if [ -e Packages-Cinnamon ] ; then
-   	pkgsfile="Packages-Cinnamon" 
-    fi
-    if [ -e Packages-Openbox ] ; then
-  	pkgsfile="Packages-Openbox"  
-    fi
-    if [ -e Packages-Lxde ] ; then
- 	pkgsfile="Packages-Lxde"   
-    fi
-    if [ -e Packages-Lxqt ] ; then
-    	pkgsfile="Packages-Lxqt"
-    fi
-    if [ -e Packages-Mate ] ; then
-    	pkgsfile="Packages-Mate"
-    fi
-    if [ -e Packages-Enlightenment ] ; then
-    	pkgsfile="Packages-Enlightenment"
-    fi
-    if [ -e Packages-Net ] ; then
-   	pkgsfile="Packages-Net" 
-    fi
-    if [ -e Packages-PekWM ] ; then
-	pkgsfile="Packages-PekWM"
-    fi
-    if [ -e Packages-Kf5 ] ; then
-	pkgsfile="Packages-Kf5"
-    fi
-    if [ -e Packages-i3 ] ; then
-	pkgsfile="Packages-i3"
-    fi
-    if [ -e Packages-Custom ] ; then
-    	pkgsfile="Packages-Custom"
-    fi
+
+    
     desktop=${pkgsfile#*-}
     desktop=${desktop,,}
     
@@ -699,40 +652,42 @@ load_profile(){
 	pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
     fi
     create_args+=(-C ${pacman_conf})
+    
+    work_dir=${chroots_iso}/$1/${arch}
 }
 
 compress_images(){
     make_isomounts
     make_iso
-    create_checksum "${iso_file}"
+    make_checksum "${iso_file}"
 }
 
 build_images(){
-    load_pkgs_root
+    load_pkgs "Packages"
     make_image_root
     
-    if [ -e "${pkgsfile}" ] ; then
-	load_pkgs_de
-	make_image_de
+    if [[ -f "${pkgsfile}" ]] ; then
+	load_pkgs "${pkgsfile}"
+	make_image_desktop
     fi
 
-    if [ -e Packages-Xorg ] ; then
+    if [[ -f Packages-Xorg ]] ; then
 	load_pkgs_xorg
 	make_image_xorg
     fi
     
-    if [ -e Packages-Lng ] ; then
+    if [[ -f Packages-Lng ]] ; then
 	load_pkgs_lng
 	make_image_lng
     fi
     
     if [[ -f Packages-Livecd ]]; then
-	load_pkgs_livecd
+	load_pkgs "Packages-Livecd"
 	make_image_livecd
     fi   
     
     make_image_boot
-    if [ "${arch}" == "x86_64" ]; then
+    if [[ "${arch}" == "x86_64" ]]; then
 	make_efi
 	make_efiboot
     fi
@@ -771,15 +726,11 @@ build_profile(){
 #     tee "$logfile" < "$logpipe" &
 #     local teepid=$!
 # 
-#     $1 2>&1"$logpipe"
+#     $1 &> "$logpipe"
 # 
 #     wait $teepid
 #     rm "$logpipe"
 # }
-
-set_work_dir(){
-    work_dir=${chroots_iso}/$1/${arch}
-}
 
 build_iso(){
     if ${is_buildset};then
@@ -787,8 +738,7 @@ build_iso(){
 	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
 	    [[ -f $prof/initsys ]] || break
 	    cd $prof
-		load_profile
-		set_work_dir "$prof"
+		load_profile "$prof"
 		build_profile
 	    cd ..
 	done
@@ -796,8 +746,7 @@ build_iso(){
     else
 	[[ -f ${buildset_iso}/initsys ]] || die "${buildset_iso} is not a valid profile!"
 	cd ${buildset_iso}    
-	    load_profile
-	    set_work_dir "${buildset_iso}"
+	    load_profile "${buildset_iso}"
 	    build_profile
 	cd ..
     fi
