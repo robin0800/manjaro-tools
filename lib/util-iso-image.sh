@@ -115,9 +115,9 @@ configure_hosts(){
 
 # $1: chroot
 configure_displaymanager(){
-    
+
     msg2 "Configuring Displaymanager ..."
-    
+
     case ${displaymanager} in
 	'lightdm')
 	    chroot $1 groupadd -r autologin
@@ -230,24 +230,24 @@ configure_displaymanager(){
 		sed -i -e 's|^.*session=.*|session=/usr/bin/i3|' $1/etc/lxdm/lxdm.conf
 	    fi
 	;;
-	*) 
+	*)
 	    break
 	;;
     esac
-    
-    if [ ${initsys} == 'openrc' ];then
-	local _conf_xdm='DISPLAYMANAGER="'${displaymanager}'"'
-	sed -i -e "s|^.*DISPLAYMANAGER=.*|${_conf_xdm}|" $1/etc/conf.d/xdm
+
+    if [[ ${initsys} -eq "openrc" ]];then
+	local conf='DISPLAYMANAGER="'${displaymanager}'"'
+	sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
 	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
 	chroot $1 rc-update add xdm default &> /dev/null
     else
-	if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
+	if [[ -f $1/etc/plymouth/plymouthd.conf ]] ; then
 	    chroot $1 systemctl enable ${displaymanager}-plymouth &> /dev/null
 	else
 	    chroot $1 systemctl enable ${displaymanager} &> /dev/null
 	fi
     fi
-    
+
     msg2 "Configured: ${displaymanager}"
 }
 
@@ -258,26 +258,26 @@ configure_xorg_drivers(){
 	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/
 	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/MHWDCONFIG
 	fi
-	
+
 	# Disable Nvidia if not present
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
 	    msg2 "Disabling Nvidia driver"
 	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/
 	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/MHWDCONFIG
 	fi
-	
+
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
 	    msg2 "Disabling Nvidia Bumblebee driver"
 	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/
 	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
 	fi
-	
+
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-304xx-utils 2> /dev/null)" ]; then
 	    msg2 "Disabling Nvidia 304xx driver"
 	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/
 	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/MHWDCONFIG
 	fi
-	
+
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-340xx-utils 2> /dev/null)" ]; then
 	    msg2 "Disabling Nvidia 340xx driver"
 	    mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/

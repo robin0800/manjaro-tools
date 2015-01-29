@@ -10,109 +10,65 @@
 # GNU General Public License for more details.
 
 write_calamares_machineid_conf(){
-    local _conf="$1/etc/calamares/modules/machineid.conf"
-    
-    echo "systemd: false" > $_conf
-    echo "dbus: true" >> $_conf
-    echo "symlink: false" >> $_conf
+    local conf="$1/etc/calamares/modules/machineid.conf"
+
+    echo "systemd: false" > $conf
+    echo "dbus: true" >> $conf
+    echo "symlink: false" >> $conf
 }
 
 write_calamares_dm_conf(){
-    # write the conf to overlay-image/etc/calamares ?
-    local cdm="$1/etc/calamares/modules/displaymanager.conf"
-    
-    echo "displaymanagers:" > "$cdm"
-    echo "  - ${displaymanager}" >> "$cdm"
-    echo '' >> "$cdm"
-    echo '#executable: "startkde"' >> "$cdm"
-    echo '#desktopFile: "plasma"' >> "$cdm"
-    echo '' >> "$cdm"
-    echo "basicSetup: false" >> "$cdm"
+    # write the conf to livecd-image/etc/calamares ?
+    local conf="$1/etc/calamares/modules/displaymanager.conf"
+
+    echo "displaymanagers:" > "$conf"
+    echo "  - ${displaymanager}" >> "$conf"
+    echo '' >> "$conf"
+    echo '#executable: "startkde"' >> "$conf"
+    echo '#desktopFile: "plasma"' >> "$conf"
+    echo '' >> "$conf"
+    echo "basicSetup: false" >> "$conf"
 }
 
 write_calamares_initcpio_conf(){
-    local INITCPIO="$1/usr/share/calamares/modules/initcpio.conf"
-    if [ ! -e $INITCPIO ] ; then
-        echo "---" > "$INITCPIO"
-        echo "kernel: ${manjaro_kernel}" >> "$INITCPIO"
-    fi  
+    local conf="$1/usr/share/calamares/modules/initcpio.conf"
+    if [ ! -e $conf ] ; then
+        echo "---" > "$conf"
+        echo "kernel: ${manjaro_kernel}" >> "$conf"
+    else
+        sed -e "s|_kernel_|$manjaro_kernel|g" -i "$conf"
+    fi
+
 }
 
 configure_installer () {
-    cmd=$(echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment)
-    if [ -e "$1" ] ; then
-	sed -i "s|_root-image_|/bootmnt/${install_dir}/_ARCH_/root-image.sqfs|g" $1
-
-	if [ -e "/bootmnt/${install_dir}/${arch}/xfce-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/xfce-image.sqfs|g" $1
-	    $cmd
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/gnome-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/gnome-image.sqfs|g" $1
-	    $cmd
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/cinnamon-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/cinnamon-image.sqfs|g" $1
-	    $cmd
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/openbox-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/openbox-image.sqfs|g" $1
-	    $cmd
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/mate-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/mate-image.sqfs|g" $1
-	    $cmd
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/kde-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/kde-image.sqfs|g" $1
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/lxde-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/lxde-image.sqfs|g" $1
-	    $cmd
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/lxqt-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/lxqt-image.sqfs|g" $1
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/enlightenment-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/enlightenment-image.sqfs|g" $1
-	    $cmd
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/pekwm-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/pekwm-image.sqfs|g" $1
-	    $cmd
-	fi
-	if [ -e "/bootmnt/${install_dir}/${arch}/custom-image.sqfs" ] ; then
-	    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/_ARCH_/custom-image.sqfs|g" $1
-	fi
-	if [ "${arch}" == "i686" ] ; then
-	    sed -i "s|_ARCH_|i686|g" $1
-	else
-	    sed -i "s|_ARCH_|x86_64|g" $1
-	fi
-    fi
+    sed -i "s|_root-image_|/bootmnt/${install_dir}/${arch}/root-image.sqfs|g" $1
+    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs|g" $1
+    echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment
 }
 
 configure_calamares(){
     if [[ -f $1/usr/bin/calamares ]];then
 	msg2 "Configuring Calamares ..."
-	mkdir -p $1/etc/calamares/modules            
-	local UNPACKFS="$1/usr/share/calamares/modules/unpackfs.conf"            
-	if [ ! -e $UNPACKFS ] ; then                              
-	    echo "---" > "$UNPACKFS"
-	    echo "unpack:" >> "$UNPACKFS"
-	    echo "    -   source: \"/bootmnt/${install_dir}/${arch}/root-image.sqfs\"" >> "$UNPACKFS"
-	    echo "        sourcefs: \"squashfs\"" >> "$UNPACKFS"
-	    echo "        destination: \"\"" >> "$UNPACKFS"
-	    echo "    -   source: \"/bootmnt/${install_dir}/${arch}/${desktop}-image.sqfs\"" >> "$UNPACKFS"
-	    echo "        sourcefs: \"squashfs\"" >> "$UNPACKFS"
-	    echo "        destination: \"\"" >> "$UNPACKFS"                
+	mkdir -p $1/etc/calamares/modules
+	local conf="$1/usr/share/calamares/modules/unpackfs.conf"
+	if [ ! -e $conf ] ; then
+	    echo "---" > "$conf"
+	    echo "unpack:" >> "$conf"
+	    echo "    -   source: \"/bootmnt/${install_dir}/${arch}/root-image.sqfs\"" >> "$conf"
+	    echo "        sourcefs: \"squashfs\"" >> "$conf"
+	    echo "        destination: \"\"" >> "$conf"
+	    echo "    -   source: \"/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs\"" >> "$conf"
+	    echo "        sourcefs: \"squashfs\"" >> "$conf"
+	    echo "        destination: \"\"" >> "$conf"
+        else
+            configure_installer "$conf"
 	fi
-	
+
 	write_calamares_dm_conf $1
 	write_calamares_initcpio_conf $1
-        [[ "${initsys}" == "openrc" ]] && write_calamares_machineid_conf $1
-        
-        configure_installer "$UNPACKFS"
+        [[ "${initsys}" -eq "openrc" ]] && write_calamares_machineid_conf $1
+
 	mkdir -p $1/home/${username}/Desktop
 	cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
 	chmod a+x $1/home/${username}/Desktop/calamares.desktop
@@ -122,11 +78,11 @@ configure_calamares(){
 configure_thus(){
     if [[ -f $1/usr/bin/thus ]];then
         msg2 "Configuring Thus ..."
-	local conf_file="$1/etc/thus.conf"
+	local conf="$1/etc/thus.conf"
 	local rel=$(cat $1/etc/lsb-release | grep DISTRIB_RELEASE | cut -d= -f2)
-	sed -i "s|_version_|$rel|g" $conf_file
-	sed -i "s|_kernel_|$manjaro_kernel|g" $conf_file
-	configure_installer "$conf_file"
+	sed -i "s|_version_|$rel|g" $conf
+	sed -i "s|_kernel_|$manjaro_kernel|g" $conf
+	configure_installer "$conf"
 	mkdir -p $1/home/${username}/Desktop
 	cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
 	chmod a+x $1/home/${username}/Desktop/thus.desktop
