@@ -354,7 +354,7 @@ make_image_xorg() {
 	    done
 	fi
 
-	cp pacman-gfx.conf ${work_dir}/pkgs-image/opt/livecd
+	cp ${PKGDATADIR}/pacman-gfx.conf ${work_dir}/pkgs-image/opt/livecd
 	rm -r ${work_dir}/pkgs-image/var
 
 	make_repo "${work_dir}/pkgs-image/opt/livecd/pkgs/gfx-pkgs" "${work_dir}/pkgs-image/opt/livecd/pkgs"
@@ -399,7 +399,7 @@ make_image_lng() {
 	    done
 	fi
 
-	cp pacman-lng.conf ${work_dir}/lng-image/opt/livecd
+	cp ${PKGDATADIR}/pacman-lng.conf ${work_dir}/lng-image/opt/livecd
 	rm -r ${work_dir}/lng-image/var
 
 	make_repo ${work_dir}/lng-image/opt/livecd/lng/lng-pkgs ${work_dir}/lng-image/opt/livecd/lng
