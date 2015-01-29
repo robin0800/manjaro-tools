@@ -27,10 +27,10 @@ SYSCONFIGFILES = \
 
 SETS_PKG = \
 	sets/pkg/default.set
-	
+
 SETS_ISO = \
 	sets/iso/default.set
-	
+
 CONFIGFILES = \
 	conf/makepkg-i686.conf \
 	conf/makepkg-x86_64.conf \
@@ -38,30 +38,32 @@ CONFIGFILES = \
 	conf/pacman-multilib.conf \
 	conf/pacman-mirrors-stable.conf \
 	conf/pacman-mirrors-testing.conf \
-	conf/pacman-mirrors-unstable.conf
-	
+	conf/pacman-mirrors-unstable.conf \
+	conf/pacman-gfx.conf \
+	conf/pacman-lng.conf
+
 LIBS = \
 	lib/util.sh \
 	lib/util-mount.sh \
 	lib/util-msg.sh \
 	lib/util-pkg.sh \
-	lib/util-livecd.sh \
-	lib/util-iso.sh \
 	lib/util-fstab.sh \
+	lib/util-iso.sh \
 	lib/util-iso-image.sh \
-	lib/util-iso-calamares.sh
+	lib/util-iso-calamares.sh \
+	lib/util-livecd.sh
 
 CPIOHOOKS = \
 	initcpio/hooks/miso \
 	initcpio/hooks/miso_loop_mnt \
 	initcpio/hooks/miso_pxe_nbd
-	
+
 CPIOINST = \
 	initcpio/inst/miso \
 	initcpio/inst/miso_loop_mnt \
 	initcpio/inst/miso_pxe_nbd \
 	initcpio/inst/miso_kms
-	
+
 SCRIPTS = \
 	scripts/mhwd-live \
 	scripts/livecd
@@ -104,7 +106,7 @@ install:
 	install -m0755 ${CPIOINST} $(DESTDIR)$(PREFIX)/lib/initcpio/install
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
 	install -m0644 ${SCRIPTS} $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
-	
+
 # 	install -Dm0644 bin/bash_completion $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 # 	install -Dm0644 bin/zsh_completion $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
 
@@ -119,7 +121,7 @@ uninstall:
 	for f in ${CPIOHOOKS}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/hooks/$$f; done
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
 	for f in ${SCRIPTS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts/$$f; done
-	
+
 # 	rm $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 # 	rm $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
 
