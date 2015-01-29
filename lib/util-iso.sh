@@ -587,19 +587,43 @@ make_isolinux() {
     fi
 }
 
+generate_isomounts(){
+        echo '# syntax: <img> <arch> <mount point> <type> <kernel argument>' > $1
+        echo '# Sample kernel argument in syslinux: overlay=extra,extra2' >> $1
+        echo '' >> $1
+        
+        msg2 "Writing livecd entry ..."
+        echo "${arch}/livecd-image.sqfs ${arch} / squashfs" >> $1
+        
+        if [[ -f Packages-Lng ]] ; then
+            msg2 "Writing lng entry ..."
+            echo "${arch}/lng-image.sqfs ${arch} / squashfs" >> $1
+        fi
+        
+        if [[ -f Packages-Xorg ]] ; then
+            msg2 "Writing pkgs entry ..."
+            echo "${arch}/pkgs-image.sqfs ${arch} / squashfs" >> $1
+        fi
+        
+        if [[ -f "${packages_custom}" ]] ; then
+            msg2 "Writing ${custom} entry ..."
+            echo "${arch}/${custom}-image.sqfs ${arch} / squashfs" >> $1
+        fi
+        
+        msg2 "Writing root entry ..."
+        echo "${arch}/root-image.sqfs ${arch} / squashfs" >> $1
+}
+
 # Process isomounts
 make_isomounts() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-	msg "Process [isomounts]"
-	
-        sed "s|@ARCH@|${arch}|g" isomounts > ${work_dir}/iso/${install_dir}/isomounts
-        if [[ -n ${custom} ]];then
-            sed -e "s|@custom@|${custom}|" -i ${work_dir}/iso/${install_dir}/isomounts
-        fi
+	msg "Creating [isomounts]"
+            
+        generate_isomounts "${work_dir}/iso/${install_dir}/isomounts"
         
         : > ${work_dir}/build.${FUNCNAME}
         
-	msg "Done processing [isomounts]"
+	msg "Done creating [isomounts]"
     fi
 }
 
