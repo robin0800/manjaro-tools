@@ -274,7 +274,7 @@ make_image_custom() {
 
 	umount_image_handler
 
-	aufs_mount_root_image "${work_dir}/${custom}-image"
+	aufs_mount_root_image "${path}"
 
 	mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 
