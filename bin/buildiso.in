@@ -57,16 +57,15 @@ display_settings(){
     msg "IMAGES SETTINGS:"
     msg2 "manjaro_kernel: ${manjaro_kernel}"
     msg2 "manjaro_version: ${manjaro_version}"
-
     msg2 "plymouth_theme: ${plymouth_theme}"
 
     msg "ISO SETTINGS:"
     msg2 "iso_label: ${iso_label}"
     msg2 "iso_version: ${iso_version}"
-    msg2 "manjaroiso: ${manjaroiso}"
+#     msg2 "manjaroiso: ${manjaroiso}"
     msg2 "code_name: ${code_name}"
-    msg2 "img_name: ${img_name}"
-    msg2 "install_dir: ${install_dir}"
+#     msg2 "img_name: ${img_name}"
+#     msg2 "install_dir: ${install_dir}"
     msg2 "compression: ${compression}"
     msg2 "checksum_mode: ${checksum_mode}"
 
@@ -80,7 +79,6 @@ display_settings(){
     if ${is_buildset};then
 	local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
 	for item in ${list[@]}; do
-	    msg3 "$item"
 	    cd $item
 	    load_profile "$item"
 	    msg2 "initsys: ${initsys}"
@@ -98,7 +96,6 @@ display_settings(){
 	    cd ..
 	done
     else
-	msg3 "${buildset_iso}"
 	cd ${buildset_iso}
 	load_profile "${buildset_iso}"
 	msg2 "initsys: ${initsys}"
