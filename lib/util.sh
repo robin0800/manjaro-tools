@@ -8,6 +8,18 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+kernel_cmdline(){
+    for param in $(/bin/cat /proc/cmdline); do
+        case "${param}" in
+            $1=*) echo "${param##*=}"; return 0 ;;
+            $1) return 0 ;;
+            *) continue ;;
+        esac
+    done
+    [ -n "${2}" ] && echo "${2}"
+    return 1
+}
+
 ##
 #  usage : in_array( $needle, $haystack )
 # return : 0 - found
@@ -339,8 +351,8 @@ load_sets(){
     echo $prof
 }
 
-# $1: sets_dir
-# $2: buildset
+# $1: buildset
+# $2: sets_dir
 eval_buildset(){
     eval "case $1 in
 	    $(load_sets $2)) is_buildset=true ;;
