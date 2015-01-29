@@ -209,7 +209,7 @@ aufs_append_root_image(){
 }
 
 # $1: add branch
-aufs_mount_de_image(){
+aufs_mount_custom_image(){
     msg2 "mount ${custom}-image"
     mount -t aufs -o br=$1:${work_dir}/${custom}-image=ro none $1
 }
@@ -242,7 +242,7 @@ make_image_root() {
 
 	msg "Prepare [Base installation] (root-image)"
 
-	local path=${work_dir}/root-image
+	local path="${work_dir}/root-image"
 
 	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || mkiso_error_handler
 
@@ -268,7 +268,7 @@ make_image_custom() {
 
 	msg "Prepare [${custom} installation] (${custom}-image)"
 
-	local path=${work_dir}/${custom}-image
+	local path="${work_dir}/${custom}-image"
 
 	mkdir -p ${path}
 
@@ -301,14 +301,14 @@ make_image_livecd() {
 
 	msg "Prepare [livecd-image]"
 
-	local path=${work_dir}/livecd-image
+	local path="${work_dir}/livecd-image"
 
 	mkdir -p ${path}
 
         umount_image_handler
 
 	if [[ -n "${custom}" ]] ; then
-	    aufs_mount_de_image "${path}"
+	    aufs_mount_custom_image "${path}"
 	    aufs_append_root_image "${path}"
 	else
 	    aufs_mount_root_image "${path}"
@@ -345,14 +345,14 @@ make_image_xorg() {
 
 	msg "Prepare [pkgs-image]"
 
-	local path=${work_dir}/pkgs-image
+	local path="${work_dir}/pkgs-image"
 
 	mkdir -p ${path}/opt/livecd/pkgs
 
 	umount_image_handler
 
 	if [[ -n "${custom}" ]] ; then
-	    aufs_mount_de_image "${path}"
+	    aufs_mount_custom_image "${path}"
 	    aufs_append_root_image "${path}"
 	else
 	    aufs_mount_root_image "${path}"
@@ -389,14 +389,14 @@ make_image_lng() {
 
 	msg "Prepare [lng-image]"
 
-	local path=${work_dir}/lng-image
+	local path="${work_dir}/lng-image"
 
 	mkdir -p ${path}/opt/livecd/lng
 
 	umount_image_handler
 
 	if [[ -n "${custom}" ]] ; then
-	    aufs_mount_de_image "${path}"
+	    aufs_mount_custom_image "${path}"
 	    aufs_append_root_image "${path}"
 	else
 	    aufs_mount_root_image "${path}"
@@ -451,7 +451,7 @@ make_image_boot() {
         umount_image_handler
 
         if [[ -n "${custom}" ]] ; then
-	    aufs_mount_de_image "${path}"
+	    aufs_mount_custom_image "${path}"
 	    aufs_append_root_image "${path}"
 	else
 	    aufs_mount_root_image "${path}"
