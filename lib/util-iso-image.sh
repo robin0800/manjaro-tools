@@ -251,7 +251,6 @@ configure_displaymanager(){
     msg2 "Configured: ${displaymanager}"
 }
 
-
 configure_xorg_drivers(){
 	# Disable Catalyst if not present
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
@@ -285,4 +284,3 @@ configure_xorg_drivers(){
 	    touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/MHWDCONFIG
 	fi
 }
-
