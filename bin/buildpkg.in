@@ -109,7 +109,7 @@ sign=false
 
 usage() {
     echo "Usage: ${0##*/} [options] [--] [makepkg args]"
-    echo "    -p <pkg>           Set or pkg [default: ${buildset_pkg}]"
+    echo "    -p <pkg>           Buildset or pkg [default: ${buildset_pkg}]"
     echo "    -a <arch>          Arch [default: ${arch}]"
     echo "    -b <branch>        Branch [default: ${branch}]"
     echo '    -r <dir>           Chroots directory'

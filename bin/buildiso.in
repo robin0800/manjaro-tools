@@ -62,12 +62,12 @@ display_settings(){
     msg "ISO SETTINGS:"
     msg2 "iso_label: ${iso_label}"
     msg2 "iso_version: ${iso_version}"
-#     msg2 "manjaroiso: ${manjaroiso}"
     msg2 "code_name: ${code_name}"
+#     msg2 "manjaroiso: ${manjaroiso}"    
 #     msg2 "img_name: ${img_name}"
 #     msg2 "install_dir: ${install_dir}"
-    msg2 "compression: ${compression}"
-    msg2 "checksum_mode: ${checksum_mode}"
+#     msg2 "compression: ${compression}"
+#     msg2 "checksum_mode: ${checksum_mode}"
 
     msg "LIVECD:"
     msg2 "username: ${username}"
@@ -132,7 +132,7 @@ pacman_conf_arch='default'
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo "    -p <profile>       Set or profile [default: ${buildset_iso}]"
+    echo "    -p <profile>       Buildset or profile [default: ${buildset_iso}]"
     echo "    -a <arch>          Arch [default: ${arch}]"
     echo "    -b <branch>        Branch [default: ${branch}]"
     echo '    -r <dir>           Chroots directory'
@@ -143,9 +143,9 @@ usage() {
     echo '    -l                 Disable clean lng cache'
     echo '    -i                 Build images only'
     echo '    -s                 Generate iso only'
-    echo '                       Requires pre built images'
-    echo '    -h                 This help'
+    echo '                       Requires pre built images (-i)'
     echo '    -q                 Query settings and pretend build'
+    echo '    -h                 This help'
     echo ''
     echo ''
     exit $1

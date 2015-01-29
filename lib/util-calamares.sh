@@ -38,7 +38,6 @@ write_calamares_initcpio_conf(){
     fi  
 }
 
-# $1: chroot
 configure_calamares(){
     if [[ -f $1/usr/bin/calamares ]];then
 	msg2 "Configuring Calamares ..."
@@ -55,10 +54,8 @@ configure_calamares(){
 	    echo "        destination: \"\"" >> "$UNPACKFS"                
 	fi
 	
-	write_calamares_dm_conf $1
-	write_calamares_initcpio_conf $1
-	if [ ${initsys} == 'openrc' ];then
-            write_calamares_machineid_conf $1
-	fi
+	write_calamares_dm_conf
+	write_calamares_initcpio_conf
+        [[ "${initsys}" == "openrc" ]] && write_calamares_machineid_conf
     fi
 }
