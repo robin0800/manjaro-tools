@@ -198,25 +198,25 @@ make_checksum(){
 
 # $1: new branch
 aufs_mount_root_image(){
-    msg2 "mount root-image"
-    mount -t aufs -o br=$1:${work_dir}/root-image=ro none $1
+    msg2 "mount [root-image] on [${1##*/}]"
+    mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
 }
 
 # $1: add branch
 aufs_append_root_image(){
-    msg2 "append root-image"
-    mount -t aufs -o remount,append:${work_dir}/root-image=ro none $1
+    msg2 "append [root-image] on [${1##*/}]"
+    mount -t aufs -o remount,append:${work_dir}/root-image=ro none "$1"
 }
 
 # $1: add branch
 aufs_mount_custom_image(){
-    msg2 "mount ${custom}-image"
-    mount -t aufs -o br=$1:${work_dir}/${custom}-image=ro none $1
+    msg2 "mount [${1##*/}] on [${custom}-image]"
+    mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro none "$1"
 }
 
 # $1: del branch
 aufs_remove_image(){
-    if mountpoint -q $1;then
+    if mountpoint -q "$1";then
         msg2 "unmount ${1##*/}"
 	umount $1
     fi
@@ -274,7 +274,7 @@ make_image_custom() {
 
 	umount_image_handler
 
-	aufs_mount_root_image "${path}"
+	aufs_mount_root_image "${work_dir}/${custom}-image"
 
 	mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 
@@ -436,7 +436,7 @@ make_image_boot() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 	msg "Prepare [${install_dir}/boot]"
 
-	local path_iso=${work_dir}/iso/${install_dir}/boot
+	local path_iso="${work_dir}/iso/${install_dir}/boot"
 
 	mkdir -p ${path_iso}/${arch}
 
@@ -444,7 +444,7 @@ make_image_boot() {
 
 	cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${manjaroiso}
 
-        local path=${work_dir}/boot-image
+        local path="${work_dir}/boot-image"
 
         mkdir -p ${path}
 
@@ -481,8 +481,8 @@ make_efi() {
 
         msg "Prepare [${install_dir}/boot/EFI]"
 
-        local path_iso=${work_dir}/iso
-        local path_efi=${path_iso}/EFI
+        local path_iso="${work_dir}/iso"
+        local path_efi="${path_iso}/EFI"
 
         mkdir -p ${path_efi}/boot
 
@@ -521,7 +521,7 @@ make_efiboot() {
 
         msg "Prepare [${install_dir}/iso/EFI]"
 
-        local path_iso=${work_dir}/iso
+        local path_iso="${work_dir}/iso"
 
         mkdir -p ${path_iso}/EFI/miso
 
@@ -533,7 +533,7 @@ make_efiboot() {
 
         mount ${path_iso}/EFI/miso/${img_name}.img ${work_dir}/efiboot
 
-        local path_efi=${work_dir}/efiboot/EFI
+        local path_efi="${work_dir}/efiboot/EFI"
 
         mkdir -p ${path_efi}/miso
 
@@ -585,7 +585,7 @@ make_isolinux() {
             cp -a --no-preserve=ownership isolinux-overlay/* ${work_dir}/iso/isolinux
         fi
 
-        local path=${work_dir}/root-image/usr/lib/syslinux
+        local path="${work_dir}/root-image/usr/lib/syslinux"
 
         if [[ -e ${path}/bios/ ]]; then
             cp ${path}/bios/isolinux.bin ${work_dir}/iso/isolinux/
