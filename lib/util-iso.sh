@@ -598,7 +598,7 @@ load_profile(){
     for f in ${files[@]};do
         case $f in
             Packages|Packages-Livecd*|Packages-Xorg*|Packages-Lng*) continue ;;
-            *) pkgsfile="$f"; msg2 "Packages-$f: $f" ;;
+            *) pkgsfile="$f"; msg2 "Packages-Desktop: $f" ;;
         esac
     done
     
