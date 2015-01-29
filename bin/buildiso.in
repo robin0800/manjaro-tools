@@ -86,7 +86,7 @@ display_settings(){
 	    msg2 "pacman_conf: ${pacman_conf}"
 	    msg2 "work_dir: ${work_dir}"
 	    msg2 "iso_file: ${iso_file}"
-	    if [[ ${initsys} -eq "systemd" ]];then
+	    if [[ ${initsys} == 'systemd' ]];then
 		msg2 "start_systemd: ${start_systemd[*]}"
 		msg2 "start_systemd_live: ${start_systemd_live[*]}"
 	    else
@@ -103,7 +103,7 @@ display_settings(){
 	msg2 "pacman_conf: ${pacman_conf}"
 	msg2 "work_dir: ${work_dir}"
 	msg2 "iso_file: ${iso_file}"
-	if [[ ${initsys} -eq "systemd" ]];then
+	if [[ ${initsys} == 'systemd' ]];then
 	    msg2 "start_systemd: ${start_systemd[*]}"
 	    msg2 "start_systemd_live: ${start_systemd_live[*]}"
 	else

@@ -235,7 +235,7 @@ configure_displaymanager(){
 	;;
     esac
 
-    if [[ ${initsys} -eq "openrc" ]];then
+    if [[ ${initsys} == 'openrc' ]];then
 	local conf='DISPLAYMANAGER="'${displaymanager}'"'
 	sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
 	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
