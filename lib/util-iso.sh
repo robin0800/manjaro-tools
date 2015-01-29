@@ -118,11 +118,13 @@ clean_up(){
 configure_custom_image(){
     msg3 "Configuring [${custom}-image]"
 
-    configure_plymouth "${work_dir}/${custom}-image"
+    local path=${work_dir}/${custom}-image
 
-    configure_displaymanager "${work_dir}/${custom}-image"
+    configure_plymouth "${path}"
 
-    configure_services "${work_dir}/${custom}-image"
+    configure_displaymanager "${path}"
+
+    configure_services "${path}"
 
     msg3 "Done configuring [${custom}-image]"
 }
@@ -130,19 +132,21 @@ configure_custom_image(){
 configure_livecd_image(){
     msg3 "Configuring [livecd-image]"
 
-    configure_hostname "${work_dir}/livecd-image"
+    local path=${work_dir}/livecd-image
 
-    configure_hosts "${work_dir}/livecd-image"
+    configure_hostname "${path}"
 
-    configure_accountsservice "${work_dir}/livecd-image" "${username}"
+    configure_hosts "${path}"
 
-    configure_user "${work_dir}/livecd-image"
+    configure_accountsservice "${path}" "${username}"
 
-    configure_services_live "${work_dir}/livecd-image"
+    configure_user "${path}"
 
-    configure_calamares "${work_dir}/livecd-image"
+    configure_services_live "${path}"
 
-    configure_thus "${work_dir}/livecd-image"
+    configure_calamares "${path}"
+
+    configure_thus "${path}"
 
     msg3 "Done configuring [livecd-image]"
 }
@@ -238,18 +242,20 @@ make_image_root() {
 
 	msg "Prepare [Base installation] (root-image)"
 
+	local path=${work_dir}/root-image
+
 	mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || mkiso_error_handler
 
-	pacman -Qr "${work_dir}/root-image" > "${work_dir}/root-image/root-image-pkgs.txt"
+	pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 
-	if [ -e ${work_dir}/root-image/boot/grub/grub.cfg ] ; then
-	    rm ${work_dir}/root-image/boot/grub/grub.cfg
+	if [ -e ${path}/boot/grub/grub.cfg ] ; then
+	    rm ${path}/boot/grub/grub.cfg
 	fi
-	if [ -e ${work_dir}/root-image/etc/lsb-release ] ; then
-	    sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" ${work_dir}/root-image/etc/lsb-release
+	if [ -e ${path}/etc/lsb-release ] ; then
+	    sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" ${path}/etc/lsb-release
 	fi
 
-	copy_overlay_root "${work_dir}/root-image"
+	copy_overlay_root "${path}"
 
 	: > ${work_dir}/build.${FUNCNAME}
 
@@ -262,17 +268,19 @@ make_image_custom() {
 
 	msg "Prepare [${custom} installation] (${custom}-image)"
 
-	mkdir -p ${work_dir}/${custom}-image
+	local path=${work_dir}/${custom}-image
+
+	mkdir -p ${path}
 
 	umount_image_handler
 
-	aufs_mount_root_image "${work_dir}/${custom}-image"
+	aufs_mount_root_image "${path}"
 
 	mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 
-	pacman -Qr "${work_dir}/${custom}-image" > "${work_dir}/${custom}-image/${custom}-image-pkgs.txt"
+	pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 
-	cp "${work_dir}/${custom}-image/${custom}-image-pkgs.txt" ${cache_dir_iso}/${img_name}-${custom}-${iso_version}-${arch}-pkgs.txt
+	cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${img_name}-${custom}-${iso_version}-${arch}-pkgs.txt
 
 	[[ -d ${custom}-overlay ]] && copy_overlay_custom
 
@@ -280,7 +288,7 @@ make_image_custom() {
 
         umount_image_handler
 
-	rm -R ${work_dir}/${custom}-image/.wh*
+	rm -R ${path}/.wh*
 
 	: > ${work_dir}/build.${FUNCNAME}
 
@@ -293,36 +301,38 @@ make_image_livecd() {
 
 	msg "Prepare [livecd-image]"
 
-	mkdir -p ${work_dir}/livecd-image
+	local path=${work_dir}/livecd-image
+
+	mkdir -p ${path}
 
         umount_image_handler
 
 	if [[ -n "${custom}" ]] ; then
-	    aufs_mount_de_image "${work_dir}/livecd-image"
-	    aufs_append_root_image "${work_dir}/livecd-image"
+	    aufs_mount_de_image "${path}"
+	    aufs_append_root_image "${path}"
 	else
-	    aufs_mount_root_image "${work_dir}/livecd-image"
+	    aufs_mount_root_image "${path}"
 	fi
 
 	mkiso ${create_args[*]} -i "livecd-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 
-	pacman -Qr "${work_dir}/livecd-image" > "${work_dir}/livecd-image/livecd-image-pkgs.txt"
+	pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 
-	copy_overlay_livecd "${work_dir}/livecd-image"
+	copy_overlay_livecd "${path}"
 
 	# copy over setup helpers and config loader
-        copy_livecd_helpers "${work_dir}/livecd-image/opt/livecd"
+        copy_livecd_helpers "${path}/opt/livecd"
 
-        copy_startup_scripts "${work_dir}/livecd-image/usr/bin"
+        copy_startup_scripts "${path}/usr/bin"
 
 	configure_livecd_image
 
 	# Clean up GnuPG keys?
-	rm -rf "${work_dir}/livecd-image/etc/pacman.d/gnupg"
+	rm -rf "${path}/etc/pacman.d/gnupg"
 
         umount_image_handler
 
-	rm -R ${work_dir}/livecd-image/.wh*
+	rm -R ${path}/.wh*
 
         : > ${work_dir}/build.${FUNCNAME}
 
@@ -332,38 +342,41 @@ make_image_livecd() {
 
 make_image_xorg() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+
 	msg "Prepare [pkgs-image]"
 
-	mkdir -p ${work_dir}/pkgs-image/opt/livecd/pkgs
+	local path=${work_dir}/pkgs-image
+
+	mkdir -p ${path}/opt/livecd/pkgs
 
 	umount_image_handler
 
 	if [[ -n "${custom}" ]] ; then
-	    aufs_mount_de_image "${work_dir}/pkgs-image"
-	    aufs_append_root_image "${work_dir}/pkgs-image"
+	    aufs_mount_de_image "${path}"
+	    aufs_append_root_image "${path}"
 	else
-	    aufs_mount_root_image "${work_dir}/pkgs-image"
+	    aufs_mount_root_image "${path}"
 	fi
 
-	download_to_cache "${work_dir}/pkgs-image" "${cache_dir_xorg}" "${packages_xorg}"
+	download_to_cache "${path}" "${cache_dir_xorg}" "${packages_xorg}"
 	copy_cache_xorg
 
 	if [[ -n "${packages_xorg_cleanup}" ]]; then
 	    for xorg_clean in ${packages_xorg_cleanup}; do
-		rm ${work_dir}/pkgs-image/opt/livecd/pkgs/${xorg_clean}
+		rm ${path}/opt/livecd/pkgs/${xorg_clean}
 	    done
 	fi
 
-	cp ${PKGDATADIR}/pacman-gfx.conf ${work_dir}/pkgs-image/opt/livecd
-	rm -r ${work_dir}/pkgs-image/var
+	cp ${PKGDATADIR}/pacman-gfx.conf ${path}/opt/livecd
+	rm -r ${path}/var
 
-	make_repo "${work_dir}/pkgs-image/opt/livecd/pkgs/gfx-pkgs" "${work_dir}/pkgs-image/opt/livecd/pkgs"
+	make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 
-	configure_xorg_drivers "${work_dir}/pkgs-image"
+	configure_xorg_drivers "${path}"
 
         umount_image_handler
 
-	rm -R ${work_dir}/pkgs-image/.wh*
+	rm -R ${path}/.wh*
 
 	: > ${work_dir}/build.${FUNCNAME}
 
@@ -373,40 +386,44 @@ make_image_xorg() {
 
 make_image_lng() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+
 	msg "Prepare [lng-image]"
-	mkdir -p ${work_dir}/lng-image/opt/livecd/lng
+
+	local path=${work_dir}/lng-image
+
+	mkdir -p ${path}/opt/livecd/lng
 
 	umount_image_handler
 
 	if [[ -n "${custom}" ]] ; then
-	    aufs_mount_de_image "${work_dir}/lng-image"
-	    aufs_append_root_image "${work_dir}/lng-image"
+	    aufs_mount_de_image "${path}"
+	    aufs_append_root_image "${path}"
 	else
-	    aufs_mount_root_image "${work_dir}/lng-image"
+	    aufs_mount_root_image "${path}"
 	fi
 
 	if [[ -n ${packages_lng_kde} ]]; then
-	    download_to_cache "${work_dir}/lng-image" "${cache_dir_lng}" "${packages_lng} ${packages_lng_kde}"
+	    download_to_cache "${path}" "${cache_dir_lng}" "${packages_lng} ${packages_lng_kde}"
 	    copy_cache_lng
 	else
-	    download_to_cache "${work_dir}/lng-image" "${cache_dir_lng}" "${packages_lng}"
+	    download_to_cache "${path}" "${cache_dir_lng}" "${packages_lng}"
 	    copy_cache_lng
 	fi
 
 	if [[ -n "${packages_lng_cleanup}" ]]; then
 	    for lng_clean in ${packages_lng_cleanup}; do
-		rm ${work_dir}/lng-image/opt/livecd/lng/${lng_clean}
+		rm ${path}/opt/livecd/lng/${lng_clean}
 	    done
 	fi
 
-	cp ${PKGDATADIR}/pacman-lng.conf ${work_dir}/lng-image/opt/livecd
-	rm -r ${work_dir}/lng-image/var
+	cp ${PKGDATADIR}/pacman-lng.conf ${path}/opt/livecd
+	rm -r ${path}/var
 
-	make_repo ${work_dir}/lng-image/opt/livecd/lng/lng-pkgs ${work_dir}/lng-image/opt/livecd/lng
+	make_repo ${path}/opt/livecd/lng/lng-pkgs ${path}/opt/livecd/lng
 
 	umount_image_handler
 
-	rm -R ${work_dir}/lng-image/.wh*
+	rm -R ${path}/.wh*
 
 	: > ${work_dir}/build.${FUNCNAME}
 
@@ -417,35 +434,40 @@ make_image_lng() {
 # Prepare ${install_dir}/boot/
 make_image_boot() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-
 	msg "Prepare [${install_dir}/boot]"
-	mkdir -p ${work_dir}/iso/${install_dir}/boot/${arch}
 
-        cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${work_dir}/iso/${install_dir}/boot/${arch}/memtest
+	local path_iso=${work_dir}/iso/${install_dir}/boot
 
-	cp ${work_dir}/root-image/boot/vmlinuz* ${work_dir}/iso/${install_dir}/boot/${arch}/${manjaroiso}
-        mkdir -p ${work_dir}/boot-image
+	mkdir -p ${path_iso}/${arch}
+
+        cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${arch}/memtest
+
+	cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${manjaroiso}
+
+        local path=${work_dir}/boot-image
+
+        mkdir -p ${path}
 
         umount_image_handler
 
         if [[ -n "${custom}" ]] ; then
-	    aufs_mount_de_image "${work_dir}/boot-image"
-	    aufs_append_root_image "${work_dir}/boot-image"
+	    aufs_mount_de_image "${path}"
+	    aufs_append_root_image "${path}"
 	else
-	    aufs_mount_root_image "${work_dir}/boot-image"
+	    aufs_mount_root_image "${path}"
         fi
 
-        copy_initcpio "${work_dir}/boot-image"
+        copy_initcpio "${path}"
 
-        gen_boot_image "${work_dir}/boot-image"
+        gen_boot_image "${path}"
 
-        mv ${work_dir}/boot-image/boot/${img_name}.img ${work_dir}/iso/${install_dir}/boot/${arch}/${img_name}.img
-        cp ${work_dir}/boot-image/boot/intel-ucode.img ${work_dir}/iso/${install_dir}/boot/intel_ucode.img
-        cp ${work_dir}/boot-image/usr/share/licenses/intel-ucode/LICENSE ${work_dir}/iso/${install_dir}/boot/intel_ucode.LICENSE
+        mv ${path}/boot/${img_name}.img ${path_iso}/${arch}/${img_name}.img
+        cp ${path}/boot/intel-ucode.img ${path_iso}/intel_ucode.img
+        cp ${path}/usr/share/licenses/intel-ucode/LICENSE ${path_iso}/intel_ucode.LICENSE
 
         umount_image_handler
 
-        rm -R ${work_dir}/boot-image
+        rm -R ${path}
 
 	: > ${work_dir}/build.${FUNCNAME}
 
@@ -456,32 +478,36 @@ make_image_boot() {
 # Prepare /EFI
 make_efi() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-	msg "Prepare [${install_dir}/boot/EFI]"
 
-        mkdir -p ${work_dir}/iso/EFI/boot
+        msg "Prepare [${install_dir}/boot/EFI]"
 
-        cp ${work_dir}/root-image/usr/lib/prebootloader/PreLoader.efi ${work_dir}/iso/EFI/boot/bootx64.efi
-        cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${work_dir}/iso/EFI/boot/
-        cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${work_dir}/iso/EFI/boot/loader.efi
+        local path_iso=${work_dir}/iso
+        local path_efi=${path_iso}/EFI
 
-        mkdir -p ${work_dir}/iso/loader/entries
+        mkdir -p ${path_efi}/boot
 
-        cp efiboot/loader/loader.conf ${work_dir}/iso/loader/
-        cp efiboot/loader/entries/uefi-shell-v2-x86_64.conf ${work_dir}/iso/loader/entries/
-        cp efiboot/loader/entries/uefi-shell-v1-x86_64.conf ${work_dir}/iso/loader/entries/
+        cp ${work_dir}/root-image/usr/lib/prebootloader/PreLoader.efi ${path_efi}/boot/bootx64.efi
+        cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${path_efi}/boot/
+        cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${path_efi}/boot/loader.efi
+
+        mkdir -p ${path_iso}/loader/entries
+
+        cp efiboot/loader/loader.conf ${path_iso}/loader/
+        cp efiboot/loader/entries/uefi-shell-v2-x86_64.conf ${path_iso}/loader/entries/
+        cp efiboot/loader/entries/uefi-shell-v1-x86_64.conf ${path_iso}/loader/entries/
 
         sed "s|%MISO_LABEL%|${iso_label}|g;
              s|%INSTALL_DIR%|${install_dir}|g" \
-            efiboot/loader/entries/${manjaroiso}-x86_64-usb.conf > ${work_dir}/iso/loader/entries/${manjaroiso}-x86_64.conf
+            efiboot/loader/entries/${manjaroiso}-x86_64-usb.conf > ${path_iso}/loader/entries/${manjaroiso}-x86_64.conf
 
         sed "s|%MISO_LABEL%|${iso_label}|g;
              s|%INSTALL_DIR%|${install_dir}|g" \
-            efiboot/loader/entries/${manjaroiso}-x86_64-nonfree-usb.conf > ${work_dir}/iso/loader/entries/${manjaroiso}-x86_64-nonfree.conf
+            efiboot/loader/entries/${manjaroiso}-x86_64-nonfree-usb.conf > ${path_iso}/loader/entries/${manjaroiso}-x86_64-nonfree.conf
 
         # EFI Shell 2.0 for UEFI 2.3+ ( http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=UEFI_Shell )
-        curl -k -o ${work_dir}/iso/EFI/shellx64_v2.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi
+        curl -k -o ${path_efi}/shellx64_v2.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi
         # EFI Shell 1.0 for non UEFI 2.3+ ( http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=Efi-shell )
-        curl -k -o ${work_dir}/iso/EFI/shellx64_v1.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi
+        curl -k -o ${path_efi}/shellx64_v1.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi
 
         : > ${work_dir}/build.${FUNCNAME}
 
@@ -492,27 +518,34 @@ make_efi() {
 # Prepare kernel.img::/EFI for "El Torito" EFI boot mode
 make_efiboot() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-	msg "Prepare [${install_dir}/iso/EFI]"
 
-        mkdir -p ${work_dir}/iso/EFI/miso
-        truncate -s 31M ${work_dir}/iso/EFI/miso/${img_name}.img
-        mkfs.vfat -n MISO_EFI ${work_dir}/iso/EFI/miso/${img_name}.img
+        msg "Prepare [${install_dir}/iso/EFI]"
+
+        local path_iso=${work_dir}/iso
+
+        mkdir -p ${path_iso}/EFI/miso
+
+        truncate -s 31M ${path_iso}/EFI/miso/${img_name}.img
+
+        mkfs.vfat -n MISO_EFI ${path_iso}/EFI/miso/${img_name}.img
 
         mkdir -p ${work_dir}/efiboot
 
-        mount ${work_dir}/iso/EFI/miso/${img_name}.img ${work_dir}/efiboot
+        mount ${path_iso}/EFI/miso/${img_name}.img ${work_dir}/efiboot
 
-        mkdir -p ${work_dir}/efiboot/EFI/miso
+        local path_efi=${work_dir}/efiboot/EFI
 
-        cp ${work_dir}/iso/${install_dir}/boot/x86_64/${manjaroiso} ${work_dir}/efiboot/EFI/miso/${manjaroiso}.efi
-        cp ${work_dir}/iso/${install_dir}/boot/x86_64/${img_name}.img ${work_dir}/efiboot/EFI/miso/${img_name}.img
-        cp ${work_dir}/iso/${install_dir}/boot/intel_ucode.img ${work_dir}/efiboot/EFI/miso/intel_ucode.img
+        mkdir -p ${path_efi}/miso
 
-        mkdir -p ${work_dir}/efiboot/EFI/boot
+        cp ${path_iso}/${install_dir}/boot/x86_64/${manjaroiso} ${path_efi}/miso/${manjaroiso}.efi
+        cp ${path_iso}/${install_dir}/boot/x86_64/${img_name}.img ${path_efi}/miso/${img_name}.img
+        cp ${path_iso}/${install_dir}/boot/intel_ucode.img ${path_efi}/miso/intel_ucode.img
 
-        cp ${work_dir}/root-image/usr/lib/prebootloader/PreLoader.efi ${work_dir}/efiboot/EFI/boot/bootx64.efi
-        cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${work_dir}/efiboot/EFI/boot/
-        cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${work_dir}/efiboot/EFI/boot/loader.efi
+        mkdir -p ${path_efi}/boot
+
+        cp ${work_dir}/root-image/usr/lib/prebootloader/PreLoader.efi ${path_efi}/boot/bootx64.efi
+        cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${path_efi}/boot/
+        cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${path_efi}/boot/loader.efi
 
         mkdir -p ${work_dir}/efiboot/loader/entries
 
@@ -528,8 +561,8 @@ make_efiboot() {
              s|%INSTALL_DIR%|${install_dir}|g" \
             efiboot/loader/entries/${manjaroiso}-x86_64-nonfree-dvd.conf > ${work_dir}/efiboot/loader/entries/${manjaroiso}-x86_64-nonfree.conf
 
-        cp ${work_dir}/iso/EFI/shellx64_v2.efi ${work_dir}/efiboot/EFI/
-        cp ${work_dir}/iso/EFI/shellx64_v1.efi ${work_dir}/efiboot/EFI/
+        cp ${path_iso}/EFI/shellx64_v2.efi ${path_efi}/
+        cp ${path_iso}/EFI/shellx64_v1.efi ${path_efi}/
 
         umount ${work_dir}/efiboot
 
@@ -552,27 +585,29 @@ make_isolinux() {
             cp -a --no-preserve=ownership isolinux-overlay/* ${work_dir}/iso/isolinux
         fi
 
-        if [[ -e ${work_dir}/root-image/usr/lib/syslinux/bios/ ]]; then
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/isolinux.bin ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/isohdpfx.bin ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/ldlinux.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/gfxboot.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/whichsys.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/mboot.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/hdt.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/chain.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/libcom32.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/libmenu.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/libutil.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/bios/libgpl.c32 ${work_dir}/iso/isolinux/
+        local path=${work_dir}/root-image/usr/lib/syslinux
+
+        if [[ -e ${path}/bios/ ]]; then
+            cp ${path}/bios/isolinux.bin ${work_dir}/iso/isolinux/
+            cp ${path}/bios/isohdpfx.bin ${work_dir}/iso/isolinux/
+            cp ${path}/bios/ldlinux.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/gfxboot.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/whichsys.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/mboot.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/hdt.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/chain.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/libcom32.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/libmenu.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/libutil.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/bios/libgpl.c32 ${work_dir}/iso/isolinux/
         else
-            cp ${work_dir}/root-image/usr/lib/syslinux/isolinux.bin ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/isohdpfx.bin ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/gfxboot.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/whichsys.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/mboot.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/hdt.c32 ${work_dir}/iso/isolinux/
-            cp ${work_dir}/root-image/usr/lib/syslinux/chain.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/isolinux.bin ${work_dir}/iso/isolinux/
+            cp ${path}/isohdpfx.bin ${work_dir}/iso/isolinux/
+            cp ${path}/gfxboot.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/whichsys.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/mboot.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/hdt.c32 ${work_dir}/iso/isolinux/
+            cp ${path}/chain.c32 ${work_dir}/iso/isolinux/
         fi
 
         sed -i "s|%MISO_LABEL%|${iso_label}|g;
