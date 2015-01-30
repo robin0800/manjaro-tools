@@ -67,7 +67,7 @@ configure_calamares(){
 
 	write_calamares_dm_conf $1
 	write_calamares_initcpio_conf $1
-        [[ "${initsys}" -eq "openrc" ]] && write_calamares_machineid_conf $1
+        [[ ${initsys} == 'openrc' ]] && write_calamares_machineid_conf $1
 
 	mkdir -p $1/home/${username}/Desktop
 	cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
