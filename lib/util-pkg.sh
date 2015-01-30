@@ -37,9 +37,9 @@ chroot_clean(){
 
 chroot_update(){
     msg "Updating chroot for [${branch}] (${arch})..."
-    lock 9 "${work_dir}/${OWNER}.lock" "Locking clean chroot"
+    lock 9 "${work_dir}/root.lock" "Locking clean chroot"
     chroot-run ${mkchroot_args[*]} \
-	      "${work_dir}/${OWNER}" \
+	      "${work_dir}/root" \
 	      pacman -Syu --noconfirm || abort
 }
 
@@ -77,9 +77,13 @@ move_pkg(){
     local ext='pkg.tar.xz'
     if [[ -n $PKGDEST ]];then
         source PKGBUILD
-        for p in ${pkgname[@]};do
-            mv $PKGDEST/$p*{any,$arch}.${ext} ${cache_dir_pkg}/
-        done
+        if [[ -n $pkgbase ]];then
+            for p in ${pkgname[@]};do
+                mv $PKGDEST/$p*{any,$arch}.${ext} ${cache_dir_pkg}/
+            done
+        else
+            mv $PKGDEST/$pkgname*{any,$arch}.${ext} ${cache_dir_pkg}/
+        fi
     else
         mv *.${ext} ${cache_dir_pkg}
     fi
