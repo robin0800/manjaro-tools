@@ -118,13 +118,11 @@ clean_up(){
 configure_custom_image(){
     msg3 "Configuring [${custom}-image]"
 
-    local path=${work_dir}/${custom}-image
+    configure_plymouth "$1"
 
-    configure_plymouth "${path}"
+    configure_displaymanager "$1"
 
-    configure_displaymanager "${path}"
-
-    configure_services "${path}"
+    configure_services "$1"
 
     msg3 "Done configuring [${custom}-image]"
 }
@@ -132,21 +130,19 @@ configure_custom_image(){
 configure_livecd_image(){
     msg3 "Configuring [livecd-image]"
 
-    local path=${work_dir}/livecd-image
+    configure_hostname "$1"
 
-    configure_hostname "${path}"
+    configure_hosts "$1"
 
-    configure_hosts "${path}"
+    configure_accountsservice "$1" "${username}"
 
-    configure_accountsservice "${path}" "${username}"
+    configure_user "$1"
 
-    configure_user "${path}"
+    configure_services_live "$1"
 
-    configure_services_live "${path}"
+    configure_calamares "$1"
 
-    configure_calamares "${path}"
-
-    configure_thus "${path}"
+    configure_thus "$1"
 
     msg3 "Done configuring [livecd-image]"
 }
@@ -284,7 +280,7 @@ make_image_custom() {
 
 	[[ -d ${custom}-overlay ]] && copy_overlay_custom
 
-	configure_custom_image
+	configure_custom_image "${path}"
 
         umount_image_handler
 
@@ -325,7 +321,7 @@ make_image_livecd() {
 
         copy_startup_scripts "${path}/usr/bin"
 
-	configure_livecd_image
+	configure_livecd_image "${path}"
 
 	# Clean up GnuPG keys?
 	rm -rf "${path}/etc/pacman.d/gnupg"
