@@ -78,7 +78,7 @@ move_pkg(){
     if [[ -n $PKGDEST ]];then
         source PKGBUILD
         for p in ${pkgname[@]};do
-            mv mv $PKGDEST/$p*{any,$arch}.${ext} ${cache_dir_pkg}/
+            mv $PKGDEST/$p*{any,$arch}.${ext} ${cache_dir_pkg}/
         done
     else
         mv *.${ext} ${cache_dir_pkg}
