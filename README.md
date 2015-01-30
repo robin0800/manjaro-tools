@@ -1,4 +1,4 @@
-﻿manjaro-tools
+manjaro-tools
 =============
 
 Manjaro-tools-0.9.6
@@ -7,11 +7,28 @@ User manual
 
 ###1. manjaro.tools.conf
 
-manjaro-tools.conf is the central configuration file for manjaro-tools.
-By default, the config is installed in /etc/manjaro-tools/manjaro-tools.conf
-A user config manjaro-tools.conf can be placed in $HOME/.config.
-If the userconfig is present, manjaro-tools will load userconfig values, however, if variables have been set in the systemwide /etc/manjaro-tools/manjaro-tools.conf, these values take precedence over the userconfig. 
-Best practise is to leave systemwide file untouched, by default it is commented and shows just initialization values done in code.
+manjaro-tools.conf is the central configuration file for manjaro-tools.  
+By default, the config is installed in 
+
+~~~
+/etc/manjaro-tools/manjaro-tools.conf  
+~~~
+
+A user manjaro-tools.conf can be placed in  
+
+~~~
+$HOME/.config/manjaro-tools.conf
+~~~
+  
+If the userconfig is present, manjaro-tools will load the userconfig values, however, if variables have been set in the systemwide 
+
+~~~
+/etc/manjaro-tools/manjaro-tools.conf
+~~~
+
+these values take precedence over the userconfig.  
+Best practise is to leave systemwide file untouched.  
+By default it is commented and shows just initialization values done in code.
 
 ~~~
 ##########################################
@@ -157,28 +174,28 @@ Best practise is to leave systemwide file untouched, by default it is commented 
 
 Each iso profile must have these files or symlinks to shared:
 
-* initsys
+######* initsys  
 contains the init type string, systemd or openrc, could be eg a future runit implemetation too
 
-* displaymanager
+######* displaymanager  
 contains the DM string
 if no DM is used, set it to 'none'
 
-* Packages-Livecd
+######* Packages-Livecd  
 contains packages you only want on livecd but not installed on the target system with installer
 default files are in shared folder and can be symlinked or defined in a real file
 
-    If you need a custom livecd-overlay, create a  overlay-livecd folder in your profile, and  symlink from shared/overlay-livecd/your_selection  and add your modification
+#####* If you need a custom livecd-overlay, create a  overlay-livecd folder in your profile, and  symlink from shared/overlay-livecd/your_selection  and add your modification
 
 ###2. buildpkg
 
 buildpkg is the chroot build script oi manjaro-tools.
-It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
-It can be configured with manjaro-tools.conf or by args.
+It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.  
+It can be configured with manjaro-tools.conf or by args.  
 buildpkg creates by default a pkg cache dir in /var/cache/manjaro-tools/
 Subdirectories will be created when building for the branch and architecture.
 
-A word on makepkg.conf PKGDEST
+- A word on makepkg.conf PKGDEST  
 manjarotools.conf supports the makepkg.conf variables
 If you set PKGDEST all works fine, but be careful, that your PKGDEST is clean, or else buildpkg will move all files from PKGDEST to cache dir , not only the built package.
 
@@ -200,15 +217,15 @@ Usage: buildpkg [options] [--] [makepkg args]
     -h                 This help
 ~~~
 
-* build sysvinit package for both arches and branch testing:
+######* build sysvinit package for both arches and branch testing:
 
-first i686(buildsystem is x86_64)
+i686(buildsystem is x86_64)
 
 ~~~
 buildpkg -p sysvinit -a i686 -b testing -cwsn
 ~~~
 
-for x86_64 and testing
+for x86_64
 
 ~~~
 buildpkg -p sysvinit -b testing -cswn
@@ -217,55 +234,56 @@ buildpkg -p sysvinit -b testing -cswn
 You can drop the branch arg if you set the branch in manjaro-tools.conf
 the arch can also be set in manjaro-tools.conf, but under normal conditions, it is better to specify the non native arch by -a parameter.
 
-* -c
+######* -c  
 removes the chroot dir
 If the -c parameter is not used, buildpkg will update the existing chroot or create a new one if none is present.
-* -w
+######* -w  
 cleans pkgcache, and logfiles
-* -s
+######* -s  
 signs the package when built
-* -n
+######* -n  
 installs the built package in the chroot and runs a namcap check
 
 ###3. buildiso
 
 buildiso is used to build manjaro-iso-profiles. It is run insde the profiles folder.
 
-Packages for livecd only:
+#####Packages for livecd only:
 
 * manjaro-livecd-cli-installer 
 * manjaro-livecd-openrc
-openrc-run scripts for livecd
 * manjaro-livecd-systemd
-systemd units for livecd
 
 ####Arguments
 
 ~~~
 $ buildiso -h
 Usage: buildiso [options]
-    -p <profile>       Set or profile [default: default]
+    -p <profile>       Buildset or profile [default: default]
     -a <arch>          Arch [default: x86_64]
     -b <branch>        Branch [default: unstable]
     -r <dir>           Chroots directory
                        [default: /build/buildiso]
+    -w                 Disable clean iso cache
     -c                 Disable clean work dir
-    -q                 Query settings and pretend build
-    -i                 Build images only
-    -s                 Generate iso only
-                       Requires pre built images
     -x                 Disable clean xorg cache
     -l                 Disable clean lng cache
+    -i                 Build images only
+    -s                 Generate iso only
+                       Requires pre built images (-i)
+    -q                 Query settings and pretend build
     -h                 This help
 ~~~
 
-* build xfce iso profile for both arches and branch testing on x86_64 build system
+######* build xfce iso profile for both arches and branch testing on x86_64 build system
+
+i686 (buildsystem is x86_64)  
 
 ~~~
 buildiso -p xfce -a i686 -b testing 
 ~~~
 
-for x86_64 and testing
+for x86_64
 
 ~~~
 buildiso -p xfce -b testing
@@ -275,16 +293,16 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 
 ####Special parameters
 
-* -i
+######* -i  
 Build images only will stop after all packages have been installed. No iso sqfs compression will be executed
-* -s
+* -s  
 Use this to sqfs compress the chroots if you previously used -i.
-* -x
-By default, xorg package cache is cleaned on every build. Disabling the xorg cache cleaning will result in no dowload again for xorg drivers and the cache is used. Be careful with this option if you switch arches, it currently does not detect the pkg arch in the cache. So don't use it if you build for a different arch first time.
-* -l
+######* -x  
+By default, xorg package cache is cleaned on every build. Disabling the xorg cache cleaning will result in no dowload again for xorg drivers and the cache is used.
+######* -l  
 Disable lng cache, by default lng cache is cleaned on every build. Uning this option will enable lng packages from cache rather than downloading them again.
 
-4. mkset
+###4. mkset
 
 buildpkg and buildiso support building from buildsets
 
@@ -297,7 +315,7 @@ Default location of sets is:
 
 but it can be configured in the manjaro-tools.conf file.
 
-mkset is a little helper tools to easily create sets.
+mkset is a little helper tool to easily create buildsets.
 It is run inside the abs/pkgbuilds or iso profiles directory.
 
 ####Arguments
@@ -313,32 +331,33 @@ Usage: mkset [options]
     -h          This help
 ~~~
 
-* create a pkg buildset for lxqt
+######* create a pkg buildset for lxqt
 
 ~~~
 mkset -c lxqt-0.8
 ~~~
 
-* create a iso buildset
+######* create a iso buildset
 
 ~~~
 mkset -ic manjaro-0.9.0
 ~~~
 
-The set name should not be a name of a package, or else buildpkg won't recognize the build list and only bulds the package you specified, since the buildpkg -p arg handles set and package name.
-Same applies for buildiso.
+The buildset name should not be a name of a package or profile!  
+Else buildpkg/buildiso won't recognize the build list and will only build the package/profile specified. The -p arg handles set and package/profile name.  
 
-If you create a set manually, the set must have a .set extension.
+If you create a buildset manually, the buildset must have a .set extension.
 
-Examples
+* Examples:  
+
 ~~~
-/etc/manjaro-tools/sets/pkg/lxqt-0.8.set
-/etc/manjaro-tools/sets/iso/manjaro-0.9.0.set
+/etc/manjaro-tools/sets/pkg/lxqt-0.8.set  
+/etc/manjaro-tools/sets/iso/manjaro-0.9.0.set  
 ~~~
 
-5. buildtree
+###5. buildtree
 
-builtree is a little tools to sync arch abs and manjaro packages git repos.
+buildtree is a little tools to sync arch abs and manjaro packages git repos.
 
 ####Arguments
 
@@ -352,7 +371,7 @@ Usage: buildtree [options]
     -h            This help
 ~~~
 
-* sync arch and manjaro trees
+######* sync arch and manjaro trees
 
 ~~~
 buildtree -as
