@@ -31,30 +31,30 @@ chroot_clean(){
 	rm -rf --one-file-system "${copy}"
     done
     exec 9>&-
-    
+
     rm -rf --one-file-system "${work_dir}"
 }
 
 chroot_update(){
     msg "Updating chroot for [${branch}] (${arch})..."
-    lock 9 "${work_dir}/root.lock" "Locking clean chroot"
+    lock 9 "${work_dir}/${OWNER}.lock" "Locking clean chroot"
     chroot-run ${mkchroot_args[*]} \
-	      "${work_dir}/root" \
+	      "${work_dir}/${OWNER}" \
 	      pacman -Syu --noconfirm || abort
 }
 
 clean_up(){
     msg "Cleaning up ..."
-    
+
     local query=$(find ${cache_dir_pkg} -maxdepth 1 -name "*.*")
-    
+
     [[ -n $query ]] && rm -v $query
-    
+
     if [[ -z $LOGDEST ]];then
 	query=$(find $PWD -maxdepth 2 -name '*.log')
 	[[ -n $query ]] && rm -v $query
     fi
-    
+
     if [[ -z $SRCDEST ]];then
 	query=$(find $PWD -maxdepth 2 -name '*.?z?')
 	[[ -n $query ]] && rm -v $query
@@ -75,10 +75,15 @@ prepare_cachedir(){
 
 move_pkg(){
     local ext='pkg.tar.xz'
+    source PKGBUILD
     if [[ -n $PKGDEST ]];then
-	mv $PKGDEST/*{any,$arch}.${ext} ${cache_dir_pkg}/
+        for p in ${pkgname[@]};do
+            mv mv $PKGDEST/$p*{any,$arch}.${ext} ${cache_dir_pkg}/
+        done
     else
-	mv *.${ext} ${cache_dir_pkg}
+        for p in ${pkgname[@]};do
+            mv $p*.${ext} ${cache_dir_pkg}
+	done
     fi
     chown -R "${OWNER}:users" "${cache_dir_pkg}"
 }
