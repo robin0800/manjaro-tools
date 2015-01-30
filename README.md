@@ -7,28 +7,31 @@ User manual
 
 ###1. manjaro.tools.conf
 
-manjaro-tools.conf is the central configuration file for manjaro-tools.  
-By default, the config is installed in 
-
-~~~
-/etc/manjaro-tools/manjaro-tools.conf  
-~~~
-
-A user manjaro-tools.conf can be placed in  
-
-~~~
-$HOME/.config/manjaro-tools.conf
-~~~
-  
-If the userconfig is present, manjaro-tools will load the userconfig values, however, if variables have been set in the systemwide 
+manjaro-tools.conf is the central configuration file for manjaro-tools.
+By default, the config is installed in
 
 ~~~
 /etc/manjaro-tools/manjaro-tools.conf
 ~~~
 
-these values take precedence over the userconfig.  
-Best practise is to leave systemwide file untouched.  
+A user manjaro-tools.conf can be placed in
+
+~~~
+$HOME/.config/manjaro-tools.conf
+~~~
+
+If the userconfig is present, manjaro-tools will load the userconfig values, however, if variables have been set in the systemwide
+
+~~~
+/etc/manjaro-tools/manjaro-tools.conf
+~~~
+
+these values take precedence over the userconfig.
+Best practise is to leave systemwide file untouched.
 By default it is commented and shows just initialization values done in code.
+
+Tools configuration is done in manjaro-tools.conf or by args.  
+Specifying args will override manjaro-tools.conf settings.
 
 ~~~
 ##########################################
@@ -138,7 +141,7 @@ By default it is commented and shows just initialization values done in code.
 # names must match systemd service names
 # start_systemd=('cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 
-# unset defaults to given values, 
+# unset defaults to given values,
 # names must match openrc service names
 # start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
 
@@ -164,7 +167,7 @@ By default it is commented and shows just initialization values done in code.
 # services in start_systemd array don't need to be listed here
 # start_systemd_live=('bluetooth' 'NetworkManager' 'ModemManager')
 
-# unset defaults to given values, 
+# unset defaults to given values,
 # names must match openrc service names
 # services in start_openrc array don't need to be listed here
 # start_openrc_live=('bluetooth'  'networkmanager')
@@ -174,30 +177,52 @@ By default it is commented and shows just initialization values done in code.
 
 Each iso profile must have these files or symlinks to shared:
 
-######* initsys  
-contains the init type string, systemd or openrc, could be eg a future runit implemetation too
+######* initsys
+Contains the init type string
+systemd or openrc
+could be eg a future runit implemetation too
 
-######* displaymanager  
-contains the DM string
+######* displaymanager
+Contains the DM string
 if no DM is used, set it to 'none'
 
-######* Packages-Livecd  
-contains packages you only want on livecd but not installed on the target system with installer
+######* Packages
+Contains root image packages
+ideally no xorg
+
+######* Packages-Custom/desktop
+Contains the custom image packages
+desktop environment packages go here
+
+######* Packages-Xorg
+Contains the Xorg package repo
+
+######* Packages-Lng
+Contains the language packages repo
+
+######* Packages-Livecd
+Contains packages you only want on livecd but not installed on the target system with installer
 default files are in shared folder and can be symlinked or defined in a real file
 
-#####* If you need a custom livecd-overlay, create a  overlay-livecd folder in your profile, and  symlink from shared/overlay-livecd/your_selection  and add your modification
+######* optional custom pacman.conf in profile
+    * for i686
+~~~
+pacman-default.conf
+~~~
+
+    * for x86_64
+~~~
+pacman-multilib.conf
+~~~
+
+If you need a custom livecd-overlay, create overlay-livecd folder in  profile, and  symlink from shared/overlay-livecd/your_selection to the overlay-livecd folder.
 
 ###2. buildpkg
 
-buildpkg is the chroot build script oi manjaro-tools.
+buildpkg is the chroot build script oi manjaro-tools.  
 It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.  
-It can be configured with manjaro-tools.conf or by args.  
-buildpkg creates by default a pkg cache dir in /var/cache/manjaro-tools/
-Subdirectories will be created when building for the branch and architecture.
 
-- A word on makepkg.conf PKGDEST  
-manjarotools.conf supports the makepkg.conf variables
-If you set PKGDEST all works fine, but be careful, that your PKGDEST is clean, or else buildpkg will move all files from PKGDEST to cache dir , not only the built package.
+- manjaro-tools.conf supports the makepkg.conf variables  
 
 ####Arguments
 
@@ -234,14 +259,14 @@ buildpkg -p sysvinit -b testing -cswn
 You can drop the branch arg if you set the branch in manjaro-tools.conf
 the arch can also be set in manjaro-tools.conf, but under normal conditions, it is better to specify the non native arch by -a parameter.
 
-######* -c  
+######* -c
 removes the chroot dir
 If the -c parameter is not used, buildpkg will update the existing chroot or create a new one if none is present.
-######* -w  
+######* -w
 cleans pkgcache, and logfiles
-######* -s  
+######* -s
 signs the package when built
-######* -n  
+######* -n
 installs the built package in the chroot and runs a namcap check
 
 ###3. buildiso
@@ -250,7 +275,7 @@ buildiso is used to build manjaro-iso-profiles. It is run insde the profiles fol
 
 #####Packages for livecd only:
 
-* manjaro-livecd-cli-installer 
+* manjaro-livecd-cli-installer
 * manjaro-livecd-openrc
 * manjaro-livecd-systemd
 
@@ -277,10 +302,10 @@ Usage: buildiso [options]
 
 ######* build xfce iso profile for both arches and branch testing on x86_64 build system
 
-i686 (buildsystem is x86_64)  
+i686 (buildsystem is x86_64)
 
 ~~~
-buildiso -p xfce -a i686 -b testing 
+buildiso -p xfce -a i686 -b testing
 ~~~
 
 for x86_64
@@ -293,13 +318,13 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 
 ####Special parameters
 
-######* -i  
+######* -i
 Build images only will stop after all packages have been installed. No iso sqfs compression will be executed
-* -s  
+* -s
 Use this to sqfs compress the chroots if you previously used -i.
-######* -x  
+######* -x
 By default, xorg package cache is cleaned on every build. Disabling the xorg cache cleaning will result in no dowload again for xorg drivers and the cache is used.
-######* -l  
+######* -l
 Disable lng cache, by default lng cache is cleaned on every build. Uning this option will enable lng packages from cache rather than downloading them again.
 
 ###4. mkset
@@ -343,16 +368,16 @@ mkset -c lxqt-0.8
 mkset -ic manjaro-0.9.0
 ~~~
 
-The buildset name should not be a name of a package or profile!  
-Else buildpkg/buildiso won't recognize the build list and will only build the package/profile specified. The -p arg handles set and package/profile name.  
+The buildset name should not be a name of a package or profile!
+Else buildpkg/buildiso won't recognize the build list and will only build the package/profile specified. The -p arg handles set and package/profile name.
 
 If you create a buildset manually, the buildset must have a .set extension.
 
-* Examples:  
+* Examples:
 
 ~~~
-/etc/manjaro-tools/sets/pkg/lxqt-0.8.set  
-/etc/manjaro-tools/sets/iso/manjaro-0.9.0.set  
+/etc/manjaro-tools/sets/pkg/lxqt-0.8.set
+/etc/manjaro-tools/sets/iso/manjaro-0.9.0.set
 ~~~
 
 ###5. buildtree
