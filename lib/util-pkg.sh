@@ -51,12 +51,12 @@ clean_up(){
     [[ -n $query ]] && rm -v $query
 
     if [[ -z $LOGDEST ]];then
-	query=$(find $PWD -maxdepth 2 -name '*.log')
+	query=$(find $PWD -maxdepth 1 -name '*.log')
 	[[ -n $query ]] && rm -v $query
     fi
 
     if [[ -z $SRCDEST ]];then
-	query=$(find $PWD -maxdepth 2 -name '*.?z?')
+	query=$(find $PWD -maxdepth 1 -name '*.?z?')
 	[[ -n $query ]] && rm -v $query
     fi
 }
@@ -75,15 +75,13 @@ prepare_cachedir(){
 
 move_pkg(){
     local ext='pkg.tar.xz'
-    source PKGBUILD
     if [[ -n $PKGDEST ]];then
+        source PKGBUILD
         for p in ${pkgname[@]};do
             mv mv $PKGDEST/$p*{any,$arch}.${ext} ${cache_dir_pkg}/
         done
     else
-        for p in ${pkgname[@]};do
-            mv $p*.${ext} ${cache_dir_pkg}
-	done
+        mv *.${ext} ${cache_dir_pkg}
     fi
     chown -R "${OWNER}:users" "${cache_dir_pkg}"
 }
