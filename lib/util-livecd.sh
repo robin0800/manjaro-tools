@@ -224,6 +224,26 @@ configure_env_live(){
 	sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
 	sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
     fi
+
+    ## FIXME - Workaround to match theme with QT5
+    cmd=$(echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment)
+    if [ -e "/bootmnt/${install_dir}/${arch}/xfce-image.sqfs" ] ; then
+	$cmd
+    elif [ -e "/bootmnt/${install_dir}/${arch}/gnome-image.sqfs" ] ; then
+	$cmd
+    elif [ -e "/bootmnt/${install_dir}/${arch}/cinnamon-image.sqfs" ] ; then
+	$cmd
+    elif [ -e "/bootmnt/${install_dir}/${arch}/openbox-image.sqfs" ] ; then
+	$cmd
+    elif [ -e "/bootmnt/${install_dir}/${arch}/mate-image.sqfs" ] ; then
+	$cmd
+    elif [ -e "/bootmnt/${install_dir}/${arch}/lxde-image.sqfs" ] ; then
+	$cmd
+    elif [ -e "/bootmnt/${install_dir}/${arch}/enlightenment-image.sqfs" ] ; then
+	$cmd
+    elif [ -e "/bootmnt/${install_dir}/${arch}/pekwm-image.sqfs" ] ; then
+	$cmd
+    fi
 }
 
 configure_user_root_live(){
