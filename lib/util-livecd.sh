@@ -211,14 +211,14 @@ configure_env_live(){
     echo "BROWSER=/usr/bin/xdg-open" >> /etc/environment
     echo "BROWSER=/usr/bin/xdg-open" >> /etc/skel/.bashrc
     echo "BROWSER=/usr/bin/xdg-open" >> /etc/profile
-    
+
     # add TERM var
-    
+
     if [ -e "/usr/bin/mate-session" ] ; then
 	echo "TERM=mate-terminal" >> /etc/environment
 	echo "TERM=mate-terminal" >> /etc/profile
     fi
-    
+
     ## FIXME - Workaround to launch mate-terminal
     if [ -e "/usr/bin/mate-session" ] ; then
 	sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
@@ -226,23 +226,31 @@ configure_env_live(){
     fi
 
     ## FIXME - Workaround to match theme with QT5
-    cmd=$(echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment)
-    if [ -e "/bootmnt/${install_dir}/${arch}/xfce-image.sqfs" ] ; then
-	$cmd
-    elif [ -e "/bootmnt/${install_dir}/${arch}/gnome-image.sqfs" ] ; then
-	$cmd
-    elif [ -e "/bootmnt/${install_dir}/${arch}/cinnamon-image.sqfs" ] ; then
-	$cmd
-    elif [ -e "/bootmnt/${install_dir}/${arch}/openbox-image.sqfs" ] ; then
-	$cmd
-    elif [ -e "/bootmnt/${install_dir}/${arch}/mate-image.sqfs" ] ; then
-	$cmd
-    elif [ -e "/bootmnt/${install_dir}/${arch}/lxde-image.sqfs" ] ; then
-	$cmd
-    elif [ -e "/bootmnt/${install_dir}/${arch}/enlightenment-image.sqfs" ] ; then
-	$cmd
-    elif [ -e "/bootmnt/${install_dir}/${arch}/pekwm-image.sqfs" ] ; then
-	$cmd
+#     cmd=$(echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment)
+#     if [ -e "/bootmnt/${install_dir}/${arch}/xfce-image.sqfs" ] ; then
+# 	$cmd
+#     elif [ -e "/bootmnt/${install_dir}/${arch}/gnome-image.sqfs" ] ; then
+# 	$cmd
+#     elif [ -e "/bootmnt/${install_dir}/${arch}/cinnamon-image.sqfs" ] ; then
+# 	$cmd
+#     elif [ -e "/bootmnt/${install_dir}/${arch}/openbox-image.sqfs" ] ; then
+# 	$cmd
+#     elif [ -e "/bootmnt/${install_dir}/${arch}/mate-image.sqfs" ] ; then
+# 	$cmd
+#     elif [ -e "/bootmnt/${install_dir}/${arch}/lxde-image.sqfs" ] ; then
+# 	$cmd
+#     elif [ -e "/bootmnt/${install_dir}/${arch}/enlightenment-image.sqfs" ] ; then
+# 	$cmd
+#     elif [ -e "/bootmnt/${install_dir}/${arch}/pekwm-image.sqfs" ] ; then
+# 	$cmd
+#     fi
+    if [[ -f "/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs" ]]; then
+        case ${custom} in
+            gnome|xfce|openbox|enlightenment|cinnamon|pekwm|lxde|mate)
+                echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment
+            ;;
+            *) break ;;
+        esac
     fi
 }
 

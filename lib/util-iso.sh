@@ -74,6 +74,10 @@ copy_livecd_helpers(){
     msg2 "Copying livecd helpers ..."
     [[ ! -d $1 ]] && mkdir -p $1
     cp ${LIBDIR}/util-livecd.sh $1
+    # write the custom var to conf to be sourced for use in util-livecd
+    echo "custom=${custom}" >> $1/util-livecd.sh
+
+
     cp ${LIBDIR}/util-msg.sh $1
     cp ${LIBDIR}/util.sh $1
 #     cp ${LIBDIR}/util-mount.sh $1
