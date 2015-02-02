@@ -41,6 +41,7 @@ chroot_update(){
     chroot-run ${mkchroot_args[*]} \
 	      "${work_dir}/root" \
 	      pacman -Syu --noconfirm || abort
+
 }
 
 clean_up(){
@@ -68,6 +69,10 @@ blacklist_pkg(){
     done
 }
 
+set_mhwd_multilib(){
+    chroot-run $1/${OWNER} mhwd-gpu --setgl mesa
+}
+
 prepare_cachedir(){
     [[ ! -d "${cache_dir_pkg}" ]] && mkdir -p "${cache_dir_pkg}"
     chown -R "${OWNER}:users" "${cache_dir_pkg}"
@@ -79,10 +84,10 @@ move_pkg(){
         source PKGBUILD
         if [[ -n $pkgbase ]];then
             for p in ${pkgname[@]};do
-                mv $PKGDEST/$p*{any,$arch}.${ext} ${cache_dir_pkg}/
+                mv $PKGDEST/$p*.${ext} ${cache_dir_pkg}/
             done
         else
-            mv $PKGDEST/$pkgname*{any,$arch}.${ext} ${cache_dir_pkg}/
+            mv $PKGDEST/$pkgname*.${ext} ${cache_dir_pkg}/
         fi
     else
         mv *.${ext} ${cache_dir_pkg}
@@ -99,6 +104,7 @@ chroot_build(){
 	    for p in ${blacklist_trigger[@]}; do
 		[[ $pkg == $p ]] && blacklist_pkg "${work_dir}"
 	    done
+	    ${is_multilib} && set_mhwd_multilib
 	    setarch "${arch}" \
 		mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || break
 	    move_pkg
@@ -111,6 +117,7 @@ chroot_build(){
 	for p in ${blacklist_trigger[@]}; do
 	    [[ ${buildset_pkg} == $p ]] && blacklist_pkg "${work_dir}"
 	done
+	${is_multilib} && set_mhwd_multilib
 	setarch "${arch}" \
 	    mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
 	move_pkg

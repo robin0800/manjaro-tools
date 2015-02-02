@@ -35,7 +35,7 @@ display_settings(){
     msg2 "buildsets: $(load_sets ${sets_dir_pkg})"
     msg2 "buildset_pkg: ${buildset_pkg}"
     msg2 "is_buildset: ${is_buildset}"
-    
+
     msg "OPTIONS:"
     msg2 "arch: ${arch}"
     msg2 "branch: ${branch}"
@@ -62,7 +62,7 @@ display_settings(){
 	msg "PKG:"
 	msg2 "base_packages: ${base_packages[*]}"
     fi
-    
+
     msg "BUILD QUEUE:"
     if ${is_buildset};then
 	local list=$(cat ${sets_dir_pkg}/${buildset_pkg}.set)
@@ -91,7 +91,7 @@ display_settings(){
 
 load_user_info
 
-load_config "${USER_CONFIG}/manjaro-tools.conf"  
+load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 load_vars "$USER_HOME/.makepkg.conf"
@@ -145,15 +145,22 @@ while getopts "${opts}" arg; do
     esac
 done
 
-if [[ "$arch" == 'multilib' ]]; then
+if [[ "${arch}" == 'multilib' ]]; then
     pacman_conf_arch='multilib'
     base_packages+=('multilib-devel')
+    work_dir=${chroots_pkg}/${branch}/${arch}
+    cache_dir_pkg=${cache_dir}/${branch}/${arch}
     arch='x86_64'
+    is_multilib=true
+else
+    work_dir=${chroots_pkg}/${branch}/${arch}
+    cache_dir_pkg=${cache_dir}/${branch}/${arch}
+    is_multilib=false
 fi
 
-work_dir=${chroots_pkg}/${branch}/${arch}
+# work_dir=${chroots_pkg}/${branch}/${arch}
 
-cache_dir_pkg="${cache_dir}/${branch}/${arch}"
+# cache_dir_pkg="${cache_dir}/${branch}/${arch}"
 
 pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
@@ -175,7 +182,7 @@ ${pretend} && display_settings && exit
 
 ${wipe_clean} && clean_up
 
-chroot_init 
+chroot_init
 
 chroot_build
 
