@@ -253,6 +253,7 @@ make_image_root() {
 	fi
 	if [ -e ${path}/etc/lsb-release ] ; then
 	    sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" ${path}/etc/lsb-release
+	    sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${code_name}/" ${path}/etc/lsb-release
 	fi
 
 	copy_overlay_root "${path}"
