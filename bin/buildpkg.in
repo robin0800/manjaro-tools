@@ -115,7 +115,7 @@ usage() {
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_pkg}]"
     echo '    -c                 Recreate chroot'
-    echo '    -w                 Clean up'
+    echo '    -w                 Clean up logs,cache,sources'
     echo '    -n                 Install and run namcap check'
     echo '    -s                 Sign packages'
     echo '    -q                 Query settings and pretend build'
