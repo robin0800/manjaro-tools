@@ -23,7 +23,8 @@ configure_user(){
 # $1: chroot
 configure_hostname(){
     msg2 "Setting hostname: ${hostname} ..."
-    if [[ -f $1/usr/bin/openrc ]];then
+#     if [[ -f $1/usr/bin/openrc ]];then
+    if [[ ${initsys} == 'openrc' ]];then
 	local _hostname='hostname="'${hostname}'"'
 	sed -i -e "s|^.*hostname=.*|${_hostname}|" $1/etc/conf.d/hostname
     else
@@ -33,14 +34,16 @@ configure_hostname(){
 
 # $1: chroot
 configure_plymouth(){
-    if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
+#     if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
+    if $(is_plymouth);then
 	msg2 "Setting plymouth $plymouth_theme ...."
 	sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" $1/etc/plymouth/plymouthd.conf
     fi
 }
 
 configure_services_live(){
-   if [[ -f ${work_dir}/root-image/usr/bin/openrc ]];then
+#    if [[ -f ${work_dir}/root-image/usr/bin/openrc ]];then
+    if [[ ${initsys} == 'openrc' ]];then
       msg2 "Congiguring OpenRC ...."
       for svc in ${start_openrc_live[@]}; do
 	  if [[ -f $1/etc/init.d/$svc ]]; then
@@ -59,7 +62,8 @@ configure_services_live(){
 }
 
 configure_services(){
-   if [[ -f ${work_dir}/root-image/usr/bin/openrc ]];then
+#    if [[ -f ${work_dir}/root-image/usr/bin/openrc ]];then
+    if [[ ${initsys} == 'openrc' ]];then
       msg2 "Congiguring OpenRC ...."
       for svc in ${start_openrc[@]}; do
 	  if [[ -f $1/etc/init.d/$svc ]]; then
