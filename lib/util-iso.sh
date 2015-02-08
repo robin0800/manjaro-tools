@@ -29,6 +29,17 @@ run_log(){
     rm "$logpipe"
 }
 
+is_plymouth(){
+    source mkinitcpio.conf
+    for each h in ${HOOKS[@]};do
+        if [[ $h == 'pkymouth' ]];then
+            return 1
+        else
+            return 0
+        fi
+    done
+}
+
 copy_initcpio(){
     cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
     cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
@@ -88,6 +99,8 @@ copy_livecd_helpers(){
 	cp ${manjaro_tools_conf} $1
     fi
     # write the custom var to conf to be sourced for use in util-livecd
+    echo '' >> $1/manjaro-tools.conf
+    echo '#Custom image name' >> $1/manjaro-tools.conf
     echo "custom=${custom}" >> $1/manjaro-tools.conf
 }
 
