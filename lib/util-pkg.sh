@@ -46,20 +46,9 @@ chroot_update(){
 
 clean_up(){
     msg "Cleaning up ..."
-
-    local query=$(find ${cache_dir_pkg} -maxdepth 1 -name "*.*")
-
-    [[ -n $query ]] && rm -v $query
-
-    if [[ -z $LOGDEST ]];then
-	query=$(find $PWD -maxdepth 1 -name '*.log')
-	[[ -n $query ]] && rm -v $query
-    fi
-
-    if [[ -z $SRCDEST ]];then
-	query=$(find $PWD -maxdepth 1 -name '*.?z?')
-	[[ -n $query ]] && rm -v $query
-    fi
+    find ${cache_dir_pkg} -maxdepth 1 -name "*.*") -delete &> /dev/null
+    [[ -z $LOGDEST ]] && find $PWD -maxdepth 1 -name '*.log' -delete &> /dev/null
+    [[ -z $SRCDEST ]] && find $PWD -maxdepth 1 -name '*.?z?' -delete &> /dev/null
 }
 
 blacklist_pkg(){
