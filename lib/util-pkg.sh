@@ -46,7 +46,7 @@ chroot_update(){
 
 clean_up(){
     msg "Cleaning up ..."
-    find ${cache_dir_pkg} -maxdepth 1 -name "*.*") -delete &> /dev/null
+    find ${cache_dir_pkg} -maxdepth 1 -name "*.*" -delete &> /dev/null
     [[ -z $LOGDEST ]] && find $PWD -maxdepth 1 -name '*.log' -delete &> /dev/null
     [[ -z $SRCDEST ]] && find $PWD -maxdepth 1 -name '*.?z?' -delete &> /dev/null
 }
