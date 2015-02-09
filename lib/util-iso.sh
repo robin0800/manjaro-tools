@@ -31,7 +31,7 @@ run_log(){
 
 is_plymouth(){
     source mkinitcpio.conf
-    for each h in ${HOOKS[@]};do
+    for h in ${HOOKS[@]};do
         if [[ $h == 'pkymouth' ]];then
             return 1
         else
