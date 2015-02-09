@@ -8,6 +8,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+import(){
+    [[ -r $1 ]] && source $1
+}
+
 kernel_cmdline(){
     for param in $(/bin/cat /proc/cmdline); do
         case "${param}" in
@@ -163,68 +167,68 @@ check_root() {
 
 load_vars() {
     local var
-    
+
     [[ -f $1 ]] || return 1
 
     for var in {SRC,SRCPKG,PKG,LOG}DEST MAKEFLAGS PACKAGER CARCH GPGKEY; do
 	    [[ -z ${!var} ]] && eval $(grep "^${var}=" "$1")
     done
-    
+
     return 0
 }
 
 load_config(){
 
     [[ -f $1 ]] || return 1
-    
+
     manjaro_tools_conf="$1"
 
     [[ -r ${manjaro_tools_conf} ]] && source ${manjaro_tools_conf}
-    
+
     ######################
     # common
     ######################
-    
+
     if [[ -z ${branch} ]];then
 	branch='stable'
     fi
-    
+
     if [[ -z ${arch} ]]; then
 	arch=$(uname -m)
     fi
-    
+
     if [[ -z ${cache_dir} ]];then
 	cache_dir='/var/cache/manjaro-tools'
     fi
-    
+
     ###################
     # buildtree
     ###################
-    
+
     if [[ -z ${repo_tree} ]];then
 	repo_tree=(core extra community multilib openrc)
     fi
-    
+
     if [[ -z ${host_tree} ]];then
 	host_tree='https://github.com/manjaro'
-    fi   
-    
+    fi
+
     if [[ -z ${host_tree_abs} ]];then
 	host_tree_abs='https://projects.archlinux.org/git/svntogit/packages'
-    fi   
-    
+    fi
+
     ###################
     # buildpkg
     ###################
-    
+
     if [[ -z ${chroots_pkg} ]];then
 	chroots_pkg='/opt/buildpkg'
     fi
-        
+
     if [[ -z ${sets_dir_pkg} ]];then
 	sets_dir_pkg="${SYSCONFDIR}/sets/pkg"
     fi
-    
+
     if [[ -z ${buildset_pkg} ]];then
 	buildset_pkg='default'
     fi
@@ -236,33 +240,33 @@ load_config(){
     if [[ -z ${blacklist_trigger[@]} ]];then
 	blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
     fi
-    
+
     if [[ -z ${blacklist[@]} ]];then
 	blacklist=('libsystemd')
     fi
-    
+
     ###################
     # buildiso
     ###################
-    
+
     if [[ -z ${chroots_iso} ]];then
 	chroots_iso='/opt/buildiso'
     fi
-        
+
     if [[ -z ${sets_dir_iso} ]];then
 	sets_dir_iso="${SYSCONFDIR}/sets/iso"
     fi
-    
+
     if [[ -z ${buildset_iso} ]];then
 	buildset_iso='default'
     fi
-    
+
     if [[ -z ${iso_label} ]];then
 	source /etc/lsb-release
 	iso_label="MJRO${DISTRIB_RELEASE//.}"
     fi
 
-    if [[ -z ${iso_version} ]];then	
+    if [[ -z ${iso_version} ]];then
 	source /etc/lsb-release
 	iso_version=${DISTRIB_RELEASE}
     fi
@@ -272,48 +276,48 @@ load_config(){
     fi
 
     manjaro_kernel_ver=${manjaro_kernel#*linux}
-    
+
     if [[ -z ${manjaro_version} ]];then
 	manjaro_version=$(date +%Y.%m)
     fi
-    
+
     if [[ -z ${manjaroiso} ]];then
 	manjaroiso="manjaroiso"
     fi
-    
+
     if [[ -z ${code_name} ]];then
 	source /etc/lsb-release
 	code_name="${DISTRIB_CODENAME}"
     fi
-    
+
     if [[ -z ${img_name} ]];then
 	img_name=manjaro
     fi
-    
+
     if [[ -z ${hostname} ]];then
 	hostname="manjaro"
     fi
-    
+
     if [[ -z ${username} ]];then
 	username="manjaro"
     fi
-    
+
     if [[ -z ${install_dir} ]];then
 	install_dir=manjaro
     fi
-    
+
     if [[ -z ${plymouth_theme} ]];then
 	plymouth_theme=manjaro-elegant
     fi
-    
+
     if [[ -z ${compression} ]];then
 	compression=xz
     fi
-    
+
     if [[ -z ${password} ]];then
 	password="manjaro"
     fi
-    
+
     if [[ -z ${addgroups} ]];then
 	addgroups="video,audio,power,disk,storage,optical,network,lp,scanner"
     fi
@@ -321,23 +325,23 @@ load_config(){
     if [[ -z ${start_systemd} ]];then
 	start_systemd=('cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
     fi
-    
+
     if [[ -z ${start_openrc} ]];then
 	start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
     fi
-    
+
     if [[ -z ${start_systemd_live} ]];then
 	start_systemd_live=('bluez' 'NetworkManager' 'ModemManager')
     fi
-    
+
     if [[ -z ${start_openrc_live} ]];then
 	start_openrc_live=('bluetooth' 'NetworkManager')
     fi
-    
+
     if [[ -z ${checksum_mode} ]];then
         checksum_mode='md5'
     fi
-    
+
     return 0
 }
 
@@ -368,6 +372,6 @@ load_user_info(){
     else
 	USER_HOME=$HOME
     fi
-    
+
     USER_CONFIG="$USER_HOME/.config"
 }
