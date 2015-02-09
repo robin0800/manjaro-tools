@@ -35,6 +35,12 @@ check_run_dir(){
     fi
 }
 
+check_profile(){
+    if [[ ! -f $1/initsys ]]; then
+        die "The $1 is not a valid profile!"
+    fi
+}
+
 is_plymouth(){
     source mkinitcpio.conf
     for h in ${HOOKS[@]};do
@@ -809,7 +815,8 @@ build_iso(){
     if ${is_buildset};then
 	msg3 "Start building [${buildset_iso}]"
 	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-	    [[ -f $prof/initsys ]] || break
+	    [[ ! -f $prof/initsys ]] && break
+#             check_profile "$prof"
 	    cd $prof
 		load_profile "$prof"
 		build_profile
@@ -817,7 +824,8 @@ build_iso(){
 	done
 	msg3 "Finished building [${buildset_iso}]"
     else
-	[[ -f ${buildset_iso}/initsys ]] || die "${buildset_iso} is not a valid profile!"
+	[[ ! -f ${buildset_iso}/initsys ]] && die "${buildset_iso} is not a valid profile!"
+#         check_profile "${buildset_iso}"
 	cd ${buildset_iso}
 	    load_profile "${buildset_iso}"
 	    build_profile
