@@ -79,6 +79,7 @@ display_settings(){
     if ${is_buildset};then
 	local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
 	for item in ${list[@]}; do
+            check_profile "$item"
 	    cd $item
 	    load_profile "$item"
 	    msg2 "initsys: ${initsys}"
@@ -96,6 +97,7 @@ display_settings(){
 	    cd ..
 	done
     else
+        check_profile "${buildset_iso}"
 	cd ${buildset_iso}
 	load_profile "${buildset_iso}"
 	msg2 "initsys: ${initsys}"

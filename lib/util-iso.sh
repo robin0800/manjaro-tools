@@ -31,13 +31,13 @@ run_log(){
 
 check_run_dir(){
     if [[ ! -f shared/Packages ]];then
-        die "You are not running ${0##*/} in the manjaro-iso-profiles folder!"
+        die "${0##*/} is not run in a valid iso-profiles folder!"
     fi
 }
 
 check_profile(){
     if [[ ! -f $1/initsys ]]; then
-        die "The $1 is not a valid profile!"
+        die "$1 is not a valid profile!"
     fi
 }
 
@@ -815,8 +815,8 @@ build_iso(){
     if ${is_buildset};then
 	msg3 "Start building [${buildset_iso}]"
 	for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-	    [[ ! -f $prof/initsys ]] && break
-#             check_profile "$prof"
+# 	    [[ ! -f $prof/initsys ]] && break
+            check_profile "$prof"
 	    cd $prof
 		load_profile "$prof"
 		build_profile
@@ -824,8 +824,8 @@ build_iso(){
 	done
 	msg3 "Finished building [${buildset_iso}]"
     else
-	[[ ! -f ${buildset_iso}/initsys ]] && die "${buildset_iso} is not a valid profile!"
-#         check_profile "${buildset_iso}"
+# 	[[ ! -f ${buildset_iso}/initsys ]] && die "${buildset_iso} is not a valid profile!"
+        check_profile "${buildset_iso}"
 	cd ${buildset_iso}
 	    load_profile "${buildset_iso}"
 	    build_profile
