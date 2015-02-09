@@ -29,6 +29,12 @@ run_log(){
     rm "$logpipe"
 }
 
+check_run_dir(){
+    if [[ ! -f shared/Packages ]];then
+        die "You are not running ${0##*/} in the manjaro-iso-profiles folder!"
+    fi
+}
+
 is_plymouth(){
     source mkinitcpio.conf
     for h in ${HOOKS[@]};do
