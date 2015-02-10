@@ -41,17 +41,6 @@ check_profile(){
     fi
 }
 
-is_plymouth(){
-    source mkinitcpio.conf
-    for h in ${HOOKS[@]};do
-        if [[ $h == 'pkymouth' ]];then
-            return 1
-        else
-            return 0
-        fi
-    done
-}
-
 copy_initcpio(){
     cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
     cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
@@ -749,6 +738,13 @@ load_profile(){
 
     work_dir=${chroots_iso}/$1/${arch}
 
+    is_plymouth=false
+    source mkinitcpio.conf
+    for h in ${HOOKS[@]};do
+        if [[ $h == 'plymouth' ]];then
+            is_plymouth=true
+        fi
+    done
 }
 
 compress_images(){
