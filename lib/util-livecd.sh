@@ -321,6 +321,18 @@ configure_displaymanager_live(){
 	gpasswd -a ${username} autologin &> /dev/null
 	sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
 	sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
+	if [[ -d /run/openrc ]];then
+            sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' /etc/lightdm/lightdm.conf
+	fi
+	local greeters=$(ls /etc/lightdm/*greeter.conf)
+	for g in ${greeters[@]};do
+            case $g in
+                'lxqt-lightdm-greeter.conf')
+                    sed -i -e "s/^.*greeter-session=.*/greeter-session=${g%.conf}/" /etc/lightdm/lightdm.conf
+                ;;
+                *) break ;;
+            esac
+	done
     elif [[ -f /usr/bin/kdm ]];then
 	sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" /usr/share/config/kdm/kdmrc
 	sed -i -e "s/^.*AutoLoginPass=.*/AutoLoginPass=${password}/" /usr/share/config/kdm/kdmrc
