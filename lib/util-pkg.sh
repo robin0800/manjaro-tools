@@ -47,7 +47,6 @@ chroot_update(){
 clean_up(){
     msg "Cleaning up ..."
     find ${cache_dir_pkg} -type f -maxdepth 1 -name "*.*" -delete &> /dev/null
-    [[ -z $LOGDEST ]] && find $PWD -type f -maxdepth 1 -name '*.log' -delete &> /dev/null
     [[ -z $SRCDEST ]] && find $PWD -type f -maxdepth 1 -name '*.?z?' -delete &> /dev/null
 }
 
@@ -87,15 +86,15 @@ move_pkg(){
 archive_logs(){
     local ext='log.tar.xz'
     if [[ -z $LOGDEST ]];then
-#         source PKGBUILD
         if [[ -n $pkgbase ]];then
             for p in ${pkgname[@]};do
-                tar -cxf $p-$pkgver-$pkgrel*.${ext} *.log
+                tar -cJf $PWD/$p-$pkgver-$pkgrel-${CARCH}.${ext} *.log
             done
         else
-            tar -cxf $pkgname-$pkgver-$pkgrel*.${ext} *.log
+            tar -cJf $PWD/$pkgname-$pkgver-$pkgrel-${CARCH}.${ext} *.log
         fi
     fi
+    find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
 }
 
 chroot_build(){
@@ -112,7 +111,7 @@ chroot_build(){
 		mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || break
             source PKGBUILD
 	    move_pkg
-	    archive_logs
+	    [[ -z $LOGDEST ]] && archive_logs
 	    cd ..
 	done
 	msg3 "Finished building [${buildset_pkg}]"
@@ -127,7 +126,7 @@ chroot_build(){
 	    mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
 	source PKGBUILD
 	move_pkg
-	archive_logs
+	[[ -z $LOGDEST ]] && archive_logs
 	cd ..
     fi
 }
