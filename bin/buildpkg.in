@@ -115,7 +115,7 @@ usage() {
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_pkg}]"
     echo '    -c                 Recreate chroot'
-    echo '    -w                 Clean up logs,cache,sources'
+    echo '    -w                 Clean up cache and sources'
     echo '    -n                 Install and run namcap check'
     echo '    -s                 Sign packages'
     echo '    -q                 Query settings and pretend build'
@@ -157,10 +157,6 @@ else
     cache_dir_pkg=${cache_dir}/${branch}/${arch}
     is_multilib=false
 fi
-
-# work_dir=${chroots_pkg}/${branch}/${arch}
-
-# cache_dir_pkg="${cache_dir}/${branch}/${arch}"
 
 pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
