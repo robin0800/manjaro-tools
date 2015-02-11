@@ -46,9 +46,9 @@ chroot_update(){
 
 clean_up(){
     msg "Cleaning up ..."
-    find ${cache_dir_pkg} -maxdepth 1 -name "*.*" -delete &> /dev/null
-    [[ -z $LOGDEST ]] && find $PWD -maxdepth 1 -name '*.log' -delete &> /dev/null
-    [[ -z $SRCDEST ]] && find $PWD -maxdepth 1 -name '*.?z?' -delete &> /dev/null
+    find ${cache_dir_pkg} -type f -maxdepth 1 -name "*.*" -delete &> /dev/null
+    [[ -z $LOGDEST ]] && find $PWD -type f -maxdepth 1 -name '*.log' -delete &> /dev/null
+    [[ -z $SRCDEST ]] && find $PWD -type f -maxdepth 1 -name '*.?z?' -delete &> /dev/null
 }
 
 blacklist_pkg(){
@@ -84,6 +84,21 @@ move_pkg(){
     chown -R "${OWNER}:users" "${cache_dir_pkg}"
 }
 
+archive_logs(){
+    local ext='log.tar.xz'
+    if [[ -z $LOGDEST ]];then
+        source PKGBUILD
+        if [[ -n $pkgbase ]];then
+            for p in ${pkgname[@]};do
+                mv $PKGDEST/$p*.${ext} ${cache_dir_pkg}/
+                tar -cxf $p-$pkgver-$pkgrel*.${ext} *.log
+            done
+        else
+            tar -cxf $pkgname-$pkgver-$pkgrel*.${ext} *.log
+        fi
+    fi
+}
+
 chroot_build(){
     if ${is_buildset};then
 	msg3 "Start building [${buildset_pkg}]"
@@ -97,6 +112,7 @@ chroot_build(){
 	    setarch "${arch}" \
 		mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || break
 	    move_pkg
+	    archive_logs
 	    cd ..
 	done
 	msg3 "Finished building [${buildset_pkg}]"
@@ -110,6 +126,7 @@ chroot_build(){
 	setarch "${arch}" \
 	    mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
 	move_pkg
+	archive_logs
 	cd ..
     fi
 }
