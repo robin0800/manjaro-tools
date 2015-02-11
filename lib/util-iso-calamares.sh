@@ -29,19 +29,25 @@ write_calamares_finished_conf(){
 write_calamares_services_conf(){
     local conf="$1/etc/calamares/modules/services.conf"
 
-    # TODO: use service array from manjaro-tools.conf for systemd?
-    echo 'services:' > "$conf"
-    echo '' >> "$conf"
-    echo ' - name: "NetworkManager"' >> "$conf"
-    echo 'mandatory: false' >> "$conf"
-    echo '' >> "$conf"
-    echo ' - name: "org.cups.cupsd"' >> "$conf"
-    echo 'mandatory: false' >> "$conf"
-    echo '' >> "$conf"
-    echo 'targets:' >> "$conf"
-    echo '' >> "$conf"
+    if [[ ${initsys} == 'openrc' ]];then
+        echo 'services:' > "$conf"
+        for s in ${start_openrc[@]};do
+            echo '' >> "$conf"
+            echo ' - name: '"$s" >> "$conf"
+            echo 'mandatory: false' >> "$conf"
+        done
     echo ' - name: "graphical"' >> "$conf"
     echo 'mandatory: false' >> "$conf"
+    else
+        echo 'services:' > "$conf"
+        for s in ${start_systemd[@]};do
+            echo '' >> "$conf"
+            echo ' - name: '"$s" >> "$conf"
+            echo 'mandatory: false' >> "$conf"
+        done
+        echo ' - name: "graphical"' >> "$conf"
+        echo 'mandatory: true' >> "$conf"
+    fi
 }
 
 write_calamares_dm_conf(){
@@ -98,8 +104,9 @@ configure_calamares(){
         if [[ ${initsys} == 'openrc' ]];then
             write_calamares_machineid_conf $1
             write_calamares_services_conf $1
-            write_calamares_finished_conf $1
         fi
+
+        write_calamares_services_conf $1
 
 	mkdir -p $1/home/${username}/Desktop
 	cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
