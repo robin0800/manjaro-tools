@@ -326,9 +326,9 @@ configure_displaymanager_live(){
 	fi
 	local greeters=$(ls /etc/lightdm/*greeter.conf)
 	for g in ${greeters[@]};do
-            case $g in
+            case ${g##*/} in
                 'lxqt-lightdm-greeter.conf')
-                    sed -i -e "s/^.*greeter-session=.*/greeter-session=${g%.conf}/" /etc/lightdm/lightdm.conf
+                    sed -i -e "s/^.*greeter-session=.*/greeter-session=lxqt-lightdm-greeter/" /etc/lightdm/lightdm.conf
                 ;;
                 *) break ;;
             esac
