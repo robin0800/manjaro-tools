@@ -70,7 +70,7 @@ prepare_cachedir(){
 move_pkg(){
     local ext='pkg.tar.xz'
     if [[ -n $PKGDEST ]];then
-        source PKGBUILD
+#         source PKGBUILD
         if [[ -n $pkgbase ]];then
             for p in ${pkgname[@]};do
                 mv $PKGDEST/$p*.${ext} ${cache_dir_pkg}/
@@ -87,10 +87,9 @@ move_pkg(){
 archive_logs(){
     local ext='log.tar.xz'
     if [[ -z $LOGDEST ]];then
-        source PKGBUILD
+#         source PKGBUILD
         if [[ -n $pkgbase ]];then
             for p in ${pkgname[@]};do
-                mv $PKGDEST/$p*.${ext} ${cache_dir_pkg}/
                 tar -cxf $p-$pkgver-$pkgrel*.${ext} *.log
             done
         else
@@ -111,6 +110,7 @@ chroot_build(){
 	    ${is_multilib} && set_mhwd_multilib
 	    setarch "${arch}" \
 		mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || break
+            source PKGBUILD
 	    move_pkg
 	    archive_logs
 	    cd ..
@@ -125,6 +125,7 @@ chroot_build(){
 	${is_multilib} && set_mhwd_multilib
 	setarch "${arch}" \
 	    mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
+	source PKGBUILD
 	move_pkg
 	archive_logs
 	cd ..
