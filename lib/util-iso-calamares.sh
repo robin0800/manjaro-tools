@@ -17,6 +17,33 @@ write_calamares_machineid_conf(){
     echo "symlink: false" >> $conf
 }
 
+write_calamares_finished_conf(){
+    local conf="$1/etc/calamares/modules/finished.conf"
+
+    echo '---' > "$conf"
+    echo 'restartNowEnabled: true' >> "$conf"
+    echo 'restartNowChecked: false' >> "$conf"
+    echo 'restartNowCommand: "shutdown -r now"' >> "$conf"
+}
+
+write_calamares_services_conf(){
+    local conf="$1/etc/calamares/modules/services.conf"
+
+    # TODO: use service array from manjaro-tools.conf for systemd?
+    echo 'services:' > "$conf"
+    echo '' >> "$conf"
+    echo ' - name: "NetworkManager"' >> "$conf"
+    echo 'mandatory: false' >> "$conf"
+    echo '' >> "$conf"
+    echo ' - name: "org.cups.cupsd"' >> "$conf"
+    echo 'mandatory: false' >> "$conf"
+    echo '' >> "$conf"
+    echo 'targets:' >> "$conf"
+    echo '' >> "$conf"
+    echo ' - name: "graphical"' >> "$conf"
+    echo 'mandatory: false' >> "$conf"
+}
+
 write_calamares_dm_conf(){
     # write the conf to livecd-image/etc/calamares ?
     local conf="$1/etc/calamares/modules/displaymanager.conf"
@@ -67,7 +94,12 @@ configure_calamares(){
 
 	write_calamares_dm_conf $1
 	write_calamares_initcpio_conf $1
-        [[ ${initsys} == 'openrc' ]] && write_calamares_machineid_conf $1
+
+        if [[ ${initsys} == 'openrc' ]];then
+            write_calamares_machineid_conf $1
+            write_calamares_services_conf $1
+            write_calamares_finished_conf $1
+        fi
 
 	mkdir -p $1/home/${username}/Desktop
 	cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
