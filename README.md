@@ -5,7 +5,7 @@ Manjaro-tools-0.9.6
 
 User manual
 
-###1. manjaro.tools.conf
+###1. manjaro-tools.conf
 
 manjaro-tools.conf is the central configuration file for manjaro-tools.
 By default, the config is installed in
@@ -30,7 +30,7 @@ these values take precedence over the userconfig.
 Best practise is to leave systemwide file untouched.
 By default it is commented and shows just initialization values done in code.
 
-Tools configuration is done in manjaro-tools.conf or by args.  
+Tools configuration is done in manjaro-tools.conf or by args.
 Specifying args will override manjaro-tools.conf settings.
 
 ~~~
@@ -139,11 +139,11 @@ Specifying args will override manjaro-tools.conf settings.
 
 # unset defaults to given values
 # names must match systemd service names
-# start_systemd=('cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+# start_systemd=('bluetooth' 'cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep' 'NetworkManager' 'ModemManager')
 
 # unset defaults to given values,
 # names must match openrc service names
-# start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
+# start_openrc=('bluetooth' 'cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid' 'NetworkManager')
 
 ################# livecd #################
 
@@ -165,12 +165,12 @@ Specifying args will override manjaro-tools.conf settings.
 # unset defaults to given values
 # names must match systemd service names
 # services in start_systemd array don't need to be listed here
-# start_systemd_live=('bluetooth' 'NetworkManager' 'ModemManager')
+# start_systemd_live=()
 
 # unset defaults to given values,
 # names must match openrc service names
 # services in start_openrc array don't need to be listed here
-# start_openrc_live=('bluetooth'  'networkmanager')
+# start_openrc_live=()
 ~~~
 
 ####Config files in iso profiles
@@ -219,10 +219,10 @@ If you need a custom livecd-overlay, create overlay-livecd folder in  profile, a
 
 ###2. buildpkg
 
-buildpkg is the chroot build script oi manjaro-tools.  
-It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.  
+buildpkg is the chroot build script oi manjaro-tools.
+It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
 
-- manjaro-tools.conf supports the makepkg.conf variables  
+- manjaro-tools.conf supports the makepkg.conf variables
 
 ####Arguments
 
@@ -320,7 +320,7 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 
 ######* -i
 Build images only will stop after all packages have been installed. No iso sqfs compression will be executed
-* -s
+######* -s
 Use this to sqfs compress the chroots if you previously used -i.
 ######* -x
 By default, xorg package cache is cleaned on every build. Disabling the xorg cache cleaning will result in no dowload again for xorg drivers and the cache is used.
