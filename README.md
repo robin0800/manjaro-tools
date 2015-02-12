@@ -165,12 +165,12 @@ Specifying args will override manjaro-tools.conf settings.
 # unset defaults to given values
 # names must match systemd service names
 # services in start_systemd array don't need to be listed here
-# start_systemd_live=()
+# start_systemd_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
 
 # unset defaults to given values,
 # names must match openrc service names
 # services in start_openrc array don't need to be listed here
-# start_openrc_live=()
+# start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
 ~~~
 
 ####Config files in iso profiles
