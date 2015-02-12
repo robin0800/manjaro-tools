@@ -319,7 +319,7 @@ configure_alsa_live(){
 configure_displaymanager_live(){
     if [[ -f /usr/bin/lightdm ]];then
 	gpasswd -a ${username} autologin &> /dev/null
-	sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
+# 	sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
 	sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
     elif [[ -f /usr/bin/kdm ]];then
 	sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" /usr/share/config/kdm/kdmrc
