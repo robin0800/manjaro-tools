@@ -28,25 +28,27 @@ write_calamares_finished_conf(){
 
 write_calamares_services_conf(){
     local conf="$1/etc/calamares/modules/services.conf"
-
+    echo '---' >  "$conf"
     if [[ ${initsys} == 'openrc' ]];then
-        echo 'services:' > "$conf"
+        echo 'services:' >> "$conf"
         for s in ${start_openrc[@]};do
-            echo '' >> "$conf"
-            echo ' - name: '"$s" >> "$conf"
-            echo 'mandatory: false' >> "$conf"
+            echo '   - name: '"$s" >> "$conf"
+            echo '   mandatory: false' >> "$conf"
         done
-    echo ' - name: "graphical"' >> "$conf"
-    echo 'mandatory: false' >> "$conf"
+    echo '' >> "$conf"
+    echo 'targets:' >> "$conf"
+    echo '    - name: "graphical"' >> "$conf"
+    echo '    mandatory: false' >> "$conf"
     else
         echo 'services:' > "$conf"
         for s in ${start_systemd[@]};do
-            echo '' >> "$conf"
-            echo ' - name: '"$s" >> "$conf"
-            echo 'mandatory: false' >> "$conf"
+            echo '    - name: '"$s" >> "$conf"
+            echo '    mandatory: false' >> "$conf"
         done
-        echo ' - name: "graphical"' >> "$conf"
-        echo 'mandatory: true' >> "$conf"
+        echo '' >> "$conf"
+        echo 'targets:' >> "$conf"
+        echo '    - name: "graphical"' >> "$conf"
+        echo '    mandatory: true' >> "$conf"
     fi
 }
 
@@ -64,39 +66,44 @@ write_calamares_dm_conf(){
 }
 
 write_calamares_initcpio_conf(){
-    local conf="$1/usr/share/calamares/modules/initcpio.conf"
-    if [ ! -e $conf ] ; then
-        echo "---" > "$conf"
-        echo "kernel: ${manjaro_kernel}" >> "$conf"
-    else
-        sed -e "s|_kernel_|$manjaro_kernel|g" -i "$conf"
-    fi
+#     local conf="$1/usr/share/calamares/modules/initcpio.conf"
+    local conf="$1/etc/calamares/modules/initcpio.conf"
+#     if [ ! -e $conf ] ; then
+    echo "---" > "$conf"
+    echo "kernel: ${manjaro_kernel}" >> "$conf"
+#     else
+#         sed -e "s|_kernel_|$manjaro_kernel|g" -i "$conf"
+#     fi
 
 }
 
-configure_installer () {
-    sed -i "s|_root-image_|/bootmnt/${install_dir}/${arch}/root-image.sqfs|g" $1
-    sed -i "s|_desktop-image_|/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs|g" $1
-    echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment
-}
+# configure_installer () {
+#     sed -i "s|_root-image_|/bootmnt/${install_dir}/${arch}/root-image.sqfs|g" $1
+#     sed -i "s|_desktop-image_|/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs|g" $1
+#     echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment
+# }
 
 configure_calamares(){
     if [[ -f $1/usr/bin/calamares ]];then
 	msg2 "Configuring Calamares ..."
+
 	mkdir -p $1/etc/calamares/modules
-	local conf="$1/usr/share/calamares/modules/unpackfs.conf"
-	if [ ! -e $conf ] ; then
-	    echo "---" > "$conf"
-	    echo "unpack:" >> "$conf"
-	    echo "    -   source: \"/bootmnt/${install_dir}/${arch}/root-image.sqfs\"" >> "$conf"
-	    echo "        sourcefs: \"squashfs\"" >> "$conf"
-	    echo "        destination: \"\"" >> "$conf"
-	    echo "    -   source: \"/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs\"" >> "$conf"
-	    echo "        sourcefs: \"squashfs\"" >> "$conf"
-	    echo "        destination: \"\"" >> "$conf"
-        else
-            configure_installer "$conf"
-	fi
+
+#         local conf="$1/usr/share/calamares/modules/unpackfs.conf"
+        local conf="$1/etc/calamares/modules/unpackfs.conf"
+        
+# 	if [ ! -e $conf ] ; then
+        echo "---" > "$conf"
+        echo "unpack:" >> "$conf"
+        echo "    -   source: \"/bootmnt/${install_dir}/${arch}/root-image.sqfs\"" >> "$conf"
+        echo "        sourcefs: \"squashfs\"" >> "$conf"
+        echo "        destination: \"\"" >> "$conf"
+        echo "    -   source: \"/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs\"" >> "$conf"
+        echo "        sourcefs: \"squashfs\"" >> "$conf"
+        echo "        destination: \"\"" >> "$conf"
+#         else
+#             configure_installer "$conf"
+# 	fi
 
 	write_calamares_dm_conf $1
 	write_calamares_initcpio_conf $1
@@ -109,8 +116,11 @@ configure_calamares(){
         write_calamares_services_conf $1
 
 	mkdir -p $1/home/${username}/Desktop
+
 	cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
 	chmod a+x $1/home/${username}/Desktop/calamares.desktop
+
+	echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
     fi
 }
 
@@ -123,6 +133,7 @@ configure_thus(){
 	sed -i "s|_kernel_|$manjaro_kernel|g" $conf
 	configure_installer "$conf"
 	mkdir -p $1/home/${username}/Desktop
+
 	cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
 	chmod a+x $1/home/${username}/Desktop/thus.desktop
     fi
