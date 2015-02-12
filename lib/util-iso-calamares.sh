@@ -120,7 +120,11 @@ configure_thus(){
 	local rel=$(cat $1/etc/lsb-release | grep DISTRIB_RELEASE | cut -d= -f2)
 	sed -i "s|_version_|$rel|g" $conf
 	sed -i "s|_kernel_|$manjaro_kernel|g" $conf
-	configure_installer "$conf"
+	
+	sed -i "s|_root-image_|/bootmnt/${install_dir}/${arch}/root-image.sqfs|g" $conf
+	sed -i "s|_desktop-image_|/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs|g" $conf
+	echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
+
 	mkdir -p $1/home/${username}/Desktop
 
 	cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
