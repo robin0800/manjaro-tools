@@ -84,9 +84,7 @@ move_pkg(){
 archive_logs(){
     local ext='log.tar.xz'
     if [[ -n $pkgbase ]];then
-        for p in ${pkgname[@]};do
-            tar -cJf $PWD/$p-$pkgver-$pkgrel-${CARCH}.${ext} *.log
-        done
+        tar -cJf $PWD/$pkgbase-$pkgver-$pkgrel-${CARCH}.${ext} *.log
     else
         tar -cJf $PWD/$pkgname-$pkgver-$pkgrel-${CARCH}.${ext} *.log
     fi
