@@ -85,30 +85,31 @@ configure_services(){
 # $2: user
 configure_accountsservice(){
     msg2 "Configuring AcooutsService ..."
-    if [ -d "$1/var/lib/AccountsService/users" ] ; then
-	echo "[User]" > $1/var/lib/AccountsService/users/$2
+    local path=$1/var/lib/AccountsService/users
+    if [ -d "${path}" ] ; then
+	echo "[User]" > ${path}/$2
 	if [ -e "$1/usr/bin/openbox-session" ] ; then
-	    echo "XSession=openbox" >> $1/var/lib/AccountsService/users/$2
+	    echo "XSession=openbox" >> ${path}/$2
 	fi
 	if [ -e "$1/usr/bin/startxfce4" ] ; then
-	    echo "XSession=xfce" >> $1/var/lib/AccountsService/users/$2
+	    echo "XSession=xfce" >> ${path}/$2
 	fi
 	if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-	    echo "XSession=cinnamon" >> $1/var/lib/AccountsService/users/$2
+	    echo "XSession=cinnamon" >> ${path}/$2
 	fi
 	if [ -e "$1/usr/bin/mate-session" ] ; then
-	    echo "XSession=mate" >> $1/var/lib/AccountsService/users/$2
+	    echo "XSession=mate" >> ${path}/$2
 	fi
 	if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-	    echo "XSession=enlightenment" >> $1/var/lib/AccountsService/users/$2
+	    echo "XSession=enlightenment" >> ${path}/$2
 	fi
 	if [ -e "$1/usr/bin/startlxde" ] ; then
-	    echo "XSession=LXDE" >> $1/var/lib/AccountsService/users/$2
+	    echo "XSession=LXDE" >> ${path}/$2
 	fi
 	if [ -e "$1/usr/bin/lxqt-session" ] ; then
-	    echo "XSession=LXQt" >> $1/var/lib/AccountsService/users/$2
+	    echo "XSession=LXQt" >> ${path}/$2
 	fi
-	echo "Icon=/var/lib/AccountsService/icons/$2.png" >> $1/var/lib/AccountsService/users/$2
+	echo "Icon=/var/lib/AccountsService/icons/$2.png" >> ${path}/$2
     fi
 }
 
@@ -125,113 +126,129 @@ configure_displaymanager(){
     case ${displaymanager} in
 	'lightdm')
 	    chroot $1 groupadd -r autologin
+	    local conf=$1/etc/lightdm/lightdm.conf
 	    if [ -e "$1/usr/bin/openbox-session" ] ; then
-		  sed -i -e 's/^.*user-session=.*/user-session=openbox/' $1/etc/lightdm/lightdm.conf
+		  sed -i -e 's/^.*user-session=.*/user-session=openbox/' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/startxfce4" ] ; then
-	      sed -i -e 's/^.*user-session=.*/user-session=xfce/' $1/etc/lightdm/lightdm.conf
+	      sed -i -e 's/^.*user-session=.*/user-session=xfce/' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-		  sed -i -e 's/^.*user-session=.*/user-session=cinnamon/' $1/etc/lightdm/lightdm.conf
+		  sed -i -e 's/^.*user-session=.*/user-session=cinnamon/' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/mate-session" ] ; then
-		  sed -i -e 's/^.*user-session=.*/user-session=mate/' $1/etc/lightdm/lightdm.conf
+		  sed -i -e 's/^.*user-session=.*/user-session=mate/' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-		  sed -i -e 's/^.*user-session=.*/user-session=enlightenment/' $1/etc/lightdm/lightdm.conf
+		  sed -i -e 's/^.*user-session=.*/user-session=enlightenment/' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/startlxde" ] ; then
-		  sed -i -e 's/^.*user-session=.*/user-session=LXDE/' $1/etc/lightdm/lightdm.conf
+		  sed -i -e 's/^.*user-session=.*/user-session=LXDE/' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/lxqt-session" ] ; then
-		  sed -i -e 's/^.*user-session=.*/user-session=lxqt/' $1/etc/lightdm/lightdm.conf
+		  sed -i -e 's/^.*user-session=.*/user-session=lxqt/' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/pekwm" ] ; then
-		  sed -i -e 's/^.*user-session=.*/user-session=pekwm/' $1/etc/lightdm/lightdm.conf
+		  sed -i -e 's/^.*user-session=.*/user-session=pekwm/' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/i3" ] ; then
-		  sed -i -e 's/^.*user-session=.*/user-session=i3/' $1/etc/lightdm/lightdm.conf
+		  sed -i -e 's/^.*user-session=.*/user-session=i3/' ${conf}
 	    fi
+	    if [[ ${initsys} == 'openrc' ]];then
+                sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' ${conf}
+            fi
+            local greeters=$(ls $1/etc/lightdm/*greeter.conf)
+            for g in ${greeters[@]};do
+                case ${g##*/} in
+                    'lxqt-lightdm-greeter.conf')
+                        sed -i -e "s/^.*greeter-session=.*/greeter-session=lxqt-lightdm-greeter/" ${conf}
+                    ;;
+                    *) break ;;
+                esac
+            done
 	;;
 	'gdm')
 	    configure_accountsservice $1 "gdm"
 	;;
 	'mdm')
+            local conf=$1/etc/mdm/custom.conf
 	    if [ -e "$1/usr/bin/startxfce4" ] ; then
-		sed -i 's|default.desktop|xfce.desktop|g' $1/etc/mdm/custom.conf
+		sed -i 's|default.desktop|xfce.desktop|g' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-		sed -i 's|default.desktop|cinnamon.desktop|g' $1/etc/mdm/custom.conf
+		sed -i 's|default.desktop|cinnamon.desktop|g' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/openbox-session" ] ; then
-		sed -i 's|default.desktop|openbox.desktop|g' $1/etc/mdm/custom.conf
+		sed -i 's|default.desktop|openbox.desktop|g' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/mate-session" ] ; then
-		sed -i 's|default.desktop|mate.desktop|g' $1/etc/mdm/custom.conf
+		sed -i 's|default.desktop|mate.desktop|g' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/startlxde" ] ; then
-		sed -i 's|default.desktop|LXDE.desktop|g' $1/etc/mdm/custom.conf
+		sed -i 's|default.desktop|LXDE.desktop|g' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/lxqt-session" ] ; then
-		sed -i 's|default.desktop|lxqt.desktop|g' $1/etc/mdm/custom.conf
+		sed -i 's|default.desktop|lxqt.desktop|g' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-		sed -i 's|default.desktop|enlightenment.desktop|g' $1/etc/mdm/custom.conf
+		sed -i 's|default.desktop|enlightenment.desktop|g' ${conf}
 	    fi
 	;;
 	'sddm')
+            local conf=$1/etc/sddm.conf
 	    if [ -e "$1/usr/bin/startxfce4" ] ; then
-		sed -i -e 's|^Session=.*|Session=xfce.desktop|' $1/etc/sddm.conf
+		sed -i -e 's|^Session=.*|Session=xfce.desktop|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-		sed -i -e 's|^Session=.*|Session=cinnamon.desktop|' $1/etc/sddm.conf
+		sed -i -e 's|^Session=.*|Session=cinnamon.desktop|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/openbox-session" ] ; then
-		sed -i -e 's|^Session=.*|Session=openbox.desktop|' $1/etc/sddm.conf
+		sed -i -e 's|^Session=.*|Session=openbox.desktop|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/mate-session" ] ; then
-		sed -i -e 's|^Session=.*|Session=mate.desktop|' $1/etc/sddm.conf
+		sed -i -e 's|^Session=.*|Session=mate.desktop|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/lxsession" ] ; then
-		sed -i -e 's|^Session=.*|Session=LXDE.desktop|' $1/etc/sddm.conf
+		sed -i -e 's|^Session=.*|Session=LXDE.desktop|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/lxqt-session" ] ; then
-		sed -i -e 's|^Session=.*|Session=lxqt.desktop|' $1/etc/sddm.conf
+		sed -i -e 's|^Session=.*|Session=lxqt.desktop|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-		sed -i -e 's|^Session=.*|Session=enlightenment.desktop|' $1/etc/sddm.conf
+		sed -i -e 's|^Session=.*|Session=enlightenment.desktop|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/startkde" ] ; then
-		sed -i -e 's|^Session=.*|Session=plasma.desktop|' $1/etc/sddm.conf
+		sed -i -e 's|^Session=.*|Session=plasma.desktop|' ${conf}
 	    fi
 	;;
 	'lxdm')
+            local conf=$1/etc/lxdm/lxdm.conf
 	    if [ -e "$1/usr/bin/openbox-session" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/openbox-session|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/openbox-session|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/startxfce4" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/startxfce4|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/startxfce4|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/cinnamon-session|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/cinnamon-session|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/mate-session" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/mate-session|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/mate-session|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/enlightenment_start|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/enlightenment_start|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/startlxde" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/lxsession|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/lxsession|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/lxqt-session" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/lxqt-session|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/lxqt-session|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/pekwm" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/pekwm|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/pekwm|' ${conf}
 	    fi
 	    if [ -e "$1/usr/bin/i3" ] ; then
-		sed -i -e 's|^.*session=.*|session=/usr/bin/i3|' $1/etc/lxdm/lxdm.conf
+		sed -i -e 's|^.*session=.*|session=/usr/bin/i3|' ${conf}
 	    fi
 	;;
 	*)
