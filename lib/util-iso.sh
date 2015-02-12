@@ -134,7 +134,7 @@ clean_up(){
 }
 
 configure_custom_image(){
-    msg3 "Configuring [${custom}-image]"
+    msg "Configuring [${custom}-image]"
 
     configure_plymouth "$1"
 
@@ -142,11 +142,11 @@ configure_custom_image(){
 
     configure_services "$1"
 
-    msg3 "Done configuring [${custom}-image]"
+    msg "Done configuring [${custom}-image]"
 }
 
 configure_livecd_image(){
-    msg3 "Configuring [livecd-image]"
+    msg "Configuring [livecd-image]"
 
     configure_hostname "$1"
 
@@ -162,7 +162,7 @@ configure_livecd_image(){
 
     configure_thus "$1"
 
-    msg3 "Done configuring [livecd-image]"
+    msg "Done configuring [livecd-image]"
 }
 
 # $1: work_dir

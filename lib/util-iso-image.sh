@@ -23,7 +23,6 @@ configure_user(){
 # $1: chroot
 configure_hostname(){
     msg2 "Setting hostname: ${hostname} ..."
-#     if [[ -f $1/usr/bin/openrc ]];then
     if [[ ${initsys} == 'openrc' ]];then
 	local _hostname='hostname="'${hostname}'"'
 	sed -i -e "s|^.*hostname=.*|${_hostname}|" $1/etc/conf.d/hostname
@@ -34,7 +33,6 @@ configure_hostname(){
 
 # $1: chroot
 configure_plymouth(){
-#     if [ -e $1/etc/plymouth/plymouthd.conf ] ; then
     if ${is_plymouth};then
 	msg2 "Setting plymouth $plymouth_theme ...."
 	sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" $1/etc/plymouth/plymouthd.conf
@@ -42,43 +40,49 @@ configure_plymouth(){
 }
 
 configure_services_live(){
-#    if [[ -f ${work_dir}/root-image/usr/bin/openrc ]];then
     if [[ ${initsys} == 'openrc' ]];then
-      msg2 "Congiguring OpenRC ...."
-      for svc in ${start_openrc_live[@]}; do
-	  if [[ -f $1/etc/init.d/$svc ]]; then
-	      msg2 "Setting $svc ..."
-	      [[ ! -d  $1/etc/runlevels/{boot,default} ]] && mkdir -p $1/etc/runlevels/{boot,default}
-	      chroot $1 rc-update add $svc default &> /dev/null
-	  fi
-      done
-   else
-      msg2 "Congiguring SystemD ...."
-      for svc in ${start_systemd_live[@]}; do
-	  msg2 "Setting $svc ..."
-	  chroot $1 systemctl enable $svc &> /dev/null
-      done
-   fi
+        if [[ -n ${start_openrc_live[@]} ]];then
+            msg2 "Configuring OpenRC ...."
+#             [[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
+            for svc in ${start_openrc_live[@]}; do
+#                 if [[ -f $1/etc/init.d/$svc ]]; then
+                msg2 "Setting $svc ..."
+                chroot $1 rc-update add $svc default &> /dev/null
+#                 fi
+            done
+            msg3 "Done configuring OpenRC"
+        fi
+    else
+        if [[ -n ${start_systemd_live[@]} ]];then
+            msg2 "Configuring SystemD ...."
+            for svc in ${start_systemd_live[@]}; do
+                msg2 "Setting $svc ..."
+                chroot $1 systemctl enable $svc &> /dev/null
+            done
+            msg3 "Done configuring SystemD"
+        fi
+    fi
 }
 
 configure_services(){
-#    if [[ -f ${work_dir}/root-image/usr/bin/openrc ]];then
     if [[ ${initsys} == 'openrc' ]];then
-      msg2 "Congiguring OpenRC ...."
-      for svc in ${start_openrc[@]}; do
-	  if [[ -f $1/etc/init.d/$svc ]]; then
-	      msg2 "Setting $svc ..."
-	      [[ ! -d  $1/etc/runlevels/{boot,default} ]] && mkdir -p $1/etc/runlevels/{boot,default}
-	      chroot $1 rc-update add $svc default &> /dev/null
-	  fi
-      done
-   else
-      msg2 "Congiguring SystemD ...."
-      for svc in ${start_systemd[@]}; do
-	  msg2 "Setting $svc ..."
-	  chroot $1 systemctl enable $svc &> /dev/null
-      done
-   fi
+        msg3 "Congiguring OpenRC ...."
+#         [[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
+        for svc in ${start_openrc[@]}; do
+#         if [[ -f $1/etc/init.d/$svc ]]; then
+            msg2 "Setting $svc ..."
+            chroot $1 rc-update add $svc default &> /dev/null
+#         fi
+        done
+        msg3 "Done configuring OpenRC"
+    else
+        msg3 "Configuring SystemD ...."
+        for svc in ${start_systemd[@]}; do
+            msg2 "Setting $svc ..."
+            chroot $1 systemctl enable $svc &> /dev/null
+        done
+        msg3 "Done configuring SystemD"
+    fi
 }
 
 # $1: chroot
@@ -162,6 +166,9 @@ configure_displaymanager(){
                 case ${g##*/} in
                     'lxqt-lightdm-greeter.conf')
                         sed -i -e "s/^.*greeter-session=.*/greeter-session=lxqt-lightdm-greeter/" ${conf}
+                    ;;
+                    'lightdm-kde-greeter.conf')
+                        sed -i -e "s/^.*greeter-session=.*/greeter-session=lightdm-kde-greeter/" ${conf}
                     ;;
                     *) break ;;
                 esac
@@ -259,7 +266,7 @@ configure_displaymanager(){
     if [[ ${initsys} == 'openrc' ]];then
 	local conf='DISPLAYMANAGER="'${displaymanager}'"'
 	sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
-	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
+# 	[[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
 	chroot $1 rc-update add xdm default &> /dev/null
     else
 	if [[ -f $1/etc/plymouth/plymouthd.conf ]] ; then
