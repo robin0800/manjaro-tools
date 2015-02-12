@@ -323,19 +323,19 @@ load_config(){
     fi
 
     if [[ -z ${start_systemd} ]];then
-	start_systemd=('cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+	start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
     fi
 
     if [[ -z ${start_openrc} ]];then
-	start_openrc=('cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid')
+	start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'metalog' 'NetworkManager')
     fi
 
     if [[ -z ${start_systemd_live} ]];then
-	start_systemd_live=('bluez' 'NetworkManager' 'ModemManager')
+	start_systemd_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
     fi
 
     if [[ -z ${start_openrc_live} ]];then
-	start_openrc_live=('bluetooth' 'NetworkManager')
+	start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
     fi
 
     if [[ -z ${checksum_mode} ]];then
