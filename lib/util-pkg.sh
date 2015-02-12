@@ -37,17 +37,16 @@ chroot_clean(){
 
 chroot_update(){
     msg "Updating chroot for [${branch}] (${arch})..."
-    lock 9 "${work_dir}/root.lock" "Locking clean chroot"
     chroot-run ${mkchroot_args[*]} \
-	      "${work_dir}/root" \
+	      "${work_dir}/${OWNER}" \
 	      pacman -Syu --noconfirm || abort
 
 }
 
 clean_up(){
     msg "Cleaning up ..."
-    find ${cache_dir_pkg} -type f -maxdepth 1 -name "*.*" -delete &> /dev/null
-    [[ -z $SRCDEST ]] && find $PWD -type f -maxdepth 1 -name '*.?z?' -delete &> /dev/null
+    find ${cache_dir_pkg} -maxdepth 1 -name "*.*" -delete #&> /dev/null
+    [[ -z $SRCDEST ]] && find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
 }
 
 blacklist_pkg(){
@@ -58,7 +57,7 @@ blacklist_pkg(){
 }
 
 set_mhwd_multilib(){
-    chroot-run $1/${OWNER} mhwd-gpu --setgl mesa
+    chroot-run $1/root mhwd-gpu --setgl mesa
 }
 
 prepare_cachedir(){
@@ -69,7 +68,6 @@ prepare_cachedir(){
 move_pkg(){
     local ext='pkg.tar.xz'
     if [[ -n $PKGDEST ]];then
-#         source PKGBUILD
         if [[ -n $pkgbase ]];then
             for p in ${pkgname[@]};do
                 mv $PKGDEST/$p*.${ext} ${cache_dir_pkg}/
@@ -85,14 +83,12 @@ move_pkg(){
 
 archive_logs(){
     local ext='log.tar.xz'
-    if [[ -z $LOGDEST ]];then
-        if [[ -n $pkgbase ]];then
-            for p in ${pkgname[@]};do
-                tar -cJf $PWD/$p-$pkgver-$pkgrel-${CARCH}.${ext} *.log
-            done
-        else
-            tar -cJf $PWD/$pkgname-$pkgver-$pkgrel-${CARCH}.${ext} *.log
-        fi
+    if [[ -n $pkgbase ]];then
+        for p in ${pkgname[@]};do
+            tar -cJf $PWD/$p-$pkgver-$pkgrel-${CARCH}.${ext} *.log
+        done
+    else
+        tar -cJf $PWD/$pkgname-$pkgver-$pkgrel-${CARCH}.${ext} *.log
     fi
     find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
 }
