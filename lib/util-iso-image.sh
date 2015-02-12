@@ -42,7 +42,7 @@ configure_plymouth(){
 configure_services_live(){
     if [[ ${initsys} == 'openrc' ]];then
         if [[ -n ${start_openrc_live[@]} ]];then
-            msg2 "Configuring OpenRC ...."
+            msg3 "Configuring OpenRC ...."
 #             [[ ! -d  $1/etc/runlevels/default ]] && mkdir -p $1/etc/runlevels/default
             for svc in ${start_openrc_live[@]}; do
 #                 if [[ -f $1/etc/init.d/$svc ]]; then
@@ -54,7 +54,7 @@ configure_services_live(){
         fi
     else
         if [[ -n ${start_systemd_live[@]} ]];then
-            msg2 "Configuring SystemD ...."
+            msg3 "Configuring SystemD ...."
             for svc in ${start_systemd_live[@]}; do
                 msg2 "Setting $svc ..."
                 chroot $1 systemctl enable $svc &> /dev/null
