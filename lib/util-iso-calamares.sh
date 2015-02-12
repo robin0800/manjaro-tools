@@ -28,24 +28,26 @@ write_calamares_finished_conf(){
 
 write_calamares_services_conf(){
     local conf="$1/etc/calamares/modules/services.conf"
+
     echo '---' >  "$conf"
+    echo '' >> "$conf"
     if [[ ${initsys} == 'openrc' ]];then
         echo 'services:' >> "$conf"
         for s in ${start_openrc[@]};do
             echo '   - name: '"$s" >> "$conf"
-            echo '   mandatory: false' >> "$conf"
+            echo '     mandatory: false' >> "$conf"
+            echo '' >> "$conf"
         done
-    echo '' >> "$conf"
     echo 'targets:' >> "$conf"
     echo '    - name: "graphical"' >> "$conf"
-    echo '    mandatory: false' >> "$conf"
+    echo '      mandatory: false' >> "$conf"
     else
         echo 'services:' > "$conf"
         for s in ${start_systemd[@]};do
             echo '    - name: '"$s" >> "$conf"
-            echo '    mandatory: false' >> "$conf"
+            echo '      mandatory: false' >> "$conf"
+            echo '' >> "$conf"
         done
-        echo '' >> "$conf"
         echo 'targets:' >> "$conf"
         echo '    - name: "graphical"' >> "$conf"
         echo '    mandatory: true' >> "$conf"
@@ -53,7 +55,6 @@ write_calamares_services_conf(){
 }
 
 write_calamares_dm_conf(){
-    # write the conf to livecd-image/etc/calamares ?
     local conf="$1/etc/calamares/modules/displaymanager.conf"
 
     echo "displaymanagers:" > "$conf"
@@ -66,22 +67,24 @@ write_calamares_dm_conf(){
 }
 
 write_calamares_initcpio_conf(){
-#     local conf="$1/usr/share/calamares/modules/initcpio.conf"
     local conf="$1/etc/calamares/modules/initcpio.conf"
-#     if [ ! -e $conf ] ; then
+
     echo "---" > "$conf"
     echo "kernel: ${manjaro_kernel}" >> "$conf"
-#     else
-#         sed -e "s|_kernel_|$manjaro_kernel|g" -i "$conf"
-#     fi
-
 }
 
-# configure_installer () {
-#     sed -i "s|_root-image_|/bootmnt/${install_dir}/${arch}/root-image.sqfs|g" $1
-#     sed -i "s|_desktop-image_|/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs|g" $1
-#     echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment
-# }
+write_calamares_unpack_conf(){
+    local conf="$1/etc/calamares/modules/unpackfs.conf"
+
+    echo "---" > "$conf"
+    echo "unpack:" >> "$conf"
+    echo "    -   source: \"/bootmnt/${install_dir}/${arch}/root-image.sqfs\"" >> "$conf"
+    echo "        sourcefs: \"squashfs\"" >> "$conf"
+    echo "        destination: \"\"" >> "$conf"
+    echo "    -   source: \"/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs\"" >> "$conf"
+    echo "        sourcefs: \"squashfs\"" >> "$conf"
+    echo "        destination: \"\"" >> "$conf"
+}
 
 configure_calamares(){
     if [[ -f $1/usr/bin/calamares ]];then
@@ -89,28 +92,14 @@ configure_calamares(){
 
 	mkdir -p $1/etc/calamares/modules
 
-#         local conf="$1/usr/share/calamares/modules/unpackfs.conf"
-        local conf="$1/etc/calamares/modules/unpackfs.conf"
-        
-# 	if [ ! -e $conf ] ; then
-        echo "---" > "$conf"
-        echo "unpack:" >> "$conf"
-        echo "    -   source: \"/bootmnt/${install_dir}/${arch}/root-image.sqfs\"" >> "$conf"
-        echo "        sourcefs: \"squashfs\"" >> "$conf"
-        echo "        destination: \"\"" >> "$conf"
-        echo "    -   source: \"/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs\"" >> "$conf"
-        echo "        sourcefs: \"squashfs\"" >> "$conf"
-        echo "        destination: \"\"" >> "$conf"
-#         else
-#             configure_installer "$conf"
-# 	fi
+        write_calamares_unpack_conf $1
 
 	write_calamares_dm_conf $1
 	write_calamares_initcpio_conf $1
 
         if [[ ${initsys} == 'openrc' ]];then
             write_calamares_machineid_conf $1
-            write_calamares_services_conf $1
+            write_calamares_finished_conf $1
         fi
 
         write_calamares_services_conf $1
@@ -119,7 +108,7 @@ configure_calamares(){
 
 	cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
 	chmod a+x $1/home/${username}/Desktop/calamares.desktop
-
+#         chown ${username}:users $1/home/${username}/Desktop/calamares.desktop
 	echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
     fi
 }
@@ -136,5 +125,6 @@ configure_thus(){
 
 	cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
 	chmod a+x $1/home/${username}/Desktop/thus.desktop
+# 	chown ${username}:users $1/home/${username}/Desktop/thus.desktop
     fi
 }
