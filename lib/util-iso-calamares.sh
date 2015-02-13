@@ -85,9 +85,11 @@ write_calamares_users_conf(){
 	echo "---" > "$conf"
 	echo "userGroup:      users" >> "$conf"
 	echo "defaultGroups:" >> "$conf"
+	local IFS=','
 	for g in ${addgroups[@]};do
 		echo "    - $g" >> "$conf"
 	done
+	unset IFS
 	echo "autologinGroup: autologin" >> "$conf"
 	echo "sudoersGroup:   wheel" >> "$conf"
 }
