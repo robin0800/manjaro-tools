@@ -272,7 +272,7 @@ load_config(){
 	fi
 
 	if [[ -z ${manjaro_kernel} ]];then
-		manjaro_kernel="linux318"
+		manjaro_kernel="linux319"
 	fi
 
 	manjaro_kernel_ver=${manjaro_kernel#*linux}
