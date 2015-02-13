@@ -78,7 +78,7 @@ configure_services(){
 # $1: chroot
 # $2: user
 configure_accountsservice(){
-	msg2 "Configuring AcooutsService ..."
+	msg2 "Configuring AccountsService ..."
 	local path=$1/var/lib/AccountsService/users
 	if [ -d "${path}" ] ; then
 		echo "[User]" > ${path}/$2
