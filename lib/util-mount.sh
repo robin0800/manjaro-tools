@@ -18,10 +18,10 @@ chroot_mount() {
 }
 
 chroot_mount_conditional() {
-      local cond=$1; shift
-      if eval "$cond"; then
-	  chroot_mount "$@"
-      fi
+	local cond=$1; shift
+	if eval "$cond"; then
+		chroot_mount "$@"
+	fi
 }
 
 chroot_api_mount() {

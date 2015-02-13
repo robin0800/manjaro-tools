@@ -22,71 +22,71 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-pkg.sh ]] && source ${LIBDIR}/util-pkg.sh
 
 display_settings(){
-    msg "manjaro-tools"
-    msg2 "version: ${version}"
+	msg "manjaro-tools"
+	msg2 "version: ${version}"
 
-    if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
-	msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
-    else
-	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
-    fi
-
-    msg "PROFILE:"
-    msg2 "buildsets: $(load_sets ${sets_dir_pkg})"
-    msg2 "buildset_pkg: ${buildset_pkg}"
-    msg2 "is_buildset: ${is_buildset}"
-
-    msg "OPTIONS:"
-    msg2 "arch: ${arch}"
-    msg2 "branch: ${branch}"
-    msg2 "chroots_pkg: ${chroots_pkg}"
-
-    msg "ARGS:"
-    msg2 "clean_first: ${clean_first}"
-    msg2 "wipe_clean: ${wipe_clean}"
-    msg2 "namcap: ${namcap}"
-    msg2 "sign: ${sign}"
-    msg2 "makepkg_args: ${makepkg_args[*]}"
-
-    msg "PATHS:"
-    msg2 "work_dir: ${work_dir}"
-    msg2 "sets_dir_pkg: ${sets_dir_pkg}"
-    msg2 "cache_dir_pkg: ${cache_dir_pkg}"
-    msg2 "build_mirror: ${build_mirror}/${branch}"
-
-    msg "BLACKLIST:"
-    msg2 "blacklist_trigger: ${blacklist_trigger[*]}"
-    msg2 "blacklist: ${blacklist[*]}"
-
-    if ${clean_first};then
-	msg "PKG:"
-	msg2 "base_packages: ${base_packages[*]}"
-    fi
-
-    msg "BUILD QUEUE:"
-    if ${is_buildset};then
-	local list=$(cat ${sets_dir_pkg}/${buildset_pkg}.set)
-	for item in ${list[@]}; do
-	    msg2 "$item"
-	done
-    else
-	for arg in "${makepkg_args[@]}"; do
-	    case ${arg} in
-		--pkg) continue ;;
-		-*) continue ;;
-		*) local split_arg=${arg} ;;
-	    esac
-	done
-	if [[ -n ${split_arg} ]]; then
-	    local IFS=','
-	    for item in ${split_arg}; do
-		msg2 "$item"
-	    done
-	    unset IFS
+	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
+		msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
 	else
-	    msg2 "${buildset_pkg}"
+		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
 	fi
-    fi
+
+	msg "PROFILE:"
+	msg2 "buildsets: $(load_sets ${sets_dir_pkg})"
+	msg2 "buildset_pkg: ${buildset_pkg}"
+	msg2 "is_buildset: ${is_buildset}"
+
+	msg "OPTIONS:"
+	msg2 "arch: ${arch}"
+	msg2 "branch: ${branch}"
+	msg2 "chroots_pkg: ${chroots_pkg}"
+
+	msg "ARGS:"
+	msg2 "clean_first: ${clean_first}"
+	msg2 "wipe_clean: ${wipe_clean}"
+	msg2 "namcap: ${namcap}"
+	msg2 "sign: ${sign}"
+	msg2 "makepkg_args: ${makepkg_args[*]}"
+
+	msg "PATHS:"
+	msg2 "work_dir: ${work_dir}"
+	msg2 "sets_dir_pkg: ${sets_dir_pkg}"
+	msg2 "cache_dir_pkg: ${cache_dir_pkg}"
+	msg2 "build_mirror: ${build_mirror}/${branch}"
+
+	msg "BLACKLIST:"
+	msg2 "blacklist_trigger: ${blacklist_trigger[*]}"
+	msg2 "blacklist: ${blacklist[*]}"
+
+	if ${clean_first};then
+		msg "PKG:"
+		msg2 "base_packages: ${base_packages[*]}"
+	fi
+
+	msg "BUILD QUEUE:"
+	if ${is_buildset};then
+		local list=$(cat ${sets_dir_pkg}/${buildset_pkg}.set)
+		for item in ${list[@]}; do
+			msg2 "$item"
+		done
+	else
+		for arg in "${makepkg_args[@]}"; do
+			case ${arg} in
+				--pkg) continue ;;
+				-*) continue ;;
+				*) local split_arg=${arg} ;;
+			esac
+		done
+		if [[ -n ${split_arg} ]]; then
+			local IFS=','
+			for item in ${split_arg}; do
+				msg2 "$item"
+			done
+			unset IFS
+		else
+			msg2 "${buildset_pkg}"
+		fi
+	fi
 }
 
 load_user_info
@@ -108,21 +108,21 @@ is_buildset=false
 sign=false
 
 usage() {
-    echo "Usage: ${0##*/} [options] [--] [makepkg args]"
-    echo "    -p <pkg>           Buildset or pkg [default: ${buildset_pkg}]"
-    echo "    -a <arch>          Arch [default: ${arch}]"
-    echo "    -b <branch>        Branch [default: ${branch}]"
-    echo '    -r <dir>           Chroots directory'
-    echo "                       [default: ${chroots_pkg}]"
-    echo '    -c                 Recreate chroot'
-    echo '    -w                 Clean up cache and sources'
-    echo '    -n                 Install and run namcap check'
-    echo '    -s                 Sign packages'
-    echo '    -q                 Query settings and pretend build'
-    echo '    -h                 This help'
-    echo ''
-    echo ''
-    exit $1
+	echo "Usage: ${0##*/} [options] [--] [makepkg args]"
+	echo "    -p <pkg>           Buildset or pkg [default: ${buildset_pkg}]"
+	echo "    -a <arch>          Arch [default: ${arch}]"
+	echo "    -b <branch>        Branch [default: ${branch}]"
+	echo '    -r <dir>           Chroots directory'
+	echo "                       [default: ${chroots_pkg}]"
+	echo '    -c                 Recreate chroot'
+	echo '    -w                 Clean up cache and sources'
+	echo '    -n                 Install and run namcap check'
+	echo '    -s                 Sign packages'
+	echo '    -q                 Query settings and pretend build'
+	echo '    -h                 This help'
+	echo ''
+	echo ''
+	exit $1
 }
 
 orig_argv=("$@")
@@ -130,32 +130,32 @@ orig_argv=("$@")
 opts='p:a:b:r:cwnsqh'
 
 while getopts "${opts}" arg; do
-    case "${arg}" in
-	p) buildset_pkg="$OPTARG" ;;
-	a) arch="$OPTARG" ;;
-	b) branch="$OPTARG" ;;
-	r) chroots_pkg="$OPTARG" ;;
-	c) clean_first=true; mkchroot_args+=(-L) ;;
-	w) wipe_clean=true ;;
-	n) namcap=true; mkchrootpkg_args+=(-n) ;;
-	s) sign=true ;;
-	q) pretend=true ;;
-	h|?) usage 0 ;;
-        *) echo "invalid argument '${arg}'"; usage 1 ;;
-    esac
+	case "${arg}" in
+		p) buildset_pkg="$OPTARG" ;;
+		a) arch="$OPTARG" ;;
+		b) branch="$OPTARG" ;;
+		r) chroots_pkg="$OPTARG" ;;
+		c) clean_first=true; mkchroot_args+=(-L) ;;
+		w) wipe_clean=true ;;
+		n) namcap=true; mkchrootpkg_args+=(-n) ;;
+		s) sign=true ;;
+		q) pretend=true ;;
+		h|?) usage 0 ;;
+		*) echo "invalid argument '${arg}'"; usage 1 ;;
+	esac
 done
 
 if [[ "${arch}" == 'multilib' ]]; then
-    pacman_conf_arch='multilib'
-    base_packages+=('multilib-devel')
-    work_dir=${chroots_pkg}/${branch}/${arch}
-    cache_dir_pkg=${cache_dir}/${branch}/${arch}
-    arch='x86_64'
-    is_multilib=true
+	pacman_conf_arch='multilib'
+	base_packages+=('multilib-devel')
+	work_dir=${chroots_pkg}/${branch}/${arch}
+	cache_dir_pkg=${cache_dir}/${branch}/${arch}
+	arch='x86_64'
+	is_multilib=true
 else
-    work_dir=${chroots_pkg}/${branch}/${arch}
-    cache_dir_pkg=${cache_dir}/${branch}/${arch}
-    is_multilib=false
+	work_dir=${chroots_pkg}/${branch}/${arch}
+	cache_dir_pkg=${cache_dir}/${branch}/${arch}
+	is_multilib=false
 fi
 
 pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"

@@ -18,66 +18,66 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
 
 display_settings(){
-    msg "manjaro-tools"
-    msg2 "version: ${version}"
+	msg "manjaro-tools"
+	msg2 "version: ${version}"
 
-    if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
+	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
 	msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
-    else
+	else
 	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
-    fi
+	fi
 
-    msg "ARGS:"
-    msg2 "sync: ${sync}"
-    msg2 "abs: ${abs}"
-    msg2 "clean: ${clean}"
+	msg "ARGS:"
+	msg2 "sync: ${sync}"
+	msg2 "abs: ${abs}"
+	msg2 "clean: ${clean}"
 
-    msg "PATHS:"
-    msg2 "tree_dir: ${tree_dir}"
-    msg2 "repo_tree: ${repo_tree[*]}"
-    msg2 "host_tree: ${host_tree}"
-    msg2 "host_tree_abs: ${host_tree_abs}"
+	msg "PATHS:"
+	msg2 "tree_dir: ${tree_dir}"
+	msg2 "repo_tree: ${repo_tree[*]}"
+	msg2 "host_tree: ${host_tree}"
+	msg2 "host_tree_abs: ${host_tree_abs}"
 }
 
 prepare_dir(){
-    [[ ! -d $1 ]] && mkdir -p $1
+	[[ ! -d $1 ]] && mkdir -p $1
 }
 
 sync_tree(){
-    cd ${tree_dir}
-    for repo in ${repo_tree[@]};do
-	if [[ -d packages-$repo ]];then
-	    cd packages-$repo
-	    msg "Syncing $repo ..."
-	    git pull origin master
-	    cd ..
-	else
-	    msg "Cloning $repo ..."
-	    git clone --depth 1 ${host_tree}/packages-$repo.git
-	fi
-    done
-    cd ..
+	cd ${tree_dir}
+	for repo in ${repo_tree[@]};do
+		if [[ -d packages-$repo ]];then
+			cd packages-$repo
+			msg "Syncing $repo ..."
+			git pull origin master
+			cd ..
+		else
+			msg "Cloning $repo ..."
+			git clone --depth 1 ${host_tree}/packages-$repo.git
+		fi
+	done
+	cd ..
 }
 
 sync_tree_abs(){
-    cd ${tree_dir}/abs
-    if [[ -d packages ]];then
-	cd packages
-	msg "Syncing abs ..."
-	git pull origin master
+	cd ${tree_dir}/abs
+	if [[ -d packages ]];then
+		cd packages
+		msg "Syncing abs ..."
+		git pull origin master
+		cd ..
+	else
+		msg "Cloning abs ..."
+		git clone --depth 1 ${host_tree_abs}.git
+	fi
 	cd ..
-    else
-	msg "Cloning abs ..."
-	git clone --depth 1 ${host_tree_abs}.git
-    fi
-    cd ..
 }
 
 clean_tree_dir(){
-    if [[ -d ${tree_dir} ]]; then
-	msg "Cleaning ${tree_dir} ..."
-	rm -r ${tree_dir}/*
-    fi
+	if [[ -d ${tree_dir} ]]; then
+		msg "Cleaning ${tree_dir} ..."
+		rm -r ${tree_dir}/*
+	fi
 }
 
 load_user_info
@@ -91,15 +91,15 @@ abs=false
 clean=false
 
 usage() {
-    echo "Usage: ${0##*/} [options]"
-    echo "    -s            Sync manjaro tree"
-    echo "    -a            Sync arch abs"
-    echo '    -c            Clean package tree'
-    echo '    -q            Query settings'
-    echo '    -h            This help'
-    echo ''
-    echo ''
-    exit $1
+	echo "Usage: ${0##*/} [options]"
+	echo "    -s            Sync manjaro tree"
+	echo "    -a            Sync arch abs"
+	echo '    -c            Clean package tree'
+	echo '    -q            Query settings'
+	echo '    -h            This help'
+	echo ''
+	echo ''
+	exit $1
 }
 
 orig_argv=("$@")
@@ -107,14 +107,14 @@ orig_argv=("$@")
 opts='sacqh'
 
 while getopts "${opts}" arg; do
-    case "${arg}" in
-	s) sync=true ;;
-	a) abs=true ;;
-	c) clean=true ;;
-	q) pretend=true ;;
-	h|?) usage 0 ;;
-        *) echo "invalid argument '${arg}'"; usage 1 ;;
-    esac
+	case "${arg}" in
+		s) sync=true ;;
+		a) abs=true ;;
+		c) clean=true ;;
+		q) pretend=true ;;
+		h|?) usage 0 ;;
+		*) echo "invalid argument '${arg}'"; usage 1 ;;
+	esac
 done
 
 shift $(($OPTIND - 1))

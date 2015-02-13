@@ -30,64 +30,63 @@ APPNAME=$(basename "${0}")
 MIRRORS=''
 
 # usage: usage <exitvalue>
-usage ()
-{
-    echo "usage ${APPNAME} [options] command <command options>"
-    echo " general options:"
-    echo "    -f                Force overwrite of working files/squashfs image/bootable image"
-    echo "    -p PACKAGE(S)     Additional package(s) to install, can be used multiple times"
-    echo "    -C <file>         Config file for pacman. Default $PACCONFIG"
-    echo "    -L <label>        Set a label for the disk"
-    echo "    -P <publisher>    Set a publisher for the disk"
-    echo "    -A <application>  Set an application name for the disk"
-    echo "    -a <arch>         Set an architecture for the disk (example: i686)"
-    echo "    -c <compressor>   Set SquashFS compression type: gzip, xz or lzo. Default $COMPRESSION"
-    echo "                      NOTES:"
-    echo "                            xz: needs Linux >= 2.6.35 - you can add '-x' for better compression"
-    echo "                            lzo:  needs Linux >= 2.6.36"
-    echo "    -D <install_dir>  Set an install_dir. All files will by located here on ISO (except for isolinux)"
-    echo "                      Default $INSTALL_DIR"
-    echo "                      NOTE: Max 8 characters, use only [a-z0-9]"
-    echo "    -i <image_folder> Set an image_folder for installing selected packages to."
-    echo "                      Default $IMAGE_FOLDER"
-    echo "    -d                Create default user directory /home/manjaro"
-    echo "    -v                Enable verbose output"
-    echo "    -M                Pass pacman-mirrors.conf"
-    echo "    -h                This message"
-    echo " commands:"
-    echo "   create <dir>"
-    echo "      create a base directory layout to work with"
-    echo "      includes all specified packages"
-    echo "   iso <dir> <image name>"
-    echo "      build an iso image from the working dir"
-    exit $1
+usage (){
+	echo "usage ${APPNAME} [options] command <command options>"
+	echo " general options:"
+	echo "    -f                Force overwrite of working files/squashfs image/bootable image"
+	echo "    -p PACKAGE(S)     Additional package(s) to install, can be used multiple times"
+	echo "    -C <file>         Config file for pacman. Default $PACCONFIG"
+	echo "    -L <label>        Set a label for the disk"
+	echo "    -P <publisher>    Set a publisher for the disk"
+	echo "    -A <application>  Set an application name for the disk"
+	echo "    -a <arch>         Set an architecture for the disk (example: i686)"
+	echo "    -c <compressor>   Set SquashFS compression type: gzip, xz or lzo. Default $COMPRESSION"
+	echo "                      NOTES:"
+	echo "                            xz: needs Linux >= 2.6.35 - you can add '-x' for better compression"
+	echo "                            lzo:  needs Linux >= 2.6.36"
+	echo "    -D <install_dir>  Set an install_dir. All files will by located here on ISO (except for isolinux)"
+	echo "                      Default $INSTALL_DIR"
+	echo "                      NOTE: Max 8 characters, use only [a-z0-9]"
+	echo "    -i <image_folder> Set an image_folder for installing selected packages to."
+	echo "                      Default $IMAGE_FOLDER"
+	echo "    -d                Create default user directory /home/manjaro"
+	echo "    -v                Enable verbose output"
+	echo "    -M                Pass pacman-mirrors.conf"
+	echo "    -h                This message"
+	echo " commands:"
+	echo "   create <dir>"
+	echo "      create a base directory layout to work with"
+	echo "      includes all specified packages"
+	echo "   iso <dir> <image name>"
+	echo "      build an iso image from the working dir"
+	exit $1
 }
 
 orig_argv=("$@")
 
 while getopts 'p:C:L:P:A:a:c:M:D:i:dfvhx' arg; do
-    case "${arg}" in
-        p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
-        C) PACCONFIG="${OPTARG}" ;;
-        L) LABEL="${OPTARG}" ;;
-        P) PUBLISHER="${OPTARG}" ;;
-        A) APPLICATION="${OPTARG}" ;;
-        a) ARCH="${OPTARG}" ;;
-        c) COMPRESSION="${OPTARG}" ;;
-        D) INSTALL_DIR="${OPTARG}" ;;
-        i) IMAGE_FOLDER="${OPTARG}" ;;
-        d) CREATE_DEFAULT=true ;;
-        f) FORCE=true ;;
-        x) HIGHCOMP=" -b 256K -Xbcj x86" ;;
-        v) QUIET=false ;;
-        M) MIRRORS="${OPTARG}" ;;
-        h|?) usage 0 ;;
-        *) echo "invalid argument '${arg}'"; usage 1 ;;
-    esac
+	case "${arg}" in
+		p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
+		C) PACCONFIG="${OPTARG}" ;;
+		L) LABEL="${OPTARG}" ;;
+		P) PUBLISHER="${OPTARG}" ;;
+		A) APPLICATION="${OPTARG}" ;;
+		a) ARCH="${OPTARG}" ;;
+		c) COMPRESSION="${OPTARG}" ;;
+		D) INSTALL_DIR="${OPTARG}" ;;
+		i) IMAGE_FOLDER="${OPTARG}" ;;
+		d) CREATE_DEFAULT=true ;;
+		f) FORCE=true ;;
+		x) HIGHCOMP=" -b 256K -Xbcj x86" ;;
+		v) QUIET=false ;;
+		M) MIRRORS="${OPTARG}" ;;
+		h|?) usage 0 ;;
+		*) echo "invalid argument '${arg}'"; usage 1 ;;
+	esac
 done
 
 if [ "${COMPRESSION}" != "xz" ]; then
-    HIGHCOMP=""
+	HIGHCOMP=""
 fi
 
 #trim spaces
@@ -98,7 +97,7 @@ shift $(($OPTIND - 1))
 check_root "$0" "${orig_argv[@]}"
 
 if [ ! -f "$PACCONFIG" ]; then
-    error "pacman config file '$PACCONFIG' does not exist"
+	error "pacman config file '$PACCONFIG' does not exist"
 fi
 
 command_name="${1}"
@@ -106,9 +105,9 @@ work_dir=""
 imgname=""
 
 case "${command_name}" in
-    create) work_dir="${2}"; imgname="none" ;;
-    iso) work_dir="${2}"; imgname="${3}" ;;
-    *) error "Invalid command name ${command_name}" && usage 1 ;;
+	create) work_dir="${2}"; imgname="none" ;;
+	iso) work_dir="${2}"; imgname="${3}" ;;
+	*) error "Invalid command name ${command_name}" && usage 1 ;;
 esac
 
 [[ -z "${ARCH}" ]] && error "You need to specify an architecture:\ni686\nx86_64" && usage 1
@@ -121,188 +120,188 @@ msg2 "image name: ${imgname}"
 msg2 "pacman_mirrors: ${MIRRORS}"
 
 clean_up(){
-    msg2 "Cleaning up what we can"
-    if [ -d "${work_dir}/${IMAGE_FOLDER}/boot/" ]; then
+	msg2 "Cleaning up what we can"
+	if [ -d "${work_dir}/${IMAGE_FOLDER}/boot/" ]; then
 	# remove the initcpio images that were generated for the host system
 	find "${work_dir}/${IMAGE_FOLDER}/boot" -name 'initramfs*.img' -delete &>/dev/null
-    fi
-
-    if ${CREATE_DEFAULT}; then
-	if [ -d "${work_dir}/${IMAGE_FOLDER}/home/" ]; then
-	    msg2 "Creating default home directory"
-	    install -d -o1000 -g100 -m0755 "${work_dir}/${IMAGE_FOLDER}/home/${username}"
 	fi
-    fi
 
-    [[ -f "${work_dir}/${IMAGE_FOLDER}/etc/locale.gen.bak" ]] \
+	if ${CREATE_DEFAULT}; then
+	if [ -d "${work_dir}/${IMAGE_FOLDER}/home/" ]; then
+		msg2 "Creating default home directory"
+		install -d -o1000 -g100 -m0755 "${work_dir}/${IMAGE_FOLDER}/home/${username}"
+	fi
+	fi
+
+	[[ -f "${work_dir}/${IMAGE_FOLDER}/etc/locale.gen.bak" ]] \
 	&& mv "${work_dir}/${IMAGE_FOLDER}/etc/locale.gen.bak" "${work_dir}/${IMAGE_FOLDER}/etc/locale.gen"
-    [[ -f "${work_dir}/${IMAGE_FOLDER}/etc/locale.conf.bak" ]] \
+	[[ -f "${work_dir}/${IMAGE_FOLDER}/etc/locale.conf.bak" ]] \
 	&& mv "${work_dir}/${IMAGE_FOLDER}/etc/locale.conf.bak" "${work_dir}/${IMAGE_FOLDER}/etc/locale.conf"
 
-    # Delete pacman database sync cache files (*.tar.gz)
-    find "${work_dir}/${IMAGE_FOLDER}/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
-    # Delete pacman database sync cache
-    find "${work_dir}/${IMAGE_FOLDER}/var/lib/pacman/sync" -delete &>/dev/null
-    # Delete pacman package cache
-    find "${work_dir}/${IMAGE_FOLDER}/var/cache/pacman/pkg" -type f -delete &>/dev/null
-    # Delete all log files, keeps empty dirs.
-    find "${work_dir}/${IMAGE_FOLDER}/var/log" -type f -delete &>/dev/null
-    # Delete all temporary files and dirs
-    find "${work_dir}/${IMAGE_FOLDER}/var/tmp" -mindepth 1 -delete &>/dev/null
-    # Delete all temporary files and dirs
-    find "${work_dir}/${IMAGE_FOLDER}/tmp" -mindepth 1 -delete &>/dev/null
+	# Delete pacman database sync cache files (*.tar.gz)
+	find "${work_dir}/${IMAGE_FOLDER}/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
+	# Delete pacman database sync cache
+	find "${work_dir}/${IMAGE_FOLDER}/var/lib/pacman/sync" -delete &>/dev/null
+	# Delete pacman package cache
+	find "${work_dir}/${IMAGE_FOLDER}/var/cache/pacman/pkg" -type f -delete &>/dev/null
+	# Delete all log files, keeps empty dirs.
+	find "${work_dir}/${IMAGE_FOLDER}/var/log" -type f -delete &>/dev/null
+	# Delete all temporary files and dirs
+	find "${work_dir}/${IMAGE_FOLDER}/var/tmp" -mindepth 1 -delete &>/dev/null
+	# Delete all temporary files and dirs
+	find "${work_dir}/${IMAGE_FOLDER}/tmp" -mindepth 1 -delete &>/dev/null
 }
 
 _mkchroot(){
 	#set locale.gen
 	if [ "${IMAGE_FOLDER}" == "root-image" ]; then
-	    LOCALE="-L"
+		LOCALE="-L"
 	fi
 
 	#local ret
 	if "${QUIET}"; then
-	    setarch "${ARCH}" \
+		setarch "${ARCH}" \
 		mkchroot -C ${PACCONFIG} \
 		-S ${MIRRORS} \
 		${LOCALE} \
 		"${work_dir}/${IMAGE_FOLDER}" $@ &> /dev/null || die "Failed to retrieve one or more packages!"
 	else
-	    setarch "${ARCH}" \
+		setarch "${ARCH}" \
 		mkchroot -C ${PACCONFIG} \
 		-S ${MIRRORS} \
 		${LOCALE} \
 		"${work_dir}/${IMAGE_FOLDER}" $@ || die "Failed to retrieve one or more packages!"
 	fi
-	
+
 	# Cleanup
 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
 }
 
 command_create () {
-    mkdir -p "${work_dir}/iso/${INSTALL_DIR}/${ARCH}"
+	mkdir -p "${work_dir}/iso/${INSTALL_DIR}/${ARCH}"
 
-    [[ -n "${PKGLIST}" ]] && _mkchroot "${PKGLIST}" && clean_up
+	[[ -n "${PKGLIST}" ]] && _mkchroot "${PKGLIST}" && clean_up
 }
 
 # _mksquash dirname
 _mksquash () {
-    if [ ! -d "$1" ]; then
-        error "$1 is not a directory"
-        return 1
-    fi
+	if [ ! -d "$1" ]; then
+		error "$1 is not a directory"
+		return 1
+	fi
 
-    sqimg="${work_dir}/iso/${INSTALL_DIR}/${ARCH}/$(basename ${1}).sqfs"
-    msg "Generating SquashFS image for '${1}'"
-    if [ -e "${sqimg}" ]; then
-        dirhaschanged=$(find ${1} -newer ${sqimg})
-        msg2 "Possible changes for ${1}..." >> /tmp/mkiso.debug
-        msg2 "${dirhaschanged}" >> /tmp/mkiso.debug
-        if [ ! -z "${dirhaschanged}" ]; then
-            msg2 "SquashFS image '${sqimg}' is not up to date, rebuilding..."
-            rm "${sqimg}"
-        else
-            msg2 "SquashFS image '${sqimg}' is up to date, skipping."
-            return
-        fi
-    fi
+	sqimg="${work_dir}/iso/${INSTALL_DIR}/${ARCH}/$(basename ${1}).sqfs"
+	msg "Generating SquashFS image for '${1}'"
+	if [ -e "${sqimg}" ]; then
+		dirhaschanged=$(find ${1} -newer ${sqimg})
+		msg2 "Possible changes for ${1}..." >> /tmp/mkiso.debug
+		msg2 "${dirhaschanged}" >> /tmp/mkiso.debug
+		if [ ! -z "${dirhaschanged}" ]; then
+			msg2 "SquashFS image '${sqimg}' is not up to date, rebuilding..."
+			rm "${sqimg}"
+		else
+			msg2 "SquashFS image '${sqimg}' is up to date, skipping."
+			return
+		fi
+	fi
 
-    msg2 "Creating SquashFS image. This may take some time..."
-    start=$(date +%s)
-    if "${QUIET}"; then
-        mksquashfs "${1}" "${sqimg}" -noappend -comp "${COMPRESSION}" ${HIGHCOMP} >/dev/null
-    else
-        mksquashfs "${1}" "${sqimg}" -noappend -comp "${COMPRESSION}" ${HIGHCOMP}
-    fi
-    minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
-    msg "Image creation done in $minutes minutes."
+	msg2 "Creating SquashFS image. This may take some time..."
+	start=$(date +%s)
+	if "${QUIET}"; then
+		mksquashfs "${1}" "${sqimg}" -noappend -comp "${COMPRESSION}" ${HIGHCOMP} >/dev/null
+	else
+		mksquashfs "${1}" "${sqimg}" -noappend -comp "${COMPRESSION}" ${HIGHCOMP}
+	fi
+	minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
+	msg "Image creation done in $minutes minutes."
 }
 
 _imgcommon () {
-    for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
-        if [ "$d" != "${work_dir}/iso" -a \
-             "$(basename "$d")" != "iso" -a \
-             "$(basename "$d")" != "efiboot" -a \
-             "$d" != "${work_dir}" ]; then
-            _mksquash "$d"
-        fi
-    done
+	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
+		if [ "$d" != "${work_dir}/iso" -a \
+			"$(basename "$d")" != "iso" -a \
+			"$(basename "$d")" != "efiboot" -a \
+			"$d" != "${work_dir}" ]; then
+			_mksquash "$d"
+		fi
+	done
 
-    msg "Making bootable image"
+	msg "Making bootable image"
 
-    # Sanity checks
-    if [ ! -d "${work_dir}/iso" ]; then
-        die "${work_dir}/iso doesn't exist. What did you do?!"
-    fi
+	# Sanity checks
+	if [ ! -d "${work_dir}/iso" ]; then
+		die "${work_dir}/iso doesn't exist. What did you do?!"
+	fi
 
-    if [ ! -f "${work_dir}/iso/${INSTALL_DIR}/isomounts" ]; then
-        error "The isomounts file doesn't exist. This image won't do anything"
-        die "Protecting you from yourself and erroring out here..."
-    fi
+	if [ ! -f "${work_dir}/iso/${INSTALL_DIR}/isomounts" ]; then
+		error "The isomounts file doesn't exist. This image won't do anything"
+		die "Protecting you from yourself and erroring out here..."
+	fi
 
-    if [ -e "${imgname}" ]; then
-        if "${FORCE}"; then
-            msg2 "Removing existing bootable image..."
-            rm -rf "${imgname}"
-        else
-            error "Image ${imgname} already exists."
-            abort
-        fi
-    fi
+	if [ -e "${imgname}" ]; then
+		if "${FORCE}"; then
+			msg2 "Removing existing bootable image..."
+			rm -rf "${imgname}"
+		else
+			error "Image ${imgname} already exists."
+			abort
+		fi
+	fi
 
-    if ! sed "s|%MANJAROISO_LABEL%|${LABEL}|g;
-              s|%INSTALL_DIR%|${INSTALL_DIR}|g;
-              s|%ARCH%|${ARCH}|g" -i ${work_dir}/iso/isolinux/*.cfg; then
+	if ! sed "s|%MANJAROISO_LABEL%|${LABEL}|g;
+			s|%INSTALL_DIR%|${INSTALL_DIR}|g;
+			s|%ARCH%|${ARCH}|g" -i ${work_dir}/iso/isolinux/*.cfg; then
 	die "${work_dir}/iso/isolinux/isolinux.cfg, doesn't exist."
-    fi
+	fi
 
-    if [ ! -f "${work_dir}/iso/isolinux/isolinux.bin" ]; then
+	if [ ! -f "${work_dir}/iso/isolinux/isolinux.bin" ]; then
 	die "${work_dir}/iso/isolinux/isolinux.bin, doesn't exist."
-    fi
-    if [ ! -f "${work_dir}/iso/isolinux/isohdpfx.bin" ]; then
-	die "${work_dir}/iso/isolinux/isohdpfx.bin, doesn't exist." 
-    fi
+	fi
+	if [ ! -f "${work_dir}/iso/isolinux/isohdpfx.bin" ]; then
+	die "${work_dir}/iso/isolinux/isohdpfx.bin, doesn't exist."
+	fi
 }
 
 command_iso () {
-    _imgcommon
+	_imgcommon
 
-    _iso_efi_boot_args=""
+	_iso_efi_boot_args=""
 
-    # If exists, add an EFI "El Torito" boot image (FAT filesystem) to ISO-9660 image.
-    if [ -f "${work_dir}/iso/EFI/miso/manjaro.img" ]; then
-        _iso_efi_boot_args="-eltorito-alt-boot -e EFI/miso/manjaro.img \
-                            -isohybrid-gpt-basdat -no-emul-boot"
-    fi
+	# If exists, add an EFI "El Torito" boot image (FAT filesystem) to ISO-9660 image.
+	if [ -f "${work_dir}/iso/EFI/miso/manjaro.img" ]; then
+		_iso_efi_boot_args="-eltorito-alt-boot -e EFI/miso/manjaro.img \
+							-isohybrid-gpt-basdat -no-emul-boot"
+	fi
 
-    msg "Creating ISO image..."
-    ## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
-    _qflag=""
-    if ${QUIET}; then
-        _qflag="-quiet"
-    fi
-    xorriso -as mkisofs ${_qflag} \
-            -iso-level 3 -rock -joliet \
-            -max-iso9660-filenames -omit-period \
-            -omit-version-number \
-            -relaxed-filenames -allow-lowercase \
-            -volid "${LABEL}" \
-            -appid "${APPLICATION}" \
-            -publisher "${PUBLISHER}" \
-            -preparer "prepared by mkmiso" \
-            -eltorito-boot isolinux/isolinux.bin \
-            -eltorito-catalog isolinux/boot.cat \
-            -no-emul-boot -boot-load-size 4 -boot-info-table \
-            -isohybrid-mbr "${work_dir}/iso/isolinux/isohdpfx.bin" \
-            ${_iso_efi_boot_args} \
-            -output "${imgname}" \
-            "${work_dir}/iso/"
+	msg "Creating ISO image..."
+	## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
+	_qflag=""
+	if ${QUIET}; then
+		_qflag="-quiet"
+	fi
+	xorriso -as mkisofs ${_qflag} \
+			-iso-level 3 -rock -joliet \
+			-max-iso9660-filenames -omit-period \
+			-omit-version-number \
+			-relaxed-filenames -allow-lowercase \
+			-volid "${LABEL}" \
+			-appid "${APPLICATION}" \
+			-publisher "${PUBLISHER}" \
+			-preparer "prepared by mkmiso" \
+			-eltorito-boot isolinux/isolinux.bin \
+			-eltorito-catalog isolinux/boot.cat \
+			-no-emul-boot -boot-load-size 4 -boot-info-table \
+			-isohybrid-mbr "${work_dir}/iso/isolinux/isohdpfx.bin" \
+			${_iso_efi_boot_args} \
+			-output "${imgname}" \
+			"${work_dir}/iso/"
 }
 
 # Go through the main commands in order. If 'all' was specified, then we want
 # to do everything. Start with 'install'.
 if [ "${command_name}" = "create"  ]; then
-    command_create
+	command_create
 fi
 if [ "${command_name}" = "iso" ]; then
-    command_iso
+	command_iso
 fi

@@ -17,35 +17,35 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
 
 create_set(){
-    msg "[$1/${name}.set]"
-    if [[ -f $1/${name}.set ]];then
-	msg3 "Backing up $1/${name}.set.orig"
-	mv "$1/${name}.set" "$1/${name}.set.orig"
-    fi
-    local list=$(find * -maxdepth 0 -type d | sort)
-    for item in ${list[@]};do
-	if [[ -f $item/$2 ]];then
-	    cd $item
-		msg2 "Adding ${item##*/}"
-		echo ${item##*/} >> $1/${name}.set || break
-	    cd ..
+	msg "[$1/${name}.set]"
+	if [[ -f $1/${name}.set ]];then
+		msg3 "Backing up $1/${name}.set.orig"
+		mv "$1/${name}.set" "$1/${name}.set.orig"
 	fi
-    done
+	local list=$(find * -maxdepth 0 -type d | sort)
+	for item in ${list[@]};do
+		if [[ -f $item/$2 ]];then
+			cd $item
+				msg2 "Adding ${item##*/}"
+				echo ${item##*/} >> $1/${name}.set || break
+			cd ..
+		fi
+	done
 }
 
 remove_set(){
-    if [[ -f $1/${name}.set ]]; then
-	msg "Removing [$1/${name}.set] ..."
-	rm $1/${name}.set
-    fi
+	if [[ -f $1/${name}.set ]]; then
+		msg "Removing [$1/${name}.set] ..."
+		rm $1/${name}.set
+	fi
 }
 
 show_set(){
-    local list=$(cat $1/${name}.set)
-    msg "Content of [$1/${name}.set] ..."
-    for item in ${list[@]}; do
-	msg2 "$item"
-    done
+	local list=$(cat $1/${name}.set)
+	msg "Content of [$1/${name}.set] ..."
+	for item in ${list[@]}; do
+		msg2 "$item"
+	done
 }
 
 load_user_info
@@ -62,16 +62,16 @@ iso_mode=false
 name='default'
 
 usage() {
-    echo "Usage: ${0##*/} [options]"
-    echo "    -c <name>   Create set"
-    echo "    -r <name>   Remove set"
-    echo "    -s <name>   Show set"
-    echo "    -i          Iso mode"
-    echo "    -q          Query sets"
-    echo '    -h          This help'
-    echo ''
-    echo ''
-    exit $1
+	echo "Usage: ${0##*/} [options]"
+	echo "    -c <name>   Create set"
+	echo "    -r <name>   Remove set"
+	echo "    -s <name>   Show set"
+	echo "    -i          Iso mode"
+	echo "    -q          Query sets"
+	echo '    -h          This help'
+	echo ''
+	echo ''
+	exit $1
 }
 
 orig_argv=("$@")
@@ -79,15 +79,15 @@ orig_argv=("$@")
 opts='c:r:s:qih'
 
 while getopts "${opts}" arg; do
-    case "${arg}" in
-	c) name="$OPTARG"; create=true ;;
-	r) name="$OPTARG"; remove=true ;;
-	s) name="$OPTARG"; show=true;;
-	i) iso_mode=true ;;
-	q) query=true ;;
-	h|?) usage 0 ;;
-        *) echo "invalid argument '${arg}'"; usage 1 ;;
-    esac
+	case "${arg}" in
+		c) name="$OPTARG"; create=true ;;
+		r) name="$OPTARG"; remove=true ;;
+		s) name="$OPTARG"; show=true;;
+		i) iso_mode=true ;;
+		q) query=true ;;
+		h|?) usage 0 ;;
+		*) echo "invalid argument '${arg}'"; usage 1 ;;
+	esac
 done
 
 shift $(($OPTIND - 1))
@@ -95,28 +95,27 @@ shift $(($OPTIND - 1))
 check_root "$0" "${orig_argv[@]}"
 
 if ${create};then
-    if ${iso_mode}; then
-	create_set "${sets_dir_iso}" "initsys"
-    else
-	create_set "${sets_dir_pkg}" "PKGBUILD"
-    fi
+	if ${iso_mode}; then
+		create_set "${sets_dir_iso}" "initsys"
+	else
+		create_set "${sets_dir_pkg}" "PKGBUILD"
+	fi
 elif ${remove};then
-    if ${iso_mode}; then
-        remove_set "${sets_dir_iso}"
-    else
-        remove_set "${sets_dir_pkg}"
-    fi
+	if ${iso_mode}; then
+		remove_set "${sets_dir_iso}"
+	else
+		remove_set "${sets_dir_pkg}"
+	fi
 elif ${show};then
-    if ${iso_mode}; then
-        show_set "${sets_dir_iso}"
-    else
-        show_set "${sets_dir_pkg}"
-    fi
+	if ${iso_mode}; then
+		show_set "${sets_dir_iso}"
+	else
+		show_set "${sets_dir_pkg}"
+	fi
 else
-    if ${iso_mode}; then
-        msg "Available sets: $(load_sets ${sets_dir_iso})"
-    else
-        msg "Available sets: $(load_sets ${sets_dir_pkg})"
-    fi
-
+	if ${iso_mode}; then
+		msg "Available sets: $(load_sets ${sets_dir_iso})"
+	else
+		msg "Available sets: $(load_sets ${sets_dir_pkg})"
+	fi
 fi

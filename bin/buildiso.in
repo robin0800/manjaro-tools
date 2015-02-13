@@ -21,101 +21,101 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-iso.sh ]] && source ${LIBDIR}/util-iso.sh
 
 display_settings(){
-    msg "manjaro-tools"
-    msg2 "version: ${version}"
+	msg "manjaro-tools"
+	msg2 "version: ${version}"
 
-    if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
-	msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
-    else
-	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
-    fi
+	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
+		msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
+	else
+		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
+	fi
 
-    msg "PROFILE:"
-    msg2 "buildsets: $(load_sets ${sets_dir_iso})"
-    msg2 "buildset_iso: ${buildset_iso}"
-    msg2 "is_buildset: ${is_buildset}"
+	msg "PROFILE:"
+	msg2 "buildsets: $(load_sets ${sets_dir_iso})"
+	msg2 "buildset_iso: ${buildset_iso}"
+	msg2 "is_buildset: ${is_buildset}"
 
-    msg "OPTIONS:"
-    msg2 "arch: ${arch}"
-    msg2 "branch: ${branch}"
-    msg2 "chroots_iso: ${chroots_iso}"
+	msg "OPTIONS:"
+	msg2 "arch: ${arch}"
+	msg2 "branch: ${branch}"
+	msg2 "chroots_iso: ${chroots_iso}"
 
-    msg "ARGS:"
-    msg2 "clean_first: ${clean_first}"
-    msg2 "clean_cache_xorg: ${clean_cache_xorg}"
-    msg2 "clean_cache_lng: ${clean_cache_lng}"
-    msg2 "clean_cache_iso: ${clean_cache_iso}"
-    msg2 "images_only: ${images_only}"
-    msg2 "iso_only: ${iso_only}"
+	msg "ARGS:"
+	msg2 "clean_first: ${clean_first}"
+	msg2 "clean_cache_xorg: ${clean_cache_xorg}"
+	msg2 "clean_cache_lng: ${clean_cache_lng}"
+	msg2 "clean_cache_iso: ${clean_cache_iso}"
+	msg2 "images_only: ${images_only}"
+	msg2 "iso_only: ${iso_only}"
 
-    msg "PATHS:"
-    msg2 "sets_dir_iso: ${sets_dir_iso}"
-    msg2 "cache_dir_iso: ${cache_dir_iso}"
-    msg2 "cache_dir_xorg: ${cache_dir_xorg}"
-    msg2 "cache_dir_lng: ${cache_dir_lng}"
+	msg "PATHS:"
+	msg2 "sets_dir_iso: ${sets_dir_iso}"
+	msg2 "cache_dir_iso: ${cache_dir_iso}"
+	msg2 "cache_dir_xorg: ${cache_dir_xorg}"
+	msg2 "cache_dir_lng: ${cache_dir_lng}"
 
-    msg "IMAGES SETTINGS:"
-    msg2 "manjaro_kernel: ${manjaro_kernel}"
-    msg2 "manjaro_version: ${manjaro_version}"
-    msg2 "plymouth_theme: ${plymouth_theme}"
+	msg "IMAGES SETTINGS:"
+	msg2 "manjaro_kernel: ${manjaro_kernel}"
+	msg2 "manjaro_version: ${manjaro_version}"
+	msg2 "plymouth_theme: ${plymouth_theme}"
 
-    msg "ISO SETTINGS:"
-    msg2 "iso_label: ${iso_label}"
-    msg2 "iso_version: ${iso_version}"
-    msg2 "code_name: ${code_name}"
+	msg "ISO SETTINGS:"
+	msg2 "iso_label: ${iso_label}"
+	msg2 "iso_version: ${iso_version}"
+	msg2 "code_name: ${code_name}"
 #     msg2 "manjaroiso: ${manjaroiso}"
 #     msg2 "img_name: ${img_name}"
 #     msg2 "install_dir: ${install_dir}"
 #     msg2 "compression: ${compression}"
 #     msg2 "checksum_mode: ${checksum_mode}"
 
-    msg "LIVECD:"
-    msg2 "username: ${username}"
-    msg2 "password: ${password}"
-    msg2 "addgroups: ${addgroups}"
-    msg2 "hostname: ${hostname}"
+	msg "LIVECD:"
+	msg2 "username: ${username}"
+	msg2 "password: ${password}"
+	msg2 "addgroups: ${addgroups}"
+	msg2 "hostname: ${hostname}"
 
-    msg "BUILD QUEUE:"
-    if ${is_buildset};then
-	local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
-	for item in ${list[@]}; do
-            check_profile "$item"
-	    cd $item
-	    load_profile "$item"
-	    msg2 "initsys: ${initsys}"
-	    msg2 "displaymanager: ${displaymanager}"
-	    msg2 "is_plymouth: ${is_plymouth}"
-	    msg2 "pacman_conf: ${pacman_conf}"
-	    msg2 "work_dir: ${work_dir}"
-	    msg2 "iso_file: ${iso_file}"
-	    if [[ ${initsys} == 'systemd' ]];then
-		msg2 "start_systemd: ${start_systemd[*]}"
-		msg2 "start_systemd_live: ${start_systemd_live[*]}"
-	    else
-		msg2 "start_openrc: ${start_openrc[*]}"
-		msg2 "start_openrc_live: ${start_openrc_live[*]}"
-	    fi
-	    cd ..
-	done
-    else
-        check_profile "${buildset_iso}"
-	cd ${buildset_iso}
-	load_profile "${buildset_iso}"
-	msg2 "initsys: ${initsys}"
-	msg2 "displaymanager: ${displaymanager}"
-	msg2 "is_plymouth: ${is_plymouth}"
-	msg2 "pacman_conf: ${pacman_conf}"
-	msg2 "work_dir: ${work_dir}"
-	msg2 "iso_file: ${iso_file}"
-	if [[ ${initsys} == 'systemd' ]];then
-	    msg2 "start_systemd: ${start_systemd[*]}"
-	    msg2 "start_systemd_live: ${start_systemd_live[*]}"
+	msg "BUILD QUEUE:"
+	if ${is_buildset};then
+		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
+		for item in ${list[@]}; do
+			check_profile "$item"
+			cd $item
+				load_profile "$item"
+				msg2 "initsys: ${initsys}"
+				msg2 "displaymanager: ${displaymanager}"
+				msg2 "is_plymouth: ${is_plymouth}"
+				msg2 "pacman_conf: ${pacman_conf}"
+				msg2 "work_dir: ${work_dir}"
+				msg2 "iso_file: ${iso_file}"
+				if [[ ${initsys} == 'systemd' ]];then
+					msg2 "start_systemd: ${start_systemd[*]}"
+					msg2 "start_systemd_live: ${start_systemd_live[*]}"
+				else
+					msg2 "start_openrc: ${start_openrc[*]}"
+					msg2 "start_openrc_live: ${start_openrc_live[*]}"
+				fi
+			cd ..
+		done
 	else
-	    msg2 "start_openrc: ${start_openrc[*]}"
-	    msg2 "start_openrc_live: ${start_openrc_live[*]}"
+		check_profile "${buildset_iso}"
+		cd ${buildset_iso}
+			load_profile "${buildset_iso}"
+			msg2 "initsys: ${initsys}"
+			msg2 "displaymanager: ${displaymanager}"
+			msg2 "is_plymouth: ${is_plymouth}"
+			msg2 "pacman_conf: ${pacman_conf}"
+			msg2 "work_dir: ${work_dir}"
+			msg2 "iso_file: ${iso_file}"
+			if [[ ${initsys} == 'systemd' ]];then
+				msg2 "start_systemd: ${start_systemd[*]}"
+				msg2 "start_systemd_live: ${start_systemd_live[*]}"
+			else
+				msg2 "start_openrc: ${start_openrc[*]}"
+				msg2 "start_openrc_live: ${start_openrc_live[*]}"
+			fi
+		cd ..
 	fi
-	cd ..
-    fi
 }
 
 load_user_info
@@ -135,24 +135,24 @@ iso_only=false
 pacman_conf_arch='default'
 
 usage() {
-    echo "Usage: ${0##*/} [options]"
-    echo "    -p <profile>       Buildset or profile [default: ${buildset_iso}]"
-    echo "    -a <arch>          Arch [default: ${arch}]"
-    echo "    -b <branch>        Branch [default: ${branch}]"
-    echo '    -r <dir>           Chroots directory'
-    echo "                       [default: ${chroots_iso}]"
-    echo '    -w                 Disable clean iso cache'
-    echo '    -c                 Disable clean work dir'
-    echo '    -x                 Disable clean xorg cache'
-    echo '    -l                 Disable clean lng cache'
-    echo '    -i                 Build images only'
-    echo '    -s                 Generate iso only'
-    echo '                       Requires pre built images (-i)'
-    echo '    -q                 Query settings and pretend build'
-    echo '    -h                 This help'
-    echo ''
-    echo ''
-    exit $1
+	echo "Usage: ${0##*/} [options]"
+	echo "    -p <profile>       Buildset or profile [default: ${buildset_iso}]"
+	echo "    -a <arch>          Arch [default: ${arch}]"
+	echo "    -b <branch>        Branch [default: ${branch}]"
+	echo '    -r <dir>           Chroots directory'
+	echo "                       [default: ${chroots_iso}]"
+	echo '    -w                 Disable clean iso cache'
+	echo '    -c                 Disable clean work dir'
+	echo '    -x                 Disable clean xorg cache'
+	echo '    -l                 Disable clean lng cache'
+	echo '    -i                 Build images only'
+	echo '    -s                 Generate iso only'
+	echo '                       Requires pre built images (-i)'
+	echo '    -q                 Query settings and pretend build'
+	echo '    -h                 This help'
+	echo ''
+	echo ''
+	exit $1
 }
 
 orig_argv=("$@")
@@ -160,27 +160,27 @@ orig_argv=("$@")
 opts='p:a:b:r:cxlisqwh'
 
 while getopts "${opts}" arg; do
-    case "${arg}" in
-	p) buildset_iso="$OPTARG" ;;
-	a) arch="$OPTARG" ;;
-	b) branch="$OPTARG" ;;
-	r) chroots_iso="$OPTARG" ;;
-	c) clean_first=false ;;
-	w) clean_cache_iso=false;;
-	x) clean_cache_xorg=false ;;
-	l) clean_cache_lng=false ;;
-	i) images_only=true ;;
-	s) iso_only=true ;;
-	q) pretend=true ;;
-	h|?) usage 0 ;;
-        *) echo "invalid argument '${arg}'"; usage 1 ;;
-    esac
+	case "${arg}" in
+		p) buildset_iso="$OPTARG" ;;
+		a) arch="$OPTARG" ;;
+		b) branch="$OPTARG" ;;
+		r) chroots_iso="$OPTARG" ;;
+		c) clean_first=false ;;
+		w) clean_cache_iso=false;;
+		x) clean_cache_xorg=false ;;
+		l) clean_cache_lng=false ;;
+		i) images_only=true ;;
+		s) iso_only=true ;;
+		q) pretend=true ;;
+		h|?) usage 0 ;;
+		*) echo "invalid argument '${arg}'"; usage 1 ;;
+	esac
 done
 
 shift $(($OPTIND - 1))
 
 if [[ "$arch" == 'x86_64' ]]; then
-    pacman_conf_arch='multilib'
+	pacman_conf_arch='multilib'
 fi
 
 cache_dir_lng="${cache_dir}/lng/${arch}"
