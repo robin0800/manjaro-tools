@@ -25,7 +25,7 @@ run_log(){
 }
 
 check_run_dir(){
-	if [[ ! -f shared/Packages ]];then
+	if [[ ! -f shared/initsys-systemd ]] || [[ ! -f shared/initsys-openrc ]];then
 		die "${0##*/} is not run in a valid iso-profiles folder!"
 	fi
 }
