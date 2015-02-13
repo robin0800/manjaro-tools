@@ -319,7 +319,7 @@ load_config(){
 	fi
 
 	if [[ -z ${addgroups} ]];then
-		addgroups="video,audio,power,disk,storage,optical,network,lp,scanner"
+		addgroups="video,audio,power,disk,storage,optical,network,lp,scanner,wheel"
 	fi
 
 	if [[ -z ${start_systemd} ]];then
