@@ -80,6 +80,18 @@ write_calamares_unpack_conf(){
 	echo "        destination: \"\"" >> "$conf"
 }
 
+write_calamares_users_conf(){
+	local conf="$1/etc/calamares/modules/users.conf"
+	echo "---" > "$conf"
+	echo "userGroup:      users" >> "$conf"
+	echo "defaultGroups:" >> "$conf"
+	for g in ${addgroups[@]};do
+		echo "    - $g" >> "$conf"
+	done
+	echo "autologinGroup: autologin" >> "$conf"
+	echo "sudoersGroup:   wheel" >> "$conf"
+}
+
 configure_calamares(){
 	if [[ -f $1/usr/bin/calamares ]];then
 		msg2 "Configuring Calamares ..."
@@ -92,6 +104,8 @@ configure_calamares(){
 			write_calamares_finished_conf $1
 		fi
 		write_calamares_services_conf $1
+		write_calamares_users_conf $1
+
 		mkdir -p $1/home/${username}/Desktop
 		cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
 		chmod a+x $1/home/${username}/Desktop/calamares.desktop
