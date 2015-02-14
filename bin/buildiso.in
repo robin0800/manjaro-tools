@@ -20,6 +20,38 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
 [[ -r ${LIBDIR}/util-iso.sh ]] && source ${LIBDIR}/util-iso.sh
 
+show_profile(){
+	cd $1
+		load_profile "$1"
+		msg2 "initsys: ${initsys}"
+		msg2 "displaymanager: ${displaymanager}"
+		msg2 "is_plymouth: ${is_plymouth}"
+		msg2 "pacman_conf: ${pacman_conf}"
+		msg2 "work_dir: ${work_dir}"
+		msg2 "iso_file: ${iso_file}"
+		if [[ ${initsys} == 'systemd' ]];then
+			msg2 "start_systemd: ${start_systemd[*]}"
+			msg2 "start_systemd_live: ${start_systemd_live[*]}"
+		else
+			msg2 "start_openrc: ${start_openrc[*]}"
+			msg2 "start_openrc_live: ${start_openrc_live[*]}"
+		fi
+	cd ..
+}
+
+show_build_queue(){
+	if ${is_buildset};then
+		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
+		for item in ${list[@]}; do
+			check_sanity "$item" "break"
+			show_profile "$item"
+		done
+	else
+		check_sanity "${buildset_iso}" 'die "Not a valid iso-profiles folder!"'
+		show_profile "${buildset_iso}"
+	fi
+}
+
 display_settings(){
 	msg "manjaro-tools"
 	msg2 "version: ${version}"
@@ -76,46 +108,7 @@ display_settings(){
 	msg2 "hostname: ${hostname}"
 
 	msg "BUILD QUEUE:"
-	if ${is_buildset};then
-		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
-		for item in ${list[@]}; do
-			check_profile "$item"
-			cd $item
-				load_profile "$item"
-				msg2 "initsys: ${initsys}"
-				msg2 "displaymanager: ${displaymanager}"
-				msg2 "is_plymouth: ${is_plymouth}"
-				msg2 "pacman_conf: ${pacman_conf}"
-				msg2 "work_dir: ${work_dir}"
-				msg2 "iso_file: ${iso_file}"
-				if [[ ${initsys} == 'systemd' ]];then
-					msg2 "start_systemd: ${start_systemd[*]}"
-					msg2 "start_systemd_live: ${start_systemd_live[*]}"
-				else
-					msg2 "start_openrc: ${start_openrc[*]}"
-					msg2 "start_openrc_live: ${start_openrc_live[*]}"
-				fi
-			cd ..
-		done
-	else
-		check_profile "${buildset_iso}"
-		cd ${buildset_iso}
-			load_profile "${buildset_iso}"
-			msg2 "initsys: ${initsys}"
-			msg2 "displaymanager: ${displaymanager}"
-			msg2 "is_plymouth: ${is_plymouth}"
-			msg2 "pacman_conf: ${pacman_conf}"
-			msg2 "work_dir: ${work_dir}"
-			msg2 "iso_file: ${iso_file}"
-			if [[ ${initsys} == 'systemd' ]];then
-				msg2 "start_systemd: ${start_systemd[*]}"
-				msg2 "start_systemd_live: ${start_systemd_live[*]}"
-			else
-				msg2 "start_openrc: ${start_openrc[*]}"
-				msg2 "start_openrc_live: ${start_openrc_live[*]}"
-			fi
-		cd ..
-	fi
+	show_build_queue
 }
 
 load_user_info

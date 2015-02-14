@@ -21,6 +21,32 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
 [[ -r ${LIBDIR}/util-pkg.sh ]] && source ${LIBDIR}/util-pkg.sh
 
+show_build_queue(){
+	if ${is_buildset};then
+		local list=$(cat ${sets_dir_pkg}/${buildset_pkg}.set)
+		for item in ${list[@]}; do
+			msg2 "$item"
+		done
+	else
+		for arg in "${makepkg_args[@]}"; do
+			case ${arg} in
+				--pkg) continue ;;
+				-*) continue ;;
+				*) local split_arg=${arg} ;;
+			esac
+		done
+		if [[ -n ${split_arg} ]]; then
+			local IFS=','
+			for item in ${split_arg}; do
+				msg2 "$item"
+			done
+			unset IFS
+		else
+			msg2 "${buildset_pkg}"
+		fi
+	fi
+}
+
 display_settings(){
 	msg "manjaro-tools"
 	msg2 "version: ${version}"
@@ -64,29 +90,7 @@ display_settings(){
 	fi
 
 	msg "BUILD QUEUE:"
-	if ${is_buildset};then
-		local list=$(cat ${sets_dir_pkg}/${buildset_pkg}.set)
-		for item in ${list[@]}; do
-			msg2 "$item"
-		done
-	else
-		for arg in "${makepkg_args[@]}"; do
-			case ${arg} in
-				--pkg) continue ;;
-				-*) continue ;;
-				*) local split_arg=${arg} ;;
-			esac
-		done
-		if [[ -n ${split_arg} ]]; then
-			local IFS=','
-			for item in ${split_arg}; do
-				msg2 "$item"
-			done
-			unset IFS
-		else
-			msg2 "${buildset_pkg}"
-		fi
-	fi
+	show_build_queue
 }
 
 load_user_info
