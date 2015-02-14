@@ -375,3 +375,11 @@ load_user_info(){
 
 	USER_CONFIG="$USER_HOME/.config"
 }
+
+# $1: file
+# $2: exit code
+check_sanity(){
+	if [[ ! -f $1 ]]; then
+		eval "$2"
+	fi
+}
