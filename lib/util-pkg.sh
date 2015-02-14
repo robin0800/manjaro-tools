@@ -91,37 +91,31 @@ archive_logs(){
 	find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
 }
 
+make_pkg(){
+	msg "Start building [$1]"
+	cd $1
+		for p in ${blacklist_trigger[@]}; do
+			[[ $1 == $p ]] && blacklist_pkg "${work_dir}"
+		done
+		${is_multilib} && set_mhwd_multilib
+		setarch "${arch}" \
+			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
+		source PKGBUILD
+		move_pkg
+		[[ -z $LOGDEST ]] && archive_logs
+	cd ..
+	msg "Finished building [$1]"
+}
+
 chroot_build(){
 	if ${is_buildset};then
-		msg3 "Start building [${buildset_pkg}]"
 		for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
-			[[ -f $pkg/PKGBUILD ]] || break
-			cd $pkg
-				for p in ${blacklist_trigger[@]}; do
-					[[ $pkg == $p ]] && blacklist_pkg "${work_dir}"
-				done
-				${is_multilib} && set_mhwd_multilib
-				setarch "${arch}" \
-					mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || break
-				source PKGBUILD
-				move_pkg
-				[[ -z $LOGDEST ]] && archive_logs
-			cd ..
+			check_sanity "$pkg/PKGBUILD" "break"
+			make_pkg "$pkg" "break"
 		done
-		msg3 "Finished building [${buildset_pkg}]"
 	else
-		[[ -f ${buildset_pkg}/PKGBUILD ]] || die "${buildset_pkg} is not a valid profile!"
-		cd ${buildset_pkg}
-			for p in ${blacklist_trigger[@]}; do
-				[[ ${buildset_pkg} == $p ]] && blacklist_pkg "${work_dir}"
-			done
-			${is_multilib} && set_mhwd_multilib
-			setarch "${arch}" \
-				mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || abort
-			source PKGBUILD
-			move_pkg
-			[[ -z $LOGDEST ]] && archive_logs
-		cd ..
+		check_sanity "${buildset_pkg}/PKGBUILD" 'die "Not a valid package!"'
+		make_pkg "$pkg" "abort"
 	fi
 }
 

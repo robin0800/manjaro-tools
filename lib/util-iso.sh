@@ -30,12 +30,6 @@ check_run_dir(){
 	fi
 }
 
-check_profile(){
-	if [[ ! -f $1/initsys ]]; then
-		die "$1 is not a valid profile!"
-	fi
-}
-
 copy_initcpio(){
 	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
@@ -113,11 +107,27 @@ clean_cache(){
     find "$1" -name '*.pkg.tar.xz' -delete &>/dev/null
 }
 
-clean_up(){
-	if [[ -d ${work_dir} ]];then
-		msg "Removing [${work_dir}] ..."
-		rm -r ${work_dir}
-	fi
+clean_chroots(){
+	for image in "$1"/*-image; do
+		[[ -d ${image} ]] || continue
+		if [[ $(basename "${image}") != "pkgs-image" ]] || \
+		[[ $(basename "${image}") != "lng-image" ]];then
+			msg2 "Deleting chroot image '$(basename "${image}")'..."
+			lock 9 "${image}.lock" "Locking chroot image '${image}'"
+			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
+				{ type -P btrfs && btrfs subvolume delete "${image}"; } &>/dev/null
+			fi
+		rm -rf --one-file-system "${image}"
+		fi
+	done
+	exec 9>&-
+	rm -rf --one-file-system "$1"
+
+# 	if [[ -d $1 ]];then
+# 		msg "Removing [$1] ..."
+# # 		rm -r $1
+# 		rm -rf --one-file-system "$1"
+# 	fi
 }
 
 configure_custom_image(){
@@ -593,6 +603,10 @@ build_images(){
 		load_pkgs "${packages_custom}"
 		make_image_custom
 	fi
+	if [[ -f Packages-Livecd ]]; then
+		load_pkgs "Packages-Livecd"
+		make_image_livecd
+	fi
 	if [[ -f Packages-Xorg ]] ; then
 		load_pkgs_xorg
 		make_image_xorg
@@ -600,10 +614,6 @@ build_images(){
 	if [[ -f Packages-Lng ]] ; then
 		load_pkgs_lng
 		make_image_lng
-	fi
-	if [[ -f Packages-Livecd ]]; then
-		load_pkgs "Packages-Livecd"
-		make_image_livecd
 	fi
 	make_image_boot
 	if [[ "${arch}" == "x86_64" ]]; then
@@ -614,41 +624,39 @@ build_images(){
 	make_isomounts
 }
 
-build_profile(){
-	${clean_first} && clean_up
-	${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
-	${clean_cache_lng} && clean_cache "${cache_dir_lng}"
-	if ${iso_only}; then
-		[[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -p <name> -i"
-		compress_images
-		exit 1
-	fi
-	if ${images_only}; then
-		build_images
-		warning "Continue with eg. buildiso -p <name> -sc ..."
-		exit 1
-	else
-		build_images
-		compress_images
-	fi
+make_profile(){
+	msg "Start building [$1]"
+	cd $1
+		load_profile "$1"
+		${clean_first} && clean_chroots "${work_dir}"
+		${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
+		${clean_cache_lng} && clean_cache "${cache_dir_lng}"
+		if ${iso_only}; then
+			[[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -p <name> -i"
+			compress_images
+			exit 1
+		fi
+		if ${images_only}; then
+			build_images
+			warning "Continue with eg. buildiso -p <name> -sc ..."
+			exit 1
+		else
+			build_images
+			compress_images
+		fi
+	cd ..
+	msg "Finished building [$1]"
 }
+
 
 build_iso(){
 	if ${is_buildset};then
-		msg3 "Start building [${buildset_iso}]"
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			check_profile "$prof"
-			cd $prof
-				load_profile "$prof"
-				build_profile
-			cd ..
+			check_sanity "$prof/initsys" "break"
+			make_profile "$prof"
 		done
-		msg3 "Finished building [${buildset_iso}]"
 	else
-		check_profile "${buildset_iso}"
-		cd ${buildset_iso}
-			load_profile "${buildset_iso}"
-			build_profile
-		cd ..
+		check_sanity "${buildset_iso}/initsys" 'die "Not a valid iso-profiles folder!"'
+		make_profile "${buildset_iso}"
 	fi
 }
