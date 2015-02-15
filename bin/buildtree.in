@@ -50,7 +50,7 @@ sync_tree(){
 			cd packages-$repo
 				if [ $(git rev-parse HEAD) = $(git ls-remote $(git rev-parse --abbrev-ref @{u} | \
 				sed 's/\// /g') | cut -f1) ]; then
-					msg "$repo is up to date" || \
+					msg "$repo is up to date"
 				else
 					msg "Syncing $repo ..."
 					git pull origin master
