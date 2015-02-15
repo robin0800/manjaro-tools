@@ -48,8 +48,13 @@ sync_tree(){
 	for repo in ${repo_tree[@]};do
 		if [[ -d packages-$repo ]];then
 			cd packages-$repo
-			msg "Syncing $repo ..."
-			git pull origin master
+				if [ $(git rev-parse HEAD) = $(git ls-remote $(git rev-parse --abbrev-ref @{u} | \
+				sed 's/\// /g') | cut -f1) ]; then
+					msg "$repo is up to date" || \
+				else
+					msg "Syncing $repo ..."
+					git pull origin master
+				fi
 			cd ..
 		else
 			msg "Cloning $repo ..."
@@ -63,8 +68,13 @@ sync_tree_abs(){
 	cd ${tree_dir}/abs
 	if [[ -d packages ]];then
 		cd packages
-		msg "Syncing abs ..."
-		git pull origin master
+			if [ $(git rev-parse HEAD) = $(git ls-remote $(git rev-parse --abbrev-ref @{u} | \
+			sed 's/\// /g') | cut -f1) ];then
+				msg "abs is up to date"
+			else
+				msg "Syncing abs ..."
+				git pull origin master
+			fi
 		cd ..
 	else
 		msg "Cloning abs ..."
