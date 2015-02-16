@@ -115,7 +115,7 @@ chroot_build(){
 		done
 	else
 		check_sanity "${buildset_pkg}/PKGBUILD" 'die "Not a valid package!"'
-		make_pkg "$pkg" "abort"
+		make_pkg "${buildset_pkg}" "abort"
 	fi
 }
 
