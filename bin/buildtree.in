@@ -80,10 +80,11 @@ done
 shift $(($OPTIND - 1))
 
 tree_dir=${cache_dir}/pkgtree
+tree_dir_abs=${tree_dir}/archlinux
 
 check_root "$0" "${orig_argv[@]}"
 
-prepare_dir "${tree_dir}/abs"
+prepare_dir "${tree_dir_abs}"
 
 ${pretend} && display_settings && exit 1
 

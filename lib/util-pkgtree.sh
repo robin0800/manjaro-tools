@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 sync_tree(){
-	if [ "$(git log --pretty=%H ...refs/heads/master^)" = "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
+	if [[ "$(git log --pretty=%H ...refs/heads/master^)" == "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]]; then
 		msg "[$1]" && msg2 "up to date"
 	else
 		msg "[$1]" && msg2 "sync"
@@ -38,15 +38,13 @@ sync_tree_manjaro(){
 }
 
 sync_tree_abs(){
-	local repo=abs
-	cd ${tree_dir}/${repo}
+	cd ${tree_dir_abs}
 		if [[ -d packages ]];then
 			cd packages
-				sync_tree "${repo}"
+				sync_tree "${tree_dir_abs}"
 			cd ..
-
 		else
-			clone_tree "${repo}" "${host_tree_abs}"
+			clone_tree "${tree_dir_abs}" "${host_tree_abs}"
 		fi
 	cd ..
 }
