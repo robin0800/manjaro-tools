@@ -29,7 +29,10 @@ SETS_PKG = \
 	sets/pkg/default.set
 
 SETS_ISO = \
-	sets/iso/default.set
+	sets/iso/default.set \
+	sets/iso/official.set \
+	sets/iso/community.set \
+	sets/iso/openrc.set
 
 CONFIGFILES = \
 	conf/makepkg-i686.conf \
