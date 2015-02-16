@@ -14,15 +14,15 @@ sync_tree(){
 	for repo in ${repo_tree[@]};do
 		if [[ -d packages-$repo ]];then
 			cd packages-$repo
-				if [ "$(git log --pretty=%H ...refs/heads/master^)" = "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
-					msg "$repo is up to date"
+				if [ "$(git log --pretty=%H ...refs/heads/master^)" = "$(git ls-remote origin -h refs/heads/master | cut -f1)" ]; then
+					msg "[$repo] is up to date"
 				else
-					msg "Syncing $repo ..."
+					msg "Syncing [$repo] ..."
 					git pull origin master
 				fi
 			cd ..
 		else
-			msg "Cloning $repo ..."
+			msg "Cloning [$repo] ..."
 			git clone ${host_tree}/packages-$repo.git
 		fi
 	done
@@ -33,10 +33,10 @@ sync_tree_abs(){
 	cd ${tree_dir}/abs
 	if [[ -d packages ]];then
 		cd packages
-			if [ "$(git log --pretty=%H ...refs/heads/master^)" = "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
-				msg "abs is up to date"
+			if [ "$(git log --pretty=%H ...refs/heads/master^)" = "$(git ls-remote origin -h refs/heads/master | cut -f1)" ]; then
+				msg "[abs] is up to date"
 			else
-				msg "Syncing abs ..."
+				msg "Syncing [abs] ..."
 				git pull origin master
 			fi
 		cd ..
