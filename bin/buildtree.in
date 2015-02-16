@@ -50,7 +50,7 @@ sync_tree(){
 	for repo in ${repo_tree[@]};do
 		if [[ -d packages-$repo ]];then
 			cd packages-$repo
-				if [ "$(git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
+				if [ "$(git log --pretty=%H ...refs/heads/master^ | head -n 1)" = "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
 					msg "$repo is up to date"
 				else
 					msg "Syncing $repo ..."
@@ -69,7 +69,7 @@ sync_tree_abs(){
 	cd ${tree_dir}/abs
 	if [[ -d packages ]];then
 		cd packages
-			if [ "$(git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
+			if [ "$(git log --pretty=%H ...refs/heads/master^ | head -n 1)" = "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
 				msg "abs is up to date"
 			else
 				msg "Syncing abs ..."
