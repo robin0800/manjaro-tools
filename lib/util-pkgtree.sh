@@ -10,45 +10,43 @@
 # GNU General Public License for more details.
 
 sync_tree(){
+	if [ "$(git log --pretty=%H ...refs/heads/master^)" = "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
+		msg "[$1]" && msg2 "up to date"
+	else
+		msg "[$1]" && msg2 "sync"
+		git pull origin master
+	fi
+}
+
+clone_tree(){
+	msg "[$1]" && msg2 "clone"
+	git clone $2.git
+}
+
+sync_tree_manjaro(){
 	cd ${tree_dir}
 	for repo in ${repo_tree[@]};do
 		if [[ -d packages-${repo} ]];then
 			cd packages-${repo}
-				if [ "$(git log --pretty=%H ...refs/heads/master^)" = "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
-					msg "[${repo}]"
-					msg2 "up to date"
-				else
-					msg "Syncing ..."
-					msg2 "[${repo}]"
-					git pull origin master
-				fi
+				sync_tree "${repo}"
 			cd ..
 		else
-			msg "Cloning ..."
-			msg2 "[${repo}]"
-			git clone ${host_tree}/packages-${repo}.git
+			clone_tree "${host_tree}/packages-${repo}"
 		fi
 	done
 	cd ..
 }
 
 sync_tree_abs(){
-	cd ${tree_dir}/abs
-	if [[ -d packages ]];then
-		cd packages
-			if [ "$(git log --pretty=%H ...refs/heads/master^)" = "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]; then
-				msg "[abs]"
-				msg2 "up to date"
-			else
-				msg "Syncing ..."
-				msg2 "[abs]"
-				git pull origin master
-			fi
-		cd ..
-	else
-		msg "Cloning ..."
-		msg2 "[abs]"
-		git clone ${host_tree_abs}.git
-	fi
+	local repo=abs
+	cd ${tree_dir}/${repo}
+		if [[ -d packages ]];then
+			cd packages
+				sync_tree "${repo}"
+			cd ..
+
+		else
+			clone_tree "${host_tree_abs}"
+		fi
 	cd ..
 }

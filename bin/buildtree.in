@@ -89,6 +89,6 @@ ${pretend} && display_settings && exit 1
 
 ${clean} && clean_dir "${tree_dir}" && exit 1
 
-${sync} && sync_tree
+${sync} && sync_tree_manjaro
 
 ${abs} && sync_tree_abs
