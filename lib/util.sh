@@ -349,6 +349,13 @@ prepare_dir(){
 	[[ ! -d $1 ]] && mkdir -p $1
 }
 
+clean_dir(){
+	if [[ -d $1 ]]; then
+		msg "Cleaning [$1] ..."
+		rm -r $1/*
+	fi
+}
+
 # $1: sets_dir
 load_sets(){
 	local prof temp
