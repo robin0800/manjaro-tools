@@ -51,7 +51,8 @@ LIBS = \
 	lib/util-iso.sh \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
-	lib/util-livecd.sh
+	lib/util-livecd.sh \
+	lib/util-pkgtree.sh
 
 CPIOHOOKS = \
 	initcpio/hooks/miso \
