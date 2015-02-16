@@ -345,6 +345,10 @@ load_config(){
 	return 0
 }
 
+prepare_dir(){
+	[[ ! -d $1 ]] && mkdir -p $1
+}
+
 # $1: sets_dir
 load_sets(){
 	local prof temp

@@ -61,7 +61,7 @@ set_mhwd_multilib(){
 }
 
 prepare_cachedir(){
-	[[ ! -d "${cache_dir_pkg}" ]] && mkdir -p "${cache_dir_pkg}"
+	prepare_dir "${cache_dir_pkg}"
 	chown -R "${OWNER}:users" "${cache_dir_pkg}"
 }
 

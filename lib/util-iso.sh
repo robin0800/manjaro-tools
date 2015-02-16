@@ -97,9 +97,9 @@ copy_cache_xorg(){
 }
 
 prepare_cachedirs(){
-	[[ ! -d "${cache_dir_iso}" ]] && mkdir -p "${cache_dir_iso}"
-	[[ ! -d "${cache_dir_xorg}" ]] && mkdir -p "${cache_dir_xorg}"
-	[[ ! -d "${cache_dir_lng}" ]] && mkdir -p "${cache_dir_lng}"
+	prepare_dir "${cache_dir_iso}"
+	prepare_dir "${cache_dir_xorg}"
+	prepare_dir "${cache_dir_lng}"
 }
 
 clean_cache(){
