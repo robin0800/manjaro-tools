@@ -16,6 +16,7 @@ SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 [[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
+[[ -r ${LIBDIR}/util-pkgtree.sh ]] && source ${LIBDIR}/util-pkgtree.sh
 
 display_settings(){
 	msg "manjaro-tools"
@@ -37,51 +38,6 @@ display_settings(){
 	msg2 "repo_tree: ${repo_tree[*]}"
 	msg2 "host_tree: ${host_tree}"
 	msg2 "host_tree_abs: ${host_tree_abs}"
-}
-
-sync_tree(){
-	cd ${tree_dir}
-	for repo in ${repo_tree[@]};do
-		if [[ -d packages-$repo ]];then
-			cd packages-$repo
-				if [ "$(git log --pretty=%H ...refs/heads/master^ | head -n 1)" = "$(git ls-remote origin -h refs/heads/master | cut -f1)" ]; then
-					msg "$repo is up to date"
-				else
-					msg "Syncing $repo ..."
-					git pull origin master
-				fi
-			cd ..
-		else
-			msg "Cloning $repo ..."
-			git clone ${host_tree}/packages-$repo.git
-		fi
-	done
-	cd ..
-}
-
-sync_tree_abs(){
-	cd ${tree_dir}/abs
-	if [[ -d packages ]];then
-		cd packages
-			if [ "$(git log --pretty=%H ...refs/heads/master^ | head -n 1)" = "$(git ls-remote origin -h refs/heads/master | cut -f1)" ]; then
-				msg "abs is up to date"
-			else
-				msg "Syncing abs ..."
-				git pull origin master
-			fi
-		cd ..
-	else
-		msg "Cloning abs ..."
-		git clone ${host_tree_abs}.git
-	fi
-	cd ..
-}
-
-clean_tree_dir(){
-	if [[ -d ${tree_dir} ]]; then
-		msg "Cleaning ${tree_dir} ..."
-		rm -r ${tree_dir}/*
-	fi
 }
 
 load_user_info
@@ -131,7 +87,7 @@ prepare_dir "${tree_dir}/abs"
 
 ${pretend} && display_settings && exit 1
 
-${clean} && clean_tree_dir && exit 1
+${clean} && clean_dir "${tree_dir}" && exit 1
 
 ${sync} && sync_tree
 
