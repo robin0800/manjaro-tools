@@ -31,7 +31,7 @@ sync_tree_manjaro(){
 				sync_tree "${repo}"
 			cd ..
 		else
-			clone_tree "${host_tree}/packages-${repo}"
+			clone_tree "${repo}" "${host_tree}/packages-${repo}"
 		fi
 	done
 	cd ..
@@ -46,7 +46,7 @@ sync_tree_abs(){
 			cd ..
 
 		else
-			clone_tree "${host_tree_abs}"
+			clone_tree "${repo}" "${host_tree_abs}"
 		fi
 	cd ..
 }
