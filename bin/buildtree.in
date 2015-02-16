@@ -39,10 +39,6 @@ display_settings(){
 	msg2 "host_tree_abs: ${host_tree_abs}"
 }
 
-prepare_dir(){
-	[[ ! -d $1 ]] && mkdir -p $1
-}
-
 sync_tree(){
 	cd ${tree_dir}
 	for repo in ${repo_tree[@]};do
@@ -57,7 +53,7 @@ sync_tree(){
 			cd ..
 		else
 			msg "Cloning $repo ..."
-			git clone --depth 1 ${host_tree}/packages-$repo.git
+			git clone ${host_tree}/packages-$repo.git
 		fi
 	done
 	cd ..
@@ -76,7 +72,7 @@ sync_tree_abs(){
 		cd ..
 	else
 		msg "Cloning abs ..."
-		git clone --depth 1 ${host_tree_abs}.git
+		git clone ${host_tree_abs}.git
 	fi
 	cd ..
 }
