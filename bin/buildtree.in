@@ -80,15 +80,15 @@ done
 shift $(($OPTIND - 1))
 
 tree_dir=${cache_dir}/pkgtree
-tree_dir_abs=${tree_dir}/archlinux
+# repo_abs=archlinux
 
 check_root "$0" "${orig_argv[@]}"
 
-prepare_dir "${tree_dir_abs}"
+prepare_dir "${tree_dir}"
 
 ${pretend} && display_settings && exit 1
 
-${clean} && clean_dir "${tree_dir}" && exit 1
+${clean} && clean_dir "${tree_dir}"
 
 ${sync} && sync_tree_manjaro
 
