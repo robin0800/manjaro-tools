@@ -10,17 +10,25 @@
 # GNU General Public License for more details.
 
 sync_tree(){
-	if [[ "$(git log --pretty=%H ...refs/heads/master^)" == "$(git ls-remote origin -h refs/heads/master |cut -f1)" ]]; then
-		msg "[$1]" && msg2 "up to date"
+	local master=$(git log --pretty=%H ...refs/heads/master^ | head -n 1) \
+		master_remote=$(git ls-remote origin -h refs/heads/master | cut -f1)
+	msg "Checking [$1] ..."
+	msg2 "local:  ${master}"
+	msg2 "remote: ${master_remote}"
+	if [[ "${master}" == "${master_remote}" ]]; then
+		msg3 "nothing to do"
 	else
-		msg "[$1]" && msg2 "sync"
+		msg3 "needs sync"
 		git pull origin master
 	fi
+	msg "Done [$1]"
 }
 
 clone_tree(){
-	msg "[$1]" && msg2 "clone"
-	git clone $2.git
+	msg "Preparing [$1] ..."
+	msg3 "clone"
+	git clone $2.git -q
+	msg "Done [$1]"
 }
 
 sync_tree_manjaro(){
@@ -38,13 +46,14 @@ sync_tree_manjaro(){
 }
 
 sync_tree_abs(){
-	cd ${tree_dir_abs}
+	local repo_abs=packages
+	cd ${tree_dir} #/${repo_abs}
 		if [[ -d packages ]];then
 			cd packages
-				sync_tree "${tree_dir_abs}"
+				sync_tree "${repo_abs}"
 			cd ..
 		else
-			clone_tree "${tree_dir_abs}" "${host_tree_abs}"
+			clone_tree "${repo_abs}" "${host_tree_abs}"
 		fi
 	cd ..
 }
