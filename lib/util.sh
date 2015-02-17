@@ -214,7 +214,7 @@ load_config(){
 	fi
 
 	if [[ -z ${host_tree_abs} ]];then
-		host_tree_abs='https://projects.archlinux.org/git/svntogit/packages'
+		host_tree_abs='https://projects.archlinux.org/git/svntogit'
 	fi
 
 	###################
