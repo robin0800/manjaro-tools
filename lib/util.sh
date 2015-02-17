@@ -12,18 +12,6 @@ import(){
 	[[ -r $1 ]] && source $1
 }
 
-kernel_cmdline(){
-	for param in $(/bin/cat /proc/cmdline); do
-		case "${param}" in
-			$1=*) echo "${param##*=}"; return 0 ;;
-			$1) return 0 ;;
-			*) continue ;;
-		esac
-	done
-	[ -n "${2}" ] && echo "${2}"
-	return 1
-}
-
 ##
 #  usage : in_array( $needle, $haystack )
 # return : 0 - found
