@@ -646,7 +646,7 @@ make_profile(){
 		fi
 	cd ..
 	local minutes=$(echo ${timer_start} $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
-	msg "Finished building [$1] in $minutes"
+	msg "Finished building [$1] in ${minutes}"
 }
 
 
