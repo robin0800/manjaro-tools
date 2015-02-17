@@ -54,7 +54,7 @@ sync_tree_abs(){
 				sync_tree "${repo}"
 			cd ..
 		else
-			clone_tree "${repo}" "${host_tree_abs}"
+			clone_tree "${repo}" "${host_tree_abs}/${repo}"
 		fi
 	done
 	cd ..
