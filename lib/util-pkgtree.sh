@@ -27,7 +27,7 @@ sync_tree(){
 clone_tree(){
 	msg "Preparing [$1] ..."
 	msg3 "clone"
-	git clone $2.git # -q
+	git clone $2.git
 	msg "Done [$1]"
 }
 
@@ -46,14 +46,16 @@ sync_tree_manjaro(){
 }
 
 sync_tree_abs(){
-	local repo_abs=packages
-	cd ${tree_dir} #/${repo_abs}
-		if [[ -d packages ]];then
-			cd packages
-				sync_tree "${repo_abs}"
+	local repo_tree_abs=('packages' 'community')
+	cd ${tree_dir_abs}
+	for repo in ${repo_tree_abs[@]};do
+		if [[ -d ${repo} ]];then
+			cd ${repo}
+				sync_tree "${repo}"
 			cd ..
 		else
-			clone_tree "${repo_abs}" "${host_tree_abs}"
+			clone_tree "${repo}" "${host_tree_abs}"
 		fi
+	done
 	cd ..
 }
