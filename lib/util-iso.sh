@@ -600,7 +600,7 @@ compress_images(){
 	make_iso
 	make_checksum "${iso_file}"
 	local timer_iso=$(elapsed_time "${timer_start_iso}")
-	msg3 "Finished compression in ${timer_iso} minutes"
+	msg3 "Finished ${FUNCNAME} in ${timer_iso} minutes"
 }
 
 build_images(){
@@ -631,7 +631,7 @@ build_images(){
 	make_isolinux
 	make_isomounts
 	local timer_images=$(elapsed_time "${timer_start_images}")
-	msg3 "Finished Images in ${timer_images} minutes"
+	msg3 "Finished ${FUNCNAME} in ${timer_images} minutes"
 }
 
 make_profile(){
