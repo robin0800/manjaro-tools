@@ -591,12 +591,20 @@ load_profile(){
 	done
 }
 
+elapsed_time(){
+	echo $(echo $1 $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
+}
+
 compress_images(){
+	timer_start_iso=$(date +%s)
 	make_iso
 	make_checksum "${iso_file}"
+	local timer_iso=$(elapsed_time "${timer_start_iso}")
+	msg3 "Finished compression in ${timer_iso} minutes"
 }
 
 build_images(){
+	timer_start_images=$(date +%s)
 	load_pkgs "Packages"
 	make_image_root
 	if [[ -f "${packages_custom}" ]] ; then
@@ -622,6 +630,8 @@ build_images(){
 	fi
 	make_isolinux
 	make_isomounts
+	local timer_images=$(elapsed_time "${timer_start_images}")
+	msg3 "Finished Images in ${timer_images} minutes"
 }
 
 make_profile(){
@@ -645,8 +655,8 @@ make_profile(){
 			compress_images
 		fi
 	cd ..
-	local minutes=$(echo ${timer_start} $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
-	msg "Finished building [$1] in ${minutes}"
+	local timer_finished=$(elapsed_time "${timer_start}")
+	msg "Finished building [$1] in ${timer_finished} minutes"
 }
 
 
