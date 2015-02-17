@@ -172,6 +172,8 @@ done
 
 shift $(($OPTIND - 1))
 
+timer_start=$(date +%s)
+
 if [[ "$arch" == 'x86_64' ]]; then
 	pacman_conf_arch='multilib'
 fi
