@@ -27,7 +27,7 @@ sync_tree(){
 clone_tree(){
 	msg "Preparing [$1] ..."
 	msg3 "clone"
-	git clone $2.git -q
+	git clone $2.git # -q
 	msg "Done [$1]"
 }
 
