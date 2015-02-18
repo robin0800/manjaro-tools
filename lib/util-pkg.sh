@@ -104,7 +104,7 @@ make_pkg(){
 		move_pkg
 		[[ -z $LOGDEST ]] && archive_logs
 	cd ..
-	msg "Finished building [$1]"
+	msg "Finished building [$1] in $(elapsed_time ${timer_start}) minutes"
 }
 
 chroot_build(){
