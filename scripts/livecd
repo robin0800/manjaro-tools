@@ -22,6 +22,7 @@ echo "set locale" >> /tmp/livecd.log
 # set language
 configure_language
 locale-gen
+[[ -d /run/openrc ]] && rc-service keymaps restart &> /dev/null
 
 echo "configure system" >> /tmp/livecd.log
 
