@@ -390,6 +390,31 @@ make_image_boot() {
 	fi
 }
 
+# EFI Shell 2.0 for UEFI 2.3+ ( http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=UEFI_Shell )
+download_efi_shellv2(){
+	curl -k -o $1/shellx64_v2.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi
+}
+
+# EFI Shell 1.0 for non UEFI 2.3+ ( http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=Efi-shell )
+download_efi_shellv1(){
+	curl -k -o $1/shellx64_v1.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi
+}
+
+copy_efi_shells(){
+	if [[ -f ../shared/efi_shell/shellx64_v1.efi ]];then
+		msg2 "Copying shellx64_v1.efi ..."
+		cp ../shared/efi_shell/shellx64_v1.efi $1/
+	else
+		download_efi_shellv1 "$1"
+	fi
+	if [[ -f ../shared/efi_shell/shellx64_v2.efi ]];then
+		msg2 "Copying shellx64_v2.efi ..."
+		cp ../shared/efi_shell/shellx64_v2.efi $1/
+	else
+		download_efi_shellv2 "$1"
+	fi
+}
+
 # Prepare /EFI
 make_efi() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
@@ -410,10 +435,7 @@ make_efi() {
 		sed "s|%MISO_LABEL%|${iso_label}|g;
 				s|%INSTALL_DIR%|${install_dir}|g" \
 			efiboot/loader/entries/${manjaroiso}-x86_64-nonfree-usb.conf > ${path_iso}/loader/entries/${manjaroiso}-x86_64-nonfree.conf
-		# EFI Shell 2.0 for UEFI 2.3+ ( http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=UEFI_Shell )
-		curl -k -o ${path_efi}/shellx64_v2.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi
-		# EFI Shell 1.0 for non UEFI 2.3+ ( http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=Efi-shell )
-		curl -k -o ${path_efi}/shellx64_v1.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi
+		copy_efi_shells "${path_efi}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${install_dir}/boot/EFI]"
 	fi
@@ -591,20 +613,15 @@ load_profile(){
 	done
 }
 
-elapsed_time(){
-	echo $(echo $1 $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
-}
-
 compress_images(){
-	timer_start_iso=$(date +%s)
+	local timer=$(get_timer)
 	make_iso
 	make_checksum "${iso_file}"
-	local timer_iso=$(elapsed_time "${timer_start_iso}")
-	msg3 "Finished ${FUNCNAME} in ${timer_iso} minutes"
+	msg3 "Finished ${FUNCNAME} in $(elapsed_time ${timer}) minutes"
 }
 
 build_images(){
-	timer_start_images=$(date +%s)
+	local timer=$(get_timer)
 	load_pkgs "Packages"
 	make_image_root
 	if [[ -f "${packages_custom}" ]] ; then
@@ -630,8 +647,7 @@ build_images(){
 	fi
 	make_isolinux
 	make_isomounts
-	local timer_images=$(elapsed_time "${timer_start_images}")
-	msg3 "Finished ${FUNCNAME} in ${timer_images} minutes"
+	msg3 "Finished ${FUNCNAME} in $(elapsed_time ${timer}) minutes"
 }
 
 make_profile(){
@@ -655,10 +671,8 @@ make_profile(){
 			compress_images
 		fi
 	cd ..
-	local timer_finished=$(elapsed_time "${timer_start}")
-	msg "Finished building [$1] in ${timer_finished} minutes"
+	msg "Finished building [$1] in $(elapsed_time ${timer_start}) minutes"
 }
-
 
 build_iso(){
 	if ${is_buildset};then

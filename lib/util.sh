@@ -12,6 +12,15 @@ import(){
 	[[ -r $1 ]] && source $1
 }
 
+get_timer(){
+	echo $(date +%s)
+}
+
+# $1: start timer
+elapsed_time(){
+	echo $(echo $1 $(get_timer) | awk '{ printf "%0.2f",($2-$1)/60 }')
+}
+
 ##
 #  usage : in_array( $needle, $haystack )
 # return : 0 - found
