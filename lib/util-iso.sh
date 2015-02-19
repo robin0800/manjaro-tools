@@ -176,7 +176,7 @@ download_to_cache(){
 make_iso() {
 	msg "Start [Build ISO]"
 	touch "${work_dir}/iso/.miso"
-	mkiso ${iso_args[*]} iso "${work_dir}" "${cache_dir_iso}/${iso_file}"
+	mkiso ${iso_args[*]} iso "${work_dir}" "${cache_dir_iso}/${iso_file}" || mkiso_error_handler
 	chown -R "${OWNER}:users" "${cache_dir_iso}"
 	msg "Done [Build ISO]"
 }
