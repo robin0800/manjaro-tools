@@ -237,10 +237,6 @@ make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
-
-		# test machine-id again
-		mkdir -p ${path}/var/lib/dbus && configure_dbus "${path}"
-
 		mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_lsb "${path}"
@@ -257,6 +253,8 @@ make_image_custom() {
 		mkdir -p ${path}
 		umount_image_handler
 		aufs_mount_root_image "${path}"
+		# test machine-id again
+		configure_dbus "${path}"
 		mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${img_name}-${custom}-${iso_version}-${arch}-pkgs.txt
