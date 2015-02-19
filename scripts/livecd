@@ -45,7 +45,7 @@ depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
 DESTDIR="/"
 [[ -e "/usr/bin/kalu" ]] && _rm_kalu
 
-install_localization "${DESTDIR}"
+install_localization
 
 configure_displaymanager
 
