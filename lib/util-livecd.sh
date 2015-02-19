@@ -35,32 +35,32 @@ get_layout(){
 	echo $(kernel_cmdline layout)
 }
 
-# find_legacy_keymap(){
-# 	file="/opt/livecd/kbd-model-map"
-# 	while read -r line || [[ -n $line ]]; do
-# 		if [[ -z $line ]] || [[ $line == \#* ]]; then
-# 			continue
-# 		fi
-#
-# 		mapping=( $line ); # parses columns
-# 		if [[ ${#mapping[@]} != 5 ]]; then
-# 			continue
-# 		fi
-#
-# 		if  [[ "$KEYMAP" != "${mapping[0]}" ]]; then
-# 			continue
-# 		fi
-#
-# 		if [[ "${mapping[3]}" = "-" ]]; then
-# 			mapping[3]=""
-# 		fi
-#
-# 		X11_LAYOUT=${mapping[1]}
-# 		X11_MODEL=${mapping[2]}
-# 		X11_VARIANT=${mapping[3]}
-# 		x11_OPTIONS=${mapping[4]}
-# 	done < $file
-# }
+find_legacy_keymap(){
+	file="/opt/livecd/kbd-model-map"
+	while read -r line || [[ -n $line ]]; do
+		if [[ -z $line ]] || [[ $line == \#* ]]; then
+			continue
+		fi
+
+		mapping=( $line ); # parses columns
+		if [[ ${#mapping[@]} != 5 ]]; then
+			continue
+		fi
+
+		if  [[ "$KEYMAP" != "${mapping[0]}" ]]; then
+			continue
+		fi
+
+		if [[ "${mapping[3]}" = "-" ]]; then
+			mapping[3]=""
+		fi
+
+		X11_LAYOUT=${mapping[1]}
+		X11_MODEL=${mapping[2]}
+		X11_VARIANT=${mapping[3]}
+		x11_OPTIONS=${mapping[4]}
+	done < $file
+}
 
 write_x11_config(){
 	# find a x11 layout that matches the keymap
@@ -70,7 +70,7 @@ write_x11_config(){
 	local X11_MODEL="pc105"
 	local X11_VARIANT=""
 	local X11_OPTIONS="terminate:ctrl_alt_bksp"
-# 	find_legacy_keymap
+	find_legacy_keymap
 
 	# layout not found, use KBLAYOUT
 	if [[ -z "$X11_LAYOUT" ]]; then
@@ -360,6 +360,23 @@ configure_alsa(){
 	$alsa_amixer -c 0 sset "Master Surround" on &>/dev/null
 	$alsa_amixer -c 0 sset "SB Live Analog/Digital Output Jack" off &>/dev/null
 	$alsa_amixer -c 0 sset "Audigy Analog/Digital Output Jack" off &>/dev/null
+}
+
+rm_kalu(){
+	local base_check_virtualbox=`dmidecode | grep innotek`
+	local base_check_vmware=`dmidecode | grep VMware`
+	local base_check_qemu=`dmidecode | grep QEMU`
+	local base_check_vpc=`dmidecode | grep Microsoft`
+
+	if [ -n "$base_check_virtualbox" ]; then
+		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
+	elif [ -n "$base_check_vmware" ]; then
+		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
+	elif [ -n "$base_check_qemu" ]; then
+		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
+	elif [ -n "$base_check_vpc" ]; then
+		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
+	fi
 }
 
 ### end shared functions with cli installer

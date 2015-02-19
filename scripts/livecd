@@ -41,24 +41,23 @@ echo "depmod extramodules" >> /tmp/livecd.log
 # depmod extramodules
 depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
 
-# check if we are running inside a virtual machine and unistall kalu
-DESTDIR="/"
-[[ -e "/usr/bin/kalu" ]] && _rm_kalu
-
 install_localization
 
 configure_displaymanager
 
 echo "configure root password" >> /tmp/livecd.log
 
-configure_user_root "${DESTDIR}"
+configure_user_root "/"
 cp -a /etc/skel/. /root/
 
 # configure documentation
 [[ -e "/etc/skel/Manjaro/Beginner_User_Guide.pdf" ]] && ln -sf \
 /etc/skel/Manjaro/Beginner_User_Guide.pdf "/home/${username}/Desktop/Beginner User Guide.pdf"
 
-configure_alsa "${DESTDIR}"
+configure_alsa "/"
 
 # save settings
 alsactl -f /etc/asound.state store &>/dev/null
+
+# check if we are running inside a virtual machine and unistall kalu
+[[ -e "/usr/bin/kalu" ]] && rm_kalu "/"
