@@ -237,13 +237,13 @@ make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
+
+		# test machine-id again
+		mkdir -p ${path}/var/lib/dbus && configure_dbus "${path}"
+
 		mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
-		[[ -f ${path}/boot/grub/grub.cfg ]] && rm ${path}/boot/grub/grub.cfg
-		if [ -e ${path}/etc/lsb-release ] ; then
-			sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" ${path}/etc/lsb-release
-			sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${code_name}/" ${path}/etc/lsb-release
-		fi
+		configure_lsb "${path}"
 		copy_overlay_root "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
