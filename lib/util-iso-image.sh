@@ -57,6 +57,22 @@ configure_services_live(){
 	fi
 }
 
+configure_lsb(){
+	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
+	if [ -e $1/etc/lsb-release ] ; then
+		sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" $1/etc/lsb-release
+		sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${code_name}/" $1/etc/lsb-release
+	fi
+}
+
+configure_dbus(){
+	msg2 "Configuring dbus ...."
+	# set unique machine-id
+# 	dbus-uuidgen --ensure=/etc/machine-id
+# 	ln -sf /etc/machine-id /var/lib/dbus/machine-id
+	chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
+}
+
 configure_services(){
 	if [[ ${initsys} == 'openrc' ]];then
 		msg3 "Congiguring OpenRC ...."
