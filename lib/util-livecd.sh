@@ -11,67 +11,6 @@
 
 # this util-livecd.sh gets copied to overlay-image/opt/livecd
 
-configure_alsa(){
-	echo "configure alsa" >> /tmp/livecd.log
-	# amixer binary
-	local alsa_amixer="chroot $1 /usr/bin/amixer"
-
-	# enable all known (tm) outputs
-	$alsa_amixer -c 0 sset "Master" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "Front" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "Side" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "Surround" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "Center" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "LFE" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "Headphone" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "Speaker" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "PCM" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "Line" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "External" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "FM" 50% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "Master Mono" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "Master Digital" 70% unmute &>/dev/null
-	$alsa_amixer -c 0 sset "Analog Mix" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "Aux" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "Aux2" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "PCM Center" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "PCM Front" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "PCM LFE" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "PCM Side" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "PCM Surround" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "Playback" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "PCM,1" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "DAC" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "DAC,0" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "DAC,0" -12dB &> /dev/null
-	$alsa_amixer -c 0 sset "DAC,1" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "DAC,1" -12dB &> /dev/null
-	$alsa_amixer -c 0 sset "Synth" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "CD" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "Wave" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "Music" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "AC97" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "Analog Front" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "VIA DXS,0" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "VIA DXS,1" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "VIA DXS,2" 70% unmute &> /dev/null
-	$alsa_amixer -c 0 sset "VIA DXS,3" 70% unmute &> /dev/null
-
-	# set input levels
-	$alsa_amixer -c 0 sset "Mic" 70% mute &>/dev/null
-	$alsa_amixer -c 0 sset "IEC958" 70% mute &>/dev/null
-
-	# special stuff
-	$alsa_amixer -c 0 sset "Master Playback Switch" on &>/dev/null
-	$alsa_amixer -c 0 sset "Master Surround" on &>/dev/null
-	$alsa_amixer -c 0 sset "SB Live Analog/Digital Output Jack" off &>/dev/null
-	$alsa_amixer -c 0 sset "Audigy Analog/Digital Output Jack" off &>/dev/null
-}
-
-check_ping(){
-	echo $(LC_ALL=C ping -c 1 www.manjaro.org | grep "1 received")
-}
-
 kernel_cmdline(){
 	for param in $(/bin/cat /proc/cmdline); do
 		case "${param}" in
@@ -96,32 +35,32 @@ get_layout(){
 	echo $(kernel_cmdline layout)
 }
 
-find_legacy_keymap(){
-	file="/opt/livecd/kbd-model-map"
-	while read -r line || [[ -n $line ]]; do
-		if [[ -z $line ]] || [[ $line == \#* ]]; then
-			continue
-		fi
-
-		mapping=( $line ); # parses columns
-		if [[ ${#mapping[@]} != 5 ]]; then
-			continue
-		fi
-
-		if  [[ "$KEYMAP" != "${mapping[0]}" ]]; then
-			continue
-		fi
-
-		if [[ "${mapping[3]}" = "-" ]]; then
-			mapping[3]=""
-		fi
-
-		X11_LAYOUT=${mapping[1]}
-		X11_MODEL=${mapping[2]}
-		X11_VARIANT=${mapping[3]}
-		x11_OPTIONS=${mapping[4]}
-	done < $file
-}
+# find_legacy_keymap(){
+# 	file="/opt/livecd/kbd-model-map"
+# 	while read -r line || [[ -n $line ]]; do
+# 		if [[ -z $line ]] || [[ $line == \#* ]]; then
+# 			continue
+# 		fi
+#
+# 		mapping=( $line ); # parses columns
+# 		if [[ ${#mapping[@]} != 5 ]]; then
+# 			continue
+# 		fi
+#
+# 		if  [[ "$KEYMAP" != "${mapping[0]}" ]]; then
+# 			continue
+# 		fi
+#
+# 		if [[ "${mapping[3]}" = "-" ]]; then
+# 			mapping[3]=""
+# 		fi
+#
+# 		X11_LAYOUT=${mapping[1]}
+# 		X11_MODEL=${mapping[2]}
+# 		X11_VARIANT=${mapping[3]}
+# 		x11_OPTIONS=${mapping[4]}
+# 	done < $file
+# }
 
 write_x11_config(){
 	# find a x11 layout that matches the keymap
@@ -131,7 +70,7 @@ write_x11_config(){
 	local X11_MODEL="pc105"
 	local X11_VARIANT=""
 	local X11_OPTIONS="terminate:ctrl_alt_bksp"
-	find_legacy_keymap
+# 	find_legacy_keymap
 
 	# layout not found, use KBLAYOUT
 	if [[ -z "$X11_LAYOUT" ]]; then
@@ -139,12 +78,12 @@ write_x11_config(){
 	fi
 
 	# create X11 keyboard layout config
-	mkdir -p "${DESTDIR}/etc/X11/xorg.conf.d"
+	mkdir -p "$1/etc/X11/xorg.conf.d"
 
-	if [[ -f ${DESTDIR}/usr/bin/openrc ]]; then
-		local XORGKBLAYOUT="${DESTDIR}/etc/X11/xorg.conf.d/20-keyboard.conf"
+	if [[ -f $1/usr/bin/openrc ]]; then
+		local XORGKBLAYOUT="$1/etc/X11/xorg.conf.d/20-keyboard.conf"
 	else
-		local XORGKBLAYOUT="${DESTDIR}/etc/X11/xorg.conf.d/00-keyboard.conf"
+		local XORGKBLAYOUT="$1/etc/X11/xorg.conf.d/00-keyboard.conf"
 	fi
 
 	echo "" >> "$XORGKBLAYOUT"
@@ -158,8 +97,8 @@ write_x11_config(){
 	echo "EndSection" >> "$XORGKBLAYOUT"
 
 	# fix por keyboardctl
-	if [[ -f "${DESTDIR}/etc/keyboard.conf" ]]; then
-		sed -i -e "s/^XKBLAYOUT=.*/XKBLAYOUT=\"${X11_LAYOUT}\"/g" ${DESTDIR}/etc/keyboard.conf
+	if [[ -f "$1/etc/keyboard.conf" ]]; then
+		sed -i -e "s/^XKBLAYOUT=.*/XKBLAYOUT=\"${X11_LAYOUT}\"/g" $1/etc/keyboard.conf
 	fi
 }
 
@@ -175,27 +114,27 @@ configure_language(){
 	[[ -z "$KEYMAP" ]] && KEYMAP="us"
 	[[ -z "$KBLAYOUT" ]] && KBLAYOUT="us"
 
-	echo "KEYMAP=us" > ${DESTDIR}/etc/vconsole.conf
-	sed -i "s/^KEYMAP=.*/KEYMAP=\"${KEYMAP}\"/" ${DESTDIR}/etc/vconsole.conf
+	echo "KEYMAP=us" > $1/etc/vconsole.conf
+	sed -i "s/^KEYMAP=.*/KEYMAP=\"${KEYMAP}\"/" $1/etc/vconsole.conf
 
 	# load keymaps
 	loadkeys "$KEYMAP"
 
-	write_x11_config
+	write_x11_config $1
 
 	# set systemwide language
-	echo "LANG=${LOCALE}.UTF-8" > ${DESTDIR}/etc/locale.conf
-	echo "LC_MESSAGES=${LOCALE}.UTF-8" >> ${DESTDIR}/etc/locale.conf
-	echo "LANG=${LOCALE}.UTF-8" >> ${DESTDIR}/etc/environment
+	echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
+	echo "LC_MESSAGES=${LOCALE}.UTF-8" >> $1/etc/locale.conf
+	echo "LANG=${LOCALE}.UTF-8" >> $1/etc/environment
 
 	# generate LOCALE
 	local TLANG=${LOCALE%.*} # remove everything after the ., including the dot from LOCALE
-	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" ${DESTDIR}/etc/locale.gen
+	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
 	# add also American English as safe default
-	sed -i -r "s/#(en_US.*UTF-8)/\1/g" ${DESTDIR}/etc/locale.gen
+	sed -i -r "s/#(en_US.*UTF-8)/\1/g" $1/etc/locale.gen
 
-	if [[ -d ${DESTDIR}/usr/bin/openrc ]]; then
-		sed -i "s/keymap=.*/keymap=\"$KEYMAP\"/" ${DESTDIR}/etc/conf.d/keymaps
+	if [[ -f $1/usr/bin/openrc ]]; then
+		sed -i "s/keymap=.*/keymap=\"$KEYMAP\"/" $1/etc/conf.d/keymaps
 	fi
 }
 
@@ -346,7 +285,7 @@ configure_translation_pkgs(){
 install_localization(){
 	if [ -e "/bootmnt/${install_dir}/${arch}/lng-image.sqfs" ] ; then
 		echo "install translation packages" >> /tmp/livecd.log
-		configure_translation_pkgs
+		configure_translation_pkgs $1
 		${PACMAN_LNG} -Sy
 		if [ -e "/bootmnt/${install_dir}/${arch}/kde-image.sqfs" ] ; then
 			${PACMAN_LNG} -S ${KDE_LNG_INST} &> /dev/null
@@ -366,11 +305,61 @@ install_localization(){
 	fi
 }
 
-printk(){
-	case ${1} in
-		"on")  echo 4 >/proc/sys/kernel/printk ;;
-		"off") echo 0 >/proc/sys/kernel/printk ;;
-	esac
+configure_alsa(){
+	echo "configure alsa" >> /tmp/livecd.log
+	# amixer binary
+	local alsa_amixer="chroot $1 /usr/bin/amixer"
+
+	# enable all known (tm) outputs
+	$alsa_amixer -c 0 sset "Master" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "Front" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "Side" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "Surround" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "Center" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "LFE" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "Headphone" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "Speaker" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "PCM" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "Line" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "External" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "FM" 50% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "Master Mono" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "Master Digital" 70% unmute &>/dev/null
+	$alsa_amixer -c 0 sset "Analog Mix" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "Aux" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "Aux2" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "PCM Center" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "PCM Front" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "PCM LFE" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "PCM Side" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "PCM Surround" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "Playback" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "PCM,1" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "DAC" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "DAC,0" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "DAC,0" -12dB &> /dev/null
+	$alsa_amixer -c 0 sset "DAC,1" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "DAC,1" -12dB &> /dev/null
+	$alsa_amixer -c 0 sset "Synth" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "CD" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "Wave" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "Music" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "AC97" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "Analog Front" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "VIA DXS,0" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "VIA DXS,1" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "VIA DXS,2" 70% unmute &> /dev/null
+	$alsa_amixer -c 0 sset "VIA DXS,3" 70% unmute &> /dev/null
+
+	# set input levels
+	$alsa_amixer -c 0 sset "Mic" 70% mute &>/dev/null
+	$alsa_amixer -c 0 sset "IEC958" 70% mute &>/dev/null
+
+	# special stuff
+	$alsa_amixer -c 0 sset "Master Playback Switch" on &>/dev/null
+	$alsa_amixer -c 0 sset "Master Surround" on &>/dev/null
+	$alsa_amixer -c 0 sset "SB Live Analog/Digital Output Jack" off &>/dev/null
+	$alsa_amixer -c 0 sset "Audigy Analog/Digital Output Jack" off &>/dev/null
 }
 
 ### end shared functions with cli installer
