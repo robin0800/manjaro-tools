@@ -274,6 +274,10 @@ load_config(){
 
 	manjaro_kernel_ver=${manjaro_kernel#*linux}
 
+	if [[ -z ${efi_boot_loader} ]];then
+		efi_boot_loader="grub"
+	fi
+
 	if [[ -z ${manjaro_version} ]];then
 		manjaro_version=$(date +%Y.%m)
 	fi

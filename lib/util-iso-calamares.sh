@@ -28,6 +28,7 @@ write_calamares_bootloader_conf(){
 	source "$1/etc/mkinitcpio.d/${manjaro_kernel}.preset"
 	local conf="$1/etc/calamares/modules/bootloader.conf"
 	echo '---' > "$conf"
+	echo "efiBootLoader: ${efi_boot_loader}" >> "$conf"
 	echo "kernel: \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
 	echo "img: \"$(echo ${default_image} | sed s'|/boot||')\"" >> "$conf"
 	echo "fallback: \"$(echo ${fallback_image} | sed s'|/boot||')\"" >> "$conf"
