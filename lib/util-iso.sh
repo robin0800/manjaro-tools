@@ -254,7 +254,7 @@ make_image_custom() {
 		umount_image_handler
 		aufs_mount_root_image "${path}"
 		# test machine-id again
-		configure_dbus "${path}"
+# 		configure_dbus "${path}"
 		mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${img_name}-${custom}-${iso_version}-${arch}-pkgs.txt
