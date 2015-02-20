@@ -24,6 +24,22 @@ write_calamares_finished_conf(){
 	echo 'restartNowCommand: "shutdown -r now"' >> "$conf"
 }
 
+write_calamares_bootloader_conf(){
+	source "$1/etc/mkinitcpio.d/${manjaro_kernel}.preset"
+	local conf="$1/etc/calamares/modules/bootloader.conf"
+	echo '---' > "$conf"
+	echo "efiBootLoader: ${efi_boot_loader}" >> "$conf"
+	echo "kernel: \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
+	echo "img: \"$(echo ${default_image} | sed s'|/boot||')\"" >> "$conf"
+	echo "fallback: \"$(echo ${fallback_image} | sed s'|/boot||')\"" >> "$conf"
+	echo "kernelLine: \"${manjaro_kernel}\"" >> "$conf"
+	echo "fallbackKernelLine: \"${manjaro_kernel} (fallback initramfs)\"" >> "$conf"
+	echo 'timeout: "10"' >> "$conf"
+	echo 'grubInstall: "grub-install"' >> "$conf"
+	echo 'grubMkconfig: "grub-mkconfig"' >> "$conf"
+	echo 'grubCfg: "/boot/grub/grub.cfg"' >> "$conf"
+}
+
 write_calamares_services_conf(){
 	local conf="$1/etc/calamares/modules/services.conf"
 	echo '---' >  "$conf"
@@ -98,6 +114,7 @@ configure_calamares(){
 	if [[ -f $1/usr/bin/calamares ]];then
 		msg2 "Configuring Calamares ..."
 		mkdir -p $1/etc/calamares/modules
+		write_calamares_bootloader_conf $1
 		write_calamares_unpack_conf $1
 		write_calamares_dm_conf $1
 		write_calamares_initcpio_conf $1
@@ -111,7 +128,6 @@ configure_calamares(){
 		mkdir -p $1/home/${username}/Desktop
 		cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
 		chmod a+x $1/home/${username}/Desktop/calamares.desktop
-# 		chown ${username}:users $1/home/${username}/Desktop/calamares.desktop
 		echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 	fi
 }
@@ -128,6 +144,5 @@ configure_thus(){
 		mkdir -p $1/home/${username}/Desktop
 		cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
 		chmod a+x $1/home/${username}/Desktop/thus.desktop
-# 		chown ${username}:users $1/home/${username}/Desktop/thus.desktop
 	fi
 }
