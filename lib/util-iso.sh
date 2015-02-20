@@ -615,7 +615,7 @@ compress_images(){
 	local timer=$(get_timer)
 	make_iso
 	make_checksum "${iso_file}"
-	msg3 "Finished ${FUNCNAME} in $(elapsed_time ${timer}) minutes"
+	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
 build_images(){
@@ -645,7 +645,7 @@ build_images(){
 	fi
 	make_isolinux
 	make_isomounts
-	msg3 "Finished ${FUNCNAME} in $(elapsed_time ${timer}) minutes"
+	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
 make_profile(){
@@ -669,7 +669,8 @@ make_profile(){
 			compress_images
 		fi
 	cd ..
-	msg "Finished building [$1] in $(elapsed_time ${timer_start}) minutes"
+	msg "Finished building [$1]"
+	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
 
 build_iso(){
