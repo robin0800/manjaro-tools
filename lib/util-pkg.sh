@@ -121,6 +121,7 @@ chroot_build(){
 }
 
 chroot_init(){
+	local timer=$(get_timer)
 	if ${clean_first}; then
 		chroot_clean
 		chroot_create
@@ -129,6 +130,7 @@ chroot_init(){
 	else
 		chroot_update
 	fi
+	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
 sign_pkgs(){

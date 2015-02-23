@@ -103,17 +103,18 @@ prepare_cachedirs(){
 }
 
 clean_cache(){
-    msg "Cleaning [$1] ..."
+    msg2 "Cleaning [$1] ..."
     find "$1" -name '*.pkg.tar.xz' -delete &>/dev/null
 }
 
 clean_chroots(){
+	msg "Cleaning up ..."
 	for image in "$1"/*-image; do
 		[[ -d ${image} ]] || continue
 		if [[ $(basename "${image}") != "pkgs-image" ]] || \
 		[[ $(basename "${image}") != "lng-image" ]];then
-			msg2 "Deleting chroot image '$(basename "${image}")'..."
-			lock 9 "${image}.lock" "Locking chroot image '${image}'"
+			msg2 "Deleting chroot '$(basename "${image}")'..."
+			lock 9 "${image}.lock" "Locking chroot '${image}'"
 			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
 				{ type -P btrfs && btrfs subvolume delete "${image}"; } &>/dev/null
 			fi
@@ -122,12 +123,6 @@ clean_chroots(){
 	done
 	exec 9>&-
 	rm -rf --one-file-system "$1"
-
-# 	if [[ -d $1 ]];then
-# 		msg "Removing [$1] ..."
-# # 		rm -r $1
-# 		rm -rf --one-file-system "$1"
-# 	fi
 }
 
 configure_custom_image(){
