@@ -72,20 +72,11 @@ copy_hostconf () {
 	[[ -n $makepkg_conf ]] && cp $makepkg_conf "$1/etc/makepkg.conf"
 	[[ -n $mirrors_conf ]] && cp ${mirrors_conf} "$1/etc/pacman-mirrors.conf"
 	
-# 	if ${build_locales};then
-# 	    local host_mirror=$(pacman -Sddp community/manjaro-tools 2>/dev/null | sed -E "s#(.*/)(.*/)community/.*#\1branch/\$repo/\$arch#")
-# 	    [[ $host_mirror == *file://* ]] && host_mirror_path=$(echo "$host_mirror" | sed -r 's#file://(/.*)/\$repo/os/\$arch#\1#g')
-# 	    
-# 	    local branch=$(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch=' | sed 's/Branch=\s*//g')
-# 	    
-# 	    host_mirror=$(echo "$host_mirror" | sed -E "s#/branch/#/${branch}/#")
-# 	    echo "Server = $host_mirror" > "$1/etc/pacman.d/mirrorlist"
 	if [[ -n ${build_mirror} ]];then
-# 	    source $1/etc/pacman-mirrors.conf
 	    build_mirror=${build_mirror}'/$repo/$arch'
 	    echo "Server = ${build_mirror}" > "$1/etc/pacman.d/mirrorlist"
 	else
-	    source $1/etc/pacman-mirrors.conf	
+	    source $1/etc/pacman-mirrors.conf
 	    sed -e "s|/stable|/${Branch}|g" -i "$1/etc/pacman.d/mirrorlist"
 	fi
 
@@ -97,23 +88,23 @@ chroot_extra_umount() {
     chroot_mount "${cache_dirs[0]}" "$1${cache_dirs[0]}" -B
 
     for cache_dir in ${cache_dirs[@]:1}; do
-	chroot_mount "$cache_dir" "$1${cache_dir}" -Br
+		chroot_mount "$cache_dir" "$1${cache_dir}" -Br
     done
-    
+
     if [[ -n ${mountargs_ro[@]} ]];then
-	local IFS=','
-	for m in ${mountargs_ro[@]}; do
-	    chroot_mount "${m%%:*}" "$1${m##*:}" -Br
-	done
-	unset IFS
+		local IFS=','
+		for m in ${mountargs_ro[@]}; do
+			chroot_mount "${m%%:*}" "$1${m##*:}" -Br
+		done
+		unset IFS
     fi
-    
+
     if [[ -n ${mountargs_rw[@]} ]];then
-	local IFS=','
-	for m in ${mountargs_rw[@]}; do
-	    chroot_mount "${m%%:*}" "$1${m##*:}" -B
-	done
-	unset IFS
+		local IFS=','
+		for m in ${mountargs_rw[@]}; do
+			chroot_mount "${m%%:*}" "$1${m##*:}" -B
+		done
+		unset IFS
     fi
 }
 
