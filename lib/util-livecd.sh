@@ -70,7 +70,8 @@ write_x11_config(){
 	local X11_MODEL="pc105"
 	local X11_VARIANT=""
 	local X11_OPTIONS="terminate:ctrl_alt_bksp"
-# 	find_legacy_keymap
+
+	find_legacy_keymap
 
 	# layout not found, use KBLAYOUT
 	if [[ -z "$X11_LAYOUT" ]]; then
@@ -117,20 +118,22 @@ configure_language(){
 
 	if [[ -f $1/usr/bin/openrc ]]; then
 		sed -i "s/keymap=.*/keymap=\"${KEYMAP}\"/" $1/etc/conf.d/keymaps
-		loadkeys "${KEYMAP}"
 		# setup systemd stuff too
 		echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
 		echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
 	else
-		localectl set-keymap --no-convert ${KEYMAP}
-		localectl set-locale LANG=${LOCALE}.UTF-8
+		echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
+		echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
+# 		localectl set-keymap --no-convert ${KEYMAP}
+# 		localectl set-locale LANG=${LOCALE}.UTF-8
 	fi
 
 	write_x11_config $1
 
 	echo "LANGUAGE=${LOCALE}:${FALLBACK}" >> $1/etc/locale.conf
+	#echo "LC_MESSAGES=${LOCALE}.UTF-8" >> $1/etc/locale.conf
 
-# 	echo "LC_MESSAGES=${LOCALE}.UTF-8" >> $1/etc/locale.conf
+	loadkeys "${KEYMAP}"
 }
 
 configure_translation_pkgs(){
