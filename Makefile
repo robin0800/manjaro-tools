@@ -43,8 +43,7 @@ CONFIGFILES = \
 	conf/pacman-mirrors-testing.conf \
 	conf/pacman-mirrors-unstable.conf \
 	conf/pacman-gfx.conf \
-	conf/pacman-lng.conf \
-	conf/kbd-model-map
+	conf/pacman-lng.conf
 
 LIBS = \
 	lib/util.sh \
@@ -71,7 +70,8 @@ CPIOINST = \
 
 SCRIPTS = \
 	scripts/mhwd-live \
-	scripts/livecd
+	scripts/livecd \
+	scripts/kbd-model-map
 
 all: $(BINPROGS) #bin/bash_completion bin/zsh_completion
 
