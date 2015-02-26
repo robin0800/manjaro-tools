@@ -108,7 +108,7 @@ configure_language(){
 	local LOCALE=$(get_country)
 	local KEYMAP=$(get_keyboard)
 	local KBLAYOUT=$(get_layout)
-	local FALLBACK="en_GB"
+	local FALLBACK="en_US"
 	local TLANG=${LOCALE%.*}
 
 	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
