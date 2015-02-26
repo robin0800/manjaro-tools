@@ -108,11 +108,11 @@ configure_language(){
 	local LOCALE=$(get_country)
 	local KEYMAP=$(get_keyboard)
 	local KBLAYOUT=$(get_layout)
-	local FALLBACK="en_US"
+# 	local FALLBACK="en_US"
 	local TLANG=${LOCALE%.*}
 
 	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
-	sed -i -r "s/#(${FALLBACK}.*UTF-8)/\1/g" $1/etc/locale.gen
+# 	sed -i -r "s/#(${FALLBACK}.*UTF-8)/\1/g" $1/etc/locale.gen
 
 	echo "LANG=${LOCALE}.UTF-8" >> $1/etc/environment
 
@@ -124,14 +124,11 @@ configure_language(){
 	else
 		echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
 		echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
-# 		localectl set-keymap --no-convert ${KEYMAP}
-# 		localectl set-locale LANG=${LOCALE}.UTF-8
 	fi
 
 	write_x11_config $1
 
-	echo "LANGUAGE=${LOCALE}:${FALLBACK}" >> $1/etc/locale.conf
-	#echo "LC_MESSAGES=${LOCALE}.UTF-8" >> $1/etc/locale.conf
+# 	echo "LANGUAGE=${LOCALE}:${FALLBACK}" >> $1/etc/locale.conf
 
 	loadkeys "${KEYMAP}"
 }
