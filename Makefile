@@ -1,4 +1,4 @@
-V=0.9.6.4
+V=0.9.6.5
 
 PREFIX = $(PREFIX)/local
 
