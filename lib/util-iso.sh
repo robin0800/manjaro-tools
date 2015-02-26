@@ -62,6 +62,7 @@ copy_startup_scripts(){
 	cp ${PKGDATADIR}/scripts/mhwd-live $1
 	chmod +x $1/livecd
 	chmod +x $1/mhwd-live
+
 # 	cp ${BINDIR}/chroot-run $1
 # 	sed -e "s|${LIBDIR}|/opt/livecd|g" -i $1/chroot-run
 }
@@ -72,6 +73,8 @@ copy_livecd_helpers(){
 	cp ${LIBDIR}/util-livecd.sh $1
 	cp ${LIBDIR}/util-msg.sh $1
 	cp ${LIBDIR}/util.sh $1
+	cp ${PKGDATADIR}/scripts/kbd-model-map $1
+	
 	#     cp ${LIBDIR}/util-mount.sh $1
 	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
 		msg2 "Copying ${USER_CONFIG}/manjaro-tools.conf ..."
