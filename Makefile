@@ -43,7 +43,8 @@ CONFIGFILES = \
 	conf/pacman-mirrors-testing.conf \
 	conf/pacman-mirrors-unstable.conf \
 	conf/pacman-gfx.conf \
-	conf/pacman-lng.conf
+	conf/pacman-lng.conf \
+	conf/kbd-model-map
 
 LIBS = \
 	lib/util.sh \
