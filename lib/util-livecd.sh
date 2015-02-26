@@ -70,7 +70,7 @@ write_x11_config(){
 	local X11_MODEL="pc105"
 	local X11_VARIANT=""
 	local X11_OPTIONS="terminate:ctrl_alt_bksp"
-	find_legacy_keymap
+# 	find_legacy_keymap
 
 	# layout not found, use KBLAYOUT
 	if [[ -z "$X11_LAYOUT" ]]; then
@@ -107,35 +107,30 @@ configure_language(){
 	local LOCALE=$(get_country)
 	local KEYMAP=$(get_keyboard)
 	local KBLAYOUT=$(get_layout)
+	local FALLBACK="en_GB"
+	local TLANG=${LOCALE%.*}
 
-	# set a default value, in case something goes wrong, or a language doesn't have
-	# good defult settings
-	[[ -z "$LOCALE" ]] && LOCALE="en_US"
-	[[ -z "$KEYMAP" ]] && KEYMAP="us"
-	[[ -z "$KBLAYOUT" ]] && KBLAYOUT="us"
+	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
+	sed -i -r "s/#(${FALLBACK}.*UTF-8)/\1/g" $1/etc/locale.gen
 
-	echo "KEYMAP=us" > $1/etc/vconsole.conf
-	sed -i "s/^KEYMAP=.*/KEYMAP=\"${KEYMAP}\"/" $1/etc/vconsole.conf
+	echo "LANG=${LOCALE}.UTF-8" >> $1/etc/environment
 
-	# load keymaps
-	loadkeys "$KEYMAP"
+	if [[ -f $1/usr/bin/openrc ]]; then
+		sed -i "s/keymap=.*/keymap=\"${KEYMAP}\"/" $1/etc/conf.d/keymaps
+		loadkeys "${KEYMAP}"
+		# setup systemd stuff too
+		echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
+		echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
+	else
+		localectl set-keymap --no-convert ${KEYMAP}
+		localectl set-locale LANG=${LOCALE}.UTF-8
+	fi
 
 	write_x11_config $1
 
-	# set systemwide language
-	echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
-	echo "LC_MESSAGES=${LOCALE}.UTF-8" >> $1/etc/locale.conf
-	echo "LANG=${LOCALE}.UTF-8" >> $1/etc/environment
+	echo "LANGUAGE=${LOCALE}:${FALLBACK}" >> $1/etc/locale.conf
 
-	# generate LOCALE
-	local TLANG=${LOCALE%.*} # remove everything after the ., including the dot from LOCALE
-	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
-	# add also American English as safe default
-	sed -i -r "s/#(en_US.*UTF-8)/\1/g" $1/etc/locale.gen
-
-	if [[ -f $1/usr/bin/openrc ]]; then
-		sed -i "s/keymap=.*/keymap=\"$KEYMAP\"/" $1/etc/conf.d/keymaps
-	fi
+# 	echo "LC_MESSAGES=${LOCALE}.UTF-8" >> $1/etc/locale.conf
 }
 
 configure_translation_pkgs(){
