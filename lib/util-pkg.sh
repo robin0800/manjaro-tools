@@ -56,9 +56,9 @@ blacklist_pkg(){
 	done
 }
 
-set_mhwd_multilib(){
-	chroot-run $1/root mhwd-gpu --setgl mesa
-}
+# set_mhwd_multilib(){
+# 	chroot-run $1/root mhwd-gpu --setgl mesa
+# }
 
 prepare_cachedir(){
 	prepare_dir "${cache_dir_pkg}"

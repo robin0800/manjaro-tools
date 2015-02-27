@@ -155,11 +155,11 @@ if [[ "${arch}" == 'multilib' ]]; then
 	work_dir=${chroots_pkg}/${branch}/${arch}
 	cache_dir_pkg=${cache_dir}/${branch}/${arch}
 	arch='x86_64'
-	is_multilib=true
+	#is_multilib=true
 else
 	work_dir=${chroots_pkg}/${branch}/${arch}
 	cache_dir_pkg=${cache_dir}/${branch}/${arch}
-	is_multilib=false
+	#is_multilib=false
 fi
 
 pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
