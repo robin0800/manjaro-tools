@@ -56,6 +56,23 @@ blacklist_pkg(){
 	done
 }
 
+set_gl_multilib(){
+	# keep this in-sync with mhwd
+	msg "Setting libGL for multilib ..."
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1.2.0
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv1_CM.so.1.1.0 /usr/lib32/libGLESv1_CM.so
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv1_CM.so.1.1.0 /usr/lib32/libGLESv1_CM.so.1
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv1_CM.so.1.1.0 /usr/lib32/libGLESv1_CM.so.1.1.0
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv2.so.2.0.0 /usr/lib32/libGLESv2.so
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv2.so.2.0.0 /usr/lib32/libGLESv2.so.2
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv2.so.2.0.0 /usr/lib32/libGLESv2.so.2.0.0
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libEGL.so.1.0.0 /usr/lib32/libEGL.so
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libEGL.so.1.0.0 /usr/lib32/libEGL.so.1
+	chroot-run $1/root ln -sf /usr/lib32/mesa/libEGL.so.1.0.0 /usr/lib32/libEGL.so.1.0.0
+}
+
 prepare_cachedir(){
 	prepare_dir "${cache_dir_pkg}"
 	chown -R "${OWNER}:users" "${cache_dir_pkg}"
@@ -93,6 +110,7 @@ make_pkg(){
 		for p in ${blacklist_trigger[@]}; do
 			[[ $1 == $p ]] && blacklist_pkg "${work_dir}"
 		done
+		${is_multilib} && set_gl_multilib "${work_dir}"
 		setarch "${arch}" \
 			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
 		source PKGBUILD
