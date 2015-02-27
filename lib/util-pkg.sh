@@ -59,6 +59,7 @@ blacklist_pkg(){
 set_gl_multilib(){
 	# keep this in-sync with mhwd
 	msg "Setting libGL for multilib ..."
+	chroot-run $1/root mkdir -p /usr/lib32/
 	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so
 	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1
 	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1.2.0
