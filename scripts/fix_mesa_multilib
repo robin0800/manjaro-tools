@@ -9,6 +9,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+# keep this in-sync with mhwd
+
 ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so
 ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1
 ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1.2.0
