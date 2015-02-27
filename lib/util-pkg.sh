@@ -56,10 +56,6 @@ blacklist_pkg(){
 	done
 }
 
-# set_mhwd_multilib(){
-# 	chroot-run $1/root mhwd-gpu --setgl mesa
-# }
-
 prepare_cachedir(){
 	prepare_dir "${cache_dir_pkg}"
 	chown -R "${OWNER}:users" "${cache_dir_pkg}"
@@ -97,7 +93,6 @@ make_pkg(){
 		for p in ${blacklist_trigger[@]}; do
 			[[ $1 == $p ]] && blacklist_pkg "${work_dir}"
 		done
-		# ${is_multilib} && set_mhwd_multilib "${work_dir}"
 		setarch "${arch}" \
 			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
 		source PKGBUILD
