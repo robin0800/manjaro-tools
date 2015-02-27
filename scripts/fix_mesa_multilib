@@ -11,6 +11,8 @@
 
 # keep this in-sync with mhwd
 
+mkdir -p /usr/lib32
+
 ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so
 ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1
 ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1.2.0
