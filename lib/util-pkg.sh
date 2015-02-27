@@ -57,21 +57,10 @@ blacklist_pkg(){
 }
 
 set_gl_multilib(){
-	# keep this in-sync with mhwd
 	msg "Setting libGL for multilib ..."
-	chroot-run $1/root mkdir -p /usr/lib32/
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGL.so.1.2.0 /usr/lib32/libGL.so.1.2.0
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv1_CM.so.1.1.0 /usr/lib32/libGLESv1_CM.so
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv1_CM.so.1.1.0 /usr/lib32/libGLESv1_CM.so.1
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv1_CM.so.1.1.0 /usr/lib32/libGLESv1_CM.so.1.1.0
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv2.so.2.0.0 /usr/lib32/libGLESv2.so
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv2.so.2.0.0 /usr/lib32/libGLESv2.so.2
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libGLESv2.so.2.0.0 /usr/lib32/libGLESv2.so.2.0.0
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libEGL.so.1.0.0 /usr/lib32/libEGL.so
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libEGL.so.1.0.0 /usr/lib32/libEGL.so.1
-	chroot-run $1/root ln -sf /usr/lib32/mesa/libEGL.so.1.0.0 /usr/lib32/libEGL.so.1.0.0
+	cp ${PKGDATADIR}/scripts/fix_mesa_multilib $1/root/usr/bin
+	chmod +x $1/root/usr/bin/fix_mesa_multilib
+	chroot $1/root fix_mesa_multilib
 }
 
 prepare_cachedir(){

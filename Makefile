@@ -71,7 +71,8 @@ CPIOINST = \
 SCRIPTS = \
 	scripts/mhwd-live \
 	scripts/livecd \
-	scripts/kbd-model-map
+	scripts/kbd-model-map \
+	scripts/fix_mesa_multilib
 
 all: $(BINPROGS) #bin/bash_completion bin/zsh_completion
 
