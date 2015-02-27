@@ -97,7 +97,7 @@ make_pkg(){
 		for p in ${blacklist_trigger[@]}; do
 			[[ $1 == $p ]] && blacklist_pkg "${work_dir}"
 		done
-		${is_multilib} && set_mhwd_multilib
+		${is_multilib} && set_mhwd_multilib "${work_dir}"
 		setarch "${arch}" \
 			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
 		source PKGBUILD
