@@ -18,20 +18,26 @@ if [[ -t 2 ]]; then
 	if tput setaf 0 &>/dev/null; then
 		ALL_OFF="$(tput sgr0)"
 		BOLD="$(tput bold)"
-		BLUE="${BOLD}$(tput setaf 4)"
-		GREEN="${BOLD}$(tput setaf 2)"
 		RED="${BOLD}$(tput setaf 1)"
+		GREEN="${BOLD}$(tput setaf 2)"
 		YELLOW="${BOLD}$(tput setaf 3)"
+		BLUE="${BOLD}$(tput setaf 4)"
+		MARGENTA="${BOLD}$(tput setaf 5)"
+		CYAN="${BOLD}$(tput setaf 6)"
+		WHITE="${BOLD}$(tput setaf 7)"
 	else
 		ALL_OFF="\e[1;0m"
 		BOLD="\e[1;1m"
-		BLUE="${BOLD}\e[1;34m"
-		GREEN="${BOLD}\e[1;32m"
 		RED="${BOLD}\e[1;31m"
+		GREEN="${BOLD}\e[1;32m"
 		YELLOW="${BOLD}\e[1;33m"
+		BLUE="${BOLD}\e[1;34m"
+		MARGENTA="${BOLD}\e[1;35m"
+		CYAN="${BOLD}\e[1;36m"
+		WHITE="${BOLD}\e[1;37m"
 	fi
 fi
-readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
+readonly ALL_OFF BOLD BLUE GREEN RED YELLOW CYAN MARGENTA WHITE
 
 plain() {
 	local mesg=$1; shift
@@ -113,12 +119,12 @@ slock() {
 # 	trap - EXIT INT QUIT TERM HUP
 # 	abort
 # }
-# 
+#
 # trap_exit() {
 # 	local r=$?
 # 	trap - EXIT INT QUIT TERM HUP
 # 	cleanup $r
 # }
-# 
+#
 # trap 'trap_abort' INT QUIT TERM HUP
 # trap 'trap_exit' EXIT
