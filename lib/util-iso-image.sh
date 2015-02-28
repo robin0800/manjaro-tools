@@ -272,9 +272,9 @@ configure_displaymanager(){
 		if [[ -f $1/etc/plymouth/plymouthd.conf ]] ; then
 			if [[ -f $1/usr/lib/systemd/system/${displaymanager}-plymouth.service ]] ; then
 				service=${displaymanager}-plymouth
-			else
-				service=${displaymanager}
 			fi
+		else
+			service=${displaymanager}
 		fi
 		chroot $1 systemctl enable ${service} &> /dev/null
 	fi
