@@ -145,6 +145,7 @@ configure_livecd_image(){
 	configure_services_live "$1"
 	configure_calamares "$1"
 	configure_thus "$1"
+	configure_cli "$1"
 	msg "Done configuring [livecd-image]"
 }
 

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 [[ -r /opt/livecd/util.sh ]] && source /opt/livecd/util.sh
+[[ -r /opt/livecd/util-livecd.sh ]] && source /opt/livecd/util-livecd.sh
 
 USENONFREE="$(kernel_cmdline nonfree no)"
 VIDEO="$(kernel_cmdline xdriver no)"
