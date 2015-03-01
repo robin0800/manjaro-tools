@@ -14,8 +14,8 @@
 
 # $1: function
 run_log(){
-	logfile=${cache_dir_iso}/${buildset_iso}.log
-	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
+	local logfile=${cache_dir_iso}/${buildset_iso}.log
+	local logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
 	mkfifo "$logpipe"
 	tee "$logfile" < "$logpipe" &
 	local teepid=$!
@@ -74,7 +74,7 @@ copy_livecd_helpers(){
 	cp ${LIBDIR}/util-msg.sh $1
 	cp ${LIBDIR}/util.sh $1
 	cp ${PKGDATADIR}/scripts/kbd-model-map $1
-	
+
 	#     cp ${LIBDIR}/util-mount.sh $1
 	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
 		msg2 "Copying ${USER_CONFIG}/manjaro-tools.conf ..."
