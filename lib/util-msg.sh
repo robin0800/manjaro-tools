@@ -12,7 +12,7 @@ export LC_MESSAGES=C
 export LANG=C
 
 # check if messages are to be printed using color
-unset ALL_OFF BOLD BLUE GREEN RED YELLOW
+unset ALL_OFF BOLD BLUE GREEN RED YELLOW CYAN MAGENTA WHITE
 if [[ -t 2 ]]; then
 	# prefer terminal safe colored and bold text when tput is supported
 	if tput setaf 0 &>/dev/null; then
@@ -22,22 +22,22 @@ if [[ -t 2 ]]; then
 		GREEN="${BOLD}$(tput setaf 2)"
 		YELLOW="${BOLD}$(tput setaf 3)"
 		BLUE="${BOLD}$(tput setaf 4)"
-		MARGENTA="${BOLD}$(tput setaf 5)"
+		MAGENTA="${BOLD}$(tput setaf 5)"
 		CYAN="${BOLD}$(tput setaf 6)"
 		WHITE="${BOLD}$(tput setaf 7)"
 	else
 		ALL_OFF="\e[1;0m"
 		BOLD="\e[1;1m"
-		RED="${BOLD}\e[1;31m"
-		GREEN="${BOLD}\e[1;32m"
-		YELLOW="${BOLD}\e[1;33m"
-		BLUE="${BOLD}\e[1;34m"
-		MARGENTA="${BOLD}\e[1;35m"
-		CYAN="${BOLD}\e[1;36m"
-		WHITE="${BOLD}\e[1;37m"
+		RED="\e[1;31m"
+		GREEN="\e[1;32m"
+		YELLOW="\e[1;33m"
+		BLUE="\e[1;34m"
+		MAGENTA="\e[1;35m"
+		CYAN="\e[1;36m"
+		WHITE="\e[1;37m"
 	fi
 fi
-readonly ALL_OFF BOLD BLUE GREEN RED YELLOW CYAN MARGENTA WHITE
+readonly ALL_OFF BOLD BLUE GREEN RED YELLOW CYAN MAGENTA WHITE
 
 plain() {
 	local mesg=$1; shift
