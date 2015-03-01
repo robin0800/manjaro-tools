@@ -200,4 +200,6 @@ prepare_cachedirs
 
 ${pretend} && display_settings && exit 1
 
+# disable logging for now
+# run_log build_iso
 build_iso
