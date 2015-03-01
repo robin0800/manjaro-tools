@@ -26,55 +26,56 @@ if [[ -t 2 ]]; then
 		CYAN="${BOLD}$(tput setaf 6)"
 		WHITE="${BOLD}$(tput setaf 7)"
 	else
-		ALL_OFF="\033[01;00m"
-		RED="\033[01;31m"
-		GREEN="\033[01;32m"
-		YELLOW="\033[01;33m"
-		BLUE="\033[01;34m"
-		MAGENTA="\033[01;35m"
-		CYAN="\033[01;36m"
-		WHITE="\033[01;37m"
+		ALL_OFF="\e[0m"
+		BOLD="\e[1m"
+		RED="${BOLD}\e[31m"
+		GREEN="${BOLD}\e[32m"
+		YELLOW="${BOLD}\e[33m"
+		BLUE="${BOLD}\e[34m"
+		MAGENTA="${BOLD}\e[35m"
+		CYAN="${BOLD}\e[36m"
+		WHITE="${BOLD}\e[37m"
 	fi
 fi
 readonly ALL_OFF BOLD BLUE GREEN RED YELLOW CYAN MAGENTA WHITE
 
 plain() {
 	local mesg=$1; shift
-	printf "${WHITE}    ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${BOLD}    ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 msg() {
 	local mesg=$1; shift
-	printf "${GREEN}==>${ALL_OFF}${WHITE} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 msg2() {
 	local mesg=$1; shift
-	printf "${BLUE}  ->${ALL_OFF}${WHITE} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 msg3() {
 	local mesg=$1; shift
-	printf "${YELLOW} -->${ALL_OFF}${WHITE} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${YELLOW} -->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 warning() {
 	local mesg=$1; shift
-	printf "${YELLOW}==> WARNING:${ALL_OFF}${WHITE} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${YELLOW}==> WARNING:${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 error() {
 	local mesg=$1; shift
-	printf "${RED}==> ERROR:${ALL_OFF}${WHITE} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${RED}==> ERROR:${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 stat_busy() {
 	local mesg=$1; shift
-	printf "${GREEN}==>${ALL_OFF}${WHITE} ${mesg}...${ALL_OFF}" >&2
+	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}...${ALL_OFF}" >&2
 }
 
 stat_done() {
-	printf "${WHITE}done${ALL_OFF}\n" >&2
+	printf "${BOLD}done${ALL_OFF}\n" >&2
 }
 
 setup_workdir() {
