@@ -26,14 +26,14 @@ if [[ -t 2 ]]; then
 		CYAN="${BOLD}$(tput setaf 6)"
 		WHITE="${BOLD}$(tput setaf 7)"
 	else
-		ALL_OFF="\e[01;00m"
-		RED="\e[01;31m"
-		GREEN="\e[01;32m"
-		YELLOW="\e[01;33m"
-		BLUE="\e[01;34m"
-		MAGENTA="\e[01;35m"
-		CYAN="\e[01;36m"
-		WHITE="\e[01;37m"
+		ALL_OFF="\033[01;00m"
+		RED="\033[01;31m"
+		GREEN="\033[01;32m"
+		YELLOW="\033[01;33m"
+		BLUE="\033[01;34m"
+		MAGENTA="\033[01;35m"
+		CYAN="\033[01;36m"
+		WHITE="\033[01;37m"
 	fi
 fi
 readonly ALL_OFF BOLD BLUE GREEN RED YELLOW CYAN MAGENTA WHITE
