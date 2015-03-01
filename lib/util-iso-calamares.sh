@@ -150,6 +150,10 @@ configure_thus(){
 configure_cli(){
 	if [[ -f $1/usr/bin/setup ]]||[[ -L $1/usr/bin/setup ]];then
 		msg2 "Configuring cli-installer ..."
-		chmod a+x $1/etc/skel/Desktop/installer-launcher-cli.desktop
+		if [[ ! -f $1/home/${username}/Desktop/installer-launcher-cli.desktop ]];then
+			cp $1/etc/skel/Desktop/installer-launcher-cli.desktop \
+			$1/home/${username}/Desktop/installer-launcher-cli.desktop
+		fi
+		chmod a+x $1/home/${username}/Desktop/installer-launcher-cli.desktop
 	fi
 }
