@@ -97,10 +97,6 @@ write_x11_config(){
 	echo " Option \"XkbOptions\" \"$X11_OPTIONS\"" >> "$XORGKBLAYOUT"
 	echo "EndSection" >> "$XORGKBLAYOUT"
 
-	# fix por keyboardctl
-	if [[ -f "$1/etc/keyboard.conf" ]]; then
-		sed -i -e "s/^XKBLAYOUT=.*/XKBLAYOUT=\"${X11_LAYOUT}\"/g" $1/etc/keyboard.conf
-	fi
 }
 
 configure_language(){
