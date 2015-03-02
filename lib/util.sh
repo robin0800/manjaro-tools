@@ -258,15 +258,16 @@ load_config(){
 		buildset_iso='default'
 	fi
 
-	if [[ -z ${iso_label} ]];then
-		source /etc/lsb-release
-		iso_label="MJRO${DISTRIB_RELEASE//.}"
-	fi
-
 	if [[ -z ${iso_version} ]];then
 		source /etc/lsb-release
 		iso_version=${DISTRIB_RELEASE}
 	fi
+
+	if [[ -z ${branding} ]];then
+		branding="MJRO"
+	fi
+
+	iso_label="${branding}${iso_version//.}"
 
 	if [[ -z ${manjaro_kernel} ]];then
 		manjaro_kernel="linux319"
