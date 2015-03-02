@@ -43,11 +43,11 @@ show_build_queue(){
 	if ${is_buildset};then
 		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
 		for item in ${list[@]}; do
-			check_sanity "$item/initsys" "break"
+			check_sanity "$item/profile.conf" "break"
 			show_profile "$item"
 		done
 	else
-		check_sanity "${buildset_iso}/initsys" 'die "Not a valid iso-profiles folder!"'
+		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profiles folder!"'
 		show_profile "${buildset_iso}"
 	fi
 }
