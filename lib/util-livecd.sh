@@ -123,13 +123,9 @@ configure_language(){
 
 	if [[ -f $1/usr/bin/openrc ]]; then
 		sed -i "s/keymap=.*/keymap=\"${KEYMAP}\"/" $1/etc/conf.d/keymaps
-		# setup systemd stuff too
-		echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
-		echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
-	else
-		echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
-		echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
 	fi
+	echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
+	echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
 
 	write_x11_config $1
 
