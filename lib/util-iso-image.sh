@@ -269,12 +269,10 @@ configure_displaymanager(){
 		sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
 		chroot $1 rc-update add xdm default &> /dev/null
 	else
-		if [[ -f $1/etc/plymouth/plymouthd.conf ]] ; then
-			if [[ -f $1/usr/lib/systemd/system/${displaymanager}-plymouth.service ]] ; then
-				service=${displaymanager}-plymouth
-			fi
-		else
-			service=${displaymanager}
+		service=${displaymanager}
+		if [[ -f $1/etc/plymouth/plymouthd.conf && \
+			-f $1/usr/lib/systemd/system/${displaymanager}-plymouth.service ]]; then
+			service=${displaymanager}-plymouth
 		fi
 		chroot $1 systemctl enable ${service} &> /dev/null
 	fi
