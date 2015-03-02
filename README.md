@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.9.6
+Manjaro-tools-0.9.7
 
 User manual
 
@@ -34,9 +34,9 @@ Tools configuration is done in manjaro-tools.conf or by args.
 Specifying args will override manjaro-tools.conf settings.
 
 ~~~
-##########################################
-################ common ##################
-##########################################
+######################################################
+################ manjaro-tools.conf ##################
+######################################################
 
 # unset defaults to given value
 # branch=stable
@@ -47,20 +47,16 @@ Specifying args will override manjaro-tools.conf settings.
 # cache dir where buildpkg or buildiso cache packages
 # cache_dir=/var/cache/manjaro-tools
 
-##########################################
 ################ buildtree ###############
-##########################################
 
 # manjaro package tree
 # repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
 
 # host_tree=https://github.com/manjaro
 
-# host_tree_abs=https://projects.archlinux.org/git/svntogit/packages
+# host_tree_abs=https://projects.archlinux.org/git/svntogit
 
-##########################################
 ################ buildpkg ################
-##########################################
 
 # default chroot path
 # chroots_pkg=/opt/buildpkg
@@ -74,9 +70,7 @@ Specifying args will override manjaro-tools.conf settings.
 # custom build mirror server
 # build_mirror=http://mirror.netzspielplatz.de/manjaro/packages
 
-############# eudev specific #############
-
-# This is only useful if you compile packages against eudev
+# Next settings are only useful if you compile packages against eudev
 
 # default packages to trigger blacklist
 # blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
@@ -84,9 +78,7 @@ Specifying args will override manjaro-tools.conf settings.
 # default blacklisted packages to remove from chroot
 # blacklist=('libsystemd')
 
-##########################################
 ################ buildiso ################
-##########################################
 
 # default work dir where the image chroots are located
 # chroots_iso=/opt/buildiso
@@ -97,13 +89,11 @@ Specifying args will override manjaro-tools.conf settings.
 # default iso buildset; name without .set extension
 # buildset_iso=default
 
-############## iso settings ##############
-
-# unset defaults to given value
-# iso_label="MJRO090"
-
 # unset defaults to given value
 # iso_version=0.9.0
+
+# unset defaults to given value
+# branding="MJRO"
 
 # unset defaults to given value, specify a date here of have it automatically set
 # manjaro_version="$(date +%Y.%m)"
@@ -118,37 +108,52 @@ Specifying args will override manjaro-tools.conf settings.
 # img_name=manjaro
 
 # unset defaults to given value
-# install_dir=manjaro
-
-# unset defaults to given value
 # compression=xz
 
 # valid: md5, sha1, sha256, sha384, sha512
 # checksum_mode=md5
+~~~
+
+####Config files in iso profiles
+
+Each iso profile must have these files or symlinks to shared:
+
+
+* profile.conf
+
+~~~
+##########################################
+###### use this file in the profile ######
+##########################################
+
+# possible values: openrc,systemd
+# initsys="systemd"
+
+# displaymanager="lightdm"
 
 ################ install ################
 
-# These settings are inherited in live session
-# Settings will be installed
+# unset defaults to given value
+# manjaro_kernel="linux319"
 
 # unset defaults to given value
-# manjaro_kernel="linux317"
+# efi_boot_loader="grub"
+
+# unset defaults to given value
+# install_dir=manjaro
 
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant
 
 # unset defaults to given values
 # names must match systemd service names
-# start_systemd=('bluetooth' 'cronie' 'org.cups.cupsd' 'tlp' 'tlp-sleep' 'NetworkManager' 'ModemManager')
+# start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 
 # unset defaults to given values,
 # names must match openrc service names
-# start_openrc=('bluetooth' 'cronie' 'cupsd' 'metalog' 'dbus' 'consolekit' 'acpid' 'NetworkManager')
+# start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 
 ################# livecd #################
-
-# These settings are specific to live session
-# Settings will not be installed
 
 # unset defaults to given value
 # hostname="manjaro"
@@ -160,7 +165,7 @@ Specifying args will override manjaro-tools.conf settings.
 # password="manjaro"
 
 # unset defaults to given values
-# addgroups="video,audio,power,disk,storage,optical,network,lp,scanner"
+# addgroups="video,audio,power,disk,storage,optical,network,lp,scanner,wheel"
 
 # unset defaults to given values
 # names must match systemd service names
@@ -173,34 +178,21 @@ Specifying args will override manjaro-tools.conf settings.
 # start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
 ~~~
 
-####Config files in iso profiles
-
-Each iso profile must have these files or symlinks to shared:
-
-* initsys  
-Contains the init type string
-systemd or openrc
-could be eg a future runit implemetation too
-
-* displaymanager  
-Contains the DM string
-if no DM is used, set it to 'none'
-
-* Packages  
+* Packages
 Contains root image packages
 ideally no xorg
 
-* Packages-Custom/desktop  
+* Packages-Custom/desktop
 Contains the custom image packages
 desktop environment packages go here
 
-* Packages-Xorg  
+* Packages-Xorg
 Contains the Xorg package repo
 
-* Packages-Lng  
+* Packages-Lng
 Contains the language packages repo
 
-* Packages-Livecd  
+* Packages-Livecd
 Contains packages you only want on livecd but not installed on the target system with installer
 default files are in shared folder and can be symlinked or defined in a real file
 
