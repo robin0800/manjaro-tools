@@ -177,40 +177,43 @@ Specifying args will override manjaro-tools.conf settings.
 
 Each iso profile must have these files or symlinks to shared:
 
-######* initsys
+* initsys  
 Contains the init type string
 systemd or openrc
 could be eg a future runit implemetation too
 
-######* displaymanager
+* displaymanager  
 Contains the DM string
 if no DM is used, set it to 'none'
 
-######* Packages
+* Packages  
 Contains root image packages
 ideally no xorg
 
-######* Packages-Custom/desktop
+* Packages-Custom/desktop  
 Contains the custom image packages
 desktop environment packages go here
 
-######* Packages-Xorg
+* Packages-Xorg  
 Contains the Xorg package repo
 
-######* Packages-Lng
+* Packages-Lng  
 Contains the language packages repo
 
-######* Packages-Livecd
+* Packages-Livecd  
 Contains packages you only want on livecd but not installed on the target system with installer
 default files are in shared folder and can be symlinked or defined in a real file
 
-######* optional custom pacman.conf in profile
-    * for i686
+###### optional custom pacman.conf in profile
+
+* for i686
+
 ~~~
 pacman-default.conf
 ~~~
 
-    * for x86_64
+* for x86_64
+
 ~~~
 pacman-multilib.conf
 ~~~
@@ -222,7 +225,7 @@ If you need a custom livecd-overlay, create overlay-livecd folder in  profile, a
 buildpkg is the chroot build script oi manjaro-tools.
 It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
 
-- manjaro-tools.conf supports the makepkg.conf variables
+######manjaro-tools.conf supports the makepkg.conf variables
 
 ####Arguments
 
@@ -244,13 +247,13 @@ Usage: buildpkg [options] [--] [makepkg args]
 
 ######* build sysvinit package for both arches and branch testing:
 
-i686(buildsystem is x86_64)
+* i686(buildsystem is x86_64)
 
 ~~~
 buildpkg -p sysvinit -a i686 -b testing -cwsn
 ~~~
 
-for x86_64
+* for x86_64
 
 ~~~
 buildpkg -p sysvinit -b testing -cswn
@@ -302,13 +305,13 @@ Usage: buildiso [options]
 
 ######* build xfce iso profile for both arches and branch testing on x86_64 build system
 
-i686 (buildsystem is x86_64)
+* i686 (buildsystem is x86_64)
 
 ~~~
 buildiso -p xfce -a i686 -b testing
 ~~~
 
-for x86_64
+* for x86_64
 
 ~~~
 buildiso -p xfce -b testing
