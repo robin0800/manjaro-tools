@@ -2,7 +2,7 @@
 
 [[ -r /opt/livecd/util.sh ]] && source /opt/livecd/util.sh
 
-load_config "/opt/livecd/manjaro-tools.conf"
+load_profile_config "/opt/livecd/profile.conf"
 
 [[ -r /opt/livecd/util-livecd.sh ]] && source /opt/livecd/util-livecd.sh
 

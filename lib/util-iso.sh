@@ -50,7 +50,7 @@ run_log(){
 }
 
 check_run_dir(){
-	if [[ ! -f shared/initsys-systemd ]] || [[ ! -f shared/initsys-openrc ]];then
+	if [[ ! -f shared/Packages-Systemd ]] || [[ ! -f shared/Packages-Openrc ]];then
 		die "${0##*/} is not run in a valid iso-profiles folder!"
 	fi
 }
@@ -101,17 +101,19 @@ copy_livecd_helpers(){
 	cp ${PKGDATADIR}/scripts/kbd-model-map $1
 
 	#     cp ${LIBDIR}/util-mount.sh $1
-	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
-		msg2 "Copying ${USER_CONFIG}/manjaro-tools.conf ..."
-		cp ${USER_CONFIG}/manjaro-tools.conf $1
-	else
-		msg2 "Copying ${manjaro_tools_conf} ..."
-		cp ${manjaro_tools_conf} $1
-	fi
+# 	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
+# 		msg2 "Copying ${USER_CONFIG}/manjaro-tools.conf ..."
+# 		cp ${USER_CONFIG}/manjaro-tools.conf $1
+# 	else
+# 		msg2 "Copying ${manjaro_tools_conf} ..."
+# 		cp ${manjaro_tools_conf} $1
+# 	fi
+	cp ${profile_conf} $1
+
 	# write the custom var to conf to be sourced for use in util-livecd
-	echo '' >> $1/manjaro-tools.conf
-	echo '#custom image name' >> $1/manjaro-tools.conf
-	echo "custom=${custom}" >> $1/manjaro-tools.conf
+	echo '' >> $1/profile.conf
+	echo '#custom image name' >> $1/profile.conf
+	echo "custom=${custom}" >> $1/profile.conf
 }
 
 copy_cache_lng(){
@@ -423,15 +425,15 @@ download_efi_shellv1(){
 }
 
 copy_efi_shells(){
-	if [[ -f ../shared/efi_shell/shellx64_v1.efi ]];then
+	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v1.efi ]];then
 		msg2 "Copying shellx64_v1.efi ..."
-		cp ../shared/efi_shell/shellx64_v1.efi $1/
+		cp ${PKGDATADIR}/efi_shell/shellx64_v1.efi $1/
 	else
 		download_efi_shellv1 "$1"
 	fi
-	if [[ -f ../shared/efi_shell/shellx64_v2.efi ]];then
+	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v2.efi ]];then
 		msg2 "Copying shellx64_v2.efi ..."
-		cp ../shared/efi_shell/shellx64_v2.efi $1/
+		cp ${PKGDATADIR}/efi_shell/shellx64_v2.efi $1/
 	else
 		download_efi_shellv2 "$1"
 	fi
@@ -607,6 +609,9 @@ load_pkgs_lng(){
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1] ..."
+
+	load_profile_config 'profile.conf'
+
 	local files=$(ls Packages*)
 	for f in ${files[@]};do
 		case $f in
@@ -616,8 +621,8 @@ load_profile(){
 	done
 	custom=${packages_custom#*-}
 	custom=${custom,,}
-	displaymanager="$(cat displaymanager)"
-	initsys="$(cat initsys)"
+# 	displaymanager="$(cat displaymanager)"
+# 	initsys="$(cat initsys)"
 	iso_file="${img_name}-${custom}-${iso_version}-${arch}.iso"
 	if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
 		pacman_conf="pacman-${pacman_conf_arch}.conf"
@@ -700,11 +705,11 @@ make_profile(){
 build_iso(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			check_sanity "$prof/initsys" "break"
+			check_sanity "$prof/profile.conf" "break"
 			make_profile "$prof"
 		done
 	else
-		check_sanity "${buildset_iso}/initsys" 'die "Not a valid iso-profiles folder!"'
+		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profiles folder!"'
 		make_profile "${buildset_iso}"
 	fi
 }

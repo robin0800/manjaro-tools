@@ -258,6 +258,8 @@ load_config(){
 		buildset_iso='default'
 	fi
 
+	##### iso settings #####
+
 	if [[ -z ${iso_version} ]];then
 		source /etc/lsb-release
 		iso_version=${DISTRIB_RELEASE}
@@ -269,14 +271,22 @@ load_config(){
 
 	iso_label="${branding}${iso_version//.}"
 
-	if [[ -z ${manjaro_kernel} ]];then
-		manjaro_kernel="linux319"
+	if [[ -z ${code_name} ]];then
+		source /etc/lsb-release
+		code_name="${DISTRIB_CODENAME}"
 	fi
 
-	manjaro_kernel_ver=${manjaro_kernel#*linux}
+	if [[ -z ${img_name} ]];then
+		img_name=manjaro
+	fi
 
-	if [[ -z ${efi_boot_loader} ]];then
-		efi_boot_loader="grub"
+
+	if [[ -z ${compression} ]];then
+		compression=xz
+	fi
+
+	if [[ -z ${checksum_mode} ]];then
+		checksum_mode='md5'
 	fi
 
 	if [[ -z ${manjaro_version} ]];then
@@ -287,13 +297,29 @@ load_config(){
 		manjaroiso="manjaroiso"
 	fi
 
-	if [[ -z ${code_name} ]];then
-		source /etc/lsb-release
-		code_name="${DISTRIB_CODENAME}"
+	return 0
+}
+
+load_profile_config(){
+
+	[[ -f $1 ]] || return 1
+
+	profile_conf="$1"
+
+	[[ -r ${profile_conf} ]] && source ${profile_conf}
+
+	if [[ -z ${manjaro_kernel} ]];then
+		manjaro_kernel="linux319"
 	fi
 
-	if [[ -z ${img_name} ]];then
-		img_name=manjaro
+	manjaro_kernel_ver=${manjaro_kernel#*linux}
+
+	if [[ -z ${efi_boot_loader} ]];then
+		efi_boot_loader="grub"
+	fi
+
+	if [[ -z ${install_dir} ]];then
+		install_dir=manjaro
 	fi
 
 	if [[ -z ${hostname} ]];then
@@ -304,16 +330,8 @@ load_config(){
 		username="manjaro"
 	fi
 
-	if [[ -z ${install_dir} ]];then
-		install_dir=manjaro
-	fi
-
 	if [[ -z ${plymouth_theme} ]];then
 		plymouth_theme=manjaro-elegant
-	fi
-
-	if [[ -z ${compression} ]];then
-		compression=xz
 	fi
 
 	if [[ -z ${password} ]];then
@@ -340,8 +358,12 @@ load_config(){
 		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
 	fi
 
-	if [[ -z ${checksum_mode} ]];then
-		checksum_mode='md5'
+	if [[ -z ${initsys} ]];then
+		initsys="systemd"
+	fi
+
+	if [[ -z ${displaymanager} ]];then
+		displaymanager="none"
 	fi
 
 	return 0
