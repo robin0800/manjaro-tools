@@ -97,10 +97,6 @@ write_x11_config(){
 	echo " Option \"XkbOptions\" \"$X11_OPTIONS\"" >> "$XORGKBLAYOUT"
 	echo "EndSection" >> "$XORGKBLAYOUT"
 
-	# fix por keyboardctl
-	if [[ -f "$1/etc/keyboard.conf" ]]; then
-		sed -i -e "s/^XKBLAYOUT=.*/XKBLAYOUT=\"${X11_LAYOUT}\"/g" $1/etc/keyboard.conf
-	fi
 }
 
 configure_language(){
@@ -111,6 +107,11 @@ configure_language(){
 # 	local FALLBACK="en_US"
 	local TLANG=${LOCALE%.*}
 
+	# this is needed for efi, it doesn't set any cmdline
+	[[ -z "$LOCALE" ]] && LOCALE="en_US"
+	[[ -z "$KEYMAP" ]] && KEYMAP="us"
+	[[ -z "$KBLAYOUT" ]] && KBLAYOUT="us"
+
 	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
 # 	sed -i -r "s/#(${FALLBACK}.*UTF-8)/\1/g" $1/etc/locale.gen
 
@@ -118,13 +119,9 @@ configure_language(){
 
 	if [[ -f $1/usr/bin/openrc ]]; then
 		sed -i "s/keymap=.*/keymap=\"${KEYMAP}\"/" $1/etc/conf.d/keymaps
-		# setup systemd stuff too
-		echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
-		echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
-	else
-		echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
-		echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
 	fi
+	echo "KEYMAP=${KEYMAP}" > $1/etc/vconsole.conf
+	echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
 
 	write_x11_config $1
 
