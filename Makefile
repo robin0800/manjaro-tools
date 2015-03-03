@@ -55,6 +55,7 @@ LIBS = \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
 	lib/util-livecd.sh \
+	lib/util-iso-boot.sh \
 	lib/util-pkgtree.sh
 
 CPIOHOOKS = \
