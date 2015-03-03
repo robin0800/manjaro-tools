@@ -288,7 +288,11 @@ load_config(){
 	if [[ -z ${checksum_mode} ]];then
 		checksum_mode='md5'
 	fi
-
+	
+        if [[ -z ${install_dir} ]];then
+		install_dir=manjaro
+	fi
+	
 	if [[ -z ${manjaro_version} ]];then
 		manjaro_version=$(date +%Y.%m)
 	fi
@@ -316,10 +320,6 @@ load_profile_config(){
 
 	if [[ -z ${efi_boot_loader} ]];then
 		efi_boot_loader="grub"
-	fi
-
-	if [[ -z ${install_dir} ]];then
-		install_dir=manjaro
 	fi
 
 	if [[ -z ${hostname} ]];then
