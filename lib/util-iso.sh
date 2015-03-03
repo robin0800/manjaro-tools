@@ -626,8 +626,6 @@ load_profile(){
 			is_plymouth=true
 		fi
 	done
-
-	load_profile_config 'profile.conf'
 }
 
 compress_images(){
@@ -671,6 +669,7 @@ make_profile(){
 	msg "Start building [$1]"
 	cd $1
 		load_profile "$1"
+		load_profile_config 'profile.conf'
 		${clean_first} && clean_chroots "${work_dir}"
 		${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
 		${clean_cache_lng} && clean_cache "${cache_dir_lng}"
