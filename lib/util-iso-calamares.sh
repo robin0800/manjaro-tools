@@ -25,15 +25,15 @@ write_calamares_finished_conf(){
 }
 
 write_calamares_bootloader_conf(){
-	source "$1/etc/mkinitcpio.d/${manjaro_kernel}.preset"
+	source "$1/etc/mkinitcpio.d/${dist_kernel}.preset"
 	local conf="$1/etc/calamares/modules/bootloader.conf"
 	echo '---' > "$conf"
 	echo "efiBootLoader: \"${efi_boot_loader}\"" >> "$conf"
 	echo "kernel: \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
 	echo "img: \"$(echo ${default_image} | sed s'|/boot||')\"" >> "$conf"
 	echo "fallback: \"$(echo ${fallback_image} | sed s'|/boot||')\"" >> "$conf"
-	echo "kernelLine: \", with ${manjaro_kernel}\"" >> "$conf"
-	echo "fallbackKernelLine: \", with ${manjaro_kernel} (fallback initramfs)\"" >> "$conf"
+	echo "kernelLine: \", with ${dist_kernel}\"" >> "$conf"
+	echo "fallbackKernelLine: \", with ${dist_kernel} (fallback initramfs)\"" >> "$conf"
 	echo 'timeout: "10"' >> "$conf"
 	echo 'grubInstall: "grub-install"' >> "$conf"
 	echo 'grubMkconfig: "grub-mkconfig"' >> "$conf"
@@ -81,7 +81,7 @@ write_calamares_dm_conf(){
 write_calamares_initcpio_conf(){
 	local conf="$1/etc/calamares/modules/initcpio.conf"
 	echo "---" > "$conf"
-	echo "kernel: ${manjaro_kernel}" >> "$conf"
+	echo "kernel: ${dist_kernel}" >> "$conf"
 }
 
 write_calamares_unpack_conf(){
@@ -137,7 +137,7 @@ configure_thus(){
 		msg2 "Configuring Thus ..."
 		local conf="$1/etc/thus.conf"
 		sed -i "s|_version_|$iso_version|g" $conf
-		sed -i "s|_kernel_|$manjaro_kernel|g" $conf
+		sed -i "s|_kernel_|$dist_kernel|g" $conf
 		sed -i "s|_root-image_|/bootmnt/${install_dir}/${arch}/root-image.sqfs|g" $conf
 		sed -i "s|_desktop-image_|/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs|g" $conf
 		echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment

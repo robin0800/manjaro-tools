@@ -10,6 +10,7 @@
 # GNU General Public License for more details.
 
 [[ -r ${LIBDIR}/util-iso-image.sh ]] && source ${LIBDIR}/util-iso-image.sh
+[[ -r ${LIBDIR}/util-iso-boot.sh ]] && source ${LIBDIR}/util-iso-boot.sh
 [[ -r ${LIBDIR}/util-iso-calamares.sh ]] && source ${LIBDIR}/util-iso-calamares.sh
 
 
@@ -58,7 +59,7 @@ check_run_dir(){
 copy_initcpio(){
 	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
-	cp mkinitcpio.conf $1/etc/mkinitcpio-${manjaroiso}.conf
+	cp mkinitcpio.conf $1/etc/mkinitcpio-${dist_iso}.conf
 }
 
 copy_overlay_root(){
@@ -104,8 +105,12 @@ write_profile_conf_entries(){
 	echo "install_dir=${install_dir}" >> ${conf}
 
 	echo '' >> ${conf}
-	echo '# manjaroiso' >> ${conf}
-	echo "manjaroiso=${manjaroiso}" >> ${conf}
+	echo '# dist_iso' >> ${conf}
+	echo "dist_iso=${dist_iso}" >> ${conf}
+
+	echo '' >> ${conf}
+	echo '# dist_kernel_ver' >> ${conf}
+	echo "dist_kernel_ver=${dist_kernel_ver}" >> ${conf}
 }
 
 copy_livecd_helpers(){
@@ -186,7 +191,7 @@ gen_boot_image(){
 	local _kernver=$(cat $1/usr/lib/modules/*-MANJARO/version)
 		chroot-run $1 \
 			/usr/bin/mkinitcpio -k ${_kernver} \
-			-c /etc/mkinitcpio-${manjaroiso}.conf \
+			-c /etc/mkinitcpio-${dist_iso}.conf \
 			-g /boot/${img_name}.img
 }
 
@@ -397,7 +402,7 @@ make_image_boot() {
 		local path_iso="${work_dir}/iso/${install_dir}/boot"
 		mkdir -p ${path_iso}/${arch}
 		cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${arch}/memtest
-		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${manjaroiso}
+		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${dist_iso}
 		local path="${work_dir}/boot-image"
 		mkdir -p ${path}
 		umount_image_handler
@@ -450,22 +455,23 @@ make_efi() {
 		msg "Prepare [${install_dir}/boot/EFI]"
 		local path_iso="${work_dir}/iso"
 		local path_efi="${path_iso}/EFI"
+
 		mkdir -p ${path_efi}/boot
 		cp ${work_dir}/root-image/usr/lib/prebootloader/PreLoader.efi ${path_efi}/boot/bootx64.efi
 		cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${path_efi}/boot/
 		cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${path_efi}/boot/loader.efi
+
 		mkdir -p ${path_iso}/loader/entries
-		cp efiboot/loader/loader.conf ${path_iso}/loader/
-		cp efiboot/loader/entries/uefi-shell-v2-x86_64.conf ${path_iso}/loader/entries/
-		cp efiboot/loader/entries/uefi-shell-v1-x86_64.conf ${path_iso}/loader/entries/
-		sed "s|%MISO_LABEL%|${iso_label}|g;
-				s|%INSTALL_DIR%|${install_dir}|g" \
-			efiboot/loader/entries/${manjaroiso}-x86_64-usb.conf > ${path_iso}/loader/entries/${manjaroiso}-x86_64.conf
-		sed "s|%MISO_LABEL%|${iso_label}|g;
-				s|%INSTALL_DIR%|${install_dir}|g" \
-			efiboot/loader/entries/${manjaroiso}-x86_64-nonfree-usb.conf > ${path_iso}/loader/entries/${manjaroiso}-x86_64-nonfree.conf
+		write_loader_conf "${path_iso}/loader"
+		write_efi_shellv1_conf "${path_iso}/loader/entries"
+		write_efi_shellv2_conf "${path_iso}/loader/entries"
+		write_usb_conf "${path_iso}/loader/entries"
+		write_usb_nonfree_conf "${path_iso}/loader/entries"
+
 		copy_efi_shells "${path_efi}"
+
 		: > ${work_dir}/build.${FUNCNAME}
+
 		msg "Done [${install_dir}/boot/EFI]"
 	fi
 }
@@ -475,35 +481,39 @@ make_efiboot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [${install_dir}/iso/EFI]"
 		local path_iso="${work_dir}/iso"
+
 		mkdir -p ${path_iso}/EFI/miso
 		truncate -s 31M ${path_iso}/EFI/miso/${img_name}.img
 		mkfs.vfat -n MISO_EFI ${path_iso}/EFI/miso/${img_name}.img
+
 		mkdir -p ${work_dir}/efiboot
 		mount ${path_iso}/EFI/miso/${img_name}.img ${work_dir}/efiboot
 		local path_efi="${work_dir}/efiboot/EFI"
+
 		mkdir -p ${path_efi}/miso
-		cp ${path_iso}/${install_dir}/boot/x86_64/${manjaroiso} ${path_efi}/miso/${manjaroiso}.efi
+		cp ${path_iso}/${install_dir}/boot/x86_64/${dist_iso} ${path_efi}/miso/${dist_iso}.efi
 		cp ${path_iso}/${install_dir}/boot/x86_64/${img_name}.img ${path_efi}/miso/${img_name}.img
 		cp ${path_iso}/${install_dir}/boot/intel_ucode.img ${path_efi}/miso/intel_ucode.img
+
 		mkdir -p ${path_efi}/boot
 		cp ${work_dir}/root-image/usr/lib/prebootloader/PreLoader.efi ${path_efi}/boot/bootx64.efi
 		cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${path_efi}/boot/
 		cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${path_efi}/boot/loader.efi
+
 		mkdir -p ${work_dir}/efiboot/loader/entries
-		cp efiboot/loader/loader.conf ${work_dir}/efiboot/loader/
-		cp efiboot/loader/entries/uefi-shell-v2-x86_64.conf ${work_dir}/efiboot/loader/entries/
-		cp efiboot/loader/entries/uefi-shell-v1-x86_64.conf ${work_dir}/efiboot/loader/entries/
-		sed "s|%MISO_LABEL%|${iso_label}|g;
-				s|%INSTALL_DIR%|${install_dir}|g" \
-			efiboot/loader/entries/${manjaroiso}-x86_64-dvd.conf > ${work_dir}/efiboot/loader/entries/${manjaroiso}-x86_64.conf
-		sed "s|%MISO_LABEL%|${iso_label}|g;
-				s|%INSTALL_DIR%|${install_dir}|g" \
-			efiboot/loader/entries/${manjaroiso}-x86_64-nonfree-dvd.conf > ${work_dir}/efiboot/loader/entries/${manjaroiso}-x86_64-nonfree.conf
+		write_loader_conf "${work_dir}/efiboot/loader"
+		write_efi_shellv1_conf "${work_dir}/efiboot/loader/entries"
+		write_efi_shellv2_conf "${work_dir}/efiboot/loader/entries"
+		write_dvd_conf "${work_dir}/efiboot/loader/entries"
+		write_dvd_nonfree_conf "${work_dir}/efiboot/loader/entries"
 
 		cp ${path_iso}/EFI/shellx64_v2.efi ${path_efi}/
 		cp ${path_iso}/EFI/shellx64_v1.efi ${path_efi}/
+
 		umount ${work_dir}/efiboot
+
 		: > ${work_dir}/build.${FUNCNAME}
+
 		msg "Done [${install_dir}/iso/EFI]"
 	fi
 }
@@ -514,10 +524,14 @@ make_isolinux() {
 		msg "Prepare [${install_dir}/iso/isolinux]"
 		mkdir -p ${work_dir}/iso/isolinux
 		cp -a --no-preserve=ownership isolinux/* ${work_dir}/iso/isolinux
+
+		write_isolinux_cfg "${work_dir}/iso/isolinux"
+
 		if [[ -e isolinux-overlay ]]; then
 			msg2 "isolinux overlay found. Overwriting files."
 			cp -a --no-preserve=ownership isolinux-overlay/* ${work_dir}/iso/isolinux
 		fi
+
 		local path="${work_dir}/root-image/usr/lib/syslinux"
 		if [[ -e ${path}/bios/ ]]; then
 			cp ${path}/bios/isolinux.bin ${work_dir}/iso/isolinux/
@@ -541,10 +555,12 @@ make_isolinux() {
 			cp ${path}/hdt.c32 ${work_dir}/iso/isolinux/
 			cp ${path}/chain.c32 ${work_dir}/iso/isolinux/
 		fi
-		sed -i "s|%MISO_LABEL%|${iso_label}|g;
-				s|%INSTALL_DIR%|${install_dir}|g;
-				s|%ARCH%|${arch}|g" ${work_dir}/iso/isolinux/isolinux.cfg
+
+# 		sed -i "s|%MISO_LABEL%|${iso_label}|g;
+# 				s|%INSTALL_DIR%|${install_dir}|g;
+# 				s|%ARCH%|${arch}|g" ${work_dir}/iso/isolinux/isolinux.cfg
 		: > ${work_dir}/build.${FUNCNAME}
+
 		msg "Done [${install_dir}/iso/isolinux]"
 	fi
 }
@@ -584,20 +600,20 @@ make_isomounts() {
 load_pkgs(){
 	msg3 "Loading Packages: [$1] ..."
 	if [[ "${arch}" == "i686" ]]; then
-		packages=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+		packages=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 	elif [[ "${arch}" == "x86_64" ]]; then
-		packages=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+		packages=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 	fi
 }
 
 load_pkgs_xorg(){
 	msg3 "Loading Packages: [Packages-Xorg] ..."
 	if [[ "${arch}" == "i686" ]]; then
-		packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+		packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 	elif [[ "${arch}" == "x86_64" ]]; then
-		packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+		packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 	fi
-	packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$manjaro_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
 load_pkgs_lng(){

@@ -289,16 +289,16 @@ load_config(){
 		checksum_mode='md5'
 	fi
 
-        if [[ -z ${install_dir} ]];then
+	if [[ -z ${install_dir} ]];then
 		install_dir=manjaro
 	fi
 
-	if [[ -z ${manjaro_version} ]];then
-		manjaro_version=$(date +%Y.%m)
+	if [[ -z ${dist_version} ]];then
+		dist_version=$(date +%Y.%m)
 	fi
 
-	if [[ -z ${manjaroiso} ]];then
-		manjaroiso="manjaroiso"
+	if [[ -z ${dist_iso} ]];then
+		dist_iso="manjaroiso"
 	fi
 
 	return 0
@@ -312,11 +312,11 @@ load_profile_config(){
 
 	[[ -r ${profile_conf} ]] && source ${profile_conf}
 
-	if [[ -z ${manjaro_kernel} ]];then
-		manjaro_kernel="linux319"
+	if [[ -z ${dist_kernel} ]];then
+		dist_kernel="linux319"
 	fi
 
-	manjaro_kernel_ver=${manjaro_kernel#*linux}
+	dist_kernel_ver=${dist_kernel#*linux}
 
 	if [[ -z ${efi_boot_loader} ]];then
 		efi_boot_loader="grub"

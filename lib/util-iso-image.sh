@@ -32,6 +32,11 @@ configure_hostname(){
 }
 
 # $1: chroot
+configure_hosts(){
+	sed -e "s|localhost.localdomain|localhost.localdomain ${hostname}|" -i $1/etc/hosts
+}
+
+# $1: chroot
 configure_plymouth(){
 	if ${is_plymouth};then
 		msg2 "Setting plymouth $plymouth_theme ...."
@@ -121,11 +126,6 @@ configure_accountsservice(){
 		fi
 		echo "Icon=/var/lib/AccountsService/icons/$2.png" >> ${path}/$2
 	fi
-}
-
-# $1: chroot
-configure_hosts(){
-	sed -e "s|localhost.localdomain|localhost.localdomain ${hostname}|" -i $1/etc/hosts
 }
 
 # $1: chroot
