@@ -102,6 +102,10 @@ write_profile_conf_entries(){
 	echo '' >> ${conf}
 	echo '# install_dir' >> ${conf}
 	echo "install_dir=${install_dir}" >> ${conf}
+
+	echo '' >> ${conf}
+	echo '# manjaroiso' >> ${conf}
+	echo "manjaroiso=${manjaroiso}" >> ${conf}
 }
 
 copy_livecd_helpers(){
