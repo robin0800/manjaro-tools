@@ -288,11 +288,11 @@ load_config(){
 	if [[ -z ${checksum_mode} ]];then
 		checksum_mode='md5'
 	fi
-	
+
         if [[ -z ${install_dir} ]];then
 		install_dir=manjaro
 	fi
-	
+
 	if [[ -z ${manjaro_version} ]];then
 		manjaro_version=$(date +%Y.%m)
 	fi
@@ -347,7 +347,7 @@ load_profile_config(){
 	fi
 
 	if [[ -z ${start_openrc} ]];then
-		start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'metalog' 'NetworkManager')
+		start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 	fi
 
 	if [[ -z ${start_systemd_live} ]];then
