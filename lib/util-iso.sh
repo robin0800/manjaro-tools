@@ -600,9 +600,7 @@ load_pkgs_lng(){
 
 # $1: profile
 load_profile(){
-	msg3 "Profile: [$1] ..."
-
-	load_profile_config 'profile.conf'
+	msg3 "Profile: [$1]"
 
 	local files=$(ls Packages*)
 	for f in ${files[@]};do
@@ -628,6 +626,8 @@ load_profile(){
 			is_plymouth=true
 		fi
 	done
+
+	load_profile_config 'profile.conf'
 }
 
 compress_images(){
