@@ -25,17 +25,20 @@ show_profile(){
 		load_profile "$1"
 		msg2 "work_dir: ${work_dir}"
 		msg2 "iso_file: ${iso_file}"
+		msg2 "pacman_conf: ${pacman_conf}"
+
 		msg2 "initsys: ${initsys}"
 		msg2 "displaymanager: ${displaymanager}"
 		msg2 "manjaro_kernel: ${manjaro_kernel}"
-		msg2 "plymouth_theme: ${plymouth_theme}"
-		msg2 "is_plymouth: ${is_plymouth}"
-		msg2 "pacman_conf: ${pacman_conf}"
+		msg2 "efi_boot_loader: ${efi_boot_loader}"
+
+		${is_plymouth} && msg2 "plymouth_theme: ${plymouth_theme}"
+
+		msg2 "hostname: ${hostname}"
 		msg2 "username: ${username}"
 		msg2 "password: ${password}"
 		msg2 "addgroups: ${addgroups}"
-		msg2 "hostname: ${hostname}"
-		msg2 "efi_boot_loader: ${efi_boot_loader}"
+
 		if [[ ${initsys} == 'systemd' ]];then
 			msg2 "start_systemd: ${start_systemd[*]}"
 			msg2 "start_systemd_live: ${start_systemd_live[*]}"
@@ -54,7 +57,7 @@ show_build_queue(){
 			show_profile "$item"
 		done
 	else
-		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profiles folder!"'
+		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profile!"'
 		show_profile "${buildset_iso}"
 	fi
 }
