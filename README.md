@@ -99,6 +99,9 @@ Specifying args will override manjaro-tools.conf settings.
 # manjaro_version="$(date +%Y.%m)"
 
 # unset defaults to given value
+# install_dir=manjaro
+
+# unset defaults to given value
 # manjaroiso="manjaroiso"
 
 # unset defaults to value sourced from /etc/lsb-release
@@ -138,9 +141,6 @@ Each iso profile must have these files or symlinks to shared:
 
 # unset defaults to given value
 # efi_boot_loader="grub"
-
-# unset defaults to given value
-# install_dir=manjaro
 
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant
