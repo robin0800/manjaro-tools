@@ -96,13 +96,13 @@ Specifying args will override manjaro-tools.conf settings.
 # branding="MJRO"
 
 # unset defaults to given value, specify a date here of have it automatically set
-# manjaro_version="$(date +%Y.%m)"
+# dist_version="$(date +%Y.%m)"
 
 # unset defaults to given value
 # install_dir=manjaro
 
 # unset defaults to given value
-# manjaroiso="manjaroiso"
+# dist_iso="manjaroiso"
 
 # unset defaults to value sourced from /etc/lsb-release
 # code_name="Bellatrix"
@@ -137,7 +137,7 @@ Each iso profile must have these files or symlinks to shared:
 ################ install ################
 
 # unset defaults to given value
-# manjaro_kernel="linux319"
+# dist_kernel="linux319"
 
 # unset defaults to given value
 # efi_boot_loader="grub"
