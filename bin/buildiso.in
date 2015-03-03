@@ -103,6 +103,7 @@ display_settings(){
 	msg2 "manjaro_version: ${manjaro_version}"
     msg2 "manjaroiso: ${manjaroiso}"
     msg2 "img_name: ${img_name}"
+    msg2 "install_dir: ${install_dir}"
     msg2 "compression: ${compression}"
     msg2 "checksum_mode: ${checksum_mode}"
 

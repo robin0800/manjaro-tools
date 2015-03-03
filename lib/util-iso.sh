@@ -92,6 +92,18 @@ copy_startup_scripts(){
 # 	sed -e "s|${LIBDIR}|/opt/livecd|g" -i $1/chroot-run
 }
 
+write_profile_conf_entries(){
+	local conf=$1/profile.conf
+
+	echo '' >> ${conf}
+	echo '# custom image name' >> ${conf}
+	echo "custom=${custom}" >> ${conf}
+
+	echo '' >> ${conf}
+	echo '# install_dir' >> ${conf}
+	echo "install_dir=${install_dir}" >> ${conf}
+}
+
 copy_livecd_helpers(){
 	msg2 "Copying livecd helpers ..."
 	[[ ! -d $1 ]] && mkdir -p $1
@@ -102,10 +114,7 @@ copy_livecd_helpers(){
 
 	cp ${profile_conf} $1
 
-	# write the custom var to conf to be sourced for use in util-livecd
-	echo '' >> $1/profile.conf
-	echo '# custom image name' >> $1/profile.conf
-	echo "custom=${custom}" >> $1/profile.conf
+	write_profile_conf_entries $1
 }
 
 copy_cache_lng(){
@@ -601,7 +610,7 @@ load_pkgs_lng(){
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1]"
-
+	load_profile_config 'profile.conf'
 	local files=$(ls Packages*)
 	for f in ${files[@]};do
 		case $f in
@@ -669,7 +678,6 @@ make_profile(){
 	msg "Start building [$1]"
 	cd $1
 		load_profile "$1"
-		load_profile_config 'profile.conf'
 		${clean_first} && clean_chroots "${work_dir}"
 		${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
 		${clean_cache_lng} && clean_cache "${cache_dir_lng}"
