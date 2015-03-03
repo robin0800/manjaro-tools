@@ -100,19 +100,11 @@ copy_livecd_helpers(){
 	cp ${LIBDIR}/util.sh $1
 	cp ${PKGDATADIR}/scripts/kbd-model-map $1
 
-	#     cp ${LIBDIR}/util-mount.sh $1
-# 	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
-# 		msg2 "Copying ${USER_CONFIG}/manjaro-tools.conf ..."
-# 		cp ${USER_CONFIG}/manjaro-tools.conf $1
-# 	else
-# 		msg2 "Copying ${manjaro_tools_conf} ..."
-# 		cp ${manjaro_tools_conf} $1
-# 	fi
 	cp ${profile_conf} $1
 
 	# write the custom var to conf to be sourced for use in util-livecd
 	echo '' >> $1/profile.conf
-	echo '#custom image name' >> $1/profile.conf
+	echo '# custom image name' >> $1/profile.conf
 	echo "custom=${custom}" >> $1/profile.conf
 }
 
@@ -621,8 +613,6 @@ load_profile(){
 	done
 	custom=${packages_custom#*-}
 	custom=${custom,,}
-# 	displaymanager="$(cat displaymanager)"
-# 	initsys="$(cat initsys)"
 	iso_file="${img_name}-${custom}-${iso_version}-${arch}.iso"
 	if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
 		pacman_conf="pacman-${pacman_conf_arch}.conf"
@@ -709,7 +699,7 @@ build_iso(){
 			make_profile "$prof"
 		done
 	else
-		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profiles folder!"'
+		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profile!"'
 		make_profile "${buildset_iso}"
 	fi
 }
