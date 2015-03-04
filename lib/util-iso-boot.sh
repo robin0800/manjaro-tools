@@ -10,25 +10,29 @@
 # GNU General Public License for more details.
 
 write_loader_conf(){
-	local conf=$1/loader.conf
+	local fn=loader.conf conf=$1/${fn}
+	msg2 "writing ${fn} ..."
 	echo 'timeout 3' > ${conf}
 	echo "default ${dist_iso}-${arch}" >> ${conf}
 }
 
 write_efi_shellv1_conf(){
-	local conf=$1/uefi-shell-v1-${arch}.conf
+	local fn=uefi-shell-v1-${arch}.conf conf=$1/${fn}
+	msg2 "writing ${fn} ..."
 	echo "title  UEFI Shell ${arch} v1" > ${conf}
 	echo "efi    /EFI/shellx64_v1.efi" >> ${conf}
 }
 
 write_efi_shellv2_conf(){
-	local conf=$1/uefi-shell-v2-${arch}.conf
+	local fn=uefi-shell-v2-${arch}.conf conf=$1/${fn}
+	msg2 "writing ${fn} ..."
 	echo "title  UEFI Shell ${arch} v2" > ${conf}
 	echo "efi    /EFI/shellx64_v2.efi" >> ${conf}
 }
 
 write_dvd_conf(){
-	local conf=$1/${dist_iso}-${arch}-dvd.conf
+	local fn=${dist_iso}-${arch}.conf conf=$1/${fn}
+	msg2 "writing ${fn} ..."
 	echo "title   Manjaro Linux ${arch} UEFI DVD (default)" > ${conf}
 	echo "linux   /EFI/miso/${dist_iso}.efi" >> ${conf}
 	echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
@@ -37,7 +41,8 @@ write_dvd_conf(){
 }
 
 write_dvd_nonfree_conf(){
-	local conf=$1/${dist_iso}-${arch}-nonfree-dvd.conf
+	local fn=${dist_iso}-${arch}-nonfree.conf conf=$1/${fn}
+	msg2 "writing ${fn} ..."
 	echo "title   Manjaro Linux ${arch} UEFI DVD (nonfree)" > ${conf}
 	echo "linux   /EFI/miso/${dist_iso}.efi" >> ${conf}
 	echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
@@ -46,7 +51,8 @@ write_dvd_nonfree_conf(){
 }
 
 write_usb_conf(){
-	local conf=$1/${dist_iso}-${arch}-usb.conf
+	local fn=${dist_iso}-${arch}.conf conf=$1/${fn}
+	msg2 "writing ${fn} ..."
 	echo "title   Manjaro Linux ${arch} UEFI USB (default)" > ${conf}
 	echo "linux   /${install_dir}/boot/${arch}/${dist_iso}" >> ${conf}
 	echo "initrd  /${install_dir}/boot/intel_ucode.img" >> ${conf}
@@ -55,7 +61,8 @@ write_usb_conf(){
 }
 
 write_usb_nonfree_conf(){
-	local conf=$1/${dist_iso}-${arch}-nonfree-usb.conf
+	local fn=${dist_iso}-${arch}-nonfree.conf conf=$1/${fn}
+	msg2 "writing ${fn} ..."
 	echo "title   Manjaro Linux ${arch} UEFI USB (nonfree)" > ${conf}
 	echo "linux   /${install_dir}/boot/${arch}/${dist_iso}" >> ${conf}
 	echo "initrd  /${install_dir}/boot/intel_ucode.img" >> ${conf}
@@ -64,7 +71,8 @@ write_usb_nonfree_conf(){
 }
 
 write_isolinux_cfg(){
-	local conf=$1/isolinux.cfg
+	local fn=isolinux.cfg conf=$1/${fn}
+	msg2 "writing ${fn} ..."
 	echo "default start" > ${conf}
 	echo "implicit 1" >> ${conf}
 	echo "display isolinux.msg" >> ${conf}
@@ -89,4 +97,26 @@ write_isolinux_cfg(){
 	echo '' >> ${conf}
 	echo "label memtest" >> ${conf}
 	echo "  kernel memtest" >> ${conf}
+}
+
+write_isomounts(){
+	echo '# syntax: <img> <arch> <mount point> <type> <kernel argument>' > $1
+	echo '# Sample kernel argument in syslinux: overlay=extra,extra2' >> $1
+	echo '' >> $1
+	msg2 "writing livecd entry ..."
+	echo "${arch}/livecd-image.sqfs ${arch} / squashfs" >> $1
+	if [[ -f Packages-Lng ]] ; then
+		msg2 "writing lng entry ..."
+		echo "${arch}/lng-image.sqfs ${arch} / squashfs" >> $1
+	fi
+	if [[ -f Packages-Xorg ]] ; then
+		msg2 "writing pkgs entry ..."
+		echo "${arch}/pkgs-image.sqfs ${arch} / squashfs" >> $1
+	fi
+	if [[ -f "${packages_custom}" ]] ; then
+		msg2 "writing ${custom} entry ..."
+		echo "${arch}/${custom}-image.sqfs ${arch} / squashfs" >> $1
+	fi
+	msg2 "writing root entry ..."
+	echo "${arch}/root-image.sqfs ${arch} / squashfs" >> $1
 }
