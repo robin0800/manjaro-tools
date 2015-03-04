@@ -45,21 +45,28 @@ configure_plymouth(){
 }
 
 configure_services_live(){
-	if [[ ${initsys} == 'openrc' ]];then
-		msg3 "Configuring OpenRC ...."
-		for svc in ${start_openrc_live[@]}; do
-			msg2 "Setting $svc ..."
-			chroot $1 rc-update add $svc default &> /dev/null
-		done
-		msg3 "Done configuring OpenRC"
-	else
-		msg3 "Configuring systemd ...."
-		for svc in ${start_systemd_live[@]}; do
-			msg2 "Setting $svc ..."
-			chroot $1 systemctl enable $svc &> /dev/null
-		done
-		msg3 "Done configuring systemd"
-	fi
+	case ${initsys} in
+		'openrc')
+			msg3 "Configuring ${initsys} ...."
+			for svc in ${start_openrc_live[@]}; do
+				msg2 "Setting $svc ..."
+				chroot $1 rc-update add $svc default &> /dev/null
+			done
+			msg3 "Done configuring ${initsys}"
+		;;
+		'systemd')
+			msg3 "Configuring ${initsys} ...."
+			for svc in ${start_systemd_live[@]}; do
+				msg2 "Setting $svc ..."
+				chroot $1 systemctl enable $svc &> /dev/null
+			done
+			msg3 "Done configuring ${initsys}"
+		;;
+		*)
+			msg2 "${initsys} is not supported!"
+			break
+		;;
+	esac
 }
 
 configure_lsb(){
@@ -79,21 +86,28 @@ configure_lsb(){
 # }
 
 configure_services(){
-	if [[ ${initsys} == 'openrc' ]];then
-		msg3 "Congiguring OpenRC ...."
-		for svc in ${start_openrc[@]}; do
-			msg2 "Setting $svc ..."
-			chroot $1 rc-update add $svc default &> /dev/null
-		done
-		msg3 "Done configuring OpenRC"
-	else
-		msg3 "Configuring systemd ...."
-		for svc in ${start_systemd[@]}; do
-			msg2 "Setting $svc ..."
-			chroot $1 systemctl enable $svc &> /dev/null
-		done
-		msg3 "Done configuring systemd"
-	fi
+	case ${initsys} in
+		'openrc')
+			msg3 "Congiguring ${initsys} ...."
+			for svc in ${start_openrc[@]}; do
+				msg2 "Setting $svc ..."
+				chroot $1 rc-update add $svc default &> /dev/null
+			done
+			msg3 "Done configuring ${initsys}"
+		;;
+		'systemd')
+			msg3 "Congiguring ${initsys} ...."
+			for svc in ${start_systemd[@]}; do
+				msg2 "Setting $svc ..."
+				chroot $1 systemctl enable $svc &> /dev/null
+			done
+			msg3 "Done configuring ${initsys}"
+		;;
+		*)
+			msg2 "${initsys} is not supported!"
+			break
+		;;
+	esac
 }
 
 # $1: chroot
