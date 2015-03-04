@@ -500,20 +500,19 @@ make_efiboot() {
 		cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${path_efi}/boot/
 		cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${path_efi}/boot/loader.efi
 
-		mkdir -p ${work_dir}/efiboot/loader/entries
-		write_loader_conf "${work_dir}/efiboot/loader"
-		write_efi_shellv1_conf "${work_dir}/efiboot/loader/entries"
-		write_efi_shellv2_conf "${work_dir}/efiboot/loader/entries"
-		write_dvd_conf "${work_dir}/efiboot/loader/entries"
-		write_dvd_nonfree_conf "${work_dir}/efiboot/loader/entries"
+		local efi_loader=${work_dir}/efiboot/loader
+		mkdir -p ${efi_loader}/entries
+		write_loader_conf "${efi_loader}"
+		write_efi_shellv1_conf "${efi_loader}/entries"
+		write_efi_shellv2_conf "${efi_loader}/entries"
+		write_dvd_conf "${efi_loader}/entries"
+		write_dvd_nonfree_conf "${efi_loader}/entries"
 
 		cp ${path_iso}/EFI/shellx64_v2.efi ${path_efi}/
 		cp ${path_iso}/EFI/shellx64_v1.efi ${path_efi}/
 
 		umount ${work_dir}/efiboot
-
 		: > ${work_dir}/build.${FUNCNAME}
-
 		msg "Done [${install_dir}/iso/EFI]"
 	fi
 }
@@ -530,6 +529,10 @@ make_isolinux() {
 		if [[ -e isolinux-overlay ]]; then
 			msg2 "isolinux overlay found. Overwriting files."
 			cp -a --no-preserve=ownership isolinux-overlay/* ${work_dir}/iso/isolinux
+			sed -i "s|%MISO_LABEL%|${iso_label}|g;
+				s|%INSTALL_DIR%|${install_dir}|g;
+				s|%IMG_NAME%|${img_name}|g;
+				s|%ARCH%|${arch}|g" ${work_dir}/iso/isolinux/isolinux.cfg
 		fi
 
 		local path="${work_dir}/root-image/usr/lib/syslinux"
@@ -555,42 +558,15 @@ make_isolinux() {
 			cp ${path}/hdt.c32 ${work_dir}/iso/isolinux/
 			cp ${path}/chain.c32 ${work_dir}/iso/isolinux/
 		fi
-
-# 		sed -i "s|%MISO_LABEL%|${iso_label}|g;
-# 				s|%INSTALL_DIR%|${install_dir}|g;
-# 				s|%ARCH%|${arch}|g" ${work_dir}/iso/isolinux/isolinux.cfg
 		: > ${work_dir}/build.${FUNCNAME}
-
 		msg "Done [${install_dir}/iso/isolinux]"
 	fi
-}
-
-gen_isomounts(){
-	echo '# syntax: <img> <arch> <mount point> <type> <kernel argument>' > $1
-	echo '# Sample kernel argument in syslinux: overlay=extra,extra2' >> $1
-	echo '' >> $1
-	msg2 "Writing livecd entry ..."
-	echo "${arch}/livecd-image.sqfs ${arch} / squashfs" >> $1
-	if [[ -f Packages-Lng ]] ; then
-		msg2 "Writing lng entry ..."
-		echo "${arch}/lng-image.sqfs ${arch} / squashfs" >> $1
-	fi
-	if [[ -f Packages-Xorg ]] ; then
-		msg2 "Writing pkgs entry ..."
-		echo "${arch}/pkgs-image.sqfs ${arch} / squashfs" >> $1
-	fi
-	if [[ -f "${packages_custom}" ]] ; then
-		msg2 "Writing ${custom} entry ..."
-		echo "${arch}/${custom}-image.sqfs ${arch} / squashfs" >> $1
-	fi
-	msg2 "Writing root entry ..."
-	echo "${arch}/root-image.sqfs ${arch} / squashfs" >> $1
 }
 
 make_isomounts() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Creating [isomounts]"
-		gen_isomounts "${work_dir}/iso/${install_dir}/isomounts"
+		write_isomounts "${work_dir}/iso/${install_dir}/isomounts"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done creating [isomounts]"
 	fi
