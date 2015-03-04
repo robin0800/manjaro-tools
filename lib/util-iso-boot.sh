@@ -132,7 +132,7 @@ write_usb_nonfree_conf(){
 
 copy_isolinux_bin(){
 	msg2 "copying isolinux binaries ..."
-	if [[ -e $1/bios/ ]]; then
+	if [[ -e $1/usr/lib/syslinux/bios/ ]]; then
 		cp $1/usr/lib/syslinux/bios/isolinux.bin $2/
 		cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2/
 		cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2/
