@@ -267,8 +267,6 @@ make_image_custom() {
 		mkdir -p ${path}
 		umount_image_handler
 		aufs_mount_root_image "${path}"
-		# test machine-id again
-# 		configure_dbus "${path}"
 		mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${img_name}-${custom}-${iso_version}-${arch}-pkgs.txt
@@ -455,43 +453,16 @@ make_efiboot() {
 make_isolinux() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [${install_dir}/iso/isolinux]"
-		mkdir -p ${work_dir}/iso/isolinux
-		cp -a --no-preserve=ownership isolinux/* ${work_dir}/iso/isolinux
-
-		write_isolinux_cfg "${work_dir}/iso/isolinux"
-
+		local path=${work_dir}/iso/isolinux
+		mkdir -p ${path}
+		cp -a --no-preserve=ownership isolinux/* ${path}
+		write_isolinux_cfg "${path}"
 		if [[ -e isolinux-overlay ]]; then
-			msg2 "isolinux overlay found. Overwriting files."
-			cp -a --no-preserve=ownership isolinux-overlay/* ${work_dir}/iso/isolinux
-			sed -i "s|%MISO_LABEL%|${iso_label}|g;
-				s|%INSTALL_DIR%|${install_dir}|g;
-				s|%IMG_NAME%|${img_name}|g;
-				s|%ARCH%|${arch}|g" ${work_dir}/iso/isolinux/isolinux.cfg
+			msg2 "isolinux overlay found. Overwriting files ..."
+			cp -a --no-preserve=ownership isolinux-overlay/* ${path}
+			update_isolinux_cfg "${path}"
 		fi
-
-		local path="${work_dir}/root-image/usr/lib/syslinux"
-		if [[ -e ${path}/bios/ ]]; then
-			cp ${path}/bios/isolinux.bin ${work_dir}/iso/isolinux/
-			cp ${path}/bios/isohdpfx.bin ${work_dir}/iso/isolinux/
-			cp ${path}/bios/ldlinux.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/gfxboot.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/whichsys.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/mboot.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/hdt.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/chain.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/libcom32.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/libmenu.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/libutil.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/bios/libgpl.c32 ${work_dir}/iso/isolinux/
-		else
-			cp ${path}/isolinux.bin ${work_dir}/iso/isolinux/
-			cp ${path}/isohdpfx.bin ${work_dir}/iso/isolinux/
-			cp ${path}/gfxboot.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/whichsys.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/mboot.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/hdt.c32 ${work_dir}/iso/isolinux/
-			cp ${path}/chain.c32 ${work_dir}/iso/isolinux/
-		fi
+		copy_isolinux_bin "${work_dir}/root-image" "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${install_dir}/iso/isolinux]"
 	fi

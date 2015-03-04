@@ -19,13 +19,13 @@ download_efi_shellv1(){
 
 copy_efi_shells(){
 	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v1.efi ]];then
-		msg2 "Copying shellx64_v1.efi ..."
+		msg2 "copying shellx64_v1.efi ..."
 		cp ${PKGDATADIR}/efi_shell/shellx64_v1.efi $1/
 	else
 		download_efi_shellv1 "$1"
 	fi
 	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v2.efi ]];then
-		msg2 "Copying shellx64_v2.efi ..."
+		msg2 "copying shellx64_v2.efi ..."
 		cp ${PKGDATADIR}/efi_shell/shellx64_v2.efi $1/
 	else
 		download_efi_shellv2 "$1"
@@ -42,18 +42,21 @@ gen_boot_image(){
 }
 
 copy_efi_loaders(){
+	msg2 "copying efi loaders ..."
 	cp $1/usr/lib/prebootloader/PreLoader.efi $2/bootx64.efi
 	cp $1/usr/lib/prebootloader/HashTool.efi $2/
 	cp $1/usr/lib/gummiboot/gummibootx64.efi $2/loader.efi
 }
 
 copy_boot_images(){
+	msg2 "copying boot images ..."
 	cp $1/x86_64/${dist_iso} $2/${dist_iso}.efi
 	cp $1/x86_64/${img_name}.img $2/${img_name}.img
 	cp $1/intel_ucode.img $2/intel_ucode.img
 }
 
 copy_initcpio(){
+	msg2 "copying initcpio ..."
 	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
 	cp mkinitcpio.conf $1/etc/mkinitcpio-${dist_iso}.conf
@@ -127,6 +130,32 @@ write_usb_nonfree_conf(){
 	echo "options misobasedir=${install_dir} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=nonfree nonfree=yes" >> ${conf}
 }
 
+copy_isolinux_bin(){
+	msg2 "copying isolinux binaries ..."
+	if [[ -e $1/bios/ ]]; then
+		cp $1/usr/lib/syslinux/bios/isolinux.bin $2
+		cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2
+		cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2
+		cp $1/usr/lib/syslinux/bios/gfxboot.c32 $2
+		cp $1/usr/lib/syslinux/bios/whichsys.c32 $2
+		cp $1/usr/lib/syslinux/bios/mboot.c32 $2
+		cp $1/usr/lib/syslinux/bios/hdt.c32 $2
+		cp $1/usr/lib/syslinux/bios/chain.c32 $2
+		cp $1/usr/lib/syslinux/bios/libcom32.c32 $2
+		cp $1/usr/lib/syslinux/bios/libmenu.c32 $2
+		cp $1/usr/lib/syslinux/bios/libutil.c32 $2
+		cp $1/usr/lib/syslinux/bios/libgpl.c32 $2
+	else
+		cp $1/usr/lib/syslinux/isolinux.bin $2
+		cp $1/usr/lib/syslinux/isohdpfx.bin $2
+		cp $1/usr/lib/syslinux/gfxboot.c32 $2
+		cp $1/whichsys.c32 $2
+		cp $1/usr/lib/syslinux/mboot.c32 $2
+		cp $1/usr/lib/syslinux/hdt.c32 $2
+		cp $1/usr/lib/syslinux/chain.c32 $2
+	fi
+}
+
 write_isolinux_cfg(){
 	local fn=isolinux.cfg
 	local conf=$1/${fn}
@@ -155,6 +184,16 @@ write_isolinux_cfg(){
 	echo '' >> ${conf}
 	echo "label memtest" >> ${conf}
 	echo "  kernel memtest" >> ${conf}
+}
+
+update_isolinux_cfg(){
+	local fn=isolinux.cfg
+	msg2 "updating ${fn} ..."
+	sed -i "s|%MISO_LABEL%|${iso_label}|g;
+			s|%INSTALL_DIR%|${install_dir}|g;
+			s|%IMG_NAME%|${img_name}|g;
+			s|%DIST_ISO%|${dist_iso}|g;
+			s|%ARCH%|${arch}|g" $1/${fn}
 }
 
 write_isomounts(){
