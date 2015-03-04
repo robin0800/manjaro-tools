@@ -70,13 +70,13 @@ configure_lsb(){
 	fi
 }
 
-configure_dbus(){
-	msg2 "Configuring dbus ...."
-	# set unique machine-id
-# 	dbus-uuidgen --ensure=/etc/machine-id
-# 	ln -sf /etc/machine-id /var/lib/dbus/machine-id
-	chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
-}
+# configure_dbus(){
+# 	msg2 "Configuring dbus ...."
+# 	# set unique machine-id
+# # 	dbus-uuidgen --ensure=/etc/machine-id
+# # 	ln -sf /etc/machine-id /var/lib/dbus/machine-id
+# 	chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
+# }
 
 configure_services(){
 	if [[ ${initsys} == 'openrc' ]];then
