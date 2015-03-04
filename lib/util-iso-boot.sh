@@ -186,6 +186,23 @@ write_isolinux_cfg(){
 	echo "  kernel memtest" >> ${conf}
 }
 
+write_isolinux_msg(){
+	local fn=isolinux.msg
+	local conf=$1/${fn}
+	msg2 "writing ${fn} ..."
+	echo "Welcome to ${img_name} Linux!" > ${conf}
+	echo '' >> ${conf}
+	echo "Start the system oress enter 'press <return>'" >> ${conf}
+	echo '' >> ${conf}
+	echo '' >> ${conf}
+	echo "Available boot options:" >> ${conf}
+	echo "start                    - Start ${img_name} Live System" >> ${conf}
+	echo "nonfree                  - Start proprearity drivers" >> ${conf}
+	echo "harddisk                 - Boot from local hard disk" >> ${conf}
+	echo "hdt                      - Run Hardware Detection Tool" >> ${conf}
+	echo "memtest                  - Run Memory Test" >> ${conf}
+}
+
 update_isolinux_cfg(){
 	local fn=isolinux.cfg
 	msg2 "updating ${fn} ..."
@@ -194,6 +211,12 @@ update_isolinux_cfg(){
 			s|%IMG_NAME%|${img_name}|g;
 			s|%DIST_ISO%|${dist_iso}|g;
 			s|%ARCH%|${arch}|g" $1/${fn}
+}
+
+update_isolinux_msg(){
+	local fn=isolinux.msg
+	msg2 "updating ${fn} ..."
+	sed -i "s|%IMG_NAME%|${img_name}|g" $1/${fn}
 }
 
 write_isomounts(){
