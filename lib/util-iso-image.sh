@@ -63,7 +63,7 @@ configure_services_live(){
 			msg3 "Done configuring ${initsys}"
 		;;
 		*)
-			msg2 "${initsys} is not supported!"
+			msg3 "${initsys} is not supported!"
 			break
 		;;
 	esac
@@ -104,7 +104,7 @@ configure_services(){
 			msg3 "Done configuring ${initsys}"
 		;;
 		*)
-			msg2 "${initsys} is not supported!"
+			msg3 "${initsys} is not supported!"
 			break
 		;;
 	esac
