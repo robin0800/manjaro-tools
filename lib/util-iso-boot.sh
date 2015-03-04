@@ -192,7 +192,7 @@ write_isolinux_msg(){
 	msg2 "writing ${fn} ..."
 	echo "Welcome to ${img_name} Linux!" > ${conf}
 	echo '' >> ${conf}
-	echo "Start the system oress enter 'press <return>'" >> ${conf}
+	echo "To start the system enter 'start' and press <return>" >> ${conf}
 	echo '' >> ${conf}
 	echo '' >> ${conf}
 	echo "Available boot options:" >> ${conf}
