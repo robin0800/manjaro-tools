@@ -390,8 +390,6 @@ make_image_boot() {
 		fi
 		copy_initcpio "${path}"
 		gen_boot_image "${path}"
-		# write_initcpio_preset "${path}"
-		# run_mkinitcpio "${path}"
 		mv ${path}/boot/${img_name}.img ${path_iso}/${arch}/${img_name}.img
 		cp ${path}/boot/intel-ucode.img ${path_iso}/intel_ucode.img
 		cp ${path}/usr/share/licenses/intel-ucode/LICENSE ${path_iso}/intel_ucode.LICENSE

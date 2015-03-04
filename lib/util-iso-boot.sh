@@ -34,26 +34,10 @@ copy_efi_shells(){
 
 # $1: work_dir
 gen_boot_image(){
-	local _kernver=$(cat $1/usr/lib/modules/*-MANJARO/version)
 	chroot-run $1 \
-		/usr/bin/mkinitcpio -k ${_kernver} \
+		/usr/bin/mkinitcpio -k $(uname -r) \
 		-c /etc/mkinitcpio-${dist_iso}.conf \
 		-g /boot/${img_name}.img
-}
-
-run_mkinitcpio(){
-	chroot-run $1 \
-		/usr/bin/mkinitcpio -p ${dist_kernel}
-}
-
-write_initcpio_preset(){
-	local conf=$1/etc/mkinitcpio.d/${dist_kernel}.preset
-	msg2 "writing mkinitcpio ${dist_kernel}.preset ..."
-	echo "# mkinitcpio preset file for the 'linux' package" > ${conf}
-	echo ALL_config="/etc/mkinitcpio-${dist_iso}.conf" >> ${conf}
-	echo ALL_kver="/boot/${dist_iso}" >> ${conf}
-	echo "PRESETS=('default')" >> ${conf}
-	echo default_image="/boot/${img_name}.img" >> ${conf}
 }
 
 copy_efi_loaders(){
