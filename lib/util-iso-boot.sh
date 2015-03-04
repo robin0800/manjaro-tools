@@ -9,6 +9,56 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+download_efi_shellv2(){
+	curl -k -o $1/shellx64_v2.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi
+}
+
+download_efi_shellv1(){
+	curl -k -o $1/shellx64_v1.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi
+}
+
+copy_efi_shells(){
+	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v1.efi ]];then
+		msg2 "Copying shellx64_v1.efi ..."
+		cp ${PKGDATADIR}/efi_shell/shellx64_v1.efi $1/
+	else
+		download_efi_shellv1 "$1"
+	fi
+	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v2.efi ]];then
+		msg2 "Copying shellx64_v2.efi ..."
+		cp ${PKGDATADIR}/efi_shell/shellx64_v2.efi $1/
+	else
+		download_efi_shellv2 "$1"
+	fi
+}
+
+# $1: work_dir
+gen_boot_image(){
+	local _kernver=$(cat $1/usr/lib/modules/*-MANJARO/version)
+	chroot-run $1 \
+		/usr/bin/mkinitcpio -k ${_kernver} \
+		-c /etc/mkinitcpio-${dist_iso}.conf \
+		-g /boot/${img_name}.img
+}
+
+copy_efi_loaders(){
+	cp $1/usr/lib/prebootloader/PreLoader.efi $2/bootx64.efi
+	cp $1/usr/lib/prebootloader/HashTool.efi $2/
+	cp $1/usr/lib/gummiboot/gummibootx64.efi $2/loader.efi
+}
+
+copy_boot_images(){
+	cp $1/x86_64/${dist_iso} $2/${dist_iso}.efi
+	cp $1/x86_64/${img_name}.img $2/${img_name}.img
+	cp $1/intel_ucode.img $2/intel_ucode.img
+}
+
+copy_initcpio(){
+	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
+	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
+	cp mkinitcpio.conf $1/etc/mkinitcpio-${dist_iso}.conf
+}
+
 write_loader_conf(){
 	local fn=loader.conf
 	local conf=$1/${fn}

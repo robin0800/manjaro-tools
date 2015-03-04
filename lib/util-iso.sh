@@ -56,12 +56,6 @@ check_run_dir(){
 	fi
 }
 
-copy_initcpio(){
-	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
-	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
-	cp mkinitcpio.conf $1/etc/mkinitcpio-${dist_iso}.conf
-}
-
 copy_overlay_root(){
 	msg2 "Copying overlay ..."
 	cp -a --no-preserve=ownership overlay/* $1
@@ -88,26 +82,19 @@ copy_startup_scripts(){
 	cp ${PKGDATADIR}/scripts/mhwd-live $1
 	chmod +x $1/livecd
 	chmod +x $1/mhwd-live
-
-# 	cp ${BINDIR}/chroot-run $1
-# 	sed -e "s|${LIBDIR}|/opt/livecd|g" -i $1/chroot-run
 }
 
 write_profile_conf_entries(){
 	local conf=$1/profile.conf
-
 	echo '' >> ${conf}
 	echo '# custom image name' >> ${conf}
 	echo "custom=${custom}" >> ${conf}
-
 	echo '' >> ${conf}
 	echo '# install_dir' >> ${conf}
 	echo "install_dir=${install_dir}" >> ${conf}
-
 	echo '' >> ${conf}
 	echo '# dist_iso' >> ${conf}
 	echo "dist_iso=${dist_iso}" >> ${conf}
-
 	echo '' >> ${conf}
 	echo '# dist_kernel_ver' >> ${conf}
 	echo "dist_kernel_ver=${dist_kernel_ver}" >> ${conf}
@@ -184,15 +171,6 @@ configure_livecd_image(){
 	configure_thus "$1"
 	configure_cli "$1"
 	msg "Done configuring [livecd-image]"
-}
-
-# $1: work_dir
-gen_boot_image(){
-	local _kernver=$(cat $1/usr/lib/modules/*-MANJARO/version)
-		chroot-run $1 \
-			/usr/bin/mkinitcpio -k ${_kernver} \
-			-c /etc/mkinitcpio-${dist_iso}.conf \
-			-g /boot/${img_name}.img
 }
 
 make_repo(){
@@ -424,54 +402,22 @@ make_image_boot() {
 	fi
 }
 
-# EFI Shell 2.0 for UEFI 2.3+ ( http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=UEFI_Shell )
-download_efi_shellv2(){
-	curl -k -o $1/shellx64_v2.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi
-}
-
-# EFI Shell 1.0 for non UEFI 2.3+ ( http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=Efi-shell )
-download_efi_shellv1(){
-	curl -k -o $1/shellx64_v1.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi
-}
-
-copy_efi_shells(){
-	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v1.efi ]];then
-		msg2 "Copying shellx64_v1.efi ..."
-		cp ${PKGDATADIR}/efi_shell/shellx64_v1.efi $1/
-	else
-		download_efi_shellv1 "$1"
-	fi
-	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v2.efi ]];then
-		msg2 "Copying shellx64_v2.efi ..."
-		cp ${PKGDATADIR}/efi_shell/shellx64_v2.efi $1/
-	else
-		download_efi_shellv2 "$1"
-	fi
-}
-
 # Prepare /EFI
 make_efi() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [${install_dir}/boot/EFI]"
 		local path_iso="${work_dir}/iso"
 		local path_efi="${path_iso}/EFI"
-
 		mkdir -p ${path_efi}/boot
-		cp ${work_dir}/root-image/usr/lib/prebootloader/PreLoader.efi ${path_efi}/boot/bootx64.efi
-		cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${path_efi}/boot/
-		cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${path_efi}/boot/loader.efi
-
+		copy_efi_loaders "${work_dir}/root-image" "${path_efi}/boot"
 		mkdir -p ${path_iso}/loader/entries
 		write_loader_conf "${path_iso}/loader"
 		write_efi_shellv1_conf "${path_iso}/loader/entries"
 		write_efi_shellv2_conf "${path_iso}/loader/entries"
 		write_usb_conf "${path_iso}/loader/entries"
 		write_usb_nonfree_conf "${path_iso}/loader/entries"
-
 		copy_efi_shells "${path_efi}"
-
 		: > ${work_dir}/build.${FUNCNAME}
-
 		msg "Done [${install_dir}/boot/EFI]"
 	fi
 }
@@ -481,25 +427,16 @@ make_efiboot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [${install_dir}/iso/EFI]"
 		local path_iso="${work_dir}/iso"
-
 		mkdir -p ${path_iso}/EFI/miso
 		truncate -s 31M ${path_iso}/EFI/miso/${img_name}.img
 		mkfs.vfat -n MISO_EFI ${path_iso}/EFI/miso/${img_name}.img
-
 		mkdir -p ${work_dir}/efiboot
 		mount ${path_iso}/EFI/miso/${img_name}.img ${work_dir}/efiboot
 		local path_efi="${work_dir}/efiboot/EFI"
-
 		mkdir -p ${path_efi}/miso
-		cp ${path_iso}/${install_dir}/boot/x86_64/${dist_iso} ${path_efi}/miso/${dist_iso}.efi
-		cp ${path_iso}/${install_dir}/boot/x86_64/${img_name}.img ${path_efi}/miso/${img_name}.img
-		cp ${path_iso}/${install_dir}/boot/intel_ucode.img ${path_efi}/miso/intel_ucode.img
-
+		copy_boot_images "${path_iso}/${install_dir}/boot" "${path_efi}/miso"
 		mkdir -p ${path_efi}/boot
-		cp ${work_dir}/root-image/usr/lib/prebootloader/PreLoader.efi ${path_efi}/boot/bootx64.efi
-		cp ${work_dir}/root-image/usr/lib/prebootloader/HashTool.efi ${path_efi}/boot/
-		cp ${work_dir}/root-image/usr/lib/gummiboot/gummibootx64.efi ${path_efi}/boot/loader.efi
-
+		copy_efi_loaders "${work_dir}/root-image" "${path_efi}/boot"
 		local efi_loader=${work_dir}/efiboot/loader
 		mkdir -p ${efi_loader}/entries
 		write_loader_conf "${efi_loader}"
@@ -507,10 +444,7 @@ make_efiboot() {
 		write_efi_shellv2_conf "${efi_loader}/entries"
 		write_dvd_conf "${efi_loader}/entries"
 		write_dvd_nonfree_conf "${efi_loader}/entries"
-
-		cp ${path_iso}/EFI/shellx64_v2.efi ${path_efi}/
-		cp ${path_iso}/EFI/shellx64_v1.efi ${path_efi}/
-
+		copy_efi_shells "${path_efi}"
 		umount ${work_dir}/efiboot
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${install_dir}/iso/EFI]"
@@ -678,13 +612,13 @@ make_profile(){
 		${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
 		${clean_cache_lng} && clean_cache "${cache_dir_lng}"
 		if ${iso_only}; then
-			[[ ! -d ${work_dir} ]] && die "You need to create images first eg. buildiso -p <name> -i"
+			[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p ${buildset_iso} -i"
 			compress_images
 			exit 1
 		fi
 		if ${images_only}; then
 			build_images
-			warning "Continue with eg. buildiso -p <name> -sc ..."
+			warning "Continue compress: buildiso -p ${buildset_iso} -sc ..."
 			exit 1
 		else
 			build_images
