@@ -457,10 +457,12 @@ make_isolinux() {
 		mkdir -p ${path}
 		cp -a --no-preserve=ownership isolinux/* ${path}
 		write_isolinux_cfg "${path}"
+		write_isolinux_msg "${path}"
 		if [[ -e isolinux-overlay ]]; then
 			msg2 "isolinux overlay found. Overwriting files ..."
 			cp -a --no-preserve=ownership isolinux-overlay/* ${path}
 			update_isolinux_cfg "${path}"
+			update_isolinux_msg "${path}"
 		fi
 		copy_isolinux_bin "${work_dir}/root-image" "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
