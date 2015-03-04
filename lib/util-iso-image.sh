@@ -53,12 +53,12 @@ configure_services_live(){
 		done
 		msg3 "Done configuring OpenRC"
 	else
-		msg3 "Configuring SystemD ...."
+		msg3 "Configuring systemd ...."
 		for svc in ${start_systemd_live[@]}; do
 			msg2 "Setting $svc ..."
 			chroot $1 systemctl enable $svc &> /dev/null
 		done
-		msg3 "Done configuring SystemD"
+		msg3 "Done configuring systemd"
 	fi
 }
 
@@ -87,12 +87,12 @@ configure_services(){
 		done
 		msg3 "Done configuring OpenRC"
 	else
-		msg3 "Configuring SystemD ...."
+		msg3 "Configuring systemd ...."
 		for svc in ${start_systemd[@]}; do
 			msg2 "Setting $svc ..."
 			chroot $1 systemctl enable $svc &> /dev/null
 		done
-		msg3 "Done configuring SystemD"
+		msg3 "Done configuring systemd"
 	fi
 }
 
