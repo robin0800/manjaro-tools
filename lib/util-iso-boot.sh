@@ -41,6 +41,21 @@ gen_boot_image(){
 		-g /boot/${img_name}.img
 }
 
+run_mkinitcpio(){
+	chroot-run $1 \
+		/usr/bin/mkinitcpio -p ${dist_kernel}
+}
+
+write_initcpio_preset(){
+	local conf=$1/etc/mkinitcpio.d/${dist_kernel}.preset
+	msg2 "writing mkinitcpio ${dist_kernel}.preset ..."
+	echo "# mkinitcpio preset file for the 'linux' package" > ${conf}
+	echo ALL_config="/etc/mkinitcpio-${dist_iso}.conf" >> ${conf}
+	echo ALL_kver="/boot/${dist_iso}" >> ${conf}
+	echo "PRESETS=('default')" >> ${conf}
+	echo default_image="/boot/${img_name}.img" >> ${conf}
+}
+
 copy_efi_loaders(){
 	msg2 "copying efi loaders ..."
 	cp $1/usr/lib/prebootloader/PreLoader.efi $2/bootx64.efi
