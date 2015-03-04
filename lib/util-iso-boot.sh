@@ -10,28 +10,32 @@
 # GNU General Public License for more details.
 
 write_loader_conf(){
-	local fn=loader.conf conf=$1/${fn}
+	local fn=loader.conf
+	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo 'timeout 3' > ${conf}
 	echo "default ${dist_iso}-${arch}" >> ${conf}
 }
 
 write_efi_shellv1_conf(){
-	local fn=uefi-shell-v1-${arch}.conf conf=$1/${fn}
+	local fn=uefi-shell-v1-${arch}.conf
+	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo "title  UEFI Shell ${arch} v1" > ${conf}
 	echo "efi    /EFI/shellx64_v1.efi" >> ${conf}
 }
 
 write_efi_shellv2_conf(){
-	local fn=uefi-shell-v2-${arch}.conf conf=$1/${fn}
+	local fn=uefi-shell-v2-${arch}.conf
+	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo "title  UEFI Shell ${arch} v2" > ${conf}
 	echo "efi    /EFI/shellx64_v2.efi" >> ${conf}
 }
 
 write_dvd_conf(){
-	local fn=${dist_iso}-${arch}.conf conf=$1/${fn}
+	local fn=${dist_iso}-${arch}.conf
+	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo "title   Manjaro Linux ${arch} UEFI DVD (default)" > ${conf}
 	echo "linux   /EFI/miso/${dist_iso}.efi" >> ${conf}
@@ -41,7 +45,8 @@ write_dvd_conf(){
 }
 
 write_dvd_nonfree_conf(){
-	local fn=${dist_iso}-${arch}-nonfree.conf conf=$1/${fn}
+	local fn=${dist_iso}-${arch}-nonfree.conf
+	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo "title   Manjaro Linux ${arch} UEFI DVD (nonfree)" > ${conf}
 	echo "linux   /EFI/miso/${dist_iso}.efi" >> ${conf}
@@ -51,7 +56,8 @@ write_dvd_nonfree_conf(){
 }
 
 write_usb_conf(){
-	local fn=${dist_iso}-${arch}.conf conf=$1/${fn}
+	local fn=${dist_iso}-${arch}.conf
+	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo "title   Manjaro Linux ${arch} UEFI USB (default)" > ${conf}
 	echo "linux   /${install_dir}/boot/${arch}/${dist_iso}" >> ${conf}
@@ -61,7 +67,8 @@ write_usb_conf(){
 }
 
 write_usb_nonfree_conf(){
-	local fn=${dist_iso}-${arch}-nonfree.conf conf=$1/${fn}
+	local fn=${dist_iso}-${arch}-nonfree.conf
+	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo "title   Manjaro Linux ${arch} UEFI USB (nonfree)" > ${conf}
 	echo "linux   /${install_dir}/boot/${arch}/${dist_iso}" >> ${conf}
@@ -71,7 +78,8 @@ write_usb_nonfree_conf(){
 }
 
 write_isolinux_cfg(){
-	local fn=isolinux.cfg conf=$1/${fn}
+	local fn=isolinux.cfg
+	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo "default start" > ${conf}
 	echo "implicit 1" >> ${conf}
