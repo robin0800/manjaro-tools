@@ -197,7 +197,7 @@ write_isolinux_msg(){
 	echo '' >> ${conf}
 	echo "Available boot options:" >> ${conf}
 	echo "start                    - Start ${img_name} Live System" >> ${conf}
-	echo "nonfree                  - Start proprearity drivers" >> ${conf}
+	echo "nonfree                  - Start with proprietary drivers" >> ${conf}
 	echo "harddisk                 - Boot from local hard disk" >> ${conf}
 	echo "hdt                      - Run Hardware Detection Tool" >> ${conf}
 	echo "memtest                  - Run Memory Test" >> ${conf}
