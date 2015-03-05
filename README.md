@@ -119,7 +119,7 @@ Specifying args will override manjaro-tools.conf settings.
 Each iso profile must have these files or symlinks to shared:
 
 
-* profile.conf
+######* profile.conf
 
 ~~~
 ##########################################
@@ -175,21 +175,21 @@ Each iso profile must have these files or symlinks to shared:
 # start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
 ~~~
 
-* Packages
+######* Packages  
 Contains root image packages
 ideally no xorg
 
-* Packages-Custom/desktop
+######* Packages-Custom/desktop  
 Contains the custom image packages
 desktop environment packages go here
 
-* Packages-Xorg
+######* Packages-Xorg  
 Contains the Xorg package repo
 
-* Packages-Lng
+######* Packages-Lng  
 Contains the language packages repo
 
-* Packages-Livecd
+######* Packages-Livecd  
 Contains packages you only want on livecd but not installed on the target system with installer
 default files are in shared folder and can be symlinked or defined in a real file
 
@@ -223,9 +223,9 @@ $ buildpkg -h
 Usage: buildpkg [options] [--] [makepkg args]
     -p <pkg>           Set or pkg [default: default]
     -a <arch>          Arch [default: x86_64]
-    -b <branch>        Branch [default: unstable]
+    -b <branch>        Branch [default: stable]
     -r <dir>           Chroots directory
-                       [default: /build/buildpkg]
+                       [default: /opt/buildpkg]
     -c                 Recreate chroot
     -w                 Clean up
     -n                 Install and run namcap check
@@ -248,18 +248,18 @@ buildpkg -p sysvinit -a i686 -b testing -cwsn
 buildpkg -p sysvinit -b testing -cswn
 ~~~
 
-You can drop the branch arg if you set the branch in manjaro-tools.conf
-the arch can also be set in manjaro-tools.conf, but under normal conditions, it is better to specify the non native arch by -a parameter.
+You can drop the branch arg if you set the branch in manjaro-tools.conf  
+The arch can also be set in manjaro-tools.conf, but under normal conditions, it is better to specify the non native arch by -a parameter.
 
 ######* -c
-removes the chroot dir
+Removes the chroot dir  
 If the -c parameter is not used, buildpkg will update the existing chroot or create a new one if none is present.
 ######* -w
-cleans pkgcache, and logfiles
+Cleans pkgcache, and logfiles
 ######* -s
-signs the package when built
+Signs the package when built
 ######* -n
-installs the built package in the chroot and runs a namcap check
+Installs the built package in the chroot and runs a namcap check
 
 ###3. buildiso
 
@@ -278,9 +278,9 @@ $ buildiso -h
 Usage: buildiso [options]
     -p <profile>       Buildset or profile [default: default]
     -a <arch>          Arch [default: x86_64]
-    -b <branch>        Branch [default: unstable]
+    -b <branch>        Branch [default: stable]
     -r <dir>           Chroots directory
-                       [default: /build/buildiso]
+                       [default: /opt/buildiso]
     -w                 Disable clean iso cache
     -c                 Disable clean work dir
     -x                 Disable clean xorg cache
@@ -317,7 +317,7 @@ Use this to sqfs compress the chroots if you previously used -i.
 ######* -x
 By default, xorg package cache is cleaned on every build. Disabling the xorg cache cleaning will result in no dowload again for xorg drivers and the cache is used.
 ######* -l
-Disable lng cache, by default lng cache is cleaned on every build. Uning this option will enable lng packages from cache rather than downloading them again.
+Disable lng cache, by default lng cache is cleaned on every build. Using this option will enable lng packages from cache rather than downloading them again.
 
 ###4. mkset
 
