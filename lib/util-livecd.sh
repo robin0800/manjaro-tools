@@ -275,11 +275,11 @@ configure_translation_pkgs(){
 }
 
 install_localization(){
-	if [ -e "/bootmnt/${install_dir}/${arch}/lng-image.sqfs" ] ; then
+	if [ -e "/bootmnt/${iso_name}/${arch}/lng-image.sqfs" ] ; then
 		echo "install translation packages" >> /tmp/livecd.log
 		configure_translation_pkgs $1
 		${PACMAN_LNG} -Sy
-		if [ -e "/bootmnt/${install_dir}/${arch}/kde-image.sqfs" ] ; then
+		if [ -e "/bootmnt/${iso_name}/${arch}/kde-image.sqfs" ] ; then
 			${PACMAN_LNG} -S ${KDE_LNG_INST} &> /dev/null
 		fi
 		if [ -e "/usr/bin/firefox" ] ; then
@@ -415,7 +415,7 @@ configure_env(){
 	sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
 	fi
 
-	if [[ -f "/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs" ]]; then
+	if [[ -f "/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs" ]]; then
 		case ${custom} in
 			gnome|xfce|openbox|enlightenment|cinnamon|pekwm|lxde|mate)
 				echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment

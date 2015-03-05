@@ -90,14 +90,8 @@ write_profile_conf_entries(){
 	echo '# custom image name' >> ${conf}
 	echo "custom=${custom}" >> ${conf}
 	echo '' >> ${conf}
-	echo '# install_dir' >> ${conf}
-	echo "install_dir=${install_dir}" >> ${conf}
-	echo '' >> ${conf}
-	echo '# dist_iso' >> ${conf}
-	echo "dist_iso=${dist_iso}" >> ${conf}
-	echo '' >> ${conf}
-	echo '# dist_kernel_ver' >> ${conf}
-	echo "dist_kernel_ver=${dist_kernel_ver}" >> ${conf}
+	echo '# iso_name' >> ${conf}
+	echo "iso_name=${iso_name}" >> ${conf}
 }
 
 copy_livecd_helpers(){
@@ -198,11 +192,11 @@ make_iso() {
 # $1: file
 make_checksum(){
 	cd ${cache_dir_iso}
-		msg "Creating [${checksum_mode}sum] ..."
-		local cs=$(${checksum_mode}sum $1)
-		msg2 "${checksum_mode}sum: ${cs}"
-		echo "${cs}" > $1.${checksum_mode}
-		msg "Done [${checksum_mode}sum]"
+		msg "Creating [${iso_checksum}sum] ..."
+		local cs=$(${iso_checksum}sum $1)
+		msg2 "${iso_checksum}sum: ${cs}"
+		echo "${cs}" > $1.${iso_checksum}
+		msg "Done [${iso_checksum}sum]"
 	cd ..
 }
 
@@ -269,7 +263,7 @@ make_image_custom() {
 		aufs_mount_root_image "${path}"
 		mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
-		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${img_name}-${custom}-${iso_version}-${arch}-pkgs.txt
+		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		umount_image_handler
@@ -371,14 +365,13 @@ make_image_lng() {
 	fi
 }
 
-# Prepare ${install_dir}/boot/
 make_image_boot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${install_dir}/boot]"
-		local path_iso="${work_dir}/iso/${install_dir}/boot"
+		msg "Prepare [${iso_name}/boot]"
+		local path_iso="${work_dir}/iso/${iso_name}/boot"
 		mkdir -p ${path_iso}/${arch}
 		cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${arch}/memtest
-		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${dist_iso}
+		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${iso_name}
 		local path="${work_dir}/boot-image"
 		mkdir -p ${path}
 		umount_image_handler
@@ -390,20 +383,20 @@ make_image_boot() {
 		fi
 		copy_initcpio "${path}"
 		gen_boot_image "${path}"
-		mv ${path}/boot/${img_name}.img ${path_iso}/${arch}/${img_name}.img
+		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		cp ${path}/boot/intel-ucode.img ${path_iso}/intel_ucode.img
 		cp ${path}/usr/share/licenses/intel-ucode/LICENSE ${path_iso}/intel_ucode.LICENSE
 		umount_image_handler
 		rm -R ${path}
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${install_dir}/boot]"
+		msg "Done [${iso_name}/boot]"
 	fi
 }
 
 # Prepare /EFI
 make_efi() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${install_dir}/boot/EFI]"
+		msg "Prepare [${iso_name}/boot/EFI]"
 		local path_iso="${work_dir}/iso"
 		local path_efi="${path_iso}/EFI"
 		mkdir -p ${path_efi}/boot
@@ -416,23 +409,23 @@ make_efi() {
 		write_usb_nonfree_conf "${path_iso}/loader/entries"
 		copy_efi_shells "${path_efi}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${install_dir}/boot/EFI]"
+		msg "Done [${iso_name}/boot/EFI]"
 	fi
 }
 
 # Prepare kernel.img::/EFI for "El Torito" EFI boot mode
 make_efiboot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${install_dir}/iso/EFI]"
+		msg "Prepare [${iso_name}/iso/EFI]"
 		local path_iso="${work_dir}/iso"
 		mkdir -p ${path_iso}/EFI/miso
-		truncate -s 31M ${path_iso}/EFI/miso/${img_name}.img
-		mkfs.vfat -n MISO_EFI ${path_iso}/EFI/miso/${img_name}.img
+		truncate -s 31M ${path_iso}/EFI/miso/${iso_name}.img
+		mkfs.vfat -n MISO_EFI ${path_iso}/EFI/miso/${iso_name}.img
 		mkdir -p ${work_dir}/efiboot
-		mount ${path_iso}/EFI/miso/${img_name}.img ${work_dir}/efiboot
+		mount ${path_iso}/EFI/miso/${iso_name}.img ${work_dir}/efiboot
 		local path_efi="${work_dir}/efiboot/EFI"
 		mkdir -p ${path_efi}/miso
-		copy_boot_images "${path_iso}/${install_dir}/boot" "${path_efi}/miso"
+		copy_boot_images "${path_iso}/${iso_name}/boot" "${path_efi}/miso"
 		mkdir -p ${path_efi}/boot
 		copy_efi_loaders "${work_dir}/root-image" "${path_efi}/boot"
 		local efi_loader=${work_dir}/efiboot/loader
@@ -445,14 +438,14 @@ make_efiboot() {
 		copy_efi_shells "${path_efi}"
 		umount ${work_dir}/efiboot
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${install_dir}/iso/EFI]"
+		msg "Done [${iso_name}/iso/EFI]"
 	fi
 }
 
 # Prepare /isolinux
 make_isolinux() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${install_dir}/iso/isolinux]"
+		msg "Prepare [${iso_name}/iso/isolinux]"
 		local path=${work_dir}/iso/isolinux
 		mkdir -p ${path}
 		cp -a --no-preserve=ownership isolinux/* ${path}
@@ -466,14 +459,14 @@ make_isolinux() {
 		fi
 		copy_isolinux_bin "${work_dir}/root-image" "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${install_dir}/iso/isolinux]"
+		msg "Done [${iso_name}/iso/isolinux]"
 	fi
 }
 
 make_isomounts() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Creating [isomounts]"
-		write_isomounts "${work_dir}/iso/${install_dir}/isomounts"
+		write_isomounts "${work_dir}/iso/${iso_name}/isomounts"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done creating [isomounts]"
 	fi
@@ -483,20 +476,20 @@ make_isomounts() {
 load_pkgs(){
 	msg3 "Loading Packages: [$1] ..."
 	if [[ "${arch}" == "i686" ]]; then
-		packages=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+		packages=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|KERNEL|$kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 	elif [[ "${arch}" == "x86_64" ]]; then
-		packages=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+		packages=$(sed "s|#.*||g" "$1" | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|KERNEL|$kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 	fi
 }
 
 load_pkgs_xorg(){
 	msg3 "Loading Packages: [Packages-Xorg] ..."
 	if [[ "${arch}" == "i686" ]]; then
-		packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+		packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>x86_64.*||g" | sed "s|>i686||g" | sed "s|>free_x64.*||g" | sed "s|>free_uni||g" | sed "s|>nonfree_x64.*||g" | sed "s|>nonfree_uni||g" | sed "s|KERNEL|$kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 	elif [[ "${arch}" == "x86_64" ]]; then
-		packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+		packages_xorg=$(sed "s|#.*||g" Packages-Xorg | sed "s| ||g" | sed "s|>dvd.*||g"  | sed "s|>blacklist.*||g" | sed "s|>cleanup.*||g" | sed "s|>i686.*||g" | sed "s|>x86_64||g" | sed "s|>free_x64||g" | sed "s|>free_uni||g" | sed "s|>nonfree_uni||g" | sed "s|>nonfree_x64||g" | sed "s|KERNEL|$kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 	fi
-	packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$dist_kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
+	packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
 load_pkgs_lng(){
@@ -523,7 +516,7 @@ load_profile(){
 	done
 	custom=${packages_custom#*-}
 	custom=${custom,,}
-	iso_file="${img_name}-${custom}-${iso_version}-${arch}.iso"
+	iso_file="${iso_name}-${custom}-${dist_release}-${arch}.iso"
 	if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
 		pacman_conf="pacman-${pacman_conf_arch}.conf"
 	else

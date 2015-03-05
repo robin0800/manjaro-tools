@@ -72,8 +72,8 @@ configure_services_live(){
 configure_lsb(){
 	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
 	if [ -e $1/etc/lsb-release ] ; then
-		sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${iso_version}/" $1/etc/lsb-release
-		sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${code_name}/" $1/etc/lsb-release
+		sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${dist_release}/" $1/etc/lsb-release
+		sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${dist_codename}/" $1/etc/lsb-release
 	fi
 }
 

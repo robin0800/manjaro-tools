@@ -36,8 +36,8 @@ copy_efi_shells(){
 gen_boot_image(){
 	chroot-run $1 \
 		/usr/bin/mkinitcpio -k $(uname -r) \
-		-c /etc/mkinitcpio-${dist_iso}.conf \
-		-g /boot/${img_name}.img
+		-c /etc/mkinitcpio-${iso_name}.conf \
+		-g /boot/${iso_name}.img
 }
 
 copy_efi_loaders(){
@@ -49,8 +49,8 @@ copy_efi_loaders(){
 
 copy_boot_images(){
 	msg2 "copying boot images ..."
-	cp $1/x86_64/${dist_iso} $2/${dist_iso}.efi
-	cp $1/x86_64/${img_name}.img $2/${img_name}.img
+	cp $1/x86_64/${iso_name} $2/${iso_name}.efi
+	cp $1/x86_64/${iso_name}.img $2/${iso_name}.img
 	cp $1/intel_ucode.img $2/intel_ucode.img
 }
 
@@ -58,7 +58,7 @@ copy_initcpio(){
 	msg2 "copying initcpio ..."
 	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
-	cp mkinitcpio.conf $1/etc/mkinitcpio-${dist_iso}.conf
+	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
 }
 
 write_loader_conf(){
@@ -66,7 +66,7 @@ write_loader_conf(){
 	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
 	echo 'timeout 3' > ${conf}
-	echo "default ${dist_iso}-${arch}" >> ${conf}
+	echo "default ${iso_name}-${arch}" >> ${conf}
 }
 
 write_efi_shellv1_conf(){
@@ -86,73 +86,73 @@ write_efi_shellv2_conf(){
 }
 
 write_dvd_conf(){
-	local fn=${dist_iso}-${arch}.conf
+	local fn=${iso_name}-${arch}.conf
 	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
-	echo "title   Manjaro Linux ${arch} UEFI DVD (default)" > ${conf}
-	echo "linux   /EFI/miso/${dist_iso}.efi" >> ${conf}
+	echo "title   ${dist_name} Linux ${arch} UEFI DVD (default)" > ${conf}
+	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
 	echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
-	echo "initrd  /EFI/miso/${img_name}.img" >> ${conf}
-	echo "options misobasedir=${install_dir} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free" >> ${conf}
+	echo "initrd  /EFI/miso/${iso_name}.img" >> ${conf}
+	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free" >> ${conf}
 }
 
 write_dvd_nonfree_conf(){
-	local fn=${dist_iso}-${arch}-nonfree.conf
+	local fn=${iso_name}-${arch}-nonfree.conf
 	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
-	echo "title   Manjaro Linux ${arch} UEFI DVD (nonfree)" > ${conf}
-	echo "linux   /EFI/miso/${dist_iso}.efi" >> ${conf}
+	echo "title   ${dist_name} Linux ${arch} UEFI DVD (nonfree)" > ${conf}
+	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
 	echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
-	echo "initrd  /EFI/miso/${img_name}.img" >> ${conf}
-	echo "options misobasedir=${install_dir} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=nonfree nonfree=yes" >> ${conf}
+	echo "initrd  /EFI/miso/${iso_name}.img" >> ${conf}
+	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=nonfree nonfree=yes" >> ${conf}
 }
 
 write_usb_conf(){
-	local fn=${dist_iso}-${arch}.conf
+	local fn=${iso_name}-${arch}.conf
 	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
-	echo "title   Manjaro Linux ${arch} UEFI USB (default)" > ${conf}
-	echo "linux   /${install_dir}/boot/${arch}/${dist_iso}" >> ${conf}
-	echo "initrd  /${install_dir}/boot/intel_ucode.img" >> ${conf}
-	echo "initrd  /${install_dir}/boot/${arch}/${img_name}.img" >> ${conf}
-	echo "options misobasedir=${install_dir} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free" >> ${conf}
+	echo "title   ${dist_name} Linux ${arch} UEFI USB (default)" > ${conf}
+	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+	echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
+	echo "initrd  /${iso_name}/boot/${arch}/${iso_name}.img" >> ${conf}
+	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free" >> ${conf}
 }
 
 write_usb_nonfree_conf(){
-	local fn=${dist_iso}-${arch}-nonfree.conf
+	local fn=${iso_name}-${arch}-nonfree.conf
 	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
-	echo "title   Manjaro Linux ${arch} UEFI USB (nonfree)" > ${conf}
-	echo "linux   /${install_dir}/boot/${arch}/${dist_iso}" >> ${conf}
-	echo "initrd  /${install_dir}/boot/intel_ucode.img" >> ${conf}
-	echo "initrd  /${install_dir}/boot/${arch}/${img_name}.img" >> ${conf}
-	echo "options misobasedir=${install_dir} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=nonfree nonfree=yes" >> ${conf}
+	echo "title   ${dist_name} Linux ${arch} UEFI USB (nonfree)" > ${conf}
+	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+	echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
+	echo "initrd  /${iso_name}/boot/${arch}/${iso_name}.img" >> ${conf}
+	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=nonfree nonfree=yes" >> ${conf}
 }
 
 copy_isolinux_bin(){
 	if [[ -e $1/usr/lib/syslinux/bios ]]; then
 		msg2 "copying isolinux bios binaries ..."
-		cp $1/usr/lib/syslinux/bios/isolinux.bin $2/
-		cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2/
-		cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2/
-		cp $1/usr/lib/syslinux/bios/gfxboot.c32 $2/
-		cp $1/usr/lib/syslinux/bios/whichsys.c32 $2/
-		cp $1/usr/lib/syslinux/bios/mboot.c32 $2/
-		cp $1/usr/lib/syslinux/bios/hdt.c32 $2/
-		cp $1/usr/lib/syslinux/bios/chain.c32 $2/
-		cp $1/usr/lib/syslinux/bios/libcom32.c32 $2/
-		cp $1/usr/lib/syslinux/bios/libmenu.c32 $2/
-		cp $1/usr/lib/syslinux/bios/libutil.c32 $2/
-		cp $1/usr/lib/syslinux/bios/libgpl.c32 $2/
+		cp $1/usr/lib/syslinux/bios/isolinux.bin $2
+		cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2
+		cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2
+		cp $1/usr/lib/syslinux/bios/gfxboot.c32 $2
+		cp $1/usr/lib/syslinux/bios/whichsys.c32 $2
+		cp $1/usr/lib/syslinux/bios/mboot.c32 $2
+		cp $1/usr/lib/syslinux/bios/hdt.c32 $2
+		cp $1/usr/lib/syslinux/bios/chain.c32 $2
+		cp $1/usr/lib/syslinux/bios/libcom32.c32 $2
+		cp $1/usr/lib/syslinux/bios/libmenu.c32 $2
+		cp $1/usr/lib/syslinux/bios/libutil.c32 $2
+		cp $1/usr/lib/syslinux/bios/libgpl.c32 $2
 	else
 		msg2 "copying isolinux binaries ..."
-		cp $1/usr/lib/syslinux/isolinux.bin $2/
-		cp $1/usr/lib/syslinux/isohdpfx.bin $2/
-		cp $1/usr/lib/syslinux/gfxboot.c32 $2/
-		cp $1/usr/lib/syslinux/whichsys.c32 $2/
-		cp $1/usr/lib/syslinux/mboot.c32 $2/
-		cp $1/usr/lib/syslinux/hdt.c32 $2/
-		cp $1/usr/lib/syslinux/chain.c32 $2/
+		cp $1/usr/lib/syslinux/isolinux.bin $2
+		cp $1/usr/lib/syslinux/isohdpfx.bin $2
+		cp $1/usr/lib/syslinux/gfxboot.c32 $2
+		cp $1/usr/lib/syslinux/whichsys.c32 $2
+		cp $1/usr/lib/syslinux/mboot.c32 $2
+		cp $1/usr/lib/syslinux/hdt.c32 $2
+		cp $1/usr/lib/syslinux/chain.c32 $2
 	fi
 }
 
@@ -168,12 +168,12 @@ write_isolinux_cfg(){
 	echo "timeout  200" >> ${conf}
 	echo '' >> ${conf}
 	echo "label start" >> ${conf}
-	echo "  kernel /${install_dir}/boot/${arch}/${dist_iso}" >> ${conf}
-	echo "  append initrd=/${install_dir}/boot/intel_ucode.img,/${install_dir}/boot/${arch}/${img_name}.img misobasedir=${install_dir} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
+	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+	echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
 	echo '' >> ${conf}
 	echo "label nonfree" >> ${conf}
-	echo "  kernel /${install_dir}/boot/${arch}/${dist_iso}" >> ${conf}
-	echo "  append initrd=/${install_dir}/boot/intel_ucode.img,/${install_dir}/boot/${arch}/${img_name}.img misobasedir=${install_dir} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+	echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
 	echo '' >> ${conf}
 	echo "label harddisk" >> ${conf}
 	echo "  com32 whichsys.c32" >> ${conf}
@@ -190,13 +190,13 @@ write_isolinux_msg(){
 	local fn=isolinux.msg
 	local conf=$1/${fn}
 	msg2 "writing ${fn} ..."
-	echo "Welcome to ${img_name} Linux!" > ${conf}
+	echo "Welcome to ${dist_name} Linux!" > ${conf}
 	echo '' >> ${conf}
 	echo "To start the system enter 'start' and press <return>" >> ${conf}
 	echo '' >> ${conf}
 	echo '' >> ${conf}
 	echo "Available boot options:" >> ${conf}
-	echo "start                    - Start ${img_name} Live System" >> ${conf}
+	echo "start                    - Start ${dist_name} Live System" >> ${conf}
 	echo "nonfree                  - Start with proprietary drivers" >> ${conf}
 	echo "harddisk                 - Boot from local hard disk" >> ${conf}
 	echo "hdt                      - Run Hardware Detection Tool" >> ${conf}
@@ -207,16 +207,14 @@ update_isolinux_cfg(){
 	local fn=isolinux.cfg
 	msg2 "updating ${fn} ..."
 	sed -i "s|%MISO_LABEL%|${iso_label}|g;
-			s|%INSTALL_DIR%|${install_dir}|g;
-			s|%IMG_NAME%|${img_name}|g;
-			s|%DIST_ISO%|${dist_iso}|g;
+			s|%ISO_NAME%|${iso_name}|g;
 			s|%ARCH%|${arch}|g" $1/${fn}
 }
 
 update_isolinux_msg(){
 	local fn=isolinux.msg
 	msg2 "updating ${fn} ..."
-	sed -i "s|%IMG_NAME%|${img_name}|g" $1/${fn}
+	sed -i "s|%DIST_NAME%|${dist_name}|g" $1/${fn}
 }
 
 write_isomounts(){

@@ -260,45 +260,40 @@ load_config(){
 
 	##### iso settings #####
 
-	if [[ -z ${iso_version} ]];then
+	if [[ -z ${dist_release} ]];then
 		source /etc/lsb-release
-		iso_version=${DISTRIB_RELEASE}
+		dist_release=${DISTRIB_RELEASE}
 	fi
 
-	if [[ -z ${branding} ]];then
-		branding="MJRO"
-	fi
-
-	iso_label="${branding}${iso_version//.}"
-
-	if [[ -z ${code_name} ]];then
+	if [[ -z ${dist_codename} ]];then
 		source /etc/lsb-release
-		code_name="${DISTRIB_CODENAME}"
+		dist_codename="${DISTRIB_CODENAME}"
 	fi
 
-	if [[ -z ${img_name} ]];then
-		img_name=manjaro
-	fi
-
-
-	if [[ -z ${compression} ]];then
-		compression=xz
-	fi
-
-	if [[ -z ${checksum_mode} ]];then
-		checksum_mode='md5'
-	fi
-
-	if [[ -z ${install_dir} ]];then
-		install_dir=manjaro
+	if [[ -z ${dist_branding} ]];then
+		dist_branding="MJRO"
 	fi
 
 	if [[ -z ${dist_version} ]];then
 		dist_version=$(date +%Y.%m)
 	fi
 
-	if [[ -z ${dist_iso} ]];then
-		dist_iso="manjaroiso"
+	if [[ -z ${dist_name} ]];then
+		dist_name="Manjaro"
+	fi
+
+	if [[ -z ${iso_name} ]];then
+		iso_name="manjaro"
+	fi
+
+	iso_label="${dist_branding}${dist_release//.}"
+
+	if [[ -z ${iso_compression} ]];then
+		iso_compression=xz
+	fi
+
+	if [[ -z ${iso_checksum} ]];then
+		iso_checksum='md5'
 	fi
 
 	return 0
@@ -312,11 +307,9 @@ load_profile_config(){
 
 	[[ -r ${profile_conf} ]] && source ${profile_conf}
 
-	if [[ -z ${dist_kernel} ]];then
-		dist_kernel="linux319"
+	if [[ -z ${kernel} ]];then
+		kernel="linux319"
 	fi
-
-	dist_kernel_ver=${dist_kernel#*linux}
 
 	if [[ -z ${efi_boot_loader} ]];then
 		efi_boot_loader="grub"
@@ -331,7 +324,7 @@ load_profile_config(){
 	fi
 
 	if [[ -z ${plymouth_theme} ]];then
-		plymouth_theme=manjaro-elegant
+		plymouth_theme="manjaro-elegant"
 	fi
 
 	if [[ -z ${password} ]];then

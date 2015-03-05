@@ -25,15 +25,15 @@ write_calamares_finished_conf(){
 }
 
 write_calamares_bootloader_conf(){
-	source "$1/etc/mkinitcpio.d/${dist_kernel}.preset"
+	source "$1/etc/mkinitcpio.d/${kernel}.preset"
 	local conf="$1/etc/calamares/modules/bootloader.conf"
 	echo '---' > "$conf"
 	echo "efiBootLoader: \"${efi_boot_loader}\"" >> "$conf"
 	echo "kernel: \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
 	echo "img: \"$(echo ${default_image} | sed s'|/boot||')\"" >> "$conf"
 	echo "fallback: \"$(echo ${fallback_image} | sed s'|/boot||')\"" >> "$conf"
-	echo "kernelLine: \", with ${dist_kernel}\"" >> "$conf"
-	echo "fallbackKernelLine: \", with ${dist_kernel} (fallback initramfs)\"" >> "$conf"
+	echo "kernelLine: \", with ${kernel}\"" >> "$conf"
+	echo "fallbackKernelLine: \", with ${kernel} (fallback initramfs)\"" >> "$conf"
 	echo 'timeout: "10"' >> "$conf"
 	echo 'grubInstall: "grub-install"' >> "$conf"
 	echo 'grubMkconfig: "grub-mkconfig"' >> "$conf"
@@ -81,17 +81,17 @@ write_calamares_dm_conf(){
 write_calamares_initcpio_conf(){
 	local conf="$1/etc/calamares/modules/initcpio.conf"
 	echo "---" > "$conf"
-	echo "kernel: ${dist_kernel}" >> "$conf"
+	echo "kernel: ${kernel}" >> "$conf"
 }
 
 write_calamares_unpack_conf(){
 	local conf="$1/etc/calamares/modules/unpackfs.conf"
 	echo "---" > "$conf"
 	echo "unpack:" >> "$conf"
-	echo "    -   source: \"/bootmnt/${install_dir}/${arch}/root-image.sqfs\"" >> "$conf"
+	echo "    -   source: \"/bootmnt/${iso_name}/${arch}/root-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
-	echo "    -   source: \"/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs\"" >> "$conf"
+	echo "    -   source: \"/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
 }
@@ -136,10 +136,10 @@ configure_thus(){
 	if [[ -f $1/usr/bin/thus ]];then
 		msg2 "Configuring Thus ..."
 		local conf="$1/etc/thus.conf"
-		sed -i "s|_version_|$iso_version|g" $conf
-		sed -i "s|_kernel_|$dist_kernel|g" $conf
-		sed -i "s|_root-image_|/bootmnt/${install_dir}/${arch}/root-image.sqfs|g" $conf
-		sed -i "s|_desktop-image_|/bootmnt/${install_dir}/${arch}/${custom}-image.sqfs|g" $conf
+		sed -i "s|_version_|$dist_release|g" $conf
+		sed -i "s|_kernel_|$kernel|g" $conf
+		sed -i "s|_root-image_|/bootmnt/${iso_name}/${arch}/root-image.sqfs|g" $conf
+		sed -i "s|_desktop-image_|/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs|g" $conf
 		echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 		mkdir -p $1/home/${username}/Desktop
 		cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
