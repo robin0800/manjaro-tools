@@ -125,7 +125,6 @@ clean_cache_iso=true
 pretend=false
 images_only=false
 iso_only=false
-is_log=false
 
 pacman_conf_arch='default'
 
@@ -143,7 +142,6 @@ usage() {
 	echo '    -i                 Build images only'
 	echo '    -s                 Generate iso only'
 	echo '                       Requires pre built images (-i)'
-	echo '    -L                 Enable build logging (experimental)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
 	echo ''
@@ -167,7 +165,6 @@ while getopts "${opts}" arg; do
 		l) clean_cache_lng=false ;;
 		i) images_only=true ;;
 		s) iso_only=true ;;
-		L) is_log=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -204,9 +201,4 @@ prepare_cachedirs
 
 ${pretend} && display_settings && exit 1
 
-# disable logging for now
-if ${is_log};then
-	run_safe build_iso
-else
-	build_iso
-fi
+build_iso
