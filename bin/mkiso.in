@@ -251,14 +251,14 @@ _imgcommon () {
 	if ! sed "s|%MANJAROISO_LABEL%|${LABEL}|g;
 			s|%INSTALL_DIR%|${INSTALL_DIR}|g;
 			s|%ARCH%|${ARCH}|g" -i ${work_dir}/iso/isolinux/*.cfg; then
-	die "${work_dir}/iso/isolinux/isolinux.cfg, doesn't exist."
+		die "${work_dir}/iso/isolinux/isolinux.cfg, doesn't exist."
 	fi
 
 	if [ ! -f "${work_dir}/iso/isolinux/isolinux.bin" ]; then
-	die "${work_dir}/iso/isolinux/isolinux.bin, doesn't exist."
+		die "${work_dir}/iso/isolinux/isolinux.bin, doesn't exist."
 	fi
 	if [ ! -f "${work_dir}/iso/isolinux/isohdpfx.bin" ]; then
-	die "${work_dir}/iso/isolinux/isohdpfx.bin, doesn't exist."
+		die "${work_dir}/iso/isolinux/isohdpfx.bin, doesn't exist."
 	fi
 }
 
