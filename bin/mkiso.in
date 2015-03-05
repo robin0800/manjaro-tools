@@ -122,6 +122,42 @@ msg2 "working directory: ${work_dir}"
 msg2 "image name: ${imgname}"
 msg2 "pacman_mirrors: ${MIRRORS}"
 
+error_function() {
+	if [[ -p $logpipe ]]; then
+		rm "$logpipe"
+	fi
+	# first exit all subshells, then print the error
+	if (( ! BASH_SUBSHELL )); then
+		error "A failure occurred in %s()." "$1"
+		plain "Aborting..."
+	fi
+	exit 2
+}
+
+run_safe() {
+	local restoretrap
+	set -e
+	set -E
+	restoretrap=$(trap -p ERR)
+	trap 'error_function $1' ERR
+	run_log "$1"
+	eval $restoretrap
+	set +E
+	set +e
+}
+
+# $1: function
+run_log(){
+	local logfile=${work_dir}/${INSTALL_DIR}-${ARCH}.log
+	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
+	mkfifo "$logpipe"
+	tee "$logfile" < "$logpipe" &
+	local teepid=$!
+	$1 &> "$logpipe"
+	wait $teepid
+	rm "$logpipe"
+}
+
 clean_up(){
 	msg2 "Cleaning up what we can"
 	if [ -d "${work_dir}/${IMAGE_FOLDER}/boot/" ]; then
@@ -251,9 +287,7 @@ _imgcommon () {
 		fi
 	fi
 
-	if ! sed "s|%MANJAROISO_LABEL%|${LABEL}|g;
-			s|%INSTALL_DIR%|${INSTALL_DIR}|g;
-			s|%ARCH%|${ARCH}|g" -i ${work_dir}/iso/isolinux/*.cfg; then
+	if [[ ! -f ${work_dir}/iso/isolinux/isolinux.cfg ]]; then
 		die "${work_dir}/iso/isolinux/isolinux.cfg, doesn't exist."
 	fi
 
@@ -271,8 +305,9 @@ command_iso () {
 	_iso_efi_boot_args=""
 
 	# If exists, add an EFI "El Torito" boot image (FAT filesystem) to ISO-9660 image.
-	if [ -f "${work_dir}/iso/EFI/miso/manjaro.img" ]; then
-		_iso_efi_boot_args="-eltorito-alt-boot -e EFI/miso/manjaro.img \
+	if [ -f "${work_dir}/iso/EFI/miso/${INSTALL_DIR}.img" ]; then
+		msg2 "eltorito detected..."
+		_iso_efi_boot_args="-eltorito-alt-boot -e EFI/miso/${INSTALL_DIR}.img \
 							-isohybrid-gpt-basdat -no-emul-boot"
 	fi
 
