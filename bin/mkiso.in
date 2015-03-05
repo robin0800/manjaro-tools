@@ -28,6 +28,7 @@ IMAGE_FOLDER="root-image"
 LOCALE=""
 APPNAME=$(basename "${0}")
 MIRRORS=''
+LOG=false
 
 # usage: usage <exitvalue>
 usage (){
@@ -52,6 +53,7 @@ usage (){
 	echo "    -d                Create default user directory /home/manjaro"
 	echo "    -v                Enable verbose output"
 	echo "    -M                Pass pacman-mirrors.conf"
+	echo "    -Z                Create log file"
 	echo "    -h                This message"
 	echo " commands:"
 	echo "   create <dir>"
@@ -64,7 +66,7 @@ usage (){
 
 orig_argv=("$@")
 
-while getopts 'p:C:L:P:A:a:c:M:D:i:dfvhx' arg; do
+while getopts 'p:C:L:P:A:a:c:M:D:i:dZfvhx' arg; do
 	case "${arg}" in
 		p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
 		C) PACCONFIG="${OPTARG}" ;;
@@ -80,6 +82,7 @@ while getopts 'p:C:L:P:A:a:c:M:D:i:dfvhx' arg; do
 		x) HIGHCOMP=" -b 256K -Xbcj x86" ;;
 		v) QUIET=false ;;
 		M) MIRRORS="${OPTARG}" ;;
+		M) LOG=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
 	esac
@@ -300,8 +303,16 @@ command_iso () {
 # Go through the main commands in order. If 'all' was specified, then we want
 # to do everything. Start with 'install'.
 if [ "${command_name}" = "create"  ]; then
-	command_create
+	if ${LOG}; then
+		run_safe command_create
+	else
+		command_create
+	fi
 fi
 if [ "${command_name}" = "iso" ]; then
-	command_iso
+	if ${LOG}; then
+		run_safe command_iso
+	else
+		command_iso
+	fi
 fi
