@@ -29,7 +29,7 @@ show_profile(){
 
 		msg2 "initsys: ${initsys}"
 		msg2 "displaymanager: ${displaymanager}"
-		msg2 "dist_kernel: ${dist_kernel}"
+		msg2 "kernel: ${kernel}"
 		msg2 "efi_boot_loader: ${efi_boot_loader}"
 
 		${is_plymouth} && msg2 "plymouth_theme: ${plymouth_theme}"
@@ -96,16 +96,17 @@ display_settings(){
 	msg2 "cache_dir_xorg: ${cache_dir_xorg}"
 	msg2 "cache_dir_lng: ${cache_dir_lng}"
 
-	msg "ISO SETTINGS:"
-	msg2 "iso_label: ${iso_label}"
-	msg2 "iso_version: ${iso_version}"
-	msg2 "code_name: ${code_name}"
+	msg "DIST SETTINGS:"
+	msg2 "dist_name: ${dist_name}"
+	msg2 "dist_release: ${dist_release}"
+	msg2 "dist_codename: ${dist_codename}"
 	msg2 "dist_version: ${dist_version}"
-    msg2 "dist_iso: ${dist_iso}"
-    msg2 "img_name: ${img_name}"
-    msg2 "install_dir: ${install_dir}"
-    msg2 "compression: ${compression}"
-    msg2 "checksum_mode: ${checksum_mode}"
+
+    msg "ISO SETTINGS:"
+    msg2 "iso_label: ${iso_label}"
+    msg2 "iso_name: ${iso_name}"
+    msg2 "iso_compression: ${iso_compression}"
+    msg2 "iso_checksum: ${iso_checksum}"
 
 	msg "BUILD QUEUE:"
 	show_build_queue
@@ -187,9 +188,9 @@ cache_dir_iso="${cache_dir}/iso"
 
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
-create_args+=(-v -a ${arch} -D ${install_dir} -M ${mirrors_conf})
+create_args+=(-v -a ${arch} -D ${iso_name} -M ${mirrors_conf})
 
-iso_args+=(-v -x -a ${arch} -D ${install_dir} -L ${iso_label} -c ${compression})
+iso_args+=(-v -x -a ${arch} -D ${iso_name} -L ${iso_label} -c ${iso_compression})
 
 ${clean_cache_iso} && iso_args+=(-f)
 
