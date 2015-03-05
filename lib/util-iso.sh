@@ -13,43 +13,6 @@
 [[ -r ${LIBDIR}/util-iso-boot.sh ]] && source ${LIBDIR}/util-iso-boot.sh
 [[ -r ${LIBDIR}/util-iso-calamares.sh ]] && source ${LIBDIR}/util-iso-calamares.sh
 
-
-error_function() {
-	if [[ -p $logpipe ]]; then
-		rm "$logpipe"
-	fi
-	# first exit all subshells, then print the error
-	if (( ! BASH_SUBSHELL )); then
-		error "A failure occurred in %s()." "$1"
-		plain "Aborting..."
-	fi
-	exit 2
-}
-
-run_safe() {
-	local restoretrap
-	set -e
-	set -E
-	restoretrap=$(trap -p ERR)
-	trap 'error_function $1' ERR
-	run_log "$1"
-	eval $restoretrap
-	set +E
-	set +e
-}
-
-# $1: function
-run_log(){
-	local logfile=${cache_dir_iso}/${buildset_iso}.log
-	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
-	mkfifo "$logpipe"
-	tee "$logfile" < "$logpipe" &
-	local teepid=$!
-	$1 &> "$logpipe"
-	wait $teepid
-	rm "$logpipe"
-}
-
 check_run_dir(){
 	if [[ ! -f shared/Packages-Systemd ]] || [[ ! -f shared/Packages-Openrc ]];then
 		die "${0##*/} is not run in a valid iso-profiles folder!"

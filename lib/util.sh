@@ -411,3 +411,39 @@ check_sanity(){
 		eval "$2"
 	fi
 }
+
+error_function() {
+	if [[ -p $logpipe ]]; then
+		rm "$logpipe"
+	fi
+	# first exit all subshells, then print the error
+	if (( ! BASH_SUBSHELL )); then
+		error "A failure occurred in %s()." "$1"
+		plain "Aborting..."
+	fi
+	exit 2
+}
+
+run_safe() {
+	local restoretrap
+	set -e
+	set -E
+	restoretrap=$(trap -p ERR)
+	trap 'error_function $1' ERR
+	run_log "$1"
+	eval $restoretrap
+	set +E
+	set +e
+}
+
+# $1: function
+run_log(){
+	local logfile=${cache_dir_iso}/${buildset_iso}.log
+	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
+	mkfifo "$logpipe"
+	tee "$logfile" < "$logpipe" &
+	local teepid=$!
+	$1 &> "$logpipe"
+	wait $teepid
+	rm "$logpipe"
+}
