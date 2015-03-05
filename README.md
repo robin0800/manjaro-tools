@@ -90,31 +90,28 @@ Specifying args will override manjaro-tools.conf settings.
 # buildset_iso=default
 
 # unset defaults to given value
-# iso_version=0.9.0
+# dist_name="Manjaro"
 
 # unset defaults to given value
-# branding="MJRO"
+# dist_release=0.9.0
+
+# unset defaults to value sourced from /etc/lsb-release
+# dist_codename="Bellatrix"
+
+# unset defaults to given value
+# dist_branding="MJRO"
 
 # unset defaults to given value, specify a date here of have it automatically set
 # dist_version="$(date +%Y.%m)"
 
 # unset defaults to given value
-# install_dir=manjaro
+# iso_name=manjaro
 
 # unset defaults to given value
-# dist_iso="manjaroiso"
-
-# unset defaults to value sourced from /etc/lsb-release
-# code_name="Bellatrix"
-
-# unset defaults to given value
-# img_name=manjaro
-
-# unset defaults to given value
-# compression=xz
+# iso_compression=xz
 
 # valid: md5, sha1, sha256, sha384, sha512
-# checksum_mode=md5
+# iso_checksum=md5
 ~~~
 
 ####Config files in iso profiles
@@ -137,7 +134,7 @@ Each iso profile must have these files or symlinks to shared:
 ################ install ################
 
 # unset defaults to given value
-# dist_kernel="linux319"
+# kernel="linux319"
 
 # unset defaults to given value
 # efi_boot_loader="grub"
