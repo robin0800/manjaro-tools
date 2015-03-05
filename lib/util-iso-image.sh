@@ -47,23 +47,23 @@ configure_plymouth(){
 configure_services_live(){
 	case ${initsys} in
 		'openrc')
-			msg3 "Configuring ${initsys} ...."
+			msg3 "Configuring [${initsys}] ...."
 			for svc in ${start_openrc_live[@]}; do
 				msg2 "Setting $svc ..."
 				chroot $1 rc-update add $svc default &> /dev/null
 			done
-			msg3 "Done configuring ${initsys}"
+			msg3 "Done configuring [${initsys}]"
 		;;
 		'systemd')
-			msg3 "Configuring ${initsys} ...."
+			msg3 "Configuring [${initsys}] ...."
 			for svc in ${start_systemd_live[@]}; do
 				msg2 "Setting $svc ..."
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
-			msg3 "Done configuring ${initsys}"
+			msg3 "Done configuring [${initsys}]"
 		;;
 		*)
-			msg3 "${initsys} is not supported!"
+			msg3 "Unsupported: [${initsys}]!"
 			break
 		;;
 	esac
@@ -88,23 +88,23 @@ configure_lsb(){
 configure_services(){
 	case ${initsys} in
 		'openrc')
-			msg3 "Congiguring ${initsys} ...."
+			msg3 "Congiguring [${initsys}] ...."
 			for svc in ${start_openrc[@]}; do
 				msg2 "Setting $svc ..."
 				chroot $1 rc-update add $svc default &> /dev/null
 			done
-			msg3 "Done configuring ${initsys}"
+			msg3 "Done configuring [${initsys}]"
 		;;
 		'systemd')
-			msg3 "Congiguring ${initsys} ...."
+			msg3 "Congiguring [${initsys}] ...."
 			for svc in ${start_systemd[@]}; do
 				msg2 "Setting $svc ..."
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
-			msg3 "Done configuring ${initsys}"
+			msg3 "Done configuring [${initsys}]"
 		;;
 		*)
-			msg3 "${initsys} is not supported!"
+			msg3 "Unsupported: [${initsys}]!"
 			break
 		;;
 	esac
