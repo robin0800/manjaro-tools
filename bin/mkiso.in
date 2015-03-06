@@ -120,7 +120,7 @@ esac
 msg "${APPNAME} : Configuration Settings"
 msg2 "working directory: ${work_dir}"
 msg2 "image name: ${imgname}"
-msg2 "pacman_mirrors: ${MIRRORS}"
+[[ -n ${MIRRORS} ]] && msg2 "pacman_mirrors: ${MIRRORS}"
 
 error_function() {
 	if [[ -p $logpipe ]]; then
@@ -148,7 +148,7 @@ run_safe() {
 
 # $1: function
 run_log(){
-	local logfile=${work_dir}/${INSTALL_DIR}-${ARCH}.log
+	local logfile=${work_dir}/${imgname}.log
 	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
 	mkfifo "$logpipe"
 	tee "$logfile" < "$logpipe" &
@@ -306,7 +306,7 @@ command_iso () {
 
 	# If exists, add an EFI "El Torito" boot image (FAT filesystem) to ISO-9660 image.
 	if [ -f "${work_dir}/iso/EFI/miso/${INSTALL_DIR}.img" ]; then
-		msg2 "eltorito detected..."
+		msg2 "Setting efi args. El Torito detected."
 		_iso_efi_boot_args="-eltorito-alt-boot -e EFI/miso/${INSTALL_DIR}.img \
 							-isohybrid-gpt-basdat -no-emul-boot"
 	fi
