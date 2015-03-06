@@ -287,6 +287,10 @@ load_config(){
 	fi
 
 	iso_label="${dist_branding}${dist_release//.}"
+	iso_label="${iso_label//_}"	# relace all _
+	iso_label="${iso_label//-}"	# relace all -
+	iso_label="${iso_label^^}"	# all uppercase
+	iso_label="${iso_label::8}"	# limit to 8 characters
 
 	if [[ -z ${iso_compression} ]];then
 		iso_compression=xz
