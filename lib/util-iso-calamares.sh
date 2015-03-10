@@ -128,7 +128,6 @@ configure_calamares(){
 		mkdir -p $1/home/${username}/Desktop
 		cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
 		chmod a+x $1/home/${username}/Desktop/calamares.desktop
-		echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 	fi
 }
 
@@ -140,7 +139,6 @@ configure_thus(){
 		sed -i "s|_kernel_|$kernel|g" $conf
 		sed -i "s|_root-image_|/bootmnt/${iso_name}/${arch}/root-image.sqfs|g" $conf
 		sed -i "s|_desktop-image_|/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs|g" $conf
-		echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 		mkdir -p $1/home/${username}/Desktop
 		cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
 		chmod a+x $1/home/${username}/Desktop/thus.desktop
