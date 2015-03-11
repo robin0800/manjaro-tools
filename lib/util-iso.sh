@@ -114,6 +114,7 @@ configure_custom_image(){
 	configure_plymouth "$1"
 	configure_displaymanager "$1"
 	configure_services "$1"
+	configure_environment "$1"
 	msg "Done configuring [${custom}-image]"
 }
 

@@ -69,6 +69,7 @@ configure_services_live(){
 	esac
 }
 
+# $1: chroot
 configure_lsb(){
 	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
 	if [ -e $1/etc/lsb-release ] ; then
@@ -107,6 +108,16 @@ configure_services(){
 			msg3 "Unsupported: [${initsys}]!"
 			break
 		;;
+	esac
+}
+
+# $1: chroot
+configure_environment(){
+	case ${custom} in
+		gnome|xfce|openbox|enlightenment|cinnamon|pekwm|lxde|mate)
+			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
+		;;
+		*) break ;;
 	esac
 }
 
@@ -295,6 +306,7 @@ configure_displaymanager(){
 	msg2 "Configured: ${displaymanager}"
 }
 
+# $1: chroot
 configure_xorg_drivers(){
 	# Disable Catalyst if not present
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then

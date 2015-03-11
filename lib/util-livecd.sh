@@ -414,15 +414,6 @@ configure_env(){
 	sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
 	sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
 	fi
-
-	if [[ -f "/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs" ]]; then
-		case ${custom} in
-			gnome|xfce|openbox|enlightenment|cinnamon|pekwm|lxde|mate)
-				echo "QT_STYLE_OVERRIDE=gtk" >> /etc/environment
-			;;
-			*) break ;;
-		esac
-	fi
 }
 
 configure_user_root(){
