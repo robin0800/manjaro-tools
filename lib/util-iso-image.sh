@@ -117,7 +117,6 @@ configure_environment(){
 		gnome|xfce|openbox|enlightenment|cinnamon|pekwm|lxde|mate)
 			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 		;;
-		*) break ;;
 	esac
 }
 
