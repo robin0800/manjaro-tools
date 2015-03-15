@@ -104,13 +104,14 @@ configure_language(){
 	local LOCALE=$(get_country)
 	local KEYMAP=$(get_keyboard)
 	local KBLAYOUT=$(get_layout)
-# 	local FALLBACK="en_US"
-	local TLANG=${LOCALE%.*}
 
 	# this is needed for efi, it doesn't set any cmdline
 	[[ -z "$LOCALE" ]] && LOCALE="en_US"
 	[[ -z "$KEYMAP" ]] && KEYMAP="us"
 	[[ -z "$KBLAYOUT" ]] && KBLAYOUT="us"
+
+# 	local FALLBACK="en_US"
+	local TLANG=${LOCALE%.*}
 
 	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
 # 	sed -i -r "s/#(${FALLBACK}.*UTF-8)/\1/g" $1/etc/locale.gen
