@@ -34,8 +34,9 @@ copy_efi_shells(){
 
 # $1: work_dir
 gen_boot_image(){
+	local _kernver=$(cat $1/usr/lib/modules/*/version)
 	chroot-run $1 \
-		/usr/bin/mkinitcpio -k $(uname -r) \
+		/usr/bin/mkinitcpio -k ${_kernver} \
 		-c /etc/mkinitcpio-${iso_name}.conf \
 		-g /boot/${iso_name}.img
 }
