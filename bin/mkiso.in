@@ -82,7 +82,7 @@ while getopts 'p:C:L:P:A:a:c:M:D:i:dZfvhx' arg; do
 		x) HIGHCOMP=" -b 256K -Xbcj x86" ;;
 		v) QUIET=false ;;
 		M) MIRRORS="${OPTARG}" ;;
-		M) LOG=true ;;
+		Z) LOG=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
 	esac
