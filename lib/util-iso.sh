@@ -231,7 +231,7 @@ make_image_custom() {
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		umount_image_handler
-		rm -R ${path}/.wh*
+		find ${path} -name '.wh.*' -exec rm -rf {}
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${custom} installation] (${custom}-image)"
 	fi
@@ -259,7 +259,7 @@ make_image_livecd() {
 		# Clean up GnuPG keys?
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		umount_image_handler
-		rm -R ${path}/.wh*
+		find ${path} -name '.wh.*' -exec rm -rf {}
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [livecd-image]"
 	fi
@@ -289,7 +289,7 @@ make_image_xorg() {
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 		configure_xorg_drivers "${path}"
 		umount_image_handler
-		rm -R ${path}/.wh*
+		find ${path} -name '.wh.*' -exec rm -rf {}
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [pkgs-image]"
 	fi
@@ -323,7 +323,7 @@ make_image_lng() {
 		rm -r ${path}/var
 		make_repo ${path}/opt/livecd/lng/lng-pkgs ${path}/opt/livecd/lng
 		umount_image_handler
-		rm -R ${path}/.wh*
+		find ${path} -name '.wh.*' -exec rm -rf {}
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [lng-image]"
 	fi
