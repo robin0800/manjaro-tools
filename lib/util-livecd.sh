@@ -431,5 +431,7 @@ configure_displaymanager(){
 		sed -i -e "s|^User=.*|User=${username}|" /etc/sddm.conf
 		elif [[ -f /usr/bin/lxdm ]];then
 		sed -i -e "s/^.*autologin=.*/autologin=${username}/" /etc/lxdm/lxdm.conf
+		elif [[ -f /usr/bin/gdm ]];then
+		sed -i -e "s/^.*AutomaticLogin=.*/AutomaticLogin=${username}/" /etc/gdm/custom.conf
 	fi
 }
