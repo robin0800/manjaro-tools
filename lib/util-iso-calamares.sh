@@ -135,10 +135,16 @@ configure_thus(){
 	if [[ -f $1/usr/bin/thus ]];then
 		msg2 "Configuring Thus ..."
 		local conf="$1/etc/thus.conf"
-		sed -i "s|_version_|$dist_release|g" $conf
-		sed -i "s|_kernel_|$kernel|g" $conf
-		sed -i "s|_root-image_|/bootmnt/${iso_name}/${arch}/root-image.sqfs|g" $conf
-		sed -i "s|_desktop-image_|/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs|g" $conf
+		echo "[distribution]" > "$conf"
+		echo "DISTRIBUTION_NAME = \"${dist_name} Linux\"" >> "$conf"
+		echo "DISTRIBUTION_VERSION = \"${dist_release}\"" >> "$conf"
+		echo "SHORT_NAME = \"${dist_name}\"" >> "$conf"
+		echo "[install]" >> "$conf"
+		echo "LIVE_MEDIA_SOURCE = \"/bootmnt/${iso_name}/${arch}/root-image.sqfs\"" >> "$conf"
+		echo "LIVE_MEDIA_DESKTOP = \"/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs\"" >> "$conf"
+		echo "LIVE_MEDIA_TYPE = \"squashfs\"" >> "$conf"
+		echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
+		echo "KERNEL = \"${kernel}\"" >> "$conf"
 		mkdir -p $1/home/${username}/Desktop
 		cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
 		chmod a+x $1/home/${username}/Desktop/thus.desktop
