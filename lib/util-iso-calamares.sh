@@ -126,6 +126,9 @@ configure_calamares(){
 		write_calamares_users_conf $1
 
 		mkdir -p $1/home/${username}/Desktop
+		if [[ -f $1/usr/bin/kdesu ]];then
+			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
+		fi
 		cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
 		chmod a+x $1/home/${username}/Desktop/calamares.desktop
 	fi
@@ -146,6 +149,9 @@ configure_thus(){
 		echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
 		echo "KERNEL = \"${kernel}\"" >> "$conf"
 		mkdir -p $1/home/${username}/Desktop
+		if [[ -f $1/usr/bin/kdesu ]];then
+			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
+		fi
 		cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
 		chmod a+x $1/home/${username}/Desktop/thus.desktop
 	fi
