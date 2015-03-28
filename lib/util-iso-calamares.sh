@@ -110,6 +110,14 @@ write_calamares_users_conf(){
 	echo "sudoersGroup:   wheel" >> "$conf"
 }
 
+brand_calamares_settings_conf(){
+	local conf="$1/usr/share/calamares/settings.conf"
+	local branding="$1/usr/share/calamares/branding/manjaro-${custom}"
+	if [[ -d $branding ]];then
+		sed -i -e "s|branding: manjaro|branding: manjaro-${custom}|g" "$conf"
+	fi
+}
+
 configure_calamares(){
 	if [[ -f $1/usr/bin/calamares ]];then
 		msg2 "Configuring Calamares ..."
@@ -118,6 +126,7 @@ configure_calamares(){
 		write_calamares_unpack_conf $1
 		write_calamares_dm_conf $1
 		write_calamares_initcpio_conf $1
+		brand_calamares_settings_conf $1
 		if [[ ${initsys} == 'openrc' ]];then
 			write_calamares_machineid_conf $1
 			write_calamares_finished_conf $1
