@@ -52,7 +52,9 @@ copy_boot_images(){
 	msg2 "Copying boot images ..."
 	cp $1/x86_64/${iso_name} $2/${iso_name}.efi
 	cp $1/x86_64/${iso_name}.img $2/${iso_name}.img
-	cp $1/intel_ucode.img $2/intel_ucode.img
+	if [[ -f $1/intel_ucode.img ]] ; then
+		cp $1/intel_ucode.img $2/intel_ucode.img
+	fi
 }
 
 copy_initcpio(){
@@ -92,7 +94,9 @@ write_dvd_conf(){
 	msg2 "Writing ${fn} ..."
 	echo "title   ${dist_name} Linux ${arch} UEFI DVD (default)" > ${conf}
 	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
-	echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
+	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+		echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
+	fi
 	echo "initrd  /EFI/miso/${iso_name}.img" >> ${conf}
 	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free" >> ${conf}
 }
@@ -103,7 +107,9 @@ write_dvd_nonfree_conf(){
 	msg2 "Writing ${fn} ..."
 	echo "title   ${dist_name} Linux ${arch} UEFI DVD (nonfree)" > ${conf}
 	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
-	echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
+	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+		echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
+	fi
 	echo "initrd  /EFI/miso/${iso_name}.img" >> ${conf}
 	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=nonfree nonfree=yes" >> ${conf}
 }
@@ -114,7 +120,9 @@ write_usb_conf(){
 	msg2 "Writing ${fn} ..."
 	echo "title   ${dist_name} Linux ${arch} UEFI USB (default)" > ${conf}
 	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
+	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+		echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
+	fi
 	echo "initrd  /${iso_name}/boot/${arch}/${iso_name}.img" >> ${conf}
 	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free" >> ${conf}
 }
@@ -125,7 +133,9 @@ write_usb_nonfree_conf(){
 	msg2 "Writing ${fn} ..."
 	echo "title   ${dist_name} Linux ${arch} UEFI USB (nonfree)" > ${conf}
 	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
+	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+		echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
+	fi
 	echo "initrd  /${iso_name}/boot/${arch}/${iso_name}.img" >> ${conf}
 	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=nonfree nonfree=yes" >> ${conf}
 }
@@ -170,11 +180,19 @@ write_isolinux_cfg(){
 	echo '' >> ${conf}
 	echo "label start" >> ${conf}
 	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
+	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+		echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
+	else
+		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
+	fi
 	echo '' >> ${conf}
 	echo "label nonfree" >> ${conf}
 	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+		echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+	else
+		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+	fi
 	echo '' >> ${conf}
 	echo "label harddisk" >> ${conf}
 	echo "  com32 whichsys.c32" >> ${conf}
