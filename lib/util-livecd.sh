@@ -80,6 +80,7 @@ write_x11_config(){
 
 	# create X11 keyboard layout config
 	mkdir -p "$1/etc/X11/xorg.conf.d"
+
 	local XORGKBLAYOUT="$1/etc/X11/xorg.conf.d/00-keyboard.conf"
 
 	echo "" >> "$XORGKBLAYOUT"
