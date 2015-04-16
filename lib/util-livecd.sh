@@ -81,11 +81,7 @@ write_x11_config(){
 	# create X11 keyboard layout config
 	mkdir -p "$1/etc/X11/xorg.conf.d"
 
-	if [[ -f $1/usr/bin/openrc ]]; then
-		local XORGKBLAYOUT="$1/etc/X11/xorg.conf.d/20-keyboard.conf"
-	else
-		local XORGKBLAYOUT="$1/etc/X11/xorg.conf.d/00-keyboard.conf"
-	fi
+	local XORGKBLAYOUT="$1/etc/X11/xorg.conf.d/00-keyboard.conf"
 
 	echo "" >> "$XORGKBLAYOUT"
 	echo "Section \"InputClass\"" > "$XORGKBLAYOUT"
