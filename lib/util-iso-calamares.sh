@@ -146,6 +146,7 @@ configure_calamares(){
 configure_thus(){
 	if [[ -f $1/usr/bin/thus ]];then
 		msg2 "Configuring Thus ..."
+		source "$1/etc/mkinitcpio.d/${kernel}.preset"
 		local conf="$1/etc/thus.conf"
 		echo "[distribution]" > "$conf"
 		echo "DISTRIBUTION_NAME = \"${dist_name} Linux\"" >> "$conf"
