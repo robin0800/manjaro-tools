@@ -156,7 +156,10 @@ configure_thus(){
 		echo "LIVE_MEDIA_DESKTOP = \"/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs\"" >> "$conf"
 		echo "LIVE_MEDIA_TYPE = \"squashfs\"" >> "$conf"
 		echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
-		echo "KERNEL = \"${kernel}\"" >> "$conf"
+		echo "KERNEL = ${kernel}" >> "$conf"
+		echo "VMLINUZ = \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
+		echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot||')\"" >> "$conf"
+		echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot||')\"" >> "$conf"
 		mkdir -p $1/home/${username}/Desktop
 		if [[ -f $1/usr/bin/kdesu ]];then
 			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
