@@ -186,6 +186,9 @@ configure_displaymanager(){
 			if [ -e "$1/usr/bin/i3" ] ; then
 				sed -i -e 's/^.*user-session=.*/user-session=i3/' ${conf}
 			fi
+			if [ -e "$1/usr/bin/pantheon-session" ] ; then
+				sed -i -e 's/^.*user-session=.*/user-session=pantheon/' ${conf}
+			fi
 			if [[ ${initsys} == 'openrc' ]];then
 				sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' ${conf}
 			fi
