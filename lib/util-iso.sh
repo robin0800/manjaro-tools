@@ -73,11 +73,15 @@ copy_livecd_helpers(){
 copy_cache_lng(){
 	msg2 "Copying lng cache ..."
 	cp ${cache_dir_lng}/* ${work_dir}/lng-image/opt/livecd/lng
+	msg2 "Trimming lng pkgs ..."
+	paccache -rv -k1 -c ${work_dir}/lng-image/opt/livecd/lng
 }
 
 copy_cache_xorg(){
 	msg2 "Copying xorg pkgs cache ..."
 	cp ${cache_dir_xorg}/* ${work_dir}/pkgs-image/opt/livecd/pkgs
+	msg2 "Trimming xorg pkgs ..."
+	paccache -rv -k1 -c ${work_dir}/pkgs-image/opt/livecd/pkgs
 }
 
 prepare_cachedirs(){
