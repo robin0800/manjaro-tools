@@ -118,8 +118,6 @@ load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 clean_first=true
-clean_cache_xorg=true
-clean_cache_lng=true
 clean_cache_iso=true
 
 pretend=false
