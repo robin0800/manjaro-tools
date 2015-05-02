@@ -133,7 +133,7 @@ usage() {
 	echo "    -a <arch>          Arch [default: ${arch}]"
 	echo "    -b <branch>        Branch [default: ${branch}]"
 	echo '    -r <dir>           Chroots directory'
-	echo '    -k <repo>          Custom repo to keep from pacman.conf'
+	echo '    -k <repo>          Custom pacman repo to keep'
 	echo "                       [default: ${chroots_iso}]"
 	echo '    -w                 Disable clean iso cache'
 	echo '    -c                 Disable clean work dir'
