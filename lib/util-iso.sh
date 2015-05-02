@@ -510,6 +510,32 @@ compress_images(){
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
+clean_pacman_conf(){
+	REPOS=() # set default value
+	# Get repos from pacman_conf
+	# sed is being used for filtering comments and repo brackets []
+	REPOS=($(grep "\[*\]" "$pacman_conf" | sed -e '/^\s*#/d' -e 's/\[//' -e 's/\]//'))
+	# Set valid repos
+	if [[ $arch = x86_64 ]]; then
+		VALID=('options' 'core' 'extra' 'community' 'multilib')
+	else
+		VALID=('options' 'core' 'extra' 'community')
+	fi
+	# Remove extra repos from pacman.conf
+	for repo in "${REPOS[@]}"; do
+		if [[ ! $(echo "${VALID[*]}" | grep "$repo") ]] && [[ ! $(echo "$keep_repo" | grep "$repo") ]]; then
+			# Remove custom repo
+			for file in $work_dir/{livecd,root,$custom}-image/etc/pacman.conf; do
+				if [[ -f $file ]]; then
+					msg2 "Editing $file"
+					sed -i "/^\[$repo/,/^Server/d" "$file" || exit 1
+				fi
+			done
+			msg "Custom repo $repo removed from pacman.conf"
+		fi
+	done
+}
+
 build_images(){
 	local timer=$(get_timer)
 	load_pkgs "Packages"
@@ -554,10 +580,12 @@ make_profile(){
 		fi
 		if ${images_only}; then
 			build_images
+			clean_pacman_conf
 			warning "Continue compress: buildiso -p ${buildset_iso} -sc ..."
 			exit 1
 		else
 			build_images
+			clean_pacman_conf
 			compress_images
 		fi
 	cd ..
