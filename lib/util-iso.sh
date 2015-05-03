@@ -548,6 +548,27 @@ build_images(){
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
+check_profile(){
+	local keyfiles=(profile.conf mkinitcpio.con Packages Packages-Livecd)
+	local keydirs=(overlay overlay-livecd isolinux)
+	local has_keyfiles=false has_keydirs=false
+	for f in ${keyfiles[@]}; do
+		if [[ -f $1/$f ]]
+			has_keyfiles=true
+		fi
+	done
+	for d in ${keydirs[@]}; do
+		if [[ -d $1/$d ]]
+			has_keydirs=true
+		fi
+	done
+	if ${has_keyfiles} && ${has_keydirs};then
+		msg3 "Profile sanity check passed."
+	else
+		eval $2
+	fi
+}
+
 make_profile(){
 	msg "Start building [$1]"
 	cd $1
@@ -576,11 +597,11 @@ make_profile(){
 build_iso(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			check_sanity "$prof/profile.conf" "break"
+			check_profile "$prof" "break"
 			make_profile "$prof"
 		done
 	else
-		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profile!"'
+		check_profile "${buildset_iso}" 'die "Profile sanity check failed."'
 		make_profile "${buildset_iso}"
 	fi
 }
