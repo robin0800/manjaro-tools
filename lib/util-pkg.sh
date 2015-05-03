@@ -15,7 +15,7 @@ get_chroot_pkg_version(){
 
 
 check_chroot_pkg_version(){
-	if [[ ${version} != $(get_chroot_iso_version) ]];then
+	if [[ ${version} != $(get_chroot_pkg_version) ]];then
 		msg "Your chroot version is outdated. please use the -c switch to recreate the chroot."
 	fi
 }
