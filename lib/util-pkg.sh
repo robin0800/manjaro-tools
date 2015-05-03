@@ -9,6 +9,17 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+get_chroot_pkg_version(){
+	echo $(cat ${work_dir}/root/.manjaro-tools)
+}
+
+
+check_chroot_pkg_version(){
+	if [[ ${version} != $(get_chroot_iso_version) ]];then
+		msg "Your chroot version is outdated. please use the -c switch to recreate the chroot."
+	fi
+}
+
 chroot_create(){
 	msg "Creating chroot for [${branch}] (${arch})..."
 	mkdir -p "${work_dir}"
