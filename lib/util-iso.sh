@@ -553,13 +553,19 @@ check_profile(){
 	local keydirs=(overlay overlay-livecd isolinux)
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
-		if [[ -f $1/$f ]]
+		if [[ -f $1/$f ]];then
 			has_keyfiles=true
+		else
+			has_keyfiles=false
+			break
 		fi
 	done
 	for d in ${keydirs[@]}; do
-		if [[ -d $1/$d ]]
+		if [[ -d $1/$d ]];then
 			has_keydirs=true
+		else
+			has_keydirs=false
+			break
 		fi
 	done
 	if ${has_keyfiles} && ${has_keydirs};then
