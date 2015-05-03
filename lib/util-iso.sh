@@ -473,6 +473,13 @@ load_pkgs_lng(){
 	packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
+check_chroot_iso_version(){
+	local chroot_version=$(cat ${work_dir}/root-image/.manjaro-tools)
+	if [[ ${version} != $chroot_version ]];then
+		clean_first=true
+	fi
+}
+
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1]"
@@ -501,16 +508,7 @@ load_profile(){
 			is_plymouth=true
 		fi
 	done
-}
-
-get_chroot_iso_version(){
-	echo $(cat ${work_dir}/root-image/.manjaro-tools)
-}
-
-check_chroot_iso_version(){
-	if [[ ${version} != $(get_chroot_iso_version) ]];then
-		msg "Your chroot version is outdated. please use the -c switch to recreate the chroot."
-	fi
+	[[ -d ${work_dir}/root-image ]] && check_chroot_iso_version
 }
 
 compress_images(){
