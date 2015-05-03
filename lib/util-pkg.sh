@@ -80,9 +80,9 @@ move_pkg(){
 archive_logs(){
 	local ext='log.tar.xz'
 	if [[ -n $pkgbase ]];then
-		tar -cJf $PWD/$pkgbase-$pkgver-$pkgrel-${CARCH}.${ext} *.log
+		tar -cJf $PWD/$pkgbase-$pkgver-$pkgrel-${CARCH}.${ext} *${CARCH}*.log
 	else
-		tar -cJf $PWD/$pkgname-$pkgver-$pkgrel-${CARCH}.${ext} *.log
+		tar -cJf $PWD/$pkgname-$pkgver-$pkgrel-${CARCH}.${ext} *${CARCH}*.log
 	fi
 	find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
 }
