@@ -511,9 +511,11 @@ compress_images(){
 }
 
 clean_pacman_conf(){
-	REPOS=() # set default value
+	# set default values
+	REPOS=()
+	flag=0
 	# Get repos from pacman_conf
-	# sed is being used for filtering comments and repo brackets []
+	# sed is being used for removing comments and repo brackets []
 	REPOS=($(grep "\[*\]" "$pacman_conf" | sed -e '/^\s*#/d' -e 's/\[//' -e 's/\]//'))
 	# Set valid repos
 	if [[ $arch = x86_64 ]]; then
@@ -528,10 +530,12 @@ clean_pacman_conf(){
 			for file in $work_dir/{livecd,root,$custom}-image/etc/pacman.conf; do
 				if [[ -f $file ]]; then
 					msg2 "Editing $file"
-					sed -i "/^\[$repo/,/^Server/d" "$file" || exit 1
+					sed -i "/^\[$repo/,/^Server/d" "$file" && flag=1 || return 1
 				fi
 			done
-			msg "Custom repo $repo removed from pacman.conf"
+			if [[ $flag -eq 1 ]]; then
+			       msg "Custom repo $repo removed from pacman.conf"
+			fi
 		fi
 	done
 }
