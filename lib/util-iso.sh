@@ -350,6 +350,10 @@ make_image_boot() {
 			aufs_mount_root_image "${path}"
 		fi
 		copy_initcpio "${path}"
+
+		# possible approach to PXE boot
+		#add_kernel_modules "${path}"
+
 		gen_boot_image "${path}"
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		if [[ -f ${path}/boot/intel-ucode.img ]]; then
@@ -480,6 +484,16 @@ check_chroot_iso_version(){
 	fi
 }
 
+check_plymouth(){
+	is_plymouth=false
+	source mkinitcpio.conf
+	for h in ${HOOKS[@]};do
+		if [[ $h == 'plymouth' ]];then
+			is_plymouth=true
+		fi
+	done
+}
+
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1]"
@@ -501,13 +515,9 @@ load_profile(){
 	fi
 	create_args+=(-C ${pacman_conf})
 	work_dir=${chroots_iso}/$1/${arch}
-	is_plymouth=false
-	source mkinitcpio.conf
-	for h in ${HOOKS[@]};do
-		if [[ $h == 'plymouth' ]];then
-			is_plymouth=true
-		fi
-	done
+
+	check_plymouth
+
 	[[ -d ${work_dir}/root-image ]] && check_chroot_iso_version
 }
 
