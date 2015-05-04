@@ -549,9 +549,10 @@ build_images(){
 }
 
 check_profile(){
-	local keyfiles=(profile.conf mkinitcpio.con Packages Packages-Livecd)
-	local keydirs=(overlay overlay-livecd isolinux)
+	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
+	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
 	local has_keyfiles=false has_keydirs=false
+	msg "Checking profile [$1]"
 	for f in ${keyfiles[@]}; do
 		if [[ -f $1/$f ]];then
 			has_keyfiles=true
@@ -568,6 +569,8 @@ check_profile(){
 			break
 		fi
 	done
+	msg2 "has_keyfiles: ${has_keyfiles}"
+	msg2 "has_keydirs: ${has_keydirs}"
 	if ${has_keyfiles} && ${has_keydirs};then
 		msg3 "Profile sanity check passed."
 	else
