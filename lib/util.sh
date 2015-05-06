@@ -363,10 +363,6 @@ load_profile_config(){
 		displaymanager="none"
 	fi
 
-# 	if [[ -z ${kernel_modules} ]];then
-# 		kernel_modules=""
-# 	fi
-
 	return 0
 }
 
