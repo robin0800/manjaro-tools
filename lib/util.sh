@@ -319,6 +319,10 @@ load_profile_config(){
 		efi_boot_loader="grub"
 	fi
 
+	if [[ -z ${efi_part_size} ]]; then
+		efi_part_size="36M"
+	fi
+
 	if [[ -z ${hostname} ]];then
 		hostname="manjaro"
 	fi
