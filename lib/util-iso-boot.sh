@@ -65,11 +65,6 @@ copy_initcpio(){
 	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
 }
 
-add_kernel_modules(){
-	local conf='MODULES="'${kernel_modules}'"'
-	sed -e "s|^.*MODULES=.*|${conf}|" -i $1/etc/mkinitcpio-${iso_name}.conf
-}
-
 write_loader_conf(){
 	local fn=loader.conf
 	local conf=$1/${fn}

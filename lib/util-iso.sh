@@ -351,9 +351,6 @@ make_image_boot() {
 		fi
 		copy_initcpio "${path}"
 
-		# possible approach to PXE boot
-		#add_kernel_modules "${path}"
-
 		gen_boot_image "${path}"
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		if [[ -f ${path}/boot/intel-ucode.img ]]; then
