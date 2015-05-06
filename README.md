@@ -139,6 +139,9 @@ Each iso profile must have these files or symlinks to shared:
 # unset defaults to given value
 # efi_boot_loader="grub"
 
+# set uefi partition size
+# efi_part_size=32M
+
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant
 
@@ -175,21 +178,21 @@ Each iso profile must have these files or symlinks to shared:
 # start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
 ~~~
 
-######* Packages  
+######* Packages
 Contains root image packages
 ideally no xorg
 
-######* Packages-Custom/desktop  
+######* Packages-Custom/desktop
 Contains the custom image packages
 desktop environment packages go here
 
-######* Packages-Xorg  
+######* Packages-Xorg
 Contains the Xorg package repo
 
-######* Packages-Lng  
+######* Packages-Lng
 Contains the language packages repo
 
-######* Packages-Livecd  
+######* Packages-Livecd
 Contains packages you only want on livecd but not installed on the target system with installer
 default files are in shared folder and can be symlinked or defined in a real file
 
@@ -248,11 +251,11 @@ buildpkg -p sysvinit -a i686 -b testing -cwsn
 buildpkg -p sysvinit -b testing -cswn
 ~~~
 
-You can drop the branch arg if you set the branch in manjaro-tools.conf  
+You can drop the branch arg if you set the branch in manjaro-tools.conf
 The arch can also be set in manjaro-tools.conf, but under normal conditions, it is better to specify the non native arch by -a parameter.
 
 ######* -c
-Removes the chroot dir  
+Removes the chroot dir
 If the -c parameter is not used, buildpkg will update the existing chroot or create a new one if none is present.
 ######* -w
 Cleans pkgcache, and logfiles
