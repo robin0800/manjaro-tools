@@ -474,7 +474,7 @@ load_pkgs_lng(){
 	packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
-check_chroot_iso_version(){
+check_chroot_version(){
 	local chroot_version=$(cat ${work_dir}/root-image/.manjaro-tools)
 	if [[ ${version} != $chroot_version ]];then
 		clean_first=true
@@ -515,7 +515,7 @@ load_profile(){
 
 	check_plymouth
 
-	[[ -d ${work_dir}/root-image ]] && check_chroot_iso_version
+	[[ -d ${work_dir}/root-image ]] && check_chroot_version
 }
 
 compress_images(){
