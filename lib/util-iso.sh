@@ -390,7 +390,7 @@ make_efiboot() {
 		msg "Prepare [${iso_name}/iso/EFI]"
 		local path_iso="${work_dir}/iso"
 		mkdir -p ${path_iso}/EFI/miso
-		truncate -s 48M ${path_iso}/EFI/miso/${iso_name}.img
+		truncate -s ${efi_part_size} ${path_iso}/EFI/miso/${iso_name}.img
 		mkfs.vfat -n MISO_EFI ${path_iso}/EFI/miso/${iso_name}.img
 		mkdir -p ${work_dir}/efiboot
 		mount ${path_iso}/EFI/miso/${iso_name}.img ${work_dir}/efiboot
