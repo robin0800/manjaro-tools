@@ -189,5 +189,3 @@ ${wipe_clean} && clean_up
 chroot_init
 
 chroot_build
-
-#${sign} && sign_pkgs
