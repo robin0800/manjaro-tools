@@ -119,9 +119,6 @@ make_pkg(){
 		setarch "${arch}" \
 			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
 		run_post_build
-		#source PKGBUILD
-		#move_pkg
-		#[[ -z $LOGDEST ]] && archive_logs
 	cd ..
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
