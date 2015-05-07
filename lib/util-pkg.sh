@@ -69,32 +69,73 @@ prepare_cachedir(){
 	chown -R "${OWNER}:users" "${cache_dir_pkg}"
 }
 
-move_pkg(){
-	local ext='pkg.tar.xz'
+sign_pkg(){
+	su ${OWNER} -c "signpkg ${cache_dir_pkg}/$1"
+}
+
+run_post_build(){
+	source PKGBUILD
+	# we need a different varnane for arch to make it to work
+	# with sourced PKGBUILD $arch -> see globalvars branch
+	local ext='pkg.tar.xz' pinfo loglist=() lname
+	if [[ ${arch} == "any" ]]; then
+		pinfo=${pkgver}-${pkgrel}-any
+	else
+		pinfo=${pkgver}-${pkgrel}-${arch}
+	fi
 	if [[ -n $PKGDEST ]];then
-		if [[ -n $pkgbase ]];then
+		if [[ -n ${pkgbase} ]];then
 			for p in ${pkgname[@]};do
-				mv $PKGDEST/$p*.${ext} ${cache_dir_pkg}/
+				mv $PKGDEST/${p}-${pinfo}.${ext} ${cache_dir_pkg}/
+				${sign} && sign_pkg ${p}-${pinfo}.${ext}
+				loglist+=("*$p*.log")
+				lname=${pkgbase}
 			done
 		else
-			mv $PKGDEST/$pkgname*.${ext} ${cache_dir_pkg}/
+			mv $PKGDEST/${pkgname}-${pinfo}.${ext} ${cache_dir_pkg}/
+			${sign} && sign_pkg ${pkgname}-${pinfo}.${ext}
+			loglist+=("*${pkgname}*.log")
+			lname=${pkgname}
 		fi
 	else
 		mv *.${ext} ${cache_dir_pkg}
+		${sign} && sign_pkg ${pkgname}-${pinfo}.${ext}
+		loglist+=("*${pkgname}*.log")
+		lname=${pkgname}
 	fi
 	chown -R "${OWNER}:users" "${cache_dir_pkg}"
+	if [[ -z $LOGDEST ]];then
+		tar -cjf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
+		find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
+	fi
 }
 
-archive_logs(){
-	local ext='log.tar.xz' logfile
-	if [[ -n $pkgbase ]];then
-		logfile=$PWD/$pkgbase-$pkgver-$pkgrel.${ext}
-	else
-		logfile=$PWD/$pkgname-$pkgver-$pkgrel.${ext}
-	fi
-	tar -cJf ${logfile} $pkgname-$pkgver-$pkgrel*.log
-	find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
-}
+# move_pkg(){
+# 	local ext='pkg.tar.xz'
+# 	if [[ -n $PKGDEST ]];then
+# 		if [[ -n $pkgbase ]];then
+# 			for p in ${pkgname[@]};do
+# 				mv $PKGDEST/$p*.${ext} ${cache_dir_pkg}/
+# 			done
+# 		else
+# 			mv $PKGDEST/$pkgname*.${ext} ${cache_dir_pkg}/
+# 		fi
+# 	else
+# 		mv *.${ext} ${cache_dir_pkg}
+# 	fi
+# 	chown -R "${OWNER}:users" "${cache_dir_pkg}"
+# }
+#
+# archive_logs(){
+# 	local ext='log.tar.xz' logfile
+# 	if [[ -n $pkgbase ]];then
+# 		logfile=$PWD/$pkgbase-$pkgver-$pkgrel.${ext}
+# 	else
+# 		logfile=$PWD/$pkgname-$pkgver-$pkgrel.${ext}
+# 	fi
+# 	tar -cJf ${logfile} $pkgname-$pkgver-$pkgrel*.log
+# 	find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
+# }
 
 make_pkg(){
 	msg "Start building [$1]"
@@ -104,9 +145,10 @@ make_pkg(){
 		done
 		setarch "${arch}" \
 			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
-		source PKGBUILD
-		move_pkg
-		[[ -z $LOGDEST ]] && archive_logs
+		run_post_build
+		#source PKGBUILD
+		#move_pkg
+		#[[ -z $LOGDEST ]] && archive_logs
 	cd ..
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
@@ -137,9 +179,9 @@ chroot_init(){
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
-sign_pkgs(){
-	cd ${cache_dir_pkg}
-	su "${OWNER}" <<'EOF'
-signpkgs
-EOF
-}
+# sign_pkgs(){
+# 	cd ${cache_dir_pkg}
+# 	su "${OWNER}" <<'EOF'
+# signpkgs
+# EOF
+# }
