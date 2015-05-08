@@ -126,6 +126,12 @@ testdevice() {
 }
 
 probedevice() {
+
+    if [[ -n "${ip}" && -n "${miso_http_srv}" && -f "${isomounts}" ]]; then
+        found="yes"
+        return
+    fi
+
 # Loop device test every second up to some limit
     if [ "x${usbdelay}" != "x" ]; then
         waittime=${usbdelay}
