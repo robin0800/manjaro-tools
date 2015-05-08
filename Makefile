@@ -61,11 +61,15 @@ LIBS = \
 CPIOHOOKS = \
 	initcpio/hooks/miso \
 	initcpio/hooks/miso_loop_mnt \
+	initcpio/hooks/miso_pxe_common \
+	initcpio/hooks/miso_pxe_http \
 	initcpio/hooks/miso_pxe_nbd
 
 CPIOINST = \
 	initcpio/inst/miso \
 	initcpio/inst/miso_loop_mnt \
+	initcpio/inst/miso_pxe_common \
+	initcpio/inst/miso_pxe_http \
 	initcpio/inst/miso_pxe_nbd \
 	initcpio/inst/miso_kms
 
