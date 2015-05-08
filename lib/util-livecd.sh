@@ -421,18 +421,21 @@ configure_user_root(){
 configure_displaymanager(){
 	if [[ -f /usr/bin/lightdm ]];then
 		gpasswd -a ${username} autologin &> /dev/null
-# 		sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
+		# hopefully fixes autologin on openrc livecd
+		if [[ -d /run/openrc ]];then
+			sed -i -e 's/^.*pam-autologin-service=.*/pam-autologin-service=lightdm-autologin/' /etc/lightdm/lightdm.conf
+		fi
 		sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
-		elif [[ -f /usr/bin/kdm ]];then
+	elif [[ -f /usr/bin/kdm ]];then
 		sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" /usr/share/config/kdm/kdmrc
 		sed -i -e "s/^.*AutoLoginPass=.*/AutoLoginPass=${password}/" /usr/share/config/kdm/kdmrc
 		xdg-icon-resource forceupdate --theme hicolor &> /dev/null
 		[[ -e "/usr/bin/update-desktop-database" ]] && update-desktop-database -q
-		elif [[ -f /usr/bin/sddm ]];then
+	elif [[ -f /usr/bin/sddm ]];then
 		sed -i -e "s|^User=.*|User=${username}|" /etc/sddm.conf
-		elif [[ -f /usr/bin/lxdm ]];then
+	elif [[ -f /usr/bin/lxdm ]];then
 		sed -i -e "s/^.*autologin=.*/autologin=${username}/" /etc/lxdm/lxdm.conf
-		elif [[ -f /usr/bin/gdm ]];then
+	elif [[ -f /usr/bin/gdm ]];then
 		sed -i -e "s/^.*AutomaticLogin=.*/AutomaticLogin=${username}/" /etc/gdm/custom.conf
 	fi
 }
