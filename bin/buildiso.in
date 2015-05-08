@@ -82,6 +82,7 @@ display_settings(){
 	msg2 "arch: ${arch}"
 	msg2 "branch: ${branch}"
 	msg2 "chroots_iso: ${chroots_iso}"
+	msg2 "custom repo to keep: ${keep_repo}"
 
 	msg "ARGS:"
 	msg2 "clean_first: ${clean_first}"
@@ -119,8 +120,6 @@ load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 clean_first=true
-clean_cache_xorg=true
-clean_cache_lng=true
 clean_cache_iso=true
 
 pretend=false
@@ -135,6 +134,7 @@ usage() {
 	echo "    -a <arch>          Arch [default: ${arch}]"
 	echo "    -b <branch>        Branch [default: ${branch}]"
 	echo '    -r <dir>           Chroots directory'
+	echo '    -k <repo>          Custom pacman repo to keep'
 	echo "                       [default: ${chroots_iso}]"
 	echo '    -w                 Disable clean iso cache'
 	echo '    -c                 Disable clean work dir'
@@ -152,7 +152,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:cxlisqwLh'
+opts='p:a:b:r:k:cxlisqwLh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -160,6 +160,7 @@ while getopts "${opts}" arg; do
 		a) arch="$OPTARG" ;;
 		b) branch="$OPTARG" ;;
 		r) chroots_iso="$OPTARG" ;;
+		k) keep_repo="$OPTARG" ;;
 		c) clean_first=false ;;
 		w) clean_cache_iso=false;;
 		x) clean_cache_xorg=false ;;
