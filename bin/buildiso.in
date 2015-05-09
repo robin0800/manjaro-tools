@@ -26,13 +26,14 @@ show_profile(){
 		msg2 "work_dir: ${work_dir}"
 		msg2 "iso_file: ${iso_file}"
 		msg2 "pacman_conf: ${pacman_conf}"
+		[[ -n ${keep_repos} ]] && msg2 "keep_repos: ${keep_repos[*]}"
 
 		msg2 "initsys: ${initsys}"
 		msg2 "displaymanager: ${displaymanager}"
 		msg2 "kernel: ${kernel}"
 		msg2 "efi_boot_loader: ${efi_boot_loader}"
 		msg2 "efi_part_size: ${efi_part_size}"
-		
+
 		${is_plymouth} && msg2 "plymouth_theme: ${plymouth_theme}"
 
 		msg2 "hostname: ${hostname}"
@@ -82,7 +83,6 @@ display_settings(){
 	msg2 "arch: ${arch}"
 	msg2 "branch: ${branch}"
 	msg2 "chroots_iso: ${chroots_iso}"
-	msg2 "custom repo to keep: ${keep_repo}"
 
 	msg "ARGS:"
 	msg2 "clean_first: ${clean_first}"
@@ -122,6 +122,9 @@ load_config "${SYSCONFDIR}/manjaro-tools.conf"
 clean_first=true
 clean_cache_iso=true
 
+clean_cache_xorg=false
+clean_cache_lng=false
+
 pretend=false
 images_only=false
 iso_only=false
@@ -138,8 +141,8 @@ usage() {
 	echo "                       [default: ${chroots_iso}]"
 	echo '    -w                 Disable clean iso cache'
 	echo '    -c                 Disable clean work dir'
-	echo '    -x                 Disable clean xorg cache'
-	echo '    -l                 Disable clean lng cache'
+	echo '    -x                 Clean xorg cache'
+	echo '    -l                 Clean lng cache'
 	echo '    -i                 Build images only'
 	echo '    -s                 Generate iso only'
 	echo '                       Requires pre built images (-i)'
@@ -163,8 +166,8 @@ while getopts "${opts}" arg; do
 		k) keep_repo="$OPTARG" ;;
 		c) clean_first=false ;;
 		w) clean_cache_iso=false;;
-		x) clean_cache_xorg=false ;;
-		l) clean_cache_lng=false ;;
+		x) clean_cache_xorg=true ;;
+		l) clean_cache_lng=true ;;
 		i) images_only=true ;;
 		s) iso_only=true ;;
 		q) pretend=true ;;
