@@ -258,13 +258,13 @@ load_config(){
 		buildset_iso='default'
 	fi
 
-	if [[ -z ${clean_cache_xorg} ]];then
-		clean_cache_xorg='true'
-	fi
-
-	if [[ -z ${clean_cache_lng} ]];then
-		clean_cache_lng='true'
-	fi
+# 	if [[ -z ${clean_cache_xorg} ]];then
+# 		clean_cache_xorg='true'
+# 	fi
+#
+# 	if [[ -z ${clean_cache_lng} ]];then
+# 		clean_cache_lng='true'
+# 	fi
 
 	##### iso settings #####
 
@@ -373,6 +373,10 @@ load_profile_config(){
 
 	if [[ -z ${displaymanager} ]];then
 		displaymanager="none"
+	fi
+
+	if [[ -z ${keep_repos} ]];then
+		keep_repos=()
 	fi
 
 	return 0
