@@ -320,7 +320,7 @@ load_profile_config(){
 	[[ -r ${profile_conf} ]] && source ${profile_conf}
 
 	if [[ -z ${kernel} ]];then
-		kernel="linux319"
+		kernel="linux318"
 	fi
 
 	if [[ -z ${efi_boot_loader} ]];then
@@ -328,7 +328,7 @@ load_profile_config(){
 	fi
 
 	if [[ -z ${efi_part_size} ]]; then
-		efi_part_size="32M"
+		efi_part_size="42M"
 	fi
 
 	if [[ -z ${hostname} ]];then
