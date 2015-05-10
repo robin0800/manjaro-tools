@@ -217,6 +217,7 @@ make_image_root() {
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_lsb "${path}"
 		copy_overlay_root "${path}"
+		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
 	fi
@@ -234,6 +235,7 @@ make_image_custom() {
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
+		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		umount_image_handler
 		find ${path} -name '.wh.*' -delete &>/dev/null
 		: > ${work_dir}/build.${FUNCNAME}
@@ -260,6 +262,7 @@ make_image_livecd() {
 		copy_livecd_helpers "${path}/opt/livecd"
 		copy_startup_scripts "${path}/usr/bin"
 		configure_livecd_image "${path}"
+		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		# Clean up GnuPG keys?
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		umount_image_handler
@@ -579,14 +582,13 @@ get_repos() {
 
 clean_pacman_conf(){
 	local repositories=$(get_repos) uri='file://'
-	msg "Cleaning custom pacman.conf ..."
+	msg "Cleaning [$1/pacman.conf] ..."
 	for repo in ${repositories[@]}; do
 		case ${repo} in
 			'options'|'core'|'extra'|'community'|'multilib') continue ;;
 			*)
 				msg2 "parsing [${repo}] ..."
 				parse_section ${repo}
-				msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 				if [[ ${pc_value} == $uri* ]]; then
 					msg2 "Removing local repo ${repo} ..."
 					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
@@ -594,22 +596,20 @@ clean_pacman_conf(){
 			;;
 		esac
 	done
+	msg "Done cleaning [$1/pacman.conf]"
 }
 
 build_images(){
 	local timer=$(get_timer)
 	load_pkgs "Packages"
 	make_image_root
-	${is_custom_pac_conf} && clean_pacman_conf "${work_dir}/root-image"
 	if [[ -f "${packages_custom}" ]] ; then
 		load_pkgs "${packages_custom}"
 		make_image_custom
-		${is_custom_pac_conf} && clean_pacman_conf "${work_dir}/${custom}-image"
 	fi
 	if [[ -f Packages-Livecd ]]; then
 		load_pkgs "Packages-Livecd"
 		make_image_livecd
-		${is_custom_pac_conf} && clean_pacman_conf "${work_dir}/livecd-image"
 	fi
 	if [[ -f Packages-Xorg ]] ; then
 		load_pkgs_xorg
