@@ -579,11 +579,14 @@ get_repos() {
 
 clean_pacman_conf(){
 	local repositories=$(get_repos) uri='file://'
+	msg "Cleaning custom pacman.conf ..."
 	for repo in ${repositories[@]}; do
 		case ${repo} in
 			'options'|'core'|'extra'|'community'|'multilib') continue ;;
 			*)
+				msg2 "parsing [${repo}] ..."
 				parse_section ${repo}
+				msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 				if [[ ${pc_value} == $uri* ]]; then
 					msg2 "Removing local repo ${repo} ..."
 					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
