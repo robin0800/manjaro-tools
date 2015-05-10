@@ -490,6 +490,16 @@ check_plymouth(){
 	done
 }
 
+check_custom_pacman_conf(){
+	if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
+		pacman_conf="pacman-${pacman_conf_arch}.conf"
+		is_custom_pac_conf=true
+	else
+		pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+		is_custom_pac_conf=false
+	fi
+}
+
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1]"
@@ -504,11 +514,9 @@ load_profile(){
 	custom=${packages_custom#*-}
 	custom=${custom,,}
 	iso_file="${iso_name}-${custom}-${dist_release}-${arch}.iso"
-	if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
-		pacman_conf="pacman-${pacman_conf_arch}.conf"
-	else
-		pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
-	fi
+
+	check_custom_pacman_conf
+
 	create_args+=(-C ${pacman_conf})
 	work_dir=${chroots_iso}/$1/${arch}
 
@@ -592,7 +600,7 @@ build_images(){
 	fi
 	make_isolinux
 	make_isomounts
-	[[ -n ${keep_repos} ]] && clean_pacman_conf "${work_dir}/root-image"
+	${is_custom_pac_conf} && clean_pacman_conf "${work_dir}/root-image"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
