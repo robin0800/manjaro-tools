@@ -586,7 +586,7 @@ clean_pacman_conf(){
 				parse_section ${repo}
 				if [[ ${pc_value} == $uri* ]]; then
 					msg2 "Removing local repo ${repo} ..."
-					sed -i "/^\[${repo}/,/^SigLevel/,/^Server/d" $1/etc/pacman.conf
+					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
 				fi
 			;;
 		esac
