@@ -532,44 +532,64 @@ compress_images(){
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
-clean_pacman_conf(){
-	# set default values
-	#local repos=() #valid_repos=()
-	#flag=0
-	# Get repos from pacman_conf
-	# sed is being used for removing comments and repo brackets []
-	local repos=($(grep "\[*\]" "$pacman_conf" | sed -e '/^\s*#/d' -e 's/\[//' -e 's/\]//'))
-	# Set valid repos
-# 	case ${arch} in
-# 		'x86_64') valid_repos==('options' 'core' 'extra' 'community' 'multilib') ;;
-# 		*) valid_repos=('options' 'core' 'extra' 'community') ;;
-# 	esac
+# $1: section
+parse_section() {
+	local is_section=0
+	while read line; do
+	[[ $line =~ ^\ {0,}# ]] && continue
+		[[ -z "$line" ]] && continue
+		if [ $is_section == 0 ]; then
+			if [[ $line =~ ^\[.*?\] ]]; then
+				line=${line:1:$((${#line}-2))}
+				section=${line// /}
+				if [[ $section == $1 ]]; then
+					is_section=1
+					continue
+				fi
+				continue
+			fi
+		elif [[ $line =~ ^\[.*?\] && $is_section == 1 ]]; then
+			break
+		else
+			pc_key=${line%%=*}
+			pc_key=${pc_key// /}
+			pc_value=${line##*=}
+			pc_value=${pc_value## }
+			eval "$pc_key='$pc_value'"
+		fi
+	done < "${pacman_conf}"
+}
 
-	# Remove extra repos from pacman.conf
-	for repo in "${repos[@]}"; do
-		case $repo in
+get_repos() {
+	local section repos=() filter='^\ {0,}#'
+	while read line; do
+		[[ $line =~ "${filter}" ]] && continue
+		[[ -z "$line" ]] && continue
+		if [[ $line =~ ^\[.*?\] ]]; then
+			line=${line:1:$((${#line}-2))}
+			section=${line// /}
+			case ${section} in
+				"options") continue ;;
+				*) repos+=("${section}") ;;
+			esac
+		fi
+	done < "${pacman_conf}"
+	echo ${repos[@]}
+}
+
+clean_pacman_conf(){
+	local repositories=$(get_repos) uri='file://'
+	for repo in ${repositories[@]}; do
+		case ${repo} in
 			'options'|'core'|'extra'|'community'|'multilib') continue ;;
 			*)
-				for kr in "${keep_repos[@]}"; do
-					if [[ ${repo} != ${kr} ]]; then
-						msg2 "Removing custom repo ${repo} ..."
-						sed -i "/^\[$repo/,/^Server/d" $1/etc/pacman.conf
-					fi
-				done
+				parse_section ${repo}
+				if [[ ${pc_value} == $uri* ]]; then
+					msg2 "Removing local repo ${repo} ..."
+					sed -i "/^\[${repo}/,/^SigLevel/,/^Server/d" $1/etc/pacman.conf
+				fi
 			;;
 		esac
-# 		if [[ ! $(echo "${valid_repos[*]}" | grep "$repo") ]] && [[ ! $(echo "$keep_repo" | grep "$repo") ]]; then
-# 			# Remove custom repo
-# 			for file in $work_dir/root-image/etc/pacman.conf; do
-# 				if [[ -f $file ]]; then
-# 					msg2 "Editing $file"
-# 					sed -i "/^\[$repo/,/^Server/d" "$file" && flag=1 || return 1
-# 				fi
-# 			done
-# 			if [[ $flag -eq 1 ]]; then
-# 			       msg "Custom repo $repo removed from pacman.conf"
-# 			fi
-# 		fi
 	done
 }
 
@@ -577,13 +597,16 @@ build_images(){
 	local timer=$(get_timer)
 	load_pkgs "Packages"
 	make_image_root
+	${is_custom_pac_conf} && clean_pacman_conf "${work_dir}/root-image"
 	if [[ -f "${packages_custom}" ]] ; then
 		load_pkgs "${packages_custom}"
 		make_image_custom
+		${is_custom_pac_conf} && clean_pacman_conf "${work_dir}/${custom}-image"
 	fi
 	if [[ -f Packages-Livecd ]]; then
 		load_pkgs "Packages-Livecd"
 		make_image_livecd
+		${is_custom_pac_conf} && clean_pacman_conf "${work_dir}/livecd-image"
 	fi
 	if [[ -f Packages-Xorg ]] ; then
 		load_pkgs_xorg
@@ -600,7 +623,6 @@ build_images(){
 	fi
 	make_isolinux
 	make_isomounts
-	${is_custom_pac_conf} && clean_pacman_conf "${work_dir}/root-image"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
