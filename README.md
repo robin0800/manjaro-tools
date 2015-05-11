@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.9.7
+Manjaro-tools-0.9.8
 
 User manual
 
@@ -107,6 +107,12 @@ Specifying args will override manjaro-tools.conf settings.
 # unset defaults to given value
 # iso_name=manjaro
 
+# publisher
+# iso_publisher="Manjaro Linux <http://www.manjaro.org>"
+
+# iso_app_id
+# iso_app_id="Manjaro Linux Live/Rescue CD"
+
 # unset defaults to given value
 # iso_compression=xz
 
@@ -140,7 +146,7 @@ Each iso profile must have these files or symlinks to shared:
 # efi_boot_loader="grub"
 
 # set uefi partition size
-# efi_part_size=32M
+# efi_part_size=42M
 
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant
@@ -284,7 +290,6 @@ Usage: buildiso [options]
     -b <branch>        Branch [default: stable]
     -r <dir>           Chroots directory
                        [default: /opt/buildiso]
-    -w                 Disable clean iso cache
     -c                 Disable clean work dir
     -x                 Disable clean xorg cache
     -l                 Disable clean lng cache
