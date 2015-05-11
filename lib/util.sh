@@ -162,6 +162,71 @@ check_root() {
 	fi
 }
 
+
+# $1: section
+parse_section() {
+	local is_section=0
+	while read line; do
+	[[ $line =~ ^\ {0,}# ]] && continue
+		[[ -z "$line" ]] && continue
+		if [ $is_section == 0 ]; then
+			if [[ $line =~ ^\[.*?\] ]]; then
+				line=${line:1:$((${#line}-2))}
+				section=${line// /}
+				if [[ $section == $1 ]]; then
+					is_section=1
+					continue
+				fi
+				continue
+			fi
+		elif [[ $line =~ ^\[.*?\] && $is_section == 1 ]]; then
+			break
+		else
+			pc_key=${line%%=*}
+			pc_key=${pc_key// /}
+			pc_value=${line##*=}
+			pc_value=${pc_value## }
+			eval "$pc_key='$pc_value'"
+		fi
+	done < "${pacman_conf}"
+}
+
+get_repos() {
+	local section repos=() filter='^\ {0,}#'
+	while read line; do
+		[[ $line =~ "${filter}" ]] && continue
+		[[ -z "$line" ]] && continue
+		if [[ $line =~ ^\[.*?\] ]]; then
+			line=${line:1:$((${#line}-2))}
+			section=${line// /}
+			case ${section} in
+				"options") continue ;;
+				*) repos+=("${section}") ;;
+			esac
+		fi
+	done < "${pacman_conf}"
+	echo ${repos[@]}
+}
+
+clean_pacman_conf(){
+	local repositories=$(get_repos) uri='file://'
+	msg "Cleaning [$1/etc/pacman.conf] ..."
+	for repo in ${repositories[@]}; do
+		case ${repo} in
+			'options'|'core'|'extra'|'community'|'multilib') continue ;;
+			*)
+				msg2 "parsing [${repo}] ..."
+				parse_section ${repo}
+				if [[ ${pc_value} == $uri* ]]; then
+					msg2 "Removing local repo [${repo}] ..."
+					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
+				fi
+			;;
+		esac
+	done
+	msg "Done cleaning [$1/etc/pacman.conf]"
+}
+
 load_vars() {
 	local var
 
@@ -203,7 +268,7 @@ load_config(){
 	###################
 
 	if [[ -z ${repo_tree} ]];then
-		repo_tree=(core extra community multilib openrc)
+		repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
 	fi
 
 	if [[ -z ${host_tree} ]];then
@@ -300,8 +365,16 @@ load_config(){
 	iso_label="${iso_label^^}"	# all uppercase
 	iso_label="${iso_label::8}"	# limit to 8 characters
 
+	if [[ -z ${iso_publisher} ]];then
+		iso_publisher='Manjaro Linux <http://www.manjaro.org>'
+	fi
+
+	if [[ -z ${iso_app_id} ]];then
+		iso_app_id='Manjaro Linux Live/Rescue CD'
+	fi
+
 	if [[ -z ${iso_compression} ]];then
-		iso_compression=xz
+		iso_compression='xz'
 	fi
 
 	if [[ -z ${iso_checksum} ]];then
@@ -373,10 +446,6 @@ load_profile_config(){
 
 	if [[ -z ${displaymanager} ]];then
 		displaymanager="none"
-	fi
-
-	if [[ -z ${keep_repos} ]];then
-		keep_repos=()
 	fi
 
 	return 0
