@@ -338,27 +338,3 @@ configure_xorg_drivers(){
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/MHWDCONFIG
 	fi
 }
-
-# $1: image path
-clean_up_image(){
-	msg2 "Cleaning up [$1]"
-	if [ -d "$1/boot/" ]; then
-		# remove the initcpio images that were generated for the host system
-		find "$1/boot" -name 'initramfs*.img' -delete &>/dev/null
-	fi
-
-	[[ -f "$1/etc/locale.gen.bak" ]] \
-	&& mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
-	[[ -f "$1/etc/locale.conf.bak" ]] \
-	&& mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
-
-	find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
-	find "$1/var/lib/pacman/sync" -delete &>/dev/null
-	find "$1/var/cache/pacman/pkg" -type f -delete &>/dev/null
-	find "$1/var/log" -type f -delete &>/dev/null
-	find "$1/var/tmp" -mindepth 1 -delete &>/dev/null
-	find "$1/tmp" -mindepth 1 -delete &>/dev/null
-
-# 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-
-}
