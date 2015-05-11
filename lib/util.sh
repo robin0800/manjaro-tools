@@ -393,7 +393,7 @@ load_profile_config(){
 	fi
 
 	if [[ -z ${efi_part_size} ]]; then
-		efi_part_size="42M"
+		efi_part_size="31M"
 	fi
 
 	if [[ -z ${hostname} ]];then

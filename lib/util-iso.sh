@@ -191,12 +191,12 @@ squash_image_dir() {
 
 run_xorriso(){
 	msg "Creating ISO image..."
-	local efi_boot_args=""
+	local efi_boot_args=()
 	if [[ -f "${work_dir}/iso/EFI/miso/${iso_name}.img" ]]; then
 		msg2 "Setting efi args. El Torito detected."
-		efi_boot_args=("-eltorito-alt-boot" \
-						"-e EFI/miso/${iso_name}.img" \
-						"-isohybrid-gpt-basdat" \
+		efi_boot_args=("-eltorito-alt-boot"
+						"-e EFI/miso/${iso_name}.img"
+						"-isohybrid-gpt-basdat"
 						"-no-emul-boot")
 	fi
 
@@ -221,7 +221,7 @@ run_xorriso(){
 # Build ISO
 make_iso() {
 	msg "Start [Build ISO]"
-	touch "${work_dir}/iso/.buildiso"
+	touch "${work_dir}/iso/.miso"
 	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
 		if [[ "$d" != "${work_dir}/iso" ]] && \
 			[[ "$(basename "$d")" != "iso" ]] && \
