@@ -157,7 +157,6 @@ make_chroot(){
 			-S ${mirrors_conf} \
 			${flag} \
 			"$1" "$2" || die "Failed to retrieve one or more packages!"
-	fi
 }
 
 
