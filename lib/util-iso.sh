@@ -166,9 +166,9 @@ squash_image_dir() {
 		error "$1 is not a directory"
 		return 1
 	fi
-
 	local timer=$(get_timer)
 	local sq_img="${work_dir}/iso/${iso_name}/${arch}/$(basename ${1}).sqfs"
+	mkdir -p ${work_dir}/iso/${iso_name}/${arch}
 	msg "Generating SquashFS image for '${1}'"
 	if [[ -f "${sq_img}" ]]; then
 		local has_changed_dir=$(find ${1} -newer ${sq_img})
@@ -182,7 +182,7 @@ squash_image_dir() {
 			return
 		fi
 	fi
-	local highcomp=" -b 256K -Xbcj x86"
+	local highcomp="-b 256K -Xbcj x86"
 	[[ "${iso_compression}" != "xz" ]] && highcomp=""
 	msg2 "Creating SquashFS image. This may take some time..."
 	mksquashfs "${1}" "${sq_img}" -noappend -comp "${iso_compression}" "${highcomp}"
@@ -213,8 +213,6 @@ make_iso() {
 	fi
 
 	local efi_boot_args=""
-
-	# If exists, add an EFI "El Torito" boot image (FAT filesystem) to ISO-9660 image.
 	if [[ -f "${work_dir}/iso/EFI/miso/${iso_name}.img" ]]; then
 		msg2 "Setting efi args. El Torito detected."
 		efi_boot_args=("-eltorito-alt-boot" \
@@ -223,6 +221,12 @@ make_iso() {
 						"-no-emul-boot")
 	fi
 	msg "Creating ISO image..."
+	# test msg2
+	msg2 "iso_label: ${iso_label}"
+	msg2 "iso_label: ${iso_name}"
+	msg2 "iso_label: ${iso_publisher}"
+	msg2 "iso_label: ${iso_app_id}"
+	msg2 "iso_label: ${iso_file}"
 	xorriso -as mkisofs \
 			-iso-level 3 -rock -joliet \
 			-max-iso9660-filenames -omit-period \
