@@ -25,7 +25,6 @@ show_profile(){
 		load_profile "$1"
 		msg2 "work_dir: ${work_dir}"
 		msg2 "iso_file: ${iso_file}"
-		#msg2 "pacman_conf: ${pacman_conf}"
 		msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 
 		msg2 "initsys: ${initsys}"
@@ -88,7 +87,6 @@ display_settings(){
 	msg2 "clean_first: ${clean_first}"
 	msg2 "clean_cache_xorg: ${clean_cache_xorg}"
 	msg2 "clean_cache_lng: ${clean_cache_lng}"
-	msg2 "clean_cache_iso: ${clean_cache_iso}"
 	msg2 "images_only: ${images_only}"
 	msg2 "iso_only: ${iso_only}"
 
@@ -107,6 +105,8 @@ display_settings(){
     msg "ISO SETTINGS:"
     msg2 "iso_label: ${iso_label}"
     msg2 "iso_name: ${iso_name}"
+    msg2 "iso_publisher: ${iso_publisher}"
+    msg2 "iso_app_id: ${iso_app_id}"
     msg2 "iso_compression: ${iso_compression}"
     msg2 "iso_checksum: ${iso_checksum}"
 
@@ -120,7 +120,6 @@ load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 clean_first=true
-clean_cache_iso=true
 
 clean_cache_xorg=false
 clean_cache_lng=false
@@ -137,9 +136,7 @@ usage() {
 	echo "    -a <arch>          Arch [default: ${arch}]"
 	echo "    -b <branch>        Branch [default: ${branch}]"
 	echo '    -r <dir>           Chroots directory'
-	echo '    -k <repo>          Custom pacman repo to keep'
 	echo "                       [default: ${chroots_iso}]"
-	echo '    -w                 Disable clean iso cache'
 	echo '    -c                 Disable clean work dir'
 	echo '    -x                 Clean xorg cache'
 	echo '    -l                 Clean lng cache'
@@ -155,7 +152,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:k:cxlisqwLh'
+opts='p:a:b:r:cxlisqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -165,7 +162,6 @@ while getopts "${opts}" arg; do
 		r) chroots_iso="$OPTARG" ;;
 		k) keep_repo="$OPTARG" ;;
 		c) clean_first=false ;;
-		w) clean_cache_iso=false;;
 		x) clean_cache_xorg=true ;;
 		l) clean_cache_lng=true ;;
 		i) images_only=true ;;
@@ -190,15 +186,9 @@ cache_dir_iso="${cache_dir}/iso"
 
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
-# create_args+=(-v -a ${arch} -D ${iso_name} -M ${mirrors_conf})
-
-# iso_args+=(-v -x -a ${arch} -D ${iso_name} -L ${iso_label} -c ${iso_compression})
-
-# ${clean_cache_iso} && iso_args+=(-f)
-
 check_root "$0" "${orig_argv[@]}"
 
-check_run_dir
+#check_run_dir
 
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 

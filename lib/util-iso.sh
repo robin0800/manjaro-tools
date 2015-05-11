@@ -13,11 +13,11 @@
 [[ -r ${LIBDIR}/util-iso-boot.sh ]] && source ${LIBDIR}/util-iso-boot.sh
 [[ -r ${LIBDIR}/util-iso-calamares.sh ]] && source ${LIBDIR}/util-iso-calamares.sh
 
-check_run_dir(){
-	if [[ ! -f shared/Packages-Systemd ]] || [[ ! -f shared/Packages-Openrc ]];then
-		die "${0##*/} is not run in a valid iso-profiles folder!"
-	fi
-}
+# check_run_dir(){
+# 	if [[ ! -f shared/Packages-Systemd ]] || [[ ! -f shared/Packages-Openrc ]];then
+# 		die "${0##*/} is not run in a valid iso-profiles folder!"
+# 	fi
+# }
 
 copy_overlay_root(){
 	msg2 "Copying overlay ..."
@@ -189,31 +189,8 @@ squash_image_dir() {
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
-make_squash(){
-
-}
-
-# Build ISO
-make_iso() {
-	msg "Start [Build ISO]"
-	touch "${work_dir}/iso/.buildiso"
-	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
-		if [[ "$d" != "${work_dir}/iso" ]] && \
-			[[ "$(basename "$d")" != "iso" ]] && \
-			[[ "$(basename "$d")" != "efiboot" ]] && \
-			[[ "$d" != "${work_dir}" ]]; then
-			squash_image_dir "$d" || die "Exit ..."
-		fi
-	done
-	msg "Making bootable image"
-	# Sanity checks
-	[[ ! -d "${work_dir}/iso" ]] && die "[${work_dir}/iso] doesn't exist. What did you do?!"
-
-	if [[ -f "${cache_dir_iso}/${iso_file}" ]]; then
-		msg2 "Removing existing bootable image..."
-		rm -rf "${cache_dir_iso}/${iso_file}"
-	fi
-
+run_xorriso(){
+	msg "Creating ISO image..."
 	local efi_boot_args=""
 	if [[ -f "${work_dir}/iso/EFI/miso/${iso_name}.img" ]]; then
 		msg2 "Setting efi args. El Torito detected."
@@ -222,13 +199,7 @@ make_iso() {
 						"-isohybrid-gpt-basdat" \
 						"-no-emul-boot")
 	fi
-	msg "Creating ISO image..."
-	# test msg2
-	msg2 "iso_label: ${iso_label}"
-	msg2 "iso_name: ${iso_name}"
-	msg2 "iso_publisher: ${iso_publisher}"
-	msg2 "iso_app_id: ${iso_app_id}"
-	msg2 "iso_file: ${iso_file}"
+
 	xorriso -as mkisofs \
 			-iso-level 3 -rock -joliet \
 			-max-iso9660-filenames -omit-period \
@@ -245,6 +216,30 @@ make_iso() {
 			${efi_boot_args[@]} \
 			-output "${cache_dir_iso}/${iso_file}" \
 			"${work_dir}/iso/"
+}
+
+# Build ISO
+make_iso() {
+	msg "Start [Build ISO]"
+	touch "${work_dir}/iso/.buildiso"
+	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
+		if [[ "$d" != "${work_dir}/iso" ]] && \
+			[[ "$(basename "$d")" != "iso" ]] && \
+			[[ "$(basename "$d")" != "efiboot" ]] && \
+			[[ "$d" != "${work_dir}" ]]; then
+			squash_image_dir "$d" || die "Exit ..."
+		fi
+	done
+
+	msg "Making bootable image"
+	# Sanity checks
+	[[ ! -d "${work_dir}/iso" ]] && die "[${work_dir}/iso] doesn't exist. What did you do?!"
+	if [[ -f "${cache_dir_iso}/${iso_file}" ]]; then
+		msg2 "Removing existing bootable image..."
+		rm -rf "${cache_dir_iso}/${iso_file}"
+	fi
+
+	run_xorriso
 
 	chown -R "${OWNER}:users" "${cache_dir_iso}"
 	msg "Done [Build ISO]"
@@ -296,10 +291,22 @@ umount_image_handler(){
 	aufs_remove_image "${work_dir}/boot-image"
 }
 
-# mkiso_error_handler(){
-# 	umount_image_handler
-# 	die "Exiting..."
-# }
+# $1: image path
+clean_up_image(){
+	msg2 "Cleaning up [$1]"
+	[[ -d "$1/boot/" ]] && find "$1/boot" -name 'initramfs*.img' -delete &>/dev/null
+	[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
+	[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
+
+	find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
+	find "$1/var/lib/pacman/sync" -delete &>/dev/null
+	find "$1/var/cache/pacman/pkg" -type f -delete &>/dev/null
+	find "$1/var/log" -type f -delete &>/dev/null
+	find "$1/var/tmp" -mindepth 1 -delete &>/dev/null
+	find "$1/tmp" -mindepth 1 -delete &>/dev/null
+
+# 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+}
 
 # Base installation (root-image)
 make_image_root() {
@@ -308,6 +315,7 @@ make_image_root() {
 		local path="${work_dir}/root-image"
 		mkdir -p ${path}
 		make_chroot "${path}" "${packages}"
+		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_lsb "${path}"
 		copy_overlay_root "${path}"
@@ -325,6 +333,7 @@ make_image_custom() {
 		umount_image_handler
 		aufs_mount_root_image "${path}"
 		make_chroot "${path}" "${packages}"
+		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
@@ -350,6 +359,7 @@ make_image_livecd() {
 			aufs_mount_root_image "${path}"
 		fi
 		make_chroot "${path}" "${packages}"
+		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
 		# copy over setup helpers and config loader
