@@ -17,7 +17,6 @@ BINPROGS = \
 	bin/fstabgen \
 	bin/mkset \
 	bin/chroot-run \
-	bin/mkiso \
 	bin/buildiso \
 	bin/testiso \
 	bin/buildtree
