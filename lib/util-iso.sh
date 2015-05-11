@@ -166,9 +166,9 @@ squash_image_dir() {
 		error "$1 is not a directory"
 		return 1
 	fi
-	local timer=$(get_timer)
-	local sq_img="${work_dir}/iso/${iso_name}/${arch}/$(basename ${1}).sqfs"
-	mkdir -p ${work_dir}/iso/${iso_name}/${arch}
+	local timer=$(get_timer) path=${work_dir}/iso/${iso_name}/${arch}
+	local sq_img="${path}/$(basename ${1}).sqfs"
+	mkdir -p ${path}
 	msg "Generating SquashFS image for '${1}'"
 	if [[ -f "${sq_img}" ]]; then
 		local has_changed_dir=$(find ${1} -newer ${sq_img})
@@ -189,18 +189,20 @@ squash_image_dir() {
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
+make_squash(){
+
+}
+
 # Build ISO
 make_iso() {
 	msg "Start [Build ISO]"
 	touch "${work_dir}/iso/.buildiso"
-# 	mkiso ${iso_args[*]} iso "${work_dir}" "${cache_dir_iso}/${iso_file}" || mkiso_error_handler
-
 	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
-		if [[ "$d" != "${work_dir}/iso" -a \
-			"$(basename "$d")" != "iso" -a \
-			"$(basename "$d")" != "efiboot" -a \
-			"$d" != "${work_dir}" ]]; then
-			squash_image_dir "$d"
+		if [[ "$d" != "${work_dir}/iso" ]] && \
+			[[ "$(basename "$d")" != "iso" ]] && \
+			[[ "$(basename "$d")" != "efiboot" ]] && \
+			[[ "$d" != "${work_dir}" ]]; then
+			squash_image_dir "$d" || die "Exit ..."
 		fi
 	done
 	msg "Making bootable image"
@@ -304,6 +306,7 @@ make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
+		mkdir -p ${path}
 		make_chroot "${path}" "${packages}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_lsb "${path}"
@@ -568,7 +571,7 @@ load_pkgs_lng(){
 }
 
 check_chroot_version(){
-	local chroot_version=$(cat ${work_dir}/root-image/.manjaro-tools)
+	[[ -f ${work_dir}/root-image/.manjaro-tools ]] && local chroot_version=$(cat ${work_dir}/root-image/.manjaro-tools)
 	if [[ ${version} != $chroot_version ]];then
 		clean_first=true
 	fi
