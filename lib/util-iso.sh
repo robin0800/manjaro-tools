@@ -152,11 +152,11 @@ download_to_cache(){
 # $2: packages
 make_chroot(){
 	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
-	setarch "${ARCH}" \
+	setarch "${arch}" \
 		mkchroot -C ${pacman_conf} \
 			-S ${mirrors_conf} \
 			${flag} \
-			"$1" "$2" || die "Failed to retrieve one or more packages!"
+			$@ || die "Failed to retrieve one or more packages!"
 }
 
 
