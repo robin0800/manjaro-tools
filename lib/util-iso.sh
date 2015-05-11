@@ -185,7 +185,7 @@ squash_image_dir() {
 	local highcomp="-b 256K -Xbcj x86"
 	[[ "${iso_compression}" != "xz" ]] && highcomp=""
 	msg2 "Creating SquashFS image. This may take some time..."
-	mksquashfs "${1}" "${sq_img}" -noappend -comp "${iso_compression}" "${highcomp}"
+	mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp}
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
@@ -196,10 +196,10 @@ make_iso() {
 # 	mkiso ${iso_args[*]} iso "${work_dir}" "${cache_dir_iso}/${iso_file}" || mkiso_error_handler
 
 	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
-		if [ "$d" != "${work_dir}/iso" -a \
+		if [[ "$d" != "${work_dir}/iso" -a \
 			"$(basename "$d")" != "iso" -a \
 			"$(basename "$d")" != "efiboot" -a \
-			"$d" != "${work_dir}" ]; then
+			"$d" != "${work_dir}" ]]; then
 			squash_image_dir "$d"
 		fi
 	done
@@ -223,10 +223,10 @@ make_iso() {
 	msg "Creating ISO image..."
 	# test msg2
 	msg2 "iso_label: ${iso_label}"
-	msg2 "iso_label: ${iso_name}"
-	msg2 "iso_label: ${iso_publisher}"
-	msg2 "iso_label: ${iso_app_id}"
-	msg2 "iso_label: ${iso_file}"
+	msg2 "iso_name: ${iso_name}"
+	msg2 "iso_publisher: ${iso_publisher}"
+	msg2 "iso_app_id: ${iso_app_id}"
+	msg2 "iso_file: ${iso_file}"
 	xorriso -as mkisofs \
 			-iso-level 3 -rock -joliet \
 			-max-iso9660-filenames -omit-period \
