@@ -148,11 +148,128 @@ download_to_cache(){
 			--cache $2 -Syw $3 --noconfirm
 }
 
+# $1: image path
+# $2: packages
+make_chroot(){
+	#set locale.gen
+	local flag
+	if [ "$1" == "${work_dir}/root-image" ]; then
+		flag="-L"
+	fi
+
+	setarch "${ARCH}" \
+		mkchroot -C ${pacman_conf} \
+			-S ${mirrors_conf} \
+			${flag} \
+			"$1" $2 || die "Failed to retrieve one or more packages!"
+	fi
+
+	# Cleanup
+	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+}
+
+
+# $1: image path
+squash_image_dir() {
+	if [ ! -d "$1" ]; then
+		error "$1 is not a directory"
+		return 1
+	fi
+
+	local sq_img="${work_dir}/iso/${INSTALL_DIR}/${ARCH}/$(basename ${1}).sqfs"
+	msg "Generating SquashFS image for '${1}'"
+	if [ -e "${sq_img}" ]; then
+		dirhaschanged=$(find ${1} -newer ${sqimg})
+		msg2 "Possible changes for ${1}..." >> /tmp/buildiso.debug
+		msg2 "${dirhaschanged}" >> /tmp/buildiso.debug
+		if [ ! -z "${dirhaschanged}" ]; then
+			msg2 "SquashFS image '${sq_img}' is not up to date, rebuilding..."
+			rm "${sqimg}"
+		else
+			msg2 "SquashFS image '${sq_img}' is up to date, skipping."
+			return
+		fi
+	fi
+
+	msg2 "Creating SquashFS image. This may take some time..."
+	start=$(date +%s)
+
+	mksquashfs "${1}" "${sqimg}" -noappend -comp "${COMPRESSION}" ${HIGHCOMP}
+
+	minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
+	msg "Image creation done in $minutes minutes."
+}
+
 # Build ISO
 make_iso() {
 	msg "Start [Build ISO]"
-	touch "${work_dir}/iso/.miso"
-	mkiso ${iso_args[*]} iso "${work_dir}" "${cache_dir_iso}/${iso_file}" || mkiso_error_handler
+	touch "${work_dir}/iso/.buildiso"
+# 	mkiso ${iso_args[*]} iso "${work_dir}" "${cache_dir_iso}/${iso_file}" || mkiso_error_handler
+
+	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
+		if [ "$d" != "${work_dir}/iso" -a \
+			"$(basename "$d")" != "iso" -a \
+			"$(basename "$d")" != "efiboot" -a \
+			"$d" != "${work_dir}" ]; then
+			squash_image_dir "$d"
+		fi
+	done
+
+	msg "Making bootable image"
+
+	# Sanity checks
+	[[ ! -d "${work_dir}/iso" ]] && die "${work_dir}/iso doesn't exist. What did you do?!"
+
+	if [[ -f "${cache_dir_iso}/${iso_file}" ]]; then
+		msg2 "Removing existing bootable image..."
+		rm -rf "${cache_dir_iso}/${iso_file}"
+	fi
+
+# 	if [[ ! -f ${work_dir}/iso/isolinux/isolinux.cfg ]]; then
+# 		die "${work_dir}/iso/isolinux/isolinux.cfg, doesn't exist."
+# 	fi
+#
+# 	if [ ! -f "${work_dir}/iso/isolinux/isolinux.bin" ]; then
+# 		die "${work_dir}/iso/isolinux/isolinux.bin, doesn't exist."
+# 	fi
+# 	if [ ! -f "${work_dir}/iso/isolinux/isohdpfx.bin" ]; then
+# 		die "${work_dir}/iso/isolinux/isohdpfx.bin, doesn't exist."
+# 	fi
+
+	local efi_boot_args=""
+
+	# If exists, add an EFI "El Torito" boot image (FAT filesystem) to ISO-9660 image.
+	if [[ -f "${work_dir}/iso/EFI/miso/${iso_name}.img" ]]; then
+		msg2 "Setting efi args. El Torito detected."
+		efi_boot_args=("-eltorito-alt-boot" \
+						"-e EFI/miso/${iso_name}.img" \
+						"-isohybrid-gpt-basdat" \
+						"-no-emul-boot")
+	fi
+
+	msg "Creating ISO image..."
+	## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
+	#_qflag=""
+# 	if ${QUIET}; then
+# 		_qflag="-quiet"
+# 	fi
+	xorriso -as mkisofs \
+			-iso-level 3 -rock -joliet \
+			-max-iso9660-filenames -omit-period \
+			-omit-version-number \
+			-relaxed-filenames -allow-lowercase \
+			-volid "${iso_label}" \
+			-appid "${iso_app_id}" \
+			-publisher "${iso_publisher}" \
+			-preparer "Prepared by manjaro-tools/${0##*/}" \
+			-eltorito-boot isolinux/isolinux.bin \
+			-eltorito-catalog isolinux/boot.cat \
+			-no-emul-boot -boot-load-size 4 -boot-info-table \
+			-isohybrid-mbr "${work_dir}/iso/isolinux/isohdpfx.bin" \
+			${efi_boot_args[@]} \
+			-output "${cache_dir_iso}/${iso_file}" \
+			"${work_dir}/iso/"
+
 	chown -R "${OWNER}:users" "${cache_dir_iso}"
 	msg "Done [Build ISO]"
 }
@@ -203,17 +320,17 @@ umount_image_handler(){
 	aufs_remove_image "${work_dir}/boot-image"
 }
 
-mkiso_error_handler(){
-	umount_image_handler
-	die "Exiting..."
-}
+# mkiso_error_handler(){
+# 	umount_image_handler
+# 	die "Exiting..."
+# }
 
 # Base installation (root-image)
 make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
-		mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || mkiso_error_handler
+# 		mkiso ${create_args[*]} -p "${packages}" -i "root-image" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_lsb "${path}"
 		copy_overlay_root "${path}"
@@ -230,7 +347,7 @@ make_image_custom() {
 		mkdir -p ${path}
 		umount_image_handler
 		aufs_mount_root_image "${path}"
-		mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
+# 		mkiso ${create_args[*]} -i "${custom}-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
@@ -255,7 +372,7 @@ make_image_livecd() {
 		else
 			aufs_mount_root_image "${path}"
 		fi
-		mkiso ${create_args[*]} -i "livecd-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
+# 		mkiso ${create_args[*]} -i "livecd-image" -p "${packages}" create "${work_dir}" || mkiso_error_handler
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
 		# copy over setup helpers and config loader
@@ -533,70 +650,6 @@ compress_images(){
 	make_iso
 	make_checksum "${iso_file}"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
-}
-
-# $1: section
-parse_section() {
-	local is_section=0
-	while read line; do
-	[[ $line =~ ^\ {0,}# ]] && continue
-		[[ -z "$line" ]] && continue
-		if [ $is_section == 0 ]; then
-			if [[ $line =~ ^\[.*?\] ]]; then
-				line=${line:1:$((${#line}-2))}
-				section=${line// /}
-				if [[ $section == $1 ]]; then
-					is_section=1
-					continue
-				fi
-				continue
-			fi
-		elif [[ $line =~ ^\[.*?\] && $is_section == 1 ]]; then
-			break
-		else
-			pc_key=${line%%=*}
-			pc_key=${pc_key// /}
-			pc_value=${line##*=}
-			pc_value=${pc_value## }
-			eval "$pc_key='$pc_value'"
-		fi
-	done < "${pacman_conf}"
-}
-
-get_repos() {
-	local section repos=() filter='^\ {0,}#'
-	while read line; do
-		[[ $line =~ "${filter}" ]] && continue
-		[[ -z "$line" ]] && continue
-		if [[ $line =~ ^\[.*?\] ]]; then
-			line=${line:1:$((${#line}-2))}
-			section=${line// /}
-			case ${section} in
-				"options") continue ;;
-				*) repos+=("${section}") ;;
-			esac
-		fi
-	done < "${pacman_conf}"
-	echo ${repos[@]}
-}
-
-clean_pacman_conf(){
-	local repositories=$(get_repos) uri='file://'
-	msg "Cleaning [$1/etc/pacman.conf] ..."
-	for repo in ${repositories[@]}; do
-		case ${repo} in
-			'options'|'core'|'extra'|'community'|'multilib') continue ;;
-			*)
-				msg2 "parsing [${repo}] ..."
-				parse_section ${repo}
-				if [[ ${pc_value} == $uri* ]]; then
-					msg2 "Removing local repo [${repo}] ..."
-					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
-				fi
-			;;
-		esac
-	done
-	msg "Done cleaning [$1/etc/pacman.conf]"
 }
 
 build_images(){

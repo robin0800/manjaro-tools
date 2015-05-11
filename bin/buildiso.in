@@ -27,7 +27,7 @@ show_profile(){
 		msg2 "iso_file: ${iso_file}"
 		#msg2 "pacman_conf: ${pacman_conf}"
 		msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
-		
+
 		msg2 "initsys: ${initsys}"
 		msg2 "displaymanager: ${displaymanager}"
 		msg2 "kernel: ${kernel}"
@@ -190,11 +190,11 @@ cache_dir_iso="${cache_dir}/iso"
 
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
-create_args+=(-v -a ${arch} -D ${iso_name} -M ${mirrors_conf})
+# create_args+=(-v -a ${arch} -D ${iso_name} -M ${mirrors_conf})
 
-iso_args+=(-v -x -a ${arch} -D ${iso_name} -L ${iso_label} -c ${iso_compression})
+# iso_args+=(-v -x -a ${arch} -D ${iso_name} -L ${iso_label} -c ${iso_compression})
 
-${clean_cache_iso} && iso_args+=(-f)
+# ${clean_cache_iso} && iso_args+=(-f)
 
 check_root "$0" "${orig_argv[@]}"
 
