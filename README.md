@@ -220,7 +220,7 @@ If you need a custom livecd-overlay, create overlay-livecd folder in  profile, a
 
 ###2. buildpkg
 
-buildpkg is the chroot build script oi manjaro-tools.
+buildpkg is the chroot build script of manjaro-tools.
 It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
 
 ######manjaro-tools.conf supports the makepkg.conf variables
@@ -287,12 +287,12 @@ $ buildiso -h
 Usage: buildiso [options]
     -p <profile>       Buildset or profile [default: default]
     -a <arch>          Arch [default: x86_64]
-    -b <branch>        Branch [default: stable]
+    -b <branch>        Branch [default: unstable]
     -r <dir>           Chroots directory
-                       [default: /opt/buildiso]
+                       [default: /build/buildiso]
     -c                 Disable clean work dir
-    -x                 Disable clean xorg cache
-    -l                 Disable clean lng cache
+    -x                 Clean xorg cache
+    -l                 Clean lng cache
     -i                 Build images only
     -s                 Generate iso only
                        Requires pre built images (-i)
@@ -319,13 +319,14 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 ####Special parameters
 
 ######* -i
-Build images only will stop after all packages have been installed. No iso sqfs compression will be executed
+Build images only
+will stop after all packages have been installed. No iso sqfs compression will be executed
 ######* -s
 Use this to sqfs compress the chroots if you previously used -i.
 ######* -x
-By default, xorg package cache is cleaned on every build. Disabling the xorg cache cleaning will result in no dowload again for xorg drivers and the cache is used.
+By default, xorg package cache is not cleaned on every build. Enabling the xorg cache cleaning will result in  dowloading the xorg drivers.
 ######* -l
-Disable lng cache, by default lng cache is cleaned on every build. Using this option will enable lng packages from cache rather than downloading them again.
+By default, lng package cache is not cleaned on every build. Enabling the lng cache cleaning will result in  dowloading the lng packages.
 
 ###4. mkset
 
@@ -338,7 +339,7 @@ Default location of sets is:
 /etc/manjaro-tools/manjaro-tools/sets/iso
 ~~~
 
-but it can be configured in the manjaro-tools.conf file.
+but it can be configured in the manjaro-tools.conf.
 
 mkset is a little helper tool to easily create buildsets.
 It is run inside the abs/pkgbuilds or iso profiles directory.
@@ -382,7 +383,7 @@ If you create a buildset manually, the buildset must have a .set extension.
 
 ###5. buildtree
 
-buildtree is a little tools to sync arch abs and manjaro packages git repos.
+buildtree is a little tools to sync arch abs and manjaro PKGBUILD git repos.
 
 ####Arguments
 
