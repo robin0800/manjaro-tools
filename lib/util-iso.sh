@@ -159,7 +159,6 @@ make_chroot(){
 			$@ || die "Failed to retrieve one or more packages!"
 }
 
-
 # $1: image path
 squash_image_dir() {
 	if [[ ! -d "$1" ]]; then
@@ -348,7 +347,7 @@ make_image_custom() {
 
 make_image_livecd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [livecd-image]"
+		msg "Prepare [livecd installation] (livecd-image)"
 		local path="${work_dir}/livecd-image"
 		mkdir -p ${path}
 		umount_image_handler
