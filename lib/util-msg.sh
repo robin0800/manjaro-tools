@@ -114,17 +114,3 @@ slock() {
 		stat_done
 	fi
 }
-
-# trap_abort() {
-# 	trap - EXIT INT QUIT TERM HUP
-# 	abort
-# }
-#
-# trap_exit() {
-# 	local r=$?
-# 	trap - EXIT INT QUIT TERM HUP
-# 	cleanup $r
-# }
-#
-# trap 'trap_abort' INT QUIT TERM HUP
-# trap 'trap_exit' EXIT
