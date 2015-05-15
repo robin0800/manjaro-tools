@@ -455,7 +455,7 @@ make_image_boot() {
 		else
 			aufs_mount_root_image "${path}"
 		fi
-		copy_initcpio "${path}"
+		copy_initcpio "${path}" || die "Failed to copy initcpio."
 		gen_boot_image "${path}"
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		if [[ -f ${path}/boot/intel-ucode.img ]]; then
