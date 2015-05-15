@@ -92,7 +92,7 @@ mkdir -m 0555 -p "$newroot"/{sys,proc}
 # mount API filesystems
 chroot_api_mount "$newroot" || die "failed to setup API filesystems in new root"
 
-msg 'Installing packages to %s' "$newroot"
+msg2 'Installing packages to %s' "$newroot"
 if ! pacman -r "$newroot" -Sy "${pacman_args[@]}"; then
   die 'Failed to install packages to new root'
 fi
