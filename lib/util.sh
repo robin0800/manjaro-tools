@@ -425,6 +425,36 @@ load_user_info(){
 	USER_CONFIG="$USER_HOME/.config"
 }
 
+check_profile(){
+	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
+	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
+	local has_keyfiles=false has_keydirs=false
+	msg "Checking profile [$1]"
+	for f in ${keyfiles[@]}; do
+		if [[ -f $1/$f ]];then
+			has_keyfiles=true
+		else
+			has_keyfiles=false
+			break
+		fi
+	done
+	for d in ${keydirs[@]}; do
+		if [[ -d $1/$d ]];then
+			has_keydirs=true
+		else
+			has_keydirs=false
+			break
+		fi
+	done
+	msg2 "has_keyfiles: ${has_keyfiles}"
+	msg2 "has_keydirs: ${has_keydirs}"
+	if ${has_keyfiles} && ${has_keydirs};then
+		msg "Profile sanity check passed."
+	else
+		eval $2
+	fi
+}
+
 # $1: file
 # $2: exit code
 check_sanity(){
