@@ -224,13 +224,13 @@ It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
 ~~~
 $ buildpkg -h
 Usage: buildpkg [options] [--] [makepkg args]
-    -p <pkg>           Set or pkg [default: default]
+    -p <pkg>           Buildset or pkg [default: default]
     -a <arch>          Arch [default: x86_64]
-    -b <branch>        Branch [default: stable]
+    -b <branch>        Branch [default: unstable]
     -r <dir>           Chroots directory
-                       [default: /opt/buildpkg]
+                       [default: /opt/build/manjaro-tools/buildpkg]
     -c                 Recreate chroot
-    -w                 Clean up
+    -w                 Clean up cache and sources
     -n                 Install and run namcap check
     -s                 Sign packages
     -q                 Query settings and pretend build
@@ -283,7 +283,7 @@ Usage: buildiso [options]
     -a <arch>          Arch [default: x86_64]
     -b <branch>        Branch [default: unstable]
     -r <dir>           Chroots directory
-                       [default: /build/buildiso]
+                       [default: /opt/build/manjaro-tools/buildiso]
     -c                 Disable clean work dir
     -x                 Clean xorg cache
     -l                 Clean lng cache
@@ -322,7 +322,7 @@ By default, xorg package cache is not cleaned on every build. Enabling the xorg 
 ######* -l
 By default, lng package cache is not cleaned on every build. Enabling the lng cache cleaning will result in  dowloading the lng packages.
 
-###4. mkset
+###4. buildset
 
 buildpkg and buildiso support building from buildsets
 
@@ -335,14 +335,14 @@ Default location of sets is:
 
 but it can be configured in the manjaro-tools.conf.
 
-mkset is a little helper tool to easily create buildsets.
+buildset is a little helper tool to easily create buildsets.
 It is run inside the abs/pkgbuilds or iso profiles directory.
 
 ####Arguments
 
 ~~~
-$ mkset -h
-Usage: mkset [options]
+$ buildset -h
+Usage: buildset [options]
     -c <name>   Create set
     -r <name>   Remove set
     -s <name>   Show set
@@ -354,13 +354,13 @@ Usage: mkset [options]
 ######* create a pkg buildset for lxqt
 
 ~~~
-mkset -c lxqt-0.8
+buildset -c lxqt-0.8
 ~~~
 
 ######* create a iso buildset
 
 ~~~
-mkset -ic manjaro-0.9.0
+buildset -ic manjaro-0.9.0
 ~~~
 
 The buildset name should not be a name of a package or profile!
