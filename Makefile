@@ -15,7 +15,7 @@ BINPROGS = \
 	bin/basestrap \
 	bin/manjaro-chroot \
 	bin/fstabgen \
-	bin/mkset \
+	bin/buildset \
 	bin/chroot-run \
 	bin/buildiso \
 	bin/testiso \
