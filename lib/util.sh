@@ -275,6 +275,10 @@ load_config(){
 	# buildpkg
 	###################
 
+	chroots_pkg="${chroots_dir}/buildpkg"
+
+	sets_dir_pkg="${sets_dir}/pkg"
+
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
 
 	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
@@ -286,6 +290,10 @@ load_config(){
 	###################
 	# buildiso
 	###################
+
+	chroots_iso="${chroots_dir}/buildiso"
+
+	sets_dir_iso="${sets_dir}/iso"
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
 
