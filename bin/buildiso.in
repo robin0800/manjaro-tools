@@ -180,6 +180,9 @@ if [[ "$arch" == 'x86_64' ]]; then
 	pacman_conf_arch='multilib'
 fi
 
+chroots_iso="${chroots_dir}/buildiso"
+sets_dir_iso="${sets_dir}/iso"
+
 cache_dir_lng="${cache_dir}/lng/${arch}"
 cache_dir_xorg="${cache_dir}/xorg/${arch}"
 cache_dir_iso="${cache_dir}/iso"

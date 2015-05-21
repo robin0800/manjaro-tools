@@ -149,6 +149,9 @@ while getopts "${opts}" arg; do
 	esac
 done
 
+chroots_pkg="${chroots_dir}/buildpkg"
+sets_dir_pkg="${sets_dir}/pkg"
+
 if [[ "${arch}" == 'multilib' ]]; then
 	pacman_conf_arch='multilib'
 	base_packages+=('multilib-devel')
