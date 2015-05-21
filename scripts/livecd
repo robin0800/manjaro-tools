@@ -13,8 +13,10 @@ arch=$(uname -m)
 
 echo "update fstab for swap" > /tmp/livecd.log
 
-## Systemd should do it
 # scan_swap
+## Systemd should do it
+# should or should not?
+# [[ -d /run/openrc ]] && configure_swap
 configure_swap
 
 echo "set locale" >> /tmp/livecd.log
