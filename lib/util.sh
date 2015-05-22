@@ -425,6 +425,8 @@ load_user_info(){
 	USER_CONFIG="$USER_HOME/.config"
 }
 
+# $1: path
+# $2: exit code
 check_profile(){
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
