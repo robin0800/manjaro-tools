@@ -440,7 +440,7 @@ umount_image_handler(){
 
 # $1: image path
 clean_up_image(){
-	msg2 "Cleaning up [$1]"
+	msg2 "Cleaning up [${1##*/}]"
 	[[ -d "$1/boot/" ]] && find "$1/boot" -name 'initramfs*.img' -delete &> /dev/null
 	[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
 	[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
