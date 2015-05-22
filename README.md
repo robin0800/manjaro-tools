@@ -279,7 +279,7 @@ buildiso is used to build manjaro-iso-profiles. It is run insde the profiles fol
 ~~~
 $ buildiso -h
 Usage: buildiso [options]
-    -p <profile>       Buildset or profile [default: default]
+    -p <profile>       Buildset or profile [default: lxqt-openrc]
     -a <arch>          Arch [default: x86_64]
     -b <branch>        Branch [default: unstable]
     -r <dir>           Chroots directory
@@ -290,6 +290,7 @@ Usage: buildiso [options]
     -i                 Build images only
     -s                 Generate iso only
                        Requires pre built images (-i)
+    -v                 Verbose output, show profies detail (-q)
     -q                 Query settings and pretend build
     -h                 This help
 ~~~
