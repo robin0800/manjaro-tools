@@ -56,11 +56,11 @@ show_build_queue(){
 	if ${is_buildset};then
 		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
 		for item in ${list[@]}; do
-			check_sanity "$item/profile.conf" "break"
+			check_profile "$item" "break"
 			show_profile "$item"
 		done
 	else
-		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profile!"'
+		check_profile "${buildset_iso}" 'die "Profile sanity check failed."'
 		show_profile "${buildset_iso}"
 	fi
 }
@@ -129,9 +129,7 @@ clean_cache_lng=false
 pretend=false
 images_only=false
 iso_only=false
-verbose=true
-
-verbose_args=''
+verbose=false
 
 pacman_conf_arch='default'
 
@@ -148,7 +146,7 @@ usage() {
 	echo '    -i                 Build images only'
 	echo '    -s                 Generate iso only'
 	echo '                       Requires pre built images (-i)'
-	echo '    -v                 Disable verbose output'
+	echo '    -v                 Verbose output, show profies detail (-q)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
 	echo ''
@@ -172,7 +170,7 @@ while getopts "${opts}" arg; do
 		l) clean_cache_lng=true ;;
 		i) images_only=true ;;
 		s) iso_only=true ;;
-		v) verbose=false; verbose_args='&> /dev/null' ;;
+		v) verbose=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
