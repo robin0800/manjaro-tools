@@ -464,3 +464,16 @@ check_sanity(){
 		eval "$2"
 	fi
 }
+
+show_version(){
+	msg "manjaro-tools"
+	msg2 "version: ${version}"
+}
+
+show_config(){
+	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
+		msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
+	else
+		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
+	fi
+}
