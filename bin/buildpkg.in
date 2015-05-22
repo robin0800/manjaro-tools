@@ -48,14 +48,8 @@ show_build_queue(){
 }
 
 display_settings(){
-	msg "manjaro-tools"
-	msg2 "version: ${version}"
-
-	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
-		msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
-	else
-		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
-	fi
+	show_version
+	show_config
 
 	msg "PROFILE:"
 	msg2 "buildsets: $(load_sets ${sets_dir_pkg})"
