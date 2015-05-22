@@ -73,7 +73,7 @@ done
 
 shift $(($OPTIND - 1))
 
-tree_dir=${cache_dir}/pkgtree
+tree_dir=${cache_dir}/buildtree
 tree_dir_abs=${tree_dir}/packages-archlinux
 
 check_root "$0" "${orig_argv[@]}"
