@@ -92,7 +92,7 @@ prepare_cachedirs(){
 
 clean_cache(){
     msg2 "Cleaning [$1] ..."
-    find "$1" -name '*.pkg.tar.xz' -delete ${verbose_args}
+    find "$1" -name '*.pkg.tar.xz' -delete &> /dev/null
 }
 
 # $1: image path
@@ -162,7 +162,7 @@ make_iso() {
 			[[ "$(basename "$d")" != "iso" ]] && \
 			[[ "$(basename "$d")" != "efiboot" ]] && \
 			[[ "$d" != "${work_dir}" ]]; then
-			squash_image_dir "$d" ${verbose_args} || die "Exit ..."
+			squash_image_dir "$d" || die "Exit ..."
 		fi
 	done
 
@@ -223,7 +223,7 @@ make_image_custom() {
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete ${verbose_args}
+		find ${path} -name '.wh.*' -delete &> /dev/null
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${custom} installation] (${custom}-image)"
 	fi
@@ -253,7 +253,7 @@ make_image_livecd() {
 		# Clean up GnuPG keys?
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete ${verbose_args}
+		find ${path} -name '.wh.*' -delete &> /dev/null
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [livecd-image]"
 	fi
@@ -283,7 +283,7 @@ make_image_xorg() {
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 		configure_xorg_drivers "${path}"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete ${verbose_args}
+		find ${path} -name '.wh.*' -delete &> /dev/null
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [pkgs-image]"
 	fi
@@ -317,7 +317,7 @@ make_image_lng() {
 		rm -r ${path}/var
 		make_repo ${path}/opt/livecd/lng/lng-pkgs ${path}/opt/livecd/lng
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete ${verbose_args}
+		find ${path} -name '.wh.*' -delete &> /dev/null
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [lng-image]"
 	fi
