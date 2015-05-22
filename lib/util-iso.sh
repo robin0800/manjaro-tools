@@ -498,7 +498,10 @@ load_profile(){
 	for f in ${files[@]};do
 		case $f in
 			Packages|Packages-Livecd|Packages-Xorg|Packages-Lng) continue ;;
-			*) packages_custom="$f"; msg2 "Packages-Custom: $f" ;;
+			*)
+				packages_custom="$f"
+				#msg2 "Packages-Custom: $f"
+			;;
 		esac
 	done
 	custom=${packages_custom#*-}
