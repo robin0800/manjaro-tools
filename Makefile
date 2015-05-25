@@ -100,7 +100,7 @@ edit = sed -e "s|@pkgdatadir[@]|$(DESTDIR)$(PREFIX)/share/manjaro-tools|g" \
 
 doc:
 	mkdir -p man
-	$(foreach var,$(MAN_XML),xsltproc /usr/share/docbook2X/xslt/man/docbook.xsl docbook/$(var) | db2x_manxml --output-dir man ;)
+	$(foreach var,$(MAN_XML),xsltproc /usr/share/docbook2X/xslt/man/docbook.xsl docbook/$(var) | db2x_manxml ---output-dir man ;)
 
 clean:
 	rm -f $(BINPROGS) #bin/bash_completion bin/zsh_completion
