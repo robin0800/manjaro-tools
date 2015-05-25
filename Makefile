@@ -79,12 +79,9 @@ EFISHELL = \
 	efi_shell/shellx64_v2.efi
 
 MAN_XML = \
-	profile.conf.xml \
-	buildiso.xml
-
-MAN = \
-	profile.conf.1 \
-	buildiso.1
+	buildiso.xml \
+	manjaro-tools.conf.xml \
+	profile.conf.xml
 
 all: $(BINPROGS) doc #bin/bash_completion bin/zsh_completion
 
@@ -103,7 +100,7 @@ edit = sed -e "s|@pkgdatadir[@]|$(DESTDIR)$(PREFIX)/share/manjaro-tools|g" \
 
 doc:
 	mkdir -p man
-	$(foreach var,$(MAN_XML),xsltproc /usr/share/docbook2X/xslt/man/docbook.xsl docbook/$(var) | db2x_manxml --output-dir man ;)
+	$(foreach var,$(MAN_XML),xsltproc /usr/share/docbook2X/xslt/man/docbook.xsl docbook/$(var) | db2x_manxml ---output-dir man ;)
 
 clean:
 	rm -f $(BINPROGS) #bin/bash_completion bin/zsh_completion
@@ -131,7 +128,11 @@ install:
 	install -m0644 ${SCRIPTS} $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell
 	install -m0644 ${EFISHELL} $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell
-	for f in ${MAN}; do gzip -c man/$$f > $(DESTDIR)$(PREFIX)/share/man/man1/$$f.gz; done
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
+	gzip -c man/buildiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man5
+	gzip -c man/manjaro-tools.conf.5 > $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
+	gzip -c man/profile.conf.5 > $(DESTDIR)$(PREFIX)/share/man/man5/profile.conf.5.gz
 
 # 	install -Dm0644 bin/bash_completion $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 # 	install -Dm0644 bin/zsh_completion $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
@@ -148,7 +149,9 @@ uninstall:
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
 	for f in ${SCRIPTS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts/$$f; done
 	for f in ${EFISHELL}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell/$$f; done
-	for f in ${MAN}; do rm -f $(DESTDIR)$(PREFIX)/share/man/man1/$$f.gz; done
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/manjaro-tools.conf.5.gz
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/profiles.conf.5.gz
 
 # 	rm $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 # 	rm $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
