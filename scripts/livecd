@@ -11,7 +11,7 @@ CONSOLEMAP="$(kernel_cmdline vconsole.font.map)"
 PACMAN_LNG="pacman --config /opt/livecd/pacman-lng.conf --noconfirm --noprogressbar"
 arch=$(uname -m)
 
-echo "update fstab for swap" > /tmp/livecd.log
+echo "update fstab for swap" > /var/log/livecd.log
 
 # scan_swap
 ## Systemd should do it
@@ -19,25 +19,25 @@ echo "update fstab for swap" > /tmp/livecd.log
 # [[ -d /run/openrc ]] && configure_swap
 configure_swap
 
-echo "set locale" >> /tmp/livecd.log
+echo "set locale" >> /var/log/livecd.log
 
 # set language
 configure_language
 locale-gen
 
-echo "configure system" >> /tmp/livecd.log
+echo "configure system" >> /var/log/livecd.log
 
 # add BROWSER var
 configure_env
 
 configure_machine_id
 
-echo "configure sudoers" >> /tmp/livecd.log
+echo "configure sudoers" >> /var/log/livecd.log
 
 # do_fix_perms
 configure_sudo
 
-echo "depmod extramodules" >> /tmp/livecd.log
+echo "depmod extramodules" >> /var/log/livecd.log
 
 # depmod extramodules
 depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
@@ -46,7 +46,7 @@ install_localization
 
 configure_displaymanager
 
-echo "configure root password" >> /tmp/livecd.log
+echo "configure root password" >> /var/log/livecd.log
 
 configure_user_root /
 cp -a /etc/skel/. /root/
