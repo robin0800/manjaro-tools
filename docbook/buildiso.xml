@@ -1,0 +1,172 @@
+<?xml version='1.0'?> <!--*-nxml-*-->
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<!--
+  This file is part of manjaro-tools.
+
+  Copyright 2015 Manjaro Developers
+
+  manjaro-tools is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
+  the Free Software Foundation; either version 2.1 of the License, or
+  (at your option) any later version.
+
+  manjaro-tools is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<refentry id="buildiso" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <refentryinfo>
+    <title>buildiso-+</title>
+    <productname>manjaro-tools</productname>
+
+    <authorgroup>
+      <author>
+        <contrib></contrib>
+        <firstname></firstname>
+        <surname></surname>
+        <email></email>
+      </author>
+    </authorgroup>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>buildiso</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>buildiso</refname>
+    <refpurpose>buildiso is used to build a particular ISO or a set of ISOs. </refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>buildiso</command>
+      <arg choice="opt" rep="repeat">OPTIONS</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para><command>buildiso</command> is used to build a particular ISO or a set of ISOs. </para>
+
+    <para>With buildiso you can build ISOs suitable to be booted from a removable media
+    like a DVD o a USB Stick, it will automatically create the necessary files to 
+    install this ISO using calamares or the cli installer.</para>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <para>The following options are understood:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><option>-p PROFILE...</option></term>
+
+        <listitem><para>Name of the buildset or name of the directory 
+        you will build. It needs to cantains a existing buildset or a 
+        folder with a valid profile.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-a i686|x86_64</option></term>
+
+        <listitem><para>Architecture that the iso will be built. Can be i686 or x86_64.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>-b stable|testing|unstable</option></term>
+
+        <listitem><para>Branch where the mirrors in the iso will point.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>-r DIR</option></term>
+
+        <listitem><para>Root working directory where the iso will be built.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>-w</option></term>
+
+        <listitem><para>Disable clean iso cache step.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>-c</option></term>
+
+        <listitem><para>Disable clean working directory step.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>-x</option></term>
+
+        <listitem><para>Disable cleaning the xorg packages cache. Xorg packages 
+        are the packages listed in Packages-Xorg file within each profile and are
+        used for the 
+        <citerefentry project='mhwd'><refentrytitle>mhwd</refentrytitle><manvolnum>1</manvolnum></citerefentry> tool.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>-l</option></term>
+
+        <listitem><para>Disable cleaning the language packages cache. Language
+        packages cache are listed in Packages-Lng and are used to bundle multiple
+        language packages with the iso.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>-i</option></term>
+
+        <listitem><para>Only build images, without creating an ISO file.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><option>-s</option></term>
+
+        <listitem><para>Generate iso from already created images, for example created with the -i option.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-q</option></term>
+
+        <listitem><para>Query settings and pretend build.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-h</option></term>
+
+        <listitem><para>Help.</para></listitem>
+      </varlistentry>   
+    </variablelist>
+
+  </refsect1>
+  <!--<refsect1>
+    <title>Exit status</title>
+
+    <para>On success, 0 is returned, a non-zero failure code
+    otherwise.</para>
+  </refsect1>
+  -->
+
+  <refsect1>
+    <title>See Also</title>
+    <para>
+      <citerefentry project='manjaro-tools'><refentrytitle>manjaro-tools.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+      <citerefentry project='manjaro-tools'><refentrytitle>profiles.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+    </para>
+  </refsect1>
+
+</refentry>
+ 

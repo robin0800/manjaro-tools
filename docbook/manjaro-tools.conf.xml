@@ -1,0 +1,307 @@
+<?xml version='1.0'?> <!--*-nxml-*-->
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<!--
+  This file is part of manjaro-tools.
+
+  Copyright 2015 Manjaro Developers
+
+  manjaro-tools is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
+  the Free Software Foundation; either version 2.1 of the License, or
+  (at your option) any later version.
+
+  manjaro-tools is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<refentry id="profile.conf" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <refentryinfo>
+    <title>profile.conf-+</title>
+    <productname>manjaro-tools</productname>
+
+    <authorgroup>
+      <author>
+        <contrib></contrib>
+        <firstname></firstname>
+        <surname></surname>
+        <email></email>
+      </author>
+    </authorgroup>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>manjaro-tools.conf</refentrytitle>
+    <manvolnum>5</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>manjaro-tools.conf</refname>
+    <refpurpose>general configuration file for manjaro-tools</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+      <para><filename>manjaro-tools.conf</filename></para>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>manjaro-tools.conf is a general configuration file for all manjaro-tools binaries. </para>
+
+    <para>By default all the options in the file are commented, with a value equal to the
+    default value. To change it just uncomment and put the desired value.</para>
+
+  </refsect1>
+
+  <refsect1>
+    <title>General options for all tools</title>
+
+    <para>The following options are understood and used for various tools:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><varname>branch=</varname></term>
+
+        <listitem><para>Takes <option>stable</option> (the default),
+        <option>testing</option> or <option>unstable</option>. It defines
+        against which repository will be used when compilling packages
+        with buildpkg.
+        </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><varname>arch=</varname></term>
+
+        <listitem><para>Takes <option>i686</option> or <option>x86_64</option>.
+        By default it will try to autodetect the current architecture.
+        It defines in witch architecture the packages will be built with
+        buildpkg.
+        </para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><varname>cache_dir=</varname></term>
+
+        <listitem><para>Cache dir where buildpkg and buildise will cache
+        packages. Default is "/var/cache/manjaro-tools".
+        </para></listitem>
+      </varlistentry>
+      
+
+      <varlistentry>
+        <term><varname>chroots_dir=</varname></term>
+
+        <listitem><para>Build dir where buildpkg or buildiso chroot
+        environment will be created. Default is "/var/lib/manjaro-tools".
+        </para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><varname>sets_dir=</varname></term>
+
+        <listitem><para>Directory where buildpkg and buildiso will 
+        search for sets. Default is "/etc/manjaro-tools/sets".
+        </para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  
+  <refsect1>
+    <title>Options for buildtree</title>
+
+    <para>The following options are understood:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><varname>repo_tree=</varname></term>
+
+        <listitem><para>Manjaro package tree. Default is 
+        "('core' 'extra' 'community' 'multilib' 'openrc')".
+        </para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><varname>host_tree=</varname></term>
+
+        <listitem><para>Host tree. Default is "https://github.com/manjaro".
+        </para></listitem>
+      </varlistentry>
+      
+
+      <varlistentry>
+        <term><varname>host_tree_abs=</varname></term>
+
+        <listitem><para>Host tree for abs. Default is 
+        "https://projects.archlinux.org/git/svntogit".
+        </para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  
+  <refsect1>
+    <title>Options for buildpkg</title>
+
+    <para>The following options are understood:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><varname>buildset_pkg=</varname></term>
+
+        <listitem><para>Default set for buildpkg without the .set
+        extension.
+        </para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><varname>build_mirror=</varname></term>
+
+        <listitem><para>Default mirror to be used when building 
+        packages.
+        </para></listitem>
+      </varlistentry>
+      
+
+      <varlistentry>
+        <term><varname>blacklist_trigger=</varname></term>
+
+        <listitem><para>Only useful when compiling packages against
+        eudev. List of packages that will trigger a package blacklist
+        defined with "blacklist=" when creating a chroot. By default 
+        they are "('eudev' 'upower-pm-utils' 'eudev-systemdcompat')"
+        </para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><varname>blacklist=</varname></term>
+
+        <listitem><para>List of packages that will be blacklisted when
+        creating a chroot. This list is only triggered when compiling
+        a packages in the "blacklist_trigger=" option. By default
+        "('libsystemd')" is blacklisted.
+        </para></listitem>
+      </varlistentry>  
+    </variablelist>
+  </refsect1>
+  
+  <refsect1>
+    <title>Options for buildiso</title>
+
+    <para>The following options are understood:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><varname>buildset_iso=</varname></term>
+
+        <listitem><para>Default set for buildiso without the .set
+        extension.
+        </para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <!-- TODO: We should tell where exactly this is used -->
+        <term><varname>dist_name=</varname></term>
+
+        <listitem><para>Name of the distribution.
+        </para></listitem>
+      </varlistentry>
+      
+
+      <varlistentry>
+        <!-- TODO: We should tell where exactly this is used -->
+        <term><varname>dist_release=</varname></term>
+
+        <listitem><para>Release of the distribution.
+        </para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><varname>dist_codename=</varname></term>
+
+        <listitem><para>Codename of this release. It's the value
+        of DISTRIB_CODENAME in /etc/lsb-release.
+        </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <!-- TODO: We should tell where exactly this is used -->
+        <term><varname>dist_branding=</varname></term>
+
+        <listitem><para>Branding of the distribution.
+        </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <!-- TODO: We should tell where exactly this is used -->
+        <term><varname>dist_version=</varname></term>
+
+        <listitem><para>Version of the distributions. It defaults to
+        the current date "date +%Y.%m". Example: 15.04
+        </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <!-- TODO: We should tell where exactly this is used -->
+        <term><varname>iso_name=</varname></term>
+
+        <listitem><para>Name of the iso.
+        </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <!-- TODO: We should tell where exactly this is used -->
+        <term><varname>iso_publisher=</varname></term>
+
+        <listitem><para>Publisher of the iso.
+        </para></listitem>
+      </varlistentry> 
+
+      <varlistentry>
+        <!-- TODO: We should tell where exactly this is used -->
+        <term><varname>iso_app_id=</varname></term>
+
+        <listitem><para>Application ID of the iso.
+        </para></listitem>
+      </varlistentry> 
+
+      <varlistentry>
+        <!-- TODO: Need list of other available compressions -->
+        <term><varname>iso_compression=</varname></term>
+
+        <listitem><para>Defaults compression that will be used
+        when creating the various images. Defaults to xz.
+        </para></listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term><varname>iso_checksum=</varname></term>
+
+        <listitem><para>Checksum that will be created against the
+        final .iso file. Can be <option>md5</option> (the default),
+        <option>sha1</option>, <option>sha256</option>,
+        <option>sha384</option> or <option>sha512</option>.
+        </para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1> 
+  
+
+  <refsect1>
+    <title>See Also</title>
+    <para>
+      <citerefentry project='manjaro-tools'><refentrytitle>profiles.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+      <citerefentry project='manjaro-tools'><refentrytitle>buildiso</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+      <citerefentry project='manjaro-tools'><refentrytitle>buildpkg</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+    </para>
+  </refsect1>
+
+</refentry>
+ 
+ 

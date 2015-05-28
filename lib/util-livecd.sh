@@ -273,7 +273,7 @@ configure_translation_pkgs(){
 
 install_localization(){
 	if [ -e "/bootmnt/${iso_name}/${arch}/lng-image.sqfs" ] ; then
-		echo "install translation packages" >> /tmp/livecd.log
+		echo "install translation packages" >> /var/log/livecd.log
 		configure_translation_pkgs $1
 		${PACMAN_LNG} -Sy
 		if [ -e "/bootmnt/${iso_name}/${arch}/kde-image.sqfs" ] ; then
@@ -295,7 +295,7 @@ install_localization(){
 }
 
 configure_alsa(){
-	echo "configure alsa" >> /tmp/livecd.log
+	echo "configure alsa" >> /var/log/livecd.log
 	# amixer binary
 	local alsa_amixer="chroot $1 /usr/bin/amixer"
 
@@ -372,7 +372,7 @@ rm_kalu(){
 
 configure_machine_id(){
 	# set unique machine-id
-	echo "Setting machine-id ..." >> /tmp/livecd.log
+	echo "Setting machine-id ..." >> /var/log/livecd.log
 	dbus-uuidgen --ensure=/etc/machine-id
 	ln -sf /etc/machine-id /var/lib/dbus/machine-id
 }

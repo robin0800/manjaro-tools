@@ -19,14 +19,8 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-pkgtree.sh ]] && source ${LIBDIR}/util-pkgtree.sh
 
 display_settings(){
-	msg "manjaro-tools"
-	msg2 "version: ${version}"
-
-	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
-	msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
-	else
-	msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
-	fi
+	show_version
+	show_config
 
 	msg "ARGS:"
 	msg2 "sync: ${sync}"
@@ -79,7 +73,7 @@ done
 
 shift $(($OPTIND - 1))
 
-tree_dir=${cache_dir}/pkgtree
+tree_dir=${cache_dir}/buildtree
 tree_dir_abs=${tree_dir}/packages-archlinux
 
 check_root "$0" "${orig_argv[@]}"

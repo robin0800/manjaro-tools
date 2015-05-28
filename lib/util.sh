@@ -251,77 +251,51 @@ load_config(){
 	# common
 	######################
 
-	if [[ -z ${branch} ]];then
-		branch='stable'
-	fi
+	[[ -z ${branch} ]] && branch='stable'
 
-	if [[ -z ${arch} ]]; then
-		arch=$(uname -m)
-	fi
+	[[ -z ${arch} ]] && arch=$(uname -m)
 
-	if [[ -z ${cache_dir} ]];then
-		cache_dir='/var/cache/manjaro-tools'
-	fi
+	[[ -z ${cache_dir} ]] && cache_dir='/var/cache/manjaro-tools'
+
+	[[ -z ${chroots_dir} ]] && chroots_dir='/var/lib/manjaro-tools'
+
+	[[ -z ${sets_dir} ]] && sets_dir="${SYSCONFDIR}/sets"
 
 	###################
 	# buildtree
 	###################
 
-	if [[ -z ${repo_tree} ]];then
-		repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
-	fi
+	[[ -z ${repo_tree[@]} ]] && repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
 
-	if [[ -z ${host_tree} ]];then
-		host_tree='https://github.com/manjaro'
-	fi
+	[[ -z ${host_tree} ]] && host_tree='https://github.com/manjaro'
 
-	if [[ -z ${host_tree_abs} ]];then
-		host_tree_abs='https://projects.archlinux.org/git/svntogit'
-	fi
+	[[ -z ${host_tree_abs} ]] && host_tree_abs='https://projects.archlinux.org/git/svntogit'
 
 	###################
 	# buildpkg
 	###################
 
-	if [[ -z ${chroots_pkg} ]];then
-		chroots_pkg='/opt/buildpkg'
-	fi
+	chroots_pkg="${chroots_dir}/buildpkg"
 
-	if [[ -z ${sets_dir_pkg} ]];then
-		sets_dir_pkg="${SYSCONFDIR}/sets/pkg"
-	fi
+	sets_dir_pkg="${sets_dir}/pkg"
 
-	if [[ -z ${buildset_pkg} ]];then
-		buildset_pkg='default'
-	fi
+	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
 
-	if [[ -z ${build_mirror} ]];then
-		build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
-	fi
+	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
 
-	if [[ -z ${blacklist_trigger[@]} ]];then
-		blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
-	fi
+	[[ -z ${blacklist_trigger[@]} ]] && blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
 
-	if [[ -z ${blacklist[@]} ]];then
-		blacklist=('libsystemd')
-	fi
+	[[ -z ${blacklist[@]} ]] && blacklist=('libsystemd')
 
 	###################
 	# buildiso
 	###################
 
-	if [[ -z ${chroots_iso} ]];then
-		chroots_iso='/opt/buildiso'
-	fi
+	chroots_iso="${chroots_dir}/buildiso"
 
-	if [[ -z ${sets_dir_iso} ]];then
-		sets_dir_iso="${SYSCONFDIR}/sets/iso"
-	fi
+	sets_dir_iso="${sets_dir}/iso"
 
-	if [[ -z ${buildset_iso} ]];then
-		buildset_iso='default'
-	fi
+	[[ -z ${buildset_iso} ]] && buildset_iso='default'
 
 	##### iso settings #####
 
@@ -335,21 +309,13 @@ load_config(){
 		dist_codename="${DISTRIB_CODENAME}"
 	fi
 
-	if [[ -z ${dist_branding} ]];then
-		dist_branding="MJRO"
-	fi
+	[[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
-	if [[ -z ${dist_version} ]];then
-		dist_version=$(date +%Y.%m)
-	fi
+	[[ -z ${dist_version} ]] && dist_version=$(date +%Y.%m)
 
-	if [[ -z ${dist_name} ]];then
-		dist_name="Manjaro"
-	fi
+	[[ -z ${dist_name} ]] && dist_name="Manjaro"
 
-	if [[ -z ${iso_name} ]];then
-		iso_name="manjaro"
-	fi
+	[[ -z ${iso_name} ]] && iso_name="manjaro"
 
 	iso_label="${dist_branding}${dist_release//.}"
 	iso_label="${iso_label//_}"	# relace all _
@@ -357,21 +323,13 @@ load_config(){
 	iso_label="${iso_label^^}"	# all uppercase
 	iso_label="${iso_label::8}"	# limit to 8 characters
 
-	if [[ -z ${iso_publisher} ]];then
-		iso_publisher='Manjaro Linux <http://www.manjaro.org>'
-	fi
+	[[ -z ${iso_publisher} ]] && iso_publisher='Manjaro Linux <http://www.manjaro.org>'
 
-	if [[ -z ${iso_app_id} ]];then
-		iso_app_id='Manjaro Linux Live/Rescue CD'
-	fi
+	[[ -z ${iso_app_id} ]] && iso_app_id='Manjaro Linux Live/Rescue CD'
 
-	if [[ -z ${iso_compression} ]];then
-		iso_compression='xz'
-	fi
+	[[ -z ${iso_compression} ]] && iso_compression='xz'
 
-	if [[ -z ${iso_checksum} ]];then
-		iso_checksum='md5'
-	fi
+	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
 
 	return 0
 }
@@ -384,60 +342,42 @@ load_profile_config(){
 
 	[[ -r ${profile_conf} ]] && source ${profile_conf}
 
-	if [[ -z ${kernel} ]];then
-		kernel="linux318"
-	fi
+	[[ -z ${initsys} ]] && initsys="systemd"
 
-	if [[ -z ${efi_boot_loader} ]];then
-		efi_boot_loader="grub"
-	fi
+	[[ -z ${displaymanager} ]] && displaymanager="none"
 
-	if [[ -z ${efi_part_size} ]]; then
-		efi_part_size="31M"
-	fi
+	[[ -z ${kernel} ]] && kernel="linux318"
 
-	if [[ -z ${hostname} ]];then
-		hostname="manjaro"
-	fi
+	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
-	if [[ -z ${username} ]];then
-		username="manjaro"
-	fi
+	[[ -z ${efi_part_size} ]] && efi_part_size="31M"
 
-	if [[ -z ${plymouth_theme} ]];then
-		plymouth_theme="manjaro-elegant"
-	fi
+	[[ -z ${hostname} ]] && hostname="manjaro"
 
-	if [[ -z ${password} ]];then
-		password="manjaro"
-	fi
+	[[ -z ${username} ]] && username="manjaro"
+
+	[[ -z ${plymouth_theme} ]] && plymouth_theme="manjaro-elegant"
+
+	[[ -z ${password} ]] && password="manjaro"
 
 	if [[ -z ${addgroups} ]];then
 		addgroups="video,audio,power,disk,storage,optical,network,lp,scanner,wheel"
 	fi
 
-	if [[ -z ${start_systemd} ]];then
+	if [[ -z ${start_systemd[@]} ]];then
 		start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 	fi
 
-	if [[ -z ${start_openrc} ]];then
+	if [[ -z ${start_openrc[@]} ]];then
 		start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 	fi
 
-	if [[ -z ${start_systemd_live} ]];then
+	if [[ -z ${start_systemd_live[@]} ]];then
 		start_systemd_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
 	fi
 
-	if [[ -z ${start_openrc_live} ]];then
+	if [[ -z ${start_openrc_live[@]} ]];then
 		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
-	fi
-
-	if [[ -z ${initsys} ]];then
-		initsys="systemd"
-	fi
-
-	if [[ -z ${displaymanager} ]];then
-		displaymanager="none"
 	fi
 
 	return 0
@@ -485,10 +425,55 @@ load_user_info(){
 	USER_CONFIG="$USER_HOME/.config"
 }
 
+# $1: path
+# $2: exit code
+check_profile(){
+	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
+	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
+	local has_keyfiles=false has_keydirs=false
+	#msg "Checking profile [$1]"
+	for f in ${keyfiles[@]}; do
+		if [[ -f $1/$f ]];then
+			has_keyfiles=true
+		else
+			has_keyfiles=false
+			break
+		fi
+	done
+	for d in ${keydirs[@]}; do
+		if [[ -d $1/$d ]];then
+			has_keydirs=true
+		else
+			has_keydirs=false
+			break
+		fi
+	done
+	#msg2 "has_keyfiles: ${has_keyfiles}"
+	#msg2 "has_keydirs: ${has_keydirs}"
+	if ! ${has_keyfiles} && ! ${has_keydirs};then
+# 		msg "Profile sanity check passed."
+# 	else
+		eval $2
+	fi
+}
+
 # $1: file
 # $2: exit code
 check_sanity(){
 	if [[ ! -f $1 ]]; then
 		eval "$2"
+	fi
+}
+
+show_version(){
+	msg "manjaro-tools"
+	msg2 "version: ${version}"
+}
+
+show_config(){
+	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
+		msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
+	else
+		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
 	fi
 }

@@ -23,29 +23,31 @@ SYSCONFDIR='@sysconfdir@'
 show_profile(){
 	cd $1
 		load_profile "$1"
-		msg2 "work_dir: ${work_dir}"
-		msg2 "iso_file: ${iso_file}"
-		msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
+		if ${verbose};then
+			msg2 "work_dir: ${work_dir}"
+			msg2 "iso_file: ${iso_file}"
+			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 
-		msg2 "initsys: ${initsys}"
-		msg2 "displaymanager: ${displaymanager}"
-		msg2 "kernel: ${kernel}"
-		msg2 "efi_boot_loader: ${efi_boot_loader}"
-		msg2 "efi_part_size: ${efi_part_size}"
+			msg2 "initsys: ${initsys}"
+			msg2 "displaymanager: ${displaymanager}"
+			msg2 "kernel: ${kernel}"
+			msg2 "efi_boot_loader: ${efi_boot_loader}"
+			msg2 "efi_part_size: ${efi_part_size}"
 
-		${is_plymouth} && msg2 "plymouth_theme: ${plymouth_theme}"
+			${is_plymouth} && msg2 "plymouth_theme: ${plymouth_theme}"
 
-		msg2 "hostname: ${hostname}"
-		msg2 "username: ${username}"
-		msg2 "password: ${password}"
-		msg2 "addgroups: ${addgroups}"
+			msg2 "hostname: ${hostname}"
+			msg2 "username: ${username}"
+			msg2 "password: ${password}"
+			msg2 "addgroups: ${addgroups}"
 
-		if [[ ${initsys} == 'systemd' ]];then
-			msg2 "start_systemd: ${start_systemd[*]}"
-			msg2 "start_systemd_live: ${start_systemd_live[*]}"
-		else
-			msg2 "start_openrc: ${start_openrc[*]}"
-			msg2 "start_openrc_live: ${start_openrc_live[*]}"
+			if [[ ${initsys} == 'systemd' ]];then
+				msg2 "start_systemd: ${start_systemd[*]}"
+				msg2 "start_systemd_live: ${start_systemd_live[*]}"
+			else
+				msg2 "start_openrc: ${start_openrc[*]}"
+				msg2 "start_openrc_live: ${start_openrc_live[*]}"
+			fi
 		fi
 	cd ..
 }
@@ -54,24 +56,18 @@ show_build_queue(){
 	if ${is_buildset};then
 		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
 		for item in ${list[@]}; do
-			check_sanity "$item/profile.conf" "break"
+			check_profile "$item" "break"
 			show_profile "$item"
 		done
 	else
-		check_sanity "${buildset_iso}/profile.conf" 'die "Not a valid iso-profile!"'
+		check_profile "${buildset_iso}" 'die "Profile sanity check failed."'
 		show_profile "${buildset_iso}"
 	fi
 }
 
 display_settings(){
-	msg "manjaro-tools"
-	msg2 "version: ${version}"
-
-	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
-		msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
-	else
-		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
-	fi
+	show_version
+	show_config
 
 	msg "PROFILE:"
 	msg2 "buildsets: $(load_sets ${sets_dir_iso})"
@@ -102,13 +98,13 @@ display_settings(){
 	msg2 "dist_codename: ${dist_codename}"
 	msg2 "dist_version: ${dist_version}"
 
-    msg "ISO SETTINGS:"
-    msg2 "iso_label: ${iso_label}"
-    msg2 "iso_name: ${iso_name}"
-    msg2 "iso_publisher: ${iso_publisher}"
-    msg2 "iso_app_id: ${iso_app_id}"
-    msg2 "iso_compression: ${iso_compression}"
-    msg2 "iso_checksum: ${iso_checksum}"
+	msg "ISO SETTINGS:"
+	msg2 "iso_label: ${iso_label}"
+	msg2 "iso_name: ${iso_name}"
+	msg2 "iso_publisher: ${iso_publisher}"
+	msg2 "iso_app_id: ${iso_app_id}"
+	msg2 "iso_compression: ${iso_compression}"
+	msg2 "iso_checksum: ${iso_checksum}"
 
 	msg "BUILD QUEUE:"
 	show_build_queue
@@ -127,6 +123,7 @@ clean_cache_lng=false
 pretend=false
 images_only=false
 iso_only=false
+verbose=false
 
 pacman_conf_arch='default'
 
@@ -143,6 +140,7 @@ usage() {
 	echo '    -i                 Build images only'
 	echo '    -s                 Generate iso only'
 	echo '                       Requires pre built images (-i)'
+	echo '    -v                 Verbose output, show profies detail (-q)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
 	echo ''
@@ -152,7 +150,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:cxlisqh'
+opts='p:a:b:r:cxlisvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -166,6 +164,7 @@ while getopts "${opts}" arg; do
 		l) clean_cache_lng=true ;;
 		i) images_only=true ;;
 		s) iso_only=true ;;
+		v) verbose=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -187,8 +186,6 @@ cache_dir_iso="${cache_dir}/iso"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 check_root "$0" "${orig_argv[@]}"
-
-#check_run_dir
 
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 

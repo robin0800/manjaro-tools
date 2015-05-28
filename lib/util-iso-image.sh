@@ -338,3 +338,119 @@ configure_xorg_drivers(){
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/MHWDCONFIG
 	fi
 }
+
+clean_chroots(){
+	msg "Cleaning up ..."
+	for image in "$1"/*-image; do
+		[[ -d ${image} ]] || continue
+		if [[ $(basename "${image}") != "pkgs-image" ]] || \
+		[[ $(basename "${image}") != "lng-image" ]];then
+			msg2 "Deleting chroot '$(basename "${image}")'..."
+			lock 9 "${image}.lock" "Locking chroot '${image}'"
+			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
+				{ type -P btrfs && btrfs subvolume delete "${image}"; } &> /dev/null
+			fi
+		rm -rf --one-file-system "${image}"
+		fi
+	done
+	exec 9>&-
+	rm -rf --one-file-system "$1"
+}
+
+configure_custom_image(){
+	msg "Configuring [${custom}-image]"
+	configure_plymouth "$1"
+	configure_displaymanager "$1"
+	configure_services "$1"
+	configure_environment "$1"
+	msg "Done configuring [${custom}-image]"
+}
+
+configure_livecd_image(){
+	msg "Configuring [livecd-image]"
+	configure_hostname "$1"
+	configure_hosts "$1"
+	configure_accountsservice "$1" "${username}"
+	configure_user "$1"
+	configure_services_live "$1"
+	configure_calamares "$1"
+	configure_thus "$1"
+	configure_cli "$1"
+	msg "Done configuring [livecd-image]"
+}
+
+make_repo(){
+	repo-add ${work_dir}/pkgs-image/opt/livecd/pkgs/gfx-pkgs.db.tar.gz ${work_dir}/pkgs-image/opt/livecd/pkgs/*pkg*z
+}
+
+# $1: work dir
+# $2: cache dir
+# $3: pkglist
+download_to_cache(){
+	pacman -v --config "${pacman_conf}" \
+			--arch "${arch}" --root "$1" \
+			--cache $2 -Syw $3 --noconfirm
+}
+
+# $1: image path
+# $2: packages
+make_chroot(){
+	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
+	setarch "${arch}" \
+		mkchroot -C ${pacman_conf} \
+			-S ${mirrors_conf} \
+			${flag} \
+			$@ || die "Failed to retrieve one or more packages!"
+}
+
+# $1: new branch
+aufs_mount_root_image(){
+	msg2 "mount [root-image] on [${1##*/}]"
+	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
+}
+
+# $1: add branch
+aufs_append_root_image(){
+	msg2 "append [root-image] on [${1##*/}]"
+	mount -t aufs -o remount,append:${work_dir}/root-image=ro none "$1"
+}
+
+# $1: add branch
+aufs_mount_custom_image(){
+	msg2 "mount [${1##*/}] on [${custom}-image]"
+	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro none "$1"
+}
+
+# $1: del branch
+aufs_remove_image(){
+	if mountpoint -q "$1";then
+		msg2 "unmount ${1##*/}"
+		umount $1
+	fi
+}
+
+umount_image_handler(){
+	aufs_remove_image "${work_dir}/livecd-image"
+	aufs_remove_image "${work_dir}/${custom}-image"
+	aufs_remove_image "${work_dir}/root-image"
+	aufs_remove_image "${work_dir}/pkgs-image"
+	aufs_remove_image "${work_dir}/lng-image"
+	aufs_remove_image "${work_dir}/boot-image"
+}
+
+# $1: image path
+clean_up_image(){
+	msg2 "Cleaning up [${1##*/}]"
+	[[ -d "$1/boot/" ]] && find "$1/boot" -name 'initramfs*.img' -delete &> /dev/null
+	[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
+	[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
+
+	find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &> /dev/null
+	find "$1/var/lib/pacman/sync" -type f -delete &> /dev/null
+	find "$1/var/cache/pacman/pkg" -type f -delete &> /dev/null
+	find "$1/var/log" -type f -delete &> /dev/null
+	find "$1/var/tmp" -mindepth 1 -delete &> /dev/null
+	find "$1/tmp" -mindepth 1 -delete &> /dev/null
+
+# 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+}

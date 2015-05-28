@@ -237,7 +237,7 @@ write_isolinux_msg(){
 update_isolinux_cfg(){
 	local fn=isolinux.cfg
 	msg2 "Updating ${fn} ..."
-	sed -i "s|%MISO_LABEL%|${iso_label}|g;
+	sed -i "s|%ISO_LABEL%|${iso_label}|g;
 			s|%ISO_NAME%|${iso_name}|g;
 			s|%ARCH%|${arch}|g" $1/${fn}
 }

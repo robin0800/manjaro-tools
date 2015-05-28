@@ -92,71 +92,7 @@ prepare_cachedirs(){
 
 clean_cache(){
     msg2 "Cleaning [$1] ..."
-    find "$1" -name '*.pkg.tar.xz' -delete &>/dev/null
-}
-
-clean_chroots(){
-	msg "Cleaning up ..."
-	for image in "$1"/*-image; do
-		[[ -d ${image} ]] || continue
-		if [[ $(basename "${image}") != "pkgs-image" ]] || \
-		[[ $(basename "${image}") != "lng-image" ]];then
-			msg2 "Deleting chroot '$(basename "${image}")'..."
-			lock 9 "${image}.lock" "Locking chroot '${image}'"
-			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
-				{ type -P btrfs && btrfs subvolume delete "${image}"; } &>/dev/null
-			fi
-		rm -rf --one-file-system "${image}"
-		fi
-	done
-	exec 9>&-
-	rm -rf --one-file-system "$1"
-}
-
-configure_custom_image(){
-	msg "Configuring [${custom}-image]"
-	configure_plymouth "$1"
-	configure_displaymanager "$1"
-	configure_services "$1"
-	configure_environment "$1"
-	msg "Done configuring [${custom}-image]"
-}
-
-configure_livecd_image(){
-	msg "Configuring [livecd-image]"
-	configure_hostname "$1"
-	configure_hosts "$1"
-	configure_accountsservice "$1" "${username}"
-	configure_user "$1"
-	configure_services_live "$1"
-	configure_calamares "$1"
-	configure_thus "$1"
-	configure_cli "$1"
-	msg "Done configuring [livecd-image]"
-}
-
-make_repo(){
-	repo-add ${work_dir}/pkgs-image/opt/livecd/pkgs/gfx-pkgs.db.tar.gz ${work_dir}/pkgs-image/opt/livecd/pkgs/*pkg*z
-}
-
-# $1: work dir
-# $2: cache dir
-# $3: pkglist
-download_to_cache(){
-	pacman -v --config "${pacman_conf}" \
-			--arch "${arch}" --root "$1" \
-			--cache $2 -Syw $3 --noconfirm
-}
-
-# $1: image path
-# $2: packages
-make_chroot(){
-	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
-	setarch "${arch}" \
-		mkchroot -C ${pacman_conf} \
-			-S ${mirrors_conf} \
-			${flag} \
-			$@ || die "Failed to retrieve one or more packages!"
+    find "$1" -name '*.pkg.tar.xz' -delete &> /dev/null
 }
 
 # $1: image path
@@ -255,58 +191,6 @@ make_checksum(){
 	cd ..
 }
 
-# $1: new branch
-aufs_mount_root_image(){
-	msg2 "mount [root-image] on [${1##*/}]"
-	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
-}
-
-# $1: add branch
-aufs_append_root_image(){
-	msg2 "append [root-image] on [${1##*/}]"
-	mount -t aufs -o remount,append:${work_dir}/root-image=ro none "$1"
-}
-
-# $1: add branch
-aufs_mount_custom_image(){
-	msg2 "mount [${1##*/}] on [${custom}-image]"
-	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro none "$1"
-}
-
-# $1: del branch
-aufs_remove_image(){
-	if mountpoint -q "$1";then
-		msg2 "unmount ${1##*/}"
-		umount $1
-	fi
-}
-
-umount_image_handler(){
-	aufs_remove_image "${work_dir}/livecd-image"
-	aufs_remove_image "${work_dir}/${custom}-image"
-	aufs_remove_image "${work_dir}/root-image"
-	aufs_remove_image "${work_dir}/pkgs-image"
-	aufs_remove_image "${work_dir}/lng-image"
-	aufs_remove_image "${work_dir}/boot-image"
-}
-
-# $1: image path
-clean_up_image(){
-	msg2 "Cleaning up [$1]"
-	[[ -d "$1/boot/" ]] && find "$1/boot" -name 'initramfs*.img' -delete &>/dev/null
-	[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
-	[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
-
-	find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &>/dev/null
-	find "$1/var/lib/pacman/sync" -delete &>/dev/null
-	find "$1/var/cache/pacman/pkg" -type f -delete &>/dev/null
-	find "$1/var/log" -type f -delete &>/dev/null
-	find "$1/var/tmp" -mindepth 1 -delete &>/dev/null
-	find "$1/tmp" -mindepth 1 -delete &>/dev/null
-
-# 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-}
-
 # Base installation (root-image)
 make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
@@ -339,7 +223,7 @@ make_image_custom() {
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete &>/dev/null
+		find ${path} -name '.wh.*' -delete &> /dev/null
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${custom} installation] (${custom}-image)"
 	fi
@@ -369,7 +253,7 @@ make_image_livecd() {
 		# Clean up GnuPG keys?
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete &>/dev/null
+		find ${path} -name '.wh.*' -delete &> /dev/null
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [livecd-image]"
 	fi
@@ -399,7 +283,7 @@ make_image_xorg() {
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 		configure_xorg_drivers "${path}"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete &>/dev/null
+		find ${path} -name '.wh.*' -delete &> /dev/null
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [pkgs-image]"
 	fi
@@ -433,7 +317,7 @@ make_image_lng() {
 		rm -r ${path}/var
 		make_repo ${path}/opt/livecd/lng/lng-pkgs ${path}/opt/livecd/lng
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete &>/dev/null
+		find ${path} -name '.wh.*' -delete &> /dev/null
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [lng-image]"
 	fi
@@ -611,7 +495,10 @@ load_profile(){
 	for f in ${files[@]};do
 		case $f in
 			Packages|Packages-Livecd|Packages-Xorg|Packages-Lng) continue ;;
-			*) packages_custom="$f"; msg2 "Packages-Custom: $f" ;;
+			*)
+				packages_custom="$f"
+				#msg2 "Packages-Custom: $f"
+			;;
 		esac
 	done
 	custom=${packages_custom#*-}
@@ -663,36 +550,6 @@ build_images(){
 	make_isolinux
 	make_isomounts
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
-}
-
-check_profile(){
-	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
-	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
-	local has_keyfiles=false has_keydirs=false
-	msg "Checking profile [$1]"
-	for f in ${keyfiles[@]}; do
-		if [[ -f $1/$f ]];then
-			has_keyfiles=true
-		else
-			has_keyfiles=false
-			break
-		fi
-	done
-	for d in ${keydirs[@]}; do
-		if [[ -d $1/$d ]];then
-			has_keydirs=true
-		else
-			has_keydirs=false
-			break
-		fi
-	done
-	msg2 "has_keyfiles: ${has_keyfiles}"
-	msg2 "has_keydirs: ${has_keydirs}"
-	if ${has_keyfiles} && ${has_keydirs};then
-		msg "Profile sanity check passed."
-	else
-		eval $2
-	fi
 }
 
 make_profile(){
