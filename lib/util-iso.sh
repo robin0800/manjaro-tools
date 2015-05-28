@@ -458,10 +458,7 @@ make_image_boot() {
 		copy_initcpio "${path}" || die "Failed to copy initcpio."
 		gen_boot_image "${path}"
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
-		if [[ -f ${path}/boot/intel-ucode.img ]]; then
-			cp ${path}/boot/intel-ucode.img ${path_iso}/intel_ucode.img
-			cp ${path}/usr/share/licenses/intel-ucode/LICENSE ${path_iso}/intel_ucode.LICENSE
-		fi
+		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
 		umount_image_handler
 		rm -R ${path}
 		: > ${work_dir}/build.${FUNCNAME}

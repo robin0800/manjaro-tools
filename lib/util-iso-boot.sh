@@ -65,6 +65,11 @@ copy_initcpio(){
 	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
 }
 
+copy_ucode(){
+	cp $1/boot/intel-ucode.img $2/intel_ucode.img
+	cp $1/usr/share/licenses/intel-ucode/LICENSE $2/intel_ucode.LICENSE
+}
+
 write_loader_conf(){
 	local fn=loader.conf
 	local conf=$1/${fn}
