@@ -97,6 +97,7 @@ load_vars /etc/makepkg.conf
 
 pacman_conf_arch='default'
 base_packages=('base-devel')
+install_pkgs=()
 
 clean_first=false
 wipe_clean=false
@@ -112,6 +113,7 @@ usage() {
 	echo "    -b <branch>        Branch [default: ${branch}]"
 	echo '    -r <dir>           Chroots directory'
 	echo "                       [default: ${chroots_pkg}]"
+	echo '    -i <pkg>           Install a package into the working copy of the chroot'
 	echo '    -c                 Recreate chroot'
 	echo '    -w                 Clean up cache and sources'
 	echo '    -n                 Install and run namcap check'
@@ -125,7 +127,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:cwnsqh'
+opts='p:a:b:r:i:cwnsqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -133,6 +135,7 @@ while getopts "${opts}" arg; do
 		a) arch="$OPTARG" ;;
 		b) branch="$OPTARG" ;;
 		r) chroots_pkg="$OPTARG" ;;
+		i) install_pkgs+="$OPTARG"; mkchrootpkg_args+=(-i ${install_pkgs[*]}) ;;
 		c) clean_first=true; mkchroot_args+=(-L) ;;
 		w) wipe_clean=true ;;
 		n) namcap=true; mkchrootpkg_args+=(-n) ;;
