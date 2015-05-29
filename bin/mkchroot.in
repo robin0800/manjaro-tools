@@ -24,6 +24,7 @@ usage() {
 	echo '    -M <file>     Location of a makepkg config file'
 	echo '    -S <file>     Location of a pacman-mirrors config file'
 	echo '    -c <dir>      Set pacman cache'
+	echo '    -b <name>     Set branch'
 	echo '    -L            Use build locale.gen en/de'
 	echo '    -B            Use custom build mirror'
 	echo '    -h            This message'
@@ -32,12 +33,15 @@ usage() {
 
 orig_argv=("$@")
 
-while getopts 'hLC:M:S:c:B:' arg; do
-	case "$arg" in
+opts='hLC:M:S:c:b:B:'
+
+while getopts ${opts} arg; do
+	case "${arg}" in
 		C) pac_conf="$OPTARG" ;;
 		M) makepkg_conf="$OPTARG" ;;
 		S) mirrors_conf="$OPTARG" ;;
 		c) cache_dir="$OPTARG" ;;
+		b) branch="$OPTARG" ;;
 		L) build_locales=true ;;
 		B) build_mirror="$OPTARG" ;;
 		h|?) usage ;;
@@ -79,7 +83,7 @@ if [[ $(stat -f -c %T "$working_dir") == btrfs ]]; then
 	chmod 0755 "$working_dir"
 fi
 
-basestrap -GMcd ${pac_conf:+-C "$pac_conf"} "$working_dir" \
+basestrap ${branch:+-b ${branch}} -GMcd ${pac_conf:+-C "$pac_conf"} "$working_dir" \
   "${cache_dirs[@]/#/--cachedir=}" "$@" || die 'Failed to install all packages'
 
 echo "$version" > "$working_dir/.manjaro-tools"

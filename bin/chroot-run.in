@@ -36,8 +36,10 @@ usage() {
 
 orig_argv=("$@")
 
-while getopts 'hC:M:S:c:r:w:B:' arg; do
-	case "$arg" in
+opts='hC:M:S:c:r:w:B:'
+
+while getopts ${opts} arg; do
+	case "${arg}" in
 		C) pac_conf="$OPTARG" ;;
 		M) makepkg_conf="$OPTARG" ;;
 		S) mirrors_conf="$OPTARG" ;;
@@ -71,7 +73,7 @@ copy_hostconf () {
 	[[ -n $pac_conf ]] && cp $pac_conf "$1/etc/pacman.conf"
 	[[ -n $makepkg_conf ]] && cp $makepkg_conf "$1/etc/makepkg.conf"
 	[[ -n $mirrors_conf ]] && cp ${mirrors_conf} "$1/etc/pacman-mirrors.conf"
-	
+
 	if [[ -n ${build_mirror} ]];then
 	    build_mirror=${build_mirror}'/$repo/$arch'
 	    echo "Server = ${build_mirror}" > "$1/etc/pacman.d/mirrorlist"
