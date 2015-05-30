@@ -67,7 +67,7 @@ write_calamares_services_conf(){
 	fi
 }
 
-write_calamares_dm_conf(){
+write_calamares_displaymanager_conf(){
 	local conf="$1/etc/calamares/modules/displaymanager.conf"
 	echo "displaymanagers:" > "$conf"
 	echo "  - ${displaymanager}" >> "$conf"
@@ -124,7 +124,7 @@ configure_calamares(){
 		mkdir -p $1/etc/calamares/modules
 		write_calamares_bootloader_conf $1
 		write_calamares_unpack_conf $1
-		write_calamares_dm_conf $1
+		write_calamares_displaymanager_conf $1
 		write_calamares_initcpio_conf $1
 		brand_calamares_settings_conf $1
 		if [[ ${initsys} == 'openrc' ]];then
