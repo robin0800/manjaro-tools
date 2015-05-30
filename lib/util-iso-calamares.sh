@@ -72,8 +72,11 @@ write_calamares_displaymanager_conf(){
 	echo "displaymanagers:" > "$conf"
 	echo "  - ${displaymanager}" >> "$conf"
 	echo '' >> "$conf"
-	echo '#executable: "startkde"' >> "$conf"
-	echo '#desktopFile: "plasma"' >> "$conf"
+	if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
+		echo "defaultDesktopEnvironment:" >> "$conf"
+		echo "    executable: \"${default_desktop_executable}\"" >> "$conf"
+		echo "    desktopFile: \"${default_desktop_file}\"" >> "$conf"
+	fi
 	echo '' >> "$conf"
 	echo "basicSetup: false" >> "$conf"
 }

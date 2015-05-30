@@ -127,27 +127,7 @@ configure_accountsservice(){
 	local path=$1/var/lib/AccountsService/users
 	if [ -d "${path}" ] ; then
 		echo "[User]" > ${path}/$2
-		if [ -e "$1/usr/bin/openbox-session" ] ; then
-			echo "XSession=openbox" >> ${path}/$2
-		fi
-		if [ -e "$1/usr/bin/startxfce4" ] ; then
-			echo "XSession=xfce" >> ${path}/$2
-		fi
-		if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-			echo "XSession=cinnamon" >> ${path}/$2
-		fi
-		if [ -e "$1/usr/bin/mate-session" ] ; then
-			echo "XSession=mate" >> ${path}/$2
-		fi
-		if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-			echo "XSession=enlightenment" >> ${path}/$2
-		fi
-		if [ -e "$1/usr/bin/startlxde" ] ; then
-			echo "XSession=LXDE" >> ${path}/$2
-		fi
-		if [ -e "$1/usr/bin/lxqt-session" ] ; then
-			echo "XSession=LXQt" >> ${path}/$2
-		fi
+		echo "XSession=${default_desktop_file}" >> ${path}/$2
 		echo "Icon=/var/lib/AccountsService/icons/$2.png" >> ${path}/$2
 	fi
 }
@@ -155,39 +135,82 @@ configure_accountsservice(){
 # $1: chroot
 configure_displaymanager(){
 	msg2 "Configuring Displaymanager ..."
+	# Try to detect desktop environment
+	if [[ "${default_desktop_executable}" == "none" ]] || [[ ${default_desktop_file} == "none" ]]; then
+		msg2 "No default desktop environment set, trying to detect it."
+		if [ -e "$1/usr/bin/startkde" ] && [ -e "$1/usr/share/xsessions/plasma.desktop" ]; then
+			default_desktop_executable="startkde"
+			default_desktop_file="plasma"
+			msg2 "Detected Plasma 5 desktop environment"
+		elif [ -e "$1/usr/bin/startkde" ] && [ -e "$1/usr/share/xsessions/kde-plasma.desktop" ]; then
+			default_desktop_executable="startkde"
+			default_desktop_file="kde-plasma"
+			msg2 "Detected KDE Plasma 4 desktop environment"
+		elif [ -e "$1/usr/bin/gnome-session" ] && [ -e "$1/usr/share/xsessions/gnome.desktop" ]; then
+			default_desktop_executable="gnome-session"
+			default_desktop_file="gnome"
+			msg2 "Detected Gnome desktop environment"
+		elif [ -e "$1/usr/bin/startxfce4" ] && [ -e "$1/usr/share/xsessions/xfce.desktop" ]; then
+			default_desktop_executable="startxfce4"
+			default_desktop_file="xfce"
+			msg2 "Detected Xfce desktop environment"
+		elif [ -e "$1/usr/bin/cinnamon-session" ] && [ -e "$1/usr/share/xsessions/cinnamon-session.desktop" ]; then
+			default_desktop_executable="cinnamon-session"
+			default_desktop_file="cinnamon-session"
+			msg2 "Detected Cinnamon desktop environment"
+		elif [ -e "$1/usr/bin/mate-session" ] && [ -e "$1/usr/share/xsessions/mate.desktop" ]; then
+			default_desktop_executable="mate-session"
+			default_desktop_file="mate"
+			msg2 "Detected Mate desktop environment"
+		elif [ -e "$1/usr/bin/enlightenment_start" ] && [ -e "$1/usr/share/xsessions/enlightenment.desktop" ]; then
+			default_desktop_executable="enlightenment_start"
+			default_desktop_file="enlightenment"
+			msg2 "Detected Enlightenment desktop environment"
+		elif [ -e "$1/usr/bin/lxsession" ] && [ -e "$1/usr/share/xsessions/LXDE.desktop" ]; then
+			default_desktop_executable="lxsession"
+			default_desktop_file="LXDE"
+			msg2 "Detected LXDE desktop environment"
+		elif [ -e "$1/usr/bin/startlxde" ] && [ -e "$1/usr/share/xsessions/LXDE.desktop" ]; then
+			default_desktop_executable="startlxde"
+			default_desktop_file="LXDE"
+			msg2 "Detected LXDE desktop environment"
+		elif [ -e "$1/usr/bin/lxqt-session" ] && [ -e "$1/usr/share/xsessions/lxqt.desktop" ]; then
+			default_desktop_executable="lxqt-session"
+			default_desktop_file="lxqt"
+			msg2 "Detected LXQt desktop environment"
+		elif [ -e "$1/usr/bin/pekwm" ] && [ -e "$1/usr/share/xsessions/pekwm.desktop" ]; then
+			default_desktop_executable="pekwm"
+			default_desktop_file="pekwm"
+			msg2 "Detected PekWM desktop environment"
+		elif [ -e "$1/usr/bin/pantheon-session" ] && [ -e "$1/usr/share/xsessions/pantheon.desktop" ]; then
+			default_desktop_executable="pantheon-session"
+			default_desktop_file="pantheon"
+			msg2 "Detected Pantheon desktop environment"
+		elif [ -e "$1/usr/bin/budgie-session" ] && [ -e "$1/usr/share/xsessions/budgie-session.desktop" ]; then
+			default_desktop_executable="budgie-session"
+			default_desktop_file="budgie-session"
+			msg2 "Detected Budgie desktop environment"
+		elif [ -e "$1/usr/bin/i3" ] && [ -e "$1/usr/share/xsessions/i3.desktop" ]; then
+			default_desktop_executable="i3"
+			default_desktop_file="i3"
+			msg2 "Detected i3 desktop environment"
+		elif [ -e "$1/usr/bin/openbox-session" ] && [ -e "$1/usr/share/xsessions/openbox.desktop" ]; then
+			default_desktop_executable="openbox-session"
+			default_desktop_file="openbox"
+			msg2 "Detected Openbox desktop environment"
+		else
+			default_desktop_executable="none"
+			default_desktop_file="none"
+			msg2 "No desktop environment detected"
+		fi
+	fi
+	# Configure display manager
 	case ${displaymanager} in
 		'lightdm')
 			chroot $1 groupadd -r autologin
 			local conf=$1/etc/lightdm/lightdm.conf
-			if [ -e "$1/usr/bin/openbox-session" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=openbox/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/startxfce4" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=xfce/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=cinnamon/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/mate-session" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=mate/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=enlightenment/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/startlxde" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=LXDE/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/lxqt-session" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=lxqt/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/pekwm" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=pekwm/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/i3" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=i3/' ${conf}
-			fi
-			if [ -e "$1/usr/bin/pantheon-session" ] ; then
-				sed -i -e 's/^.*user-session=.*/user-session=pantheon/' ${conf}
+			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
+				sed -i -e "s/^.*user-session=.*/user-session=$default_desktop_file/" ${conf}
 			fi
 			if [[ ${initsys} == 'openrc' ]];then
 				sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' ${conf}
@@ -210,83 +233,20 @@ configure_displaymanager(){
 		;;
 		'mdm')
 			local conf=$1/etc/mdm/custom.conf
-			if [ -e "$1/usr/bin/startxfce4" ] ; then
-				sed -i 's|default.desktop|xfce.desktop|g' ${conf}
-			fi
-			if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-				sed -i 's|default.desktop|cinnamon.desktop|g' ${conf}
-			fi
-			if [ -e "$1/usr/bin/openbox-session" ] ; then
-				sed -i 's|default.desktop|openbox.desktop|g' ${conf}
-			fi
-			if [ -e "$1/usr/bin/mate-session" ] ; then
-				sed -i 's|default.desktop|mate.desktop|g' ${conf}
-			fi
-			if [ -e "$1/usr/bin/startlxde" ] ; then
-				sed -i 's|default.desktop|LXDE.desktop|g' ${conf}
-			fi
-			if [ -e "$1/usr/bin/lxqt-session" ] ; then
-				sed -i 's|default.desktop|lxqt.desktop|g' ${conf}
-			fi
-			if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-				sed -i 's|default.desktop|enlightenment.desktop|g' ${conf}
+			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
+				sed -i "s|default.desktop|$default_desktop_file.desktop|g" ${conf}
 			fi
 		;;
 		'sddm')
 			local conf=$1/etc/sddm.conf
-			if [ -e "$1/usr/bin/startxfce4" ] ; then
-				sed -i -e 's|^Session=.*|Session=xfce.desktop|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-				sed -i -e 's|^Session=.*|Session=cinnamon.desktop|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/openbox-session" ] ; then
-				sed -i -e 's|^Session=.*|Session=openbox.desktop|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/mate-session" ] ; then
-				sed -i -e 's|^Session=.*|Session=mate.desktop|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/lxsession" ] ; then
-				sed -i -e 's|^Session=.*|Session=LXDE.desktop|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/lxqt-session" ] ; then
-				sed -i -e 's|^Session=.*|Session=lxqt.desktop|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-				sed -i -e 's|^Session=.*|Session=enlightenment.desktop|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/startkde" ] ; then
-				sed -i -e 's|^Session=.*|Session=plasma.desktop|' ${conf}
+			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
+				sed -i -e "s|^Session=.*|Session=$default_desktop_file.desktop|" ${conf}
 			fi
 		;;
 		'lxdm')
 			local conf=$1/etc/lxdm/lxdm.conf
-			if [ -e "$1/usr/bin/openbox-session" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/openbox-session|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/startxfce4" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/startxfce4|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/cinnamon-session" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/cinnamon-session|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/mate-session" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/mate-session|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/enlightenment_start" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/enlightenment_start|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/startlxde" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/lxsession|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/lxqt-session" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/lxqt-session|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/pekwm" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/pekwm|' ${conf}
-			fi
-			if [ -e "$1/usr/bin/i3" ] ; then
-				sed -i -e 's|^.*session=.*|session=/usr/bin/i3|' ${conf}
+			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
+				sed -i -e "s|^.*session=.*|session=/usr/bin/$default_desktop_executable|" ${conf}
 			fi
 		;;
 		*) break ;;
