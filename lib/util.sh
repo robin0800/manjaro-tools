@@ -501,6 +501,11 @@ fix_dbus(){
 	done
 }
 
+get_branch(){
+	source /etc/pacman-mirrior.conf
+	echo "$Branch"
+}
+
 set_branch(){
 	pacman-mirrors -g -b $1
 }
