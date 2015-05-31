@@ -72,11 +72,11 @@ check_root "$0" "${orig_argv[@]}"
 newroot=$1; shift
 pacman_args=("${@:-base}")
 
-${hostcache} || pacman_args+=(--cachedir="$newroot/var/cache/pacman/pkg")
+${hostcache} && pacman_args+=(--cachedir="$newroot/var/cache/pacman/pkg")
 
-${interactive} || pacman_args+=(--noconfirm)
+${interactive} && pacman_args+=(--noconfirm)
 
-[[ $pacman_config ]] && pacman_args+=(--config="$pacman_config")
+[[ -n $pacman_config ]] && pacman_args+=(--config="$pacman_config")
 
 [[ -d $newroot ]] || die "%s is not a directory" "$newroot"
 

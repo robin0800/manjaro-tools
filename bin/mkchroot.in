@@ -24,7 +24,6 @@ usage() {
 	echo '    -M <file>     Location of a makepkg config file'
 	echo '    -S <file>     Location of a pacman-mirrors config file'
 	echo '    -c <dir>      Set pacman cache'
-	echo '    -b <name>     Set branch'
 	echo '    -L            Use build locale.gen en/de'
 	echo '    -B            Use custom build mirror'
 	echo '    -h            This message'
