@@ -50,10 +50,11 @@ usage() {
 
 orig_argv=("$@")
 
-while getopts ':C:cdGiM' flag; do
+opts=':C:cdGiM'
+
+while getopts ${opts} flag; do
 	case ${arg} in
 		C) pacman_config=$OPTARG ;;
-		b) branch=$OPTARG ;;
 		d) directory=true ;;
 		c) hostcache=true ;;
 		i) interactive=true ;;
@@ -106,9 +107,9 @@ fi
 
 if ${copymirrorlist}; then
 	# install the host's mirrorlist onto the new root
-	#cp -a /etc/pacman.d/mirrorlist "$newroot/etc/pacman.d/"
-	cp -a ${PKGDATADIR}/pacman-mirrors-${branch}.conf "$newroot/etc" #/pacman.d/"
-	pacman-mirrors -g -b ${branch}
+	cp -a /etc/pacman.d/mirrorlist "$newroot/etc/pacman.d/"
+	#cp -a ${PKGDATADIR}/pacman-mirrors-${branch}.conf "$newroot/etc" #/pacman.d/"
+	#pacman-mirrors -g -b ${branch}
 fi
 
 # vim: et ts=2 sw=2 ft=sh:
