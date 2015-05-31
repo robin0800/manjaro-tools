@@ -502,10 +502,12 @@ fix_dbus(){
 }
 
 get_branch(){
-	source /etc/pacman-mirrior.conf
+	source /etc/pacman-mirrors.conf
+	msg3 "Host branch: ${Branch}"
 	echo "$Branch"
 }
 
 set_branch(){
+	msg3 "Setting branch for ${branch} build"
 	pacman-mirrors -g -b $1
 }
