@@ -500,3 +500,7 @@ fix_dbus(){
 		fi
 	done
 }
+
+set_branch(){
+	pacman-mirrors -g -b $1
+}
