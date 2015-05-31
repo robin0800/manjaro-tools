@@ -477,3 +477,26 @@ show_config(){
 		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
 	fi
 }
+
+# $1: chroot
+fix_dbus(){
+	# enable to have more debug info
+	#msg "machine-id (etc): $(cat $1/etc/machine-id)"
+	#[[ -e $1/var/lib/dbus/machine-id ]] && msg "machine-id (lib): $(cat $1/var/lib/dbus/machine-id)"
+	#msg "running processes: "
+	#lsof | grep $1
+
+	local PREFIX="$1" LINK PID NAME
+	for ROOT in /proc/*/root; do
+		LINK=$(readlink $ROOT)
+		if [ "x$LINK" != "x" ]; then
+			if [ "x${LINK:0:${#PREFIX}}" = "x$PREFIX" ]; then
+				# this process is in the chroot...
+				PID=$(basename $(dirname "$ROOT"))
+				NAME=$(ps -p $PID -o comm=)
+				msg3 "Killing chroot process: $NAME ($PID)"
+				kill -9 "$PID"
+			fi
+		fi
+	done
+}

@@ -14,37 +14,9 @@ shopt -s extglob
 
 PKGDATADIR='@pkgdatadir@'
 
+[[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
 [[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
 [[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
-
-fix_dbus(){
-	# enable to have more debug info
-	#msg "machine-id (etc): $(cat $newroot/etc/machine-id)"
-	#[[ -e $newroot/var/lib/dbus/machine-id ]] && msg "machine-id (lib): $(cat $newroot/var/lib/dbus/machine-id)"
-	#msg "running processes: "
-	#lsof | grep $newroot
-
-	local PREFIX="$1" LINK PID NAME
-	for ROOT in /proc/*/root; do
-		LINK=$(readlink $ROOT)
-		if [ "x$LINK" != "x" ]; then
-			if [ "x${LINK:0:${#PREFIX}}" = "x$PREFIX" ]; then
-				# this process is in the chroot...
-				PID=$(basename $(dirname "$ROOT"))
-				NAME=$(ps -p $PID -o comm=)
-				msg3 "Killing chroot process: $NAME ($PID)"
-				kill -9 "$PID"
-			fi
-		fi
-	done
-}
-
-create_min_fs(){
-	msg 'Creating install root at %s' "$1"
-	mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
-	mkdir -m 1777 -p $1/tmp
-	mkdir -m 0555 -p $1/{sys,proc}
-}
 
 newroot=/mnt
 
@@ -81,13 +53,13 @@ orig_argv=("$@")
 while getopts ':C:cdGiM' flag; do
 	case ${arg} in
 		C) pacman_config=$OPTARG ;;
-		B) branch=$OPTARG ;;
+		b) branch=$OPTARG ;;
 		d) directory=true ;;
 		c) hostcache=true ;;
 		i) interactive=true ;;
 		G) copykeyring=false ;;
 		M) copymirrorlist=false ;;
-		*) echo "invalid argument '${arg}'"; usage 1;;
+		:) echo "invalid argument ${arg}:$OPTARG"; usage 1;;
 		?) usage 0 ;;
 	esac
 done
@@ -127,7 +99,7 @@ fix_dbus "$newroot"
 
 if ${copykeyring}; then
 	# if there's a keyring on the host, copy it into the new root, unless it exists already
-	if [[ -d /etc/pacman.d/gnupg && ! -d $newroot/etc/pacman.d/gnupg ]]; then
+	if [[ -d /etc/pacman.d/gnupg ]] && [[ ! -d $newroot/etc/pacman.d/gnupg ]]; then
 		cp -a /etc/pacman.d/gnupg "$newroot/etc/pacman.d/"
 	fi
 fi
