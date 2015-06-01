@@ -468,7 +468,6 @@ check_sanity(){
 show_version(){
 	msg "manjaro-tools"
 	msg2 "version: ${version}"
-	msg2 "host_branch: $(get_branch)"
 }
 
 show_config(){
