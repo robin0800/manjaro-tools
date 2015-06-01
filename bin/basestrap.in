@@ -46,7 +46,6 @@ usage() {
 #   exit $(( $# ? 0 : 1 ))
 # fi
 #
-# (( EUID == 0 )) || die 'This script must be run with root privileges'
 
 orig_argv=("$@")
 
@@ -108,8 +107,6 @@ fi
 if ${copymirrorlist}; then
 	# install the host's mirrorlist onto the new root
 	cp -a /etc/pacman.d/mirrorlist "$newroot/etc/pacman.d/"
-	#cp -a ${PKGDATADIR}/pacman-mirrors-${branch}.conf "$newroot/etc" #/pacman.d/"
-	#pacman-mirrors -g -b ${branch}
 fi
 
 # vim: et ts=2 sw=2 ft=sh:

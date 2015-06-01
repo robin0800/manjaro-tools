@@ -185,10 +185,8 @@ ${wipe_clean} && clean_up
 
 [[ -d ${work_dir}/root ]] && check_chroot_version
 
-#[[ $(get_branch) != ${branch} ]] && set_branch "${branch}"
-
 chroot_init
-fix_pacman_conf "${work_dir}/root"
-chroot_build
 
-#reset_branch
+fix_pacman_conf "${work_dir}/root"
+
+chroot_build
