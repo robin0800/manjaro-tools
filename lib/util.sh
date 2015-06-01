@@ -228,12 +228,12 @@ clean_pacman_conf(){
 }
 
 fix_pacman_conf(){
-	msg "Fixing $1/etc/pacman.conf [core] ..."
+	msg "Fixing [core] ($1/etc/pacman.conf) ..."
 	sed "s|Server = ${build_mirror}/${branch}/core/${arch}|Include = /etc/pacman.d/mirrorlist|" -i $1/etc/pacman.conf
 }
 
 set_core_branch(){
-	msg "Setting [core] Server branch ($1)"
+	msg "Setting [core] Sever ${branch} ($1) ..."
 	sed -i "s|Server = ${build_mirror}.*|Server = ${build_mirror}/${branch}/core/${arch}|" $1
 }
 
