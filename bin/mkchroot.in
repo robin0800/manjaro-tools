@@ -84,8 +84,6 @@ fi
 basestrap -GMcd ${pac_conf:+-C "$pac_conf"} "$working_dir" \
   "${cache_dirs[@]/#/--cachedir=}" "$@" || die 'Failed to install all packages'
 
-fix_pacman_conf "$working_dir"
-
 echo "$version" > "$working_dir/.manjaro-tools"
 
 if ${build_locales};then

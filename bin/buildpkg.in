@@ -160,7 +160,6 @@ else
 fi
 
 pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
-set_core_branch "${pacman_conf}"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
@@ -171,6 +170,8 @@ mkchrootpkg_args+=(-r ${work_dir})
 makepkg_args+=("${@:$OPTIND}")
 
 check_root "$0" "${orig_argv[@]}"
+
+set_core_branch "${pacman_conf}"
 
 timer_start=$(get_timer)
 
@@ -187,7 +188,7 @@ ${wipe_clean} && clean_up
 #[[ $(get_branch) != ${branch} ]] && set_branch "${branch}"
 
 chroot_init
-
+fix_pacman_conf "${work_dir}/root"
 chroot_build
 
 #reset_branch
