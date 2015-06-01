@@ -160,6 +160,7 @@ else
 fi
 
 pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+set_core_branch "${pacman_conf}"
 makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
