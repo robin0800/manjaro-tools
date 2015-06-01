@@ -183,10 +183,10 @@ ${wipe_clean} && clean_up
 
 [[ -d ${work_dir}/root ]] && check_chroot_version
 
-[[ $(get_branch) != ${branch} ]] && set_branch "${branch}"
+#[[ $(get_branch) != ${branch} ]] && set_branch "${branch}"
 
 chroot_init
 
 chroot_build
 
-reset_branch
+#reset_branch
