@@ -511,17 +511,9 @@ fix_dbus(){
 	done
 }
 
-get_branch(){
-	source /etc/pacman-mirrors.conf
-	msg3 "Host branch: ${Branch}"
-	echo "$Branch"
-}
-
-set_branch(){
-	msg3 "Setting branch for ${branch} build"
-	pacman-mirrors -g -b $1
-}
-
-reset_branch(){
-	pacman-mirrors -g
+create_min_fs(){
+	msg "Creating install root at $1"
+	mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
+	mkdir -m 1777 -p $1/tmp
+	mkdir -m 0555 -p $1/{sys,proc}
 }
