@@ -150,12 +150,12 @@ if [[ "${arch}" == 'multilib' ]]; then
 	pacman_conf_arch='multilib'
 	base_packages+=('multilib-devel')
 	work_dir=${chroots_pkg}/${branch}/${arch}
-	cache_dir_pkg=${cache_dir}/${branch}/${arch}
+	cache_dir_pkg=${cache_dir}/pkg/${branch}/${arch}
 	arch='x86_64'
 	is_multilib=true
 else
 	work_dir=${chroots_pkg}/${branch}/${arch}
-	cache_dir_pkg=${cache_dir}/${branch}/${arch}
+	cache_dir_pkg=${cache_dir}/pkg/${branch}/${arch}
 	is_multilib=false
 fi
 
@@ -188,3 +188,5 @@ ${wipe_clean} && clean_up
 chroot_init
 
 chroot_build
+
+reset_branch
