@@ -468,6 +468,7 @@ check_sanity(){
 show_version(){
 	msg "manjaro-tools"
 	msg2 "version: ${version}"
+	msg2 "host_branch: $(get_branch)"
 }
 
 show_config(){
@@ -510,4 +511,8 @@ get_branch(){
 set_branch(){
 	msg3 "Setting branch for ${branch} build"
 	pacman-mirrors -g -b $1
+}
+
+reset_branch(){
+	pacman-mirrors -g
 }
