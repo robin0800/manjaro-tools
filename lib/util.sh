@@ -227,6 +227,12 @@ clean_pacman_conf(){
 	msg "Done cleaning [$1/etc/pacman.conf]"
 }
 
+fix_pacman_conf(){
+	msg "Fixing $1/etc/pacman.conf [core] ..."
+	sed -i "/^.Server.*/d" $1/etc/pacman.conf
+	sed -i '/#Include.*/s/^#//' $1/etc/pacman.conf
+}
+
 load_vars() {
 	local var
 
