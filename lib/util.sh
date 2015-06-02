@@ -237,7 +237,7 @@ initialize_branch(){
 				parse_section ${repo}
 				if [[ ${pc_value} == $match_val ]]; then
 					msg2 "Setting build mirror ..."
-					sed "s|$match_key = $match_val|Server = ${build_mirror}/${branch}/${repo}/${arch}|" $1
+					sed "s|$match_key = $match_val|Server = ${build_mirror}/${branch}/${repo}/${arch}|" -i $1
 				fi
 			;;
 			*) continue ;;
@@ -255,7 +255,7 @@ reset_pacman_conf(){
 				parse_section ${repo}
 				if [[ ${pc_value} == $match_val ]]; then
 					msg2 "Include mirrorlist ..."
-					sed "s|$match_key.*|Include = /etc/pacman.d/mirrorlist|" $1
+					sed "s|$match_key.*|Include = /etc/pacman.d/mirrorlist|" -i $1
 				fi
 			;;
 			*) continue ;;
