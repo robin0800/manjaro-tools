@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 check_chroot_version(){
-	local chroot_version=$(cat ${work_dir}/root/.manjaro-tools)
+	[[ -f ${work_dir}/root/.manjaro-tools ]] && local chroot_version=$(cat ${work_dir}/root/.manjaro-tools)
 	msg "chroot version: $chroot_version"
 	if [[ ${version} != $chroot_version ]];then
 		clean_first=true
