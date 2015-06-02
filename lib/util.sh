@@ -227,14 +227,40 @@ clean_pacman_conf(){
 	msg "Done cleaning [$1/etc/pacman.conf]"
 }
 
-fix_pacman_conf(){
-	msg "Fixing [core] ($1/etc/pacman.conf) ..."
-	sed "s|Server = ${build_mirror}/${branch}/core/${arch}|Include = /etc/pacman.d/mirrorlist|" -i $1/etc/pacman.conf
+initialize_branch(){
+	local repositories=$(get_repos) match_key='Include' match_val='/etc/pacman.d/mirrorlist'
+	msg "Initializing ${branch} ($1) ..."
+	for repo in ${repositories[@]}; do
+		case ${repo} in
+			'core'|'extra'|'community'|'multilib')
+				msg2 "parsing [${repo}] ..."
+				parse_section ${repo}
+				if [[ ${pc_value} == $match_val ]]; then
+					msg2 "Setting build mirror ..."
+					sed "s|$match_key = $match_val|Server = ${build_mirror}/${branch}/${repo}/${arch}|" $1
+				fi
+			;;
+			*) continue ;;
+		esac
+	done
 }
 
-set_core_branch(){
-	msg "Setting [core] Sever ${branch} ($1) ..."
-	sed -i "s|Server = ${build_mirror}.*|Server = ${build_mirror}/${branch}/core/${arch}|" $1
+reset_pacman_conf(){
+	local repositories=$(get_repos) match_key='Server'
+	msg "Resetting ($1) ..."
+	for repo in ${repositories[@]}; do
+		case ${repo} in
+			'core'|'extra'|'community'|'multilib')
+				msg2 "parsing [${repo}] ..."
+				parse_section ${repo}
+				if [[ ${pc_value} == $match_val ]]; then
+					msg2 "Include mirrorlist ..."
+					sed "s|$match_key.*|Include = /etc/pacman.d/mirrorlist|" $1
+				fi
+			;;
+			*) continue ;;
+		esac
+	done
 }
 
 load_vars() {
