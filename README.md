@@ -228,7 +228,8 @@ Usage: buildpkg [options] [--] [makepkg args]
     -a <arch>          Arch [default: x86_64]
     -b <branch>        Branch [default: unstable]
     -r <dir>           Chroots directory
-                       [default: /opt/build/manjaro-tools/buildpkg]
+                       [default: /build/manjaro-tools/buildpkg]
+    -i <pkg>           Install a package into the working copy of the chroot
     -c                 Recreate chroot
     -w                 Clean up cache and sources
     -n                 Install and run namcap check
@@ -279,11 +280,11 @@ buildiso is used to build manjaro-iso-profiles. It is run insde the profiles fol
 ~~~
 $ buildiso -h
 Usage: buildiso [options]
-    -p <profile>       Buildset or profile [default: lxqt-openrc]
+    -p <profile>       Buildset or profile [default: default]
     -a <arch>          Arch [default: x86_64]
     -b <branch>        Branch [default: unstable]
     -r <dir>           Chroots directory
-                       [default: /opt/build/manjaro-tools/buildiso]
+                       [default: /build/manjaro-tools/buildiso]
     -c                 Disable clean work dir
     -x                 Clean xorg cache
     -l                 Clean lng cache
