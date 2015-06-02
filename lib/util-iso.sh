@@ -197,9 +197,7 @@ make_image_root() {
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
 		mkdir -p ${path}
-		set_core_branch "${pacman_conf}"
 		make_chroot "${path}" "${packages}"
-		fix_pacman_conf "${path}"
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_lsb "${path}"
@@ -217,9 +215,7 @@ make_image_custom() {
 		mkdir -p ${path}
 		umount_image_handler
 		aufs_mount_root_image "${path}"
-		#set_core_branch "${pacman_conf}"
 		make_chroot "${path}" "${packages}"
-		#fix_pacman_conf "${path}"
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
@@ -245,9 +241,7 @@ make_image_livecd() {
 		else
 			aufs_mount_root_image "${path}"
 		fi
-		#set_core_branch "${pacman_conf}"
 		make_chroot "${path}" "${packages}"
-		#fix_pacman_conf "${path}"
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
