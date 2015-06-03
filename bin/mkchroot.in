@@ -90,10 +90,10 @@ if [[ -n $pac_conf ]] && [[ -n $mirrors_conf ]]; then
 	pac_base="$working_dir/pacman-pacstrap.conf"
 	sed "s#Include = /etc/pacman.d/mirrorlist#Server = ${host_mirror}#g" $pac_conf > $pac_base
 	basestrap -GMcd ${pac_base:+-C "$pac_base"} "$working_dir" \
-	   "${cache_dirs[@]/#/--cachedir=}" "firefox" || die 'Failed to install all packages'
+	   "${cache_dirs[@]/#/--cachedir=}" "$@" || die 'Failed to install all packages'
 else
 	basestrap -GMcd ${pac_conf:+-C "$pac_conf"} "$working_dir" \
-	   "${cache_dirs[@]/#/--cachedir=}" "firefox" || die 'Failed to install all packages'
+	   "${cache_dirs[@]/#/--cachedir=}" "$@" || die 'Failed to install all packages'
 fi
 
 [[ -f "$working_dir/pacman-pacstrap.conf" ]] && rm "$working_dir/pacman-pacstrap.conf"
