@@ -507,7 +507,7 @@ load_profile(){
 
 	check_custom_pacman_conf
 
-	create_args+=(-C ${pacman_conf})
+	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}")
 	work_dir=${chroots_iso}/$1/${arch}
 
 	check_plymouth
