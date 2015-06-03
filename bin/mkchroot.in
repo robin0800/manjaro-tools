@@ -16,7 +16,7 @@ version=@version@
 
 working_dir=''
 build_locales=false
-restore_mirrors=false
+keep_mirrors=false
 
 usage() {
 	echo "Usage: ${0##*/} [options] working-dir package-list..."
@@ -33,7 +33,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='hLRC:M:S:c:B:'
+opts='hLKC:M:S:c:B:'
 
 while getopts ${opts} arg; do
 	case "${arg}" in
@@ -43,7 +43,7 @@ while getopts ${opts} arg; do
 		c) cache_dir="$OPTARG" ;;
 		L) build_locales=true ;;
 		B) build_mirror="$OPTARG" ;;
-		R) restore_mirrors=true; mirrors_flag='-R' ;;
+		K) keep_mirrors=true; mirrors_flag='-R' ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
