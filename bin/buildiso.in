@@ -30,6 +30,8 @@ show_profile(){
 
 			msg2 "initsys: ${initsys}"
 			msg2 "displaymanager: ${displaymanager}"
+			msg2 "default_desktop_executable: ${default_desktop_executable}"
+			msg2 "default_desktop_file: ${default_desktop_file}"
 			msg2 "kernel: ${kernel}"
 			msg2 "efi_boot_loader: ${efi_boot_loader}"
 			msg2 "efi_part_size: ${efi_part_size}"
