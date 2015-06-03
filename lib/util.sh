@@ -356,6 +356,10 @@ load_profile_config(){
 
 	[[ -z ${displaymanager} ]] && displaymanager="none"
 
+	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
+
+	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
+
 	[[ -z ${kernel} ]] && kernel="linux318"
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
