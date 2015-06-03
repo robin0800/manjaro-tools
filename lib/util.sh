@@ -227,40 +227,14 @@ clean_pacman_conf(){
 	msg "Done cleaning [$1/etc/pacman.conf]"
 }
 
-get_branch(){
-	source /etc/pacman-mirrors.conf
-	msg3 "Host branch: ${Branch}"
-	echo "$Branch"
+copy_mirrorlist(){
+	cp -a /etc/pacman.d/mirrorlist "$1/etc/pacman.d/"
 }
 
-set_branch(){
-	msg3 "Setting branch for ${branch} build"
-	pacman-mirrors -g -b $1
-}
-
-reset_branch(){
-	pacman-mirrors -g
-}
-
-initialize_branch(){
-	[[ $(get_branch) != ${branch} ]] && set_branch "${branch}"
-# 	local repositories=$(get_repos) pattern='Include = /etc/pacman.d/mirrorlist' url=
-# 	msg "Initializing ${branch} ($1) ..."
-# 	for repo in ${repositories[@]}; do
-# 		case ${repo} in
-# 			'core'|extra|community|multilib)
-# 				url=${build_mirror}/${branch}/${repo}/${arch}
-# 				msg2 "Setting [${repo}]: Server = ${url}"
-# 				sed -i "s|^.*/$repo/.*|Server = $url|" -i $1
-# 			;;
-# 			*) continue ;;
-# 		esac
-# 	done
-}
-
-reset_pacman_conf(){
-	msg "Include mirrorlist ($1)"
-	sed "s|^.*${build_mirror}.*|Include = /etc/pacman.d/mirrorlist|g" -i $1
+copy_keyring(){
+	if [[ -d /etc/pacman.d/gnupg ]] && [[ ! -d $1/etc/pacman.d/gnupg ]]; then
+		cp -a /etc/pacman.d/gnupg "$1/etc/pacman.d/"
+	fi
 }
 
 load_vars() {
