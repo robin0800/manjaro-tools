@@ -17,6 +17,7 @@ version=@version@
 working_dir=''
 build_locales=false
 keep_mirrors=false
+keep_flag=''
 
 usage() {
 	echo "Usage: ${0##*/} [options] working-dir package-list..."
@@ -44,7 +45,7 @@ while getopts ${opts} arg; do
 		c) cache_dir="$OPTARG" ;;
 		L) build_locales=true ;;
 		B) build_mirror="$OPTARG" ;;
-		K) keep_mirrors=true ;;
+		K) keep_mirrors=true; keep_flag='-K' ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -115,6 +116,6 @@ exec chroot-run \
 	${mirrors_conf:+-S "$mirrors_conf"} \
 	${build_mirror:+-B "$build_mirror"} \
 	${cache_dir:+-c "$cache_dir"} \
-	${keep_mirrors:+-K} \
+	${keep_flag} \
 	"$working_dir" locale-gen
 
