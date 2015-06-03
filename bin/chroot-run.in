@@ -16,6 +16,7 @@ version=@version@
 [[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
 
 working_dir=''
+keep_mirrors=false
 
 usage() {
 	echo "Usage: ${0##*/} [options] working-dir [run arguments]"
@@ -36,7 +37,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='hC:M:S:c:r:w:B:'
+opts='hKC:M:S:c:r:w:B:'
 
 while getopts ${opts} arg; do
 	case "${arg}" in
@@ -47,6 +48,7 @@ while getopts ${opts} arg; do
 		r) mountargs_ro="$OPTARG" ;;
 		w) mountargs_rw="$OPTARG" ;;
 		B) build_mirror="$OPTARG" ;;
+		K) keep_mirrors=true ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -76,7 +78,12 @@ copy_hostconf () {
 
 	if [[ -n ${build_mirror} ]];then
 	    build_mirror=${build_mirror}'/$repo/$arch'
-	    echo "Server = ${build_mirror}" > "$1/etc/pacman.d/mirrorlist"
+	    if ${keep_mirrors}; then
+			source $1/etc/pacman-mirrors.conf
+			sed -e "s|/stable|/${Branch}|g" -i "$1/etc/pacman.d/mirrorlist"
+		else
+			echo "Server = ${build_mirror}" > "$1/etc/pacman.d/mirrorlist"
+	    fi
 	else
 	    source $1/etc/pacman-mirrors.conf
 	    sed -e "s|/stable|/${Branch}|g" -i "$1/etc/pacman.d/mirrorlist"
