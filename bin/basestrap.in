@@ -97,6 +97,11 @@ fi
 # kill chroot process if needed (TODO: check if needed at all)
 fix_dbus "$newroot"
 
-${copykeyring} && copy_keyring "$newroot"
+if ${copykeyring};then
+	copy_keyring "$newroot"
+fi
 
-${copymirrorlist} && copy_mirrorlist "$newroot"
+if ${copymirrorlist};then
+	copy_mirrorlist "$newroot"
+fi
+
