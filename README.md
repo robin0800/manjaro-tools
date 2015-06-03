@@ -53,6 +53,9 @@ Specifying args will override manjaro-tools.conf settings.
 # default path to sets
 # sets_dir=/etc/manjaro-tools/sets
 
+# custom build mirror server
+# build_mirror=http://mirror.netzspielplatz.de/manjaro/packages
+
 ################ buildtree ###############
 
 # manjaro package tree
@@ -66,9 +69,6 @@ Specifying args will override manjaro-tools.conf settings.
 
 # default pkg buildset; name without .set extension
 # buildset_pkg=default
-
-# custom build mirror server
-# build_mirror=http://mirror.netzspielplatz.de/manjaro/packages
 
 # Next settings are only useful if you compile packages against eudev
 
