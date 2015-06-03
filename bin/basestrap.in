@@ -52,7 +52,7 @@ orig_argv=("$@")
 opts=':C:cdGiM'
 
 while getopts ${opts} arg; do
-	case ${arg} in
+	case "${arg}" in
 		C) pacman_config=$OPTARG ;;
 		d) directory=true ;;
 		c) hostcache=true ;;
