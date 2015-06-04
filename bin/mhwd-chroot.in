@@ -1,11 +1,30 @@
 #!/bin/bash
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+version=@version@
+
 shopt -s extglob
+
+[[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
+[[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
+[[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
+[[ -r @libdir@/util-fstab.sh ]] && source @libdir@/util-fstab.sh
 
 if [ $EUID -ne 0 ]; then
     echo -e "\n${0##*/} must be run with root privileges !\n"
     exit 1
 fi
+
 mountpoint=/mnt/repchroot
+
 if [ -d $mountpoint ]; then
     old_IFS=$IFS
     IFS=$'\n'
@@ -17,6 +36,7 @@ if [ -d $mountpoint ]; then
 else
     mkdir -p $mountpoint 2>/dev/null
 fi
+
 curetc=$(df /etc | sed -n '/^\//p')
 curetc=${curetc%% *}
 list=()
@@ -105,15 +125,18 @@ if [ -z "$indswap" ]; then
     fi
 fi
 
+chroot_api_mount "$mountpoint"
+chroot_mount /etc/resolv.conf "$mountpoint/etc/resolv.conf" --bind
+
 # mount proc, sys, dev and chroot
-mount -B /proc    $mountpoint/proc
-mount -B /dev     $mountpoint/dev
-mount -B /sys     $mountpoint/sys
-mount -B /dev/pts $mountpoint/dev/pts
-mount -B /tmp     $mountpoint/tmp
-# mount /run if it exists
-[ -d $mountpoint/run ] && mount -B /run $mountpoint/run
-cp /etc/resolv.conf $mountpoint/etc/resolv.conf
+# mount -B /proc    $mountpoint/proc
+# mount -B /dev     $mountpoint/dev
+# mount -B /sys     $mountpoint/sys
+# mount -B /dev/pts $mountpoint/dev/pts
+# mount -B /tmp     $mountpoint/tmp
+# # mount /run if it exists
+# [ -d $mountpoint/run ] && mount -B /run $mountpoint/run
+# cp /etc/resolv.conf $mountpoint/etc/resolv.conf
 # read the architecture of the target
 elf=$(file $mountpoint/usr/bin/file)
 elf=${elf#*ELF *}
@@ -130,8 +153,8 @@ else
 fi
 
 setarch $arch chroot $mountpoint /bin/bash
-[ -d $mountpoint/run ] && umount -f $mountpoint/run
-umount -f $mountpoint/{tmp,dev/pts,sys,dev,proc}
+#[ -d $mountpoint/run ] && umount -f $mountpoint/run
+#umount -f $mountpoint/{tmp,dev/pts,sys,dev,proc}
 [ $indhome = true ] && umount $mountpoint/home
 [ $indboot = true ] && umount $mountpoint/boot
 umount $mountpoint
