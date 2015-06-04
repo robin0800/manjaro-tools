@@ -136,6 +136,8 @@ usage() {
 	echo "    -b <branch>        Branch [default: ${branch}]"
 	echo '    -r <dir>           Chroots directory'
 	echo "                       [default: ${chroots_iso}]"
+	echo '    -t <dir>           Target directory'
+	echo "                       [default: ${cache_dir_iso}]"
 	echo '    -c                 Disable clean work dir'
 	echo '    -x                 Clean xorg cache'
 	echo '    -l                 Clean lng cache'
@@ -152,7 +154,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:cxlisvqh'
+opts='p:a:b:r:t:cxlisvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -160,6 +162,7 @@ while getopts "${opts}" arg; do
 		a) arch="$OPTARG" ;;
 		b) branch="$OPTARG" ;;
 		r) chroots_iso="$OPTARG" ;;
+		t) cache_dir_iso="$OPTARG" ;;
 		k) keep_repo="$OPTARG" ;;
 		c) clean_first=false ;;
 		x) clean_cache_xorg=true ;;
@@ -177,9 +180,7 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-if [[ "$arch" == 'x86_64' ]]; then
-	pacman_conf_arch='multilib'
-fi
+[[ "$arch" == 'x86_64' ]] && pacman_conf_arch='multilib'
 
 cache_dir_lng="${cache_dir}/lng/${arch}"
 cache_dir_xorg="${cache_dir}/xorg/${arch}"
