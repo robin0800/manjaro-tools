@@ -196,7 +196,7 @@ make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
-		#mkdir -p ${path}
+		mkdir -p ${path}
 		chroot_create "${path}" "${packages}"
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
@@ -212,7 +212,7 @@ make_image_custom() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [${custom} installation] (${custom}-image)"
 		local path="${work_dir}/${custom}-image"
-# 		mkdir -p ${path}
+		mkdir -p ${path}
 		umount_image_handler
 		aufs_mount_root_image "${path}"
 		chroot_create "${path}" "${packages}"
@@ -233,7 +233,7 @@ make_image_livecd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [livecd installation] (livecd-image)"
 		local path="${work_dir}/livecd-image"
-# 		mkdir -p ${path}
+		mkdir -p ${path}
 		umount_image_handler
 		if [[ -n "${custom}" ]] ; then
 			aufs_mount_custom_image "${path}"

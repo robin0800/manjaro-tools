@@ -355,7 +355,6 @@ download_to_cache(){
 # $1: image path
 # $2: packages
 chroot_create(){
-	mkdir -p $1
 	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
 	setarch "${arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} \
