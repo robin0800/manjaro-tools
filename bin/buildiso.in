@@ -128,6 +128,7 @@ iso_only=false
 verbose=false
 
 pacman_conf_arch='default'
+cache_dir_iso="${cache_dir}/iso"
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
@@ -184,7 +185,6 @@ timer_start=$(get_timer)
 
 cache_dir_lng="${cache_dir}/lng/${arch}"
 cache_dir_xorg="${cache_dir}/xorg/${arch}"
-cache_dir_iso="${cache_dir}/iso"
 
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
