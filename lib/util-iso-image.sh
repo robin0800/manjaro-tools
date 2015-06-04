@@ -299,7 +299,7 @@ configure_xorg_drivers(){
 	fi
 }
 
-clean_chroots(){
+chroot_clean(){
 	msg "Cleaning up ..."
 	for image in "$1"/*-image; do
 		[[ -d ${image} ]] || continue
@@ -354,7 +354,8 @@ download_to_cache(){
 
 # $1: image path
 # $2: packages
-make_chroot(){
+chroot_create(){
+	mkdir -p $1
 	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
 	setarch "${arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} \
@@ -385,6 +386,11 @@ aufs_remove_image(){
 		msg2 "unmount ${1##*/}"
 		umount $1
 	fi
+}
+
+# $1: image path
+aufs_clean(){
+	find $1 -name '.wh.*' -delete &> /dev/null
 }
 
 umount_image_handler(){

@@ -196,8 +196,8 @@ make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
-		mkdir -p ${path}
-		make_chroot "${path}" "${packages}"
+		#mkdir -p ${path}
+		chroot_create "${path}" "${packages}"
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_lsb "${path}"
@@ -212,10 +212,10 @@ make_image_custom() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [${custom} installation] (${custom}-image)"
 		local path="${work_dir}/${custom}-image"
-		mkdir -p ${path}
+# 		mkdir -p ${path}
 		umount_image_handler
 		aufs_mount_root_image "${path}"
-		make_chroot "${path}" "${packages}"
+		chroot_create "${path}" "${packages}"
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
@@ -223,7 +223,7 @@ make_image_custom() {
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete &> /dev/null
+		aufs_clean "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${custom} installation] (${custom}-image)"
 	fi
@@ -233,7 +233,7 @@ make_image_livecd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [livecd installation] (livecd-image)"
 		local path="${work_dir}/livecd-image"
-		mkdir -p ${path}
+# 		mkdir -p ${path}
 		umount_image_handler
 		if [[ -n "${custom}" ]] ; then
 			aufs_mount_custom_image "${path}"
@@ -241,7 +241,7 @@ make_image_livecd() {
 		else
 			aufs_mount_root_image "${path}"
 		fi
-		make_chroot "${path}" "${packages}"
+		chroot_create "${path}" "${packages}"
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
@@ -253,7 +253,7 @@ make_image_livecd() {
 		# Clean up GnuPG keys?
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete &> /dev/null
+		aufs_clean "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [livecd-image]"
 	fi
@@ -283,7 +283,7 @@ make_image_xorg() {
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 		configure_xorg_drivers "${path}"
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete &> /dev/null
+		aufs_clean "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [pkgs-image]"
 	fi
@@ -317,7 +317,7 @@ make_image_lng() {
 		rm -r ${path}/var
 		make_repo ${path}/opt/livecd/lng/lng-pkgs ${path}/opt/livecd/lng
 		umount_image_handler
-		find ${path} -name '.wh.*' -delete &> /dev/null
+		aufs_clean "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [lng-image]"
 	fi
@@ -462,18 +462,14 @@ load_pkgs_lng(){
 
 check_chroot_version(){
 	[[ -f ${work_dir}/root-image/.manjaro-tools ]] && local chroot_version=$(cat ${work_dir}/root-image/.manjaro-tools)
-	if [[ ${version} != $chroot_version ]];then
-		clean_first=true
-	fi
+	[[ ${version} != $chroot_version ]] && clean_first=true
 }
 
 check_plymouth(){
 	is_plymouth=false
 	source mkinitcpio.conf
 	for h in ${HOOKS[@]};do
-		if [[ $h == 'plymouth' ]];then
-			is_plymouth=true
-		fi
+		[[ $h == 'plymouth' ]] && is_plymouth=true
 	done
 }
 
@@ -495,10 +491,7 @@ load_profile(){
 	for f in ${files[@]};do
 		case $f in
 			Packages|Packages-Livecd|Packages-Xorg|Packages-Lng) continue ;;
-			*)
-				packages_custom="$f"
-				#msg2 "Packages-Custom: $f"
-			;;
+			*) packages_custom="$f" ;;
 		esac
 	done
 	custom=${packages_custom#*-}
@@ -556,7 +549,7 @@ make_profile(){
 	msg "Start building [$1]"
 	cd $1
 		load_profile "$1"
-		${clean_first} && clean_chroots "${work_dir}"
+		${clean_first} && chroot_clean "${work_dir}"
 		${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
 		${clean_cache_lng} && clean_cache "${cache_dir_lng}"
 		if ${iso_only}; then
