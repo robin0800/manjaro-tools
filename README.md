@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.9.8
+Manjaro-tools-0.9.9
 
 User manual
 
@@ -225,10 +225,10 @@ It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
 $ buildpkg -h
 Usage: buildpkg [options] [--] [makepkg args]
     -p <pkg>           Buildset or pkg [default: default]
-    -a <arch>          Arch [default: x86_64]
-    -b <branch>        Branch [default: unstable]
+    -a <arch>          Arch [default: auto]
+    -b <branch>        Branch [default: stable]
     -r <dir>           Chroots directory
-                       [default: /build/manjaro-tools/buildpkg]
+                       [default: /var/lib/manjaro-tools/buildpkg]
     -i <pkg>           Install a package into the working copy of the chroot
     -c                 Recreate chroot
     -w                 Clean up cache and sources
@@ -281,10 +281,12 @@ buildiso is used to build manjaro-iso-profiles. It is run insde the profiles fol
 $ buildiso -h
 Usage: buildiso [options]
     -p <profile>       Buildset or profile [default: default]
-    -a <arch>          Arch [default: x86_64]
-    -b <branch>        Branch [default: unstable]
+    -a <arch>          Arch [default: auto]
+    -b <branch>        Branch [default: stable]
     -r <dir>           Chroots directory
-                       [default: /build/manjaro-tools/buildiso]
+                       [default: /var/lib/manjaro-tools/buildiso]
+    -t <dir>           Target directory
+                       [default: /var/cache/manjaro-tools/iso]
     -c                 Disable clean work dir
     -x                 Clean xorg cache
     -l                 Clean lng cache
