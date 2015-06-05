@@ -42,7 +42,8 @@ CONFIGFILES = \
 	conf/pacman-mirrors-testing.conf \
 	conf/pacman-mirrors-unstable.conf \
 	conf/pacman-gfx.conf \
-	conf/pacman-lng.conf
+	conf/pacman-lng.conf \
+	conf/profile.conf.example
 
 LIBS = \
 	lib/util.sh \
@@ -81,6 +82,9 @@ EFISHELL = \
 	efi_shell/shellx64_v2.efi
 
 MAN_XML = \
+	buildset.xml \
+	buildpkg.xml \
+	buildtree.xml \
 	buildiso.xml \
 	manjaro-tools.conf.xml \
 	profile.conf.xml
@@ -131,6 +135,9 @@ install:
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell
 	install -m0644 ${EFISHELL} $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell
 	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
+	gzip -c man/buildset.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildset.1.gz
+	gzip -c man/buildpkg.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildpkg.1.gz
+	gzip -c man/buildtree.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildtree.1.gz
 	gzip -c man/buildiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
 	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man5
 	gzip -c man/manjaro-tools.conf.5 > $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
@@ -151,6 +158,9 @@ uninstall:
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
 	for f in ${SCRIPTS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts/$$f; done
 	for f in ${EFISHELL}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell/$$f; done
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildset.1.gz
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildpkg.1.gz
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildtree.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/manjaro-tools.conf.5.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/profiles.conf.5.gz
