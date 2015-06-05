@@ -17,9 +17,13 @@ check_chroot_version(){
 	fi
 }
 
-#check_dir(){
-#check for pkgbuilds
-#}
+check_reqirements(){
+	local pb=$(find ${PWD} -maxdepth 2 -name 'PKGBUILD' -type f)
+	[[ -z ${pb[@]} ]] && die "${0##*/} must be run inside a valid PKGBUILD directory!"
+	for p in ${pb[@]};do
+		[[ $p != ${buildset_pkg} ]] && die "${buildset_pkg} doesn't exist!"
+	done
+}
 
 chroot_create(){
 	msg "Creating chroot for [${branch}] (${arch})..."
