@@ -139,7 +139,7 @@
 			</varlistentry>
 
 				<varlistentry>
-				<term><option>-vq</option></term>
+				<term><option>-v</option></term>
 
 				<listitem><para>Verbose output, show profile detail in combination with pretend.</para></listitem>
 			</varlistentry>
