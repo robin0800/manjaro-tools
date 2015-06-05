@@ -162,8 +162,8 @@ uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildpkg.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildtree.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
-	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/manjaro-tools.conf.5.gz
-	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/profiles.conf.5.gz
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/profile.conf.5.gz
 
 # 	rm $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 # 	rm $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
