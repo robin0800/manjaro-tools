@@ -53,6 +53,61 @@
 	</refsynopsisdiv>
 
 	<refsect1>
+		<title>Description</title>
+
+		<para><command>buildset</command> is used to manage build sets. </para>
+
+		<para>With buildset you can manage iso and package build sets.</para>
+
+	</refsect1>
+
+	<refsect1>
+		<title>Options</title>
+
+		<para>The following options are understood:</para>
+
+		<variablelist>
+
+			<varlistentry>
+				<term><option>-c [name]</option></term>
+
+				<listitem><para>Create set.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-r [name]</option></term>
+
+				<listitem><para>Remove set.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-s [name]</option></term>
+
+				<listitem><para>Show set.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-i</option></term>
+
+				<listitem><para>Iso mode.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-q</option></term>
+
+				<listitem><para>Query sets.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-h</option></term>
+
+				<listitem><para>Help.</para></listitem>
+			</varlistentry>
+		</variablelist>
+
+	</refsect1>
+
+	<refsect1>
 		<title>See Also</title>
 		<para>
 			<citerefentry project='manjaro-tools'><refentrytitle>manjaro-tools.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,

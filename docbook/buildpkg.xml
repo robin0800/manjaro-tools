@@ -48,9 +48,95 @@
 	<refsynopsisdiv>
 		<cmdsynopsis>
 			<command>buildpkg</command>
-			<arg choice="opt" rep="repeat">OPTIONS</arg>
+			<arg choice="opt" rep="repeat">OPTIONS [--] [makepkg_args]</arg>
 		</cmdsynopsis>
 	</refsynopsisdiv>
+
+	<refsect1>
+		<title>Description</title>
+
+		<para><command>buildpkg</command> is used to build a particular package or a set of packages. </para>
+
+		<para>With buildpkg you can build packages in a clean chroot environment.</para>
+
+	</refsect1>
+
+	<refsect1>
+		<title>Options</title>
+
+		<para>The following options are understood:</para>
+
+		<variablelist>
+			<varlistentry>
+				<term><option>-p PROFILE...</option></term>
+
+				<listitem><para>Name of the buildset or name of the directory
+				you will build. It needs to cantain a existing buildset or a
+				folder with a valid PKGBUILD.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-a i686|x86_64|multilib</option></term>
+
+				<listitem><para>Architecture that the iso will be built. Can be i686, x86_64 or multilib.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-b stable|testing|unstable</option></term>
+
+				<listitem><para>Branch to build against..</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-r DIR</option></term>
+
+				<listitem><para>Root working directory where the package will be built.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-i PKG</option></term>
+
+				<listitem><para>Install a package into the working copy of the chroot.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-c</option></term>
+
+				<listitem><para>Recreate chroot.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-w</option></term>
+
+				<listitem><para>Clean up cache and sources.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-n</option></term>
+
+				<listitem><para>Install built package in chroot and run namcap check.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-s</option></term>
+
+				<listitem><para>Sign package.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-q</option></term>
+
+				<listitem><para>Query settings and pretend build.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-h</option></term>
+
+				<listitem><para>Help.</para></listitem>
+			</varlistentry>
+		</variablelist>
+
+	</refsect1>
 
 	<refsect1>
 		<title>See Also</title>
