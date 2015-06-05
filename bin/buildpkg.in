@@ -183,6 +183,8 @@ ${wipe_clean} && clean_up
 
 [[ -d ${work_dir}/root ]] && check_chroot_version
 
+check_requirements
+
 chroot_init
 
 chroot_build
