@@ -17,9 +17,9 @@ check_chroot_version(){
 	fi
 }
 
-check_dir(){
+#check_dir(){
 #check for pkgbuilds
-}
+#}
 
 chroot_create(){
 	msg "Creating chroot for [${branch}] (${arch})..."
