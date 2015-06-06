@@ -183,8 +183,7 @@ ${wipe_clean} && clean_up
 
 [[ -d ${work_dir}/root ]] && check_chroot_version
 
-# disabled until there is a proper fix
-#check_requirements
+check_requirements
 
 chroot_init
 
