@@ -30,36 +30,48 @@ create_set(){
 }
 
 calculate_build_order(){
-	local is_split=false
-	for pkg in $(cat /tmp/${name}.set);do
-		cd $pkg
-			source PKGBUILD
-			if [[ -n $pkgbase ]];then
-			 	is_split=true; echo "$pkgbase" >> /tmp/${name}.split
-			fi
-			for m in ${makedepends[@]};do
-					echo $m >> /tmp/${name}.makedeps
-			done
-		cd ..
-	done
-	sort -u /tmp/${name}.split > /tmp/${name}.split.sort
-	sort -u /tmp/${name}.makedeps > /tmp/${name}.makedeps.sort
+        local is_split=false path=/tmp/calc
+        mkdir -p $path
+        #[[ -f $path/*.{sort,set,makedeps,split} ]] &&
+        rm $path/*
+        pacman -Qqg base-devel  > $path/base-devel.set
 
-	rm /tmp/${name}.split
-	#[[ -f /tmp/${name}.makedeps ]] && rm /tmp/${name}.makedeps
+        for pkg in $(cat $1/${name}.set);do
+                cd $pkg
+                        source PKGBUILD
+                        if [[ -n $pkgbase ]];then
+                                is_split=true; echo "$pkgbase" >> $path/${name}.split
+                        fi
+                        for m in ${makedepends[@]};do
+                                        echo $m >> $path/${name}.makedeps
+                        done
+                cd ..
+        done
+        [[ -f $path/${name}.split ]] && sort -u $path/${name}.split > $path/${name}.split.sort
+        sort -u $path/${name}.makedeps > $path/${name}.makedeps.sort
 
-	for d in $(cat /tmp/${name}.makedeps.sort);do
-		for pkg in $(cat /tmp/${name}.set);do
-			if [[ $pkg == $d ]];then
-				echo $d >> /tmp/${name}.makedeps
-			fi
-		done
-	done
+        [[ -f $path/${name}.split ]] && rm $path/${name}.split
 
-	sort -u /tmp/${name}.makedeps > /tmp/${name}.makedeps.sort
-	#[[ -f /tmp/${name}.makedeps ]] && rm /tmp/${name}.makedeps
+        for d in $(cat $path/${name}.makedeps.sort);do
+                for pkg in $(cat $1/${name}.set);do
+                        if [[ $pkg == $d ]];then
+                                echo $d >> $path/${name}.makedeps
+                        fi
+                done
+        done
+        sort -u $path/${name}.makedeps > $path/${name}.makedeps.sort
+        rm $path/${name}.makedeps
+        sort -u $path/${name}.makedeps.sort $path/base-devel.set > $path/filter.set
 
-	rm /tmp/${name}.*sort
+
+        for b in $(cat $path/base-devel.set);do
+                for m in $(cat $path/filter.set);do
+                        if [[ $b == $m ]];then
+                                sed "/$m/d" -i $path/filter.set
+                        fi
+                done
+        done
+
 }
 
 remove_set(){
