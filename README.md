@@ -131,6 +131,9 @@ Each iso profile must have these files or symlinks to shared:
 
 # displaymanager="lightdm"
 
+# autologin
+# autologin=true
+
 ################ install ################
 
 # unset defaults to given value
@@ -140,7 +143,7 @@ Each iso profile must have these files or symlinks to shared:
 # efi_boot_loader="grub"
 
 # set uefi partition size
-# efi_part_size=42M
+# efi_part_size=32M
 
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant
