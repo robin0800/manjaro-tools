@@ -330,18 +330,7 @@ load_vars() {
 	return 0
 }
 
-load_config(){
-
-	[[ -f $1 ]] || return 1
-
-	manjaro_tools_conf="$1"
-
-	[[ -r ${manjaro_tools_conf} ]] && source ${manjaro_tools_conf}
-
-	######################
-	# common
-	######################
-
+init_common(){
 	[[ -z ${branch} ]] && branch='stable'
 
 	[[ -z ${arch} ]] && arch=$(uname -m)
@@ -353,21 +342,17 @@ load_config(){
 	[[ -z ${sets_dir} ]] && sets_dir="${SYSCONFDIR}/sets"
 
 	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
+}
 
-	###################
-	# buildtree
-	###################
-
+init_buildtree(){
 	[[ -z ${repo_tree[@]} ]] && repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
 
 	[[ -z ${host_tree} ]] && host_tree='https://github.com/manjaro'
 
 	[[ -z ${host_tree_abs} ]] && host_tree_abs='https://projects.archlinux.org/git/svntogit'
+}
 
-	###################
-	# buildpkg
-	###################
-
+init_buildpkg(){
 	chroots_pkg="${chroots_dir}/buildpkg"
 
 	sets_dir_pkg="${sets_dir}/pkg"
@@ -377,11 +362,9 @@ load_config(){
 	[[ -z ${blacklist_trigger[@]} ]] && blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
 
 	[[ -z ${blacklist[@]} ]] && blacklist=('libsystemd')
+}
 
-	###################
-	# buildiso
-	###################
-
+init_buildiso(){
 	chroots_iso="${chroots_dir}/buildiso"
 
 	sets_dir_iso="${sets_dir}/iso"
@@ -421,6 +404,23 @@ load_config(){
 	[[ -z ${iso_compression} ]] && iso_compression='xz'
 
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
+}
+
+load_config(){
+
+	[[ -f $1 ]] || return 1
+
+	manjaro_tools_conf="$1"
+
+	[[ -r ${manjaro_tools_conf} ]] && source ${manjaro_tools_conf}
+
+	init_common
+
+	init_buildtree
+
+	init_buildpkg
+
+	init_buildiso
 
 	return 0
 }
