@@ -17,7 +17,7 @@ check_chroot_version(){
 	fi
 }
 
-check_reqirements(){
+check_requirements(){
 	local pb=$(find ${PWD} -maxdepth 2 -name 'PKGBUILD' -type f)
 	[[ -z ${pb[@]} ]] && die "${0##*/} must be run inside a valid PKGBUILD directory!"
 	for p in ${pb[@]};do
