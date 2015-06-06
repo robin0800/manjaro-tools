@@ -44,7 +44,9 @@ depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
 
 install_localization
 
-configure_displaymanager_autologin
+if [[ ${autologin} == "true" ]] ; then
+    configure_displaymanager_autologin
+fi
 
 echo "configure root password" >> /var/log/livecd.log
 
