@@ -430,7 +430,7 @@ configure_displaymanager(){
 			sed -i -e "s/^.*autologin-user-timeout=.*/autologin-user-timeout=0/" /etc/lightdm/lightdm.conf
 		fi
 	elif [[ -f /usr/bin/kdm ]];then
-		if ${autologin},then
+		if ${autologin};then
 			sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" /usr/share/config/kdm/kdmrc
 			sed -i -e "s/^.*AutoLoginPass=.*/AutoLoginPass=${password}/" /usr/share/config/kdm/kdmrc
 		fi
