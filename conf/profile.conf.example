@@ -7,9 +7,6 @@
 
 # displaymanager="lightdm"
 
-# autologin
-# autologin="true"
-
 ################ install ################
 
 # unset defaults to given value

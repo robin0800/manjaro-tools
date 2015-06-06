@@ -10,14 +10,16 @@ seconds="0"
 while [ -e "/var/lib/pacman/db.lck" ];
 do
 	echo 'Pacman is not ready yet. Will try again in 10 seconds.' >> /var/log/livecd.log
+	echo '----' >> /var/log/livecd.log
 	ps -ef >> /var/log/livecd.log
 	echo '----' >> /var/log/livecd.log
 	seconds=$(($seconds + 10))
 	sleep 10
-	if [[ "$seconds" == "120" ]]; then
-		# remove database lock after 120s
+	if [[ "$seconds" == "60" ]]; then
+		# remove database lock after 60s
 		# this might be related to https://github.com/manjaro/pamac/issues/25
 		# https://github.com/manjaro/manjaro-tools/issues/101
+		echo 'Warning: removing pacman db.lck!' >> /var/log/livecd.log
 		rm /var/lib/pacman/db.lck
 	fi
 done

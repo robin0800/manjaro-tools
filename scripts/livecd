@@ -44,7 +44,7 @@ depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
 
 install_localization
 
-configure_displaymanager
+configure_displaymanager_autologin
 
 echo "configure root password" >> /var/log/livecd.log
 
