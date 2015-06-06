@@ -425,8 +425,6 @@ load_profile_config(){
 
 	[[ -z ${displaymanager} ]] && displaymanager="none"
 
-	[[ -z ${autologin} ]] && displaymanager="true"
-
 	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
 
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
