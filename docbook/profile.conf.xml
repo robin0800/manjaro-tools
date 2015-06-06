@@ -92,6 +92,15 @@
         </para></listitem>
       </varlistentry>
 
+	<varlistentry>
+        <term><varname>autologin=</varname></term>
+
+        <listitem><para>Accepts
+			<option>true</option> (the default)
+			<option>false</option>.</para>
+		</listitem>
+	</varlistentry>
+
       <varlistentry>
         <term><varname>default_desktop_executable=</varname></term>
         <term><varname>default_desktop_file=</varname></term>
@@ -136,8 +145,8 @@
       <varlistentry>
         <term><varname>kernel=</varname></term>
 
-        <listitem><para>Takes a string corresponding to a 
-        manjaro kernel package (ex: linux318 for linux 3.18). 
+        <listitem><para>Takes a string corresponding to a
+        manjaro kernel package (ex: linux318 for linux 3.18).
         </para></listitem>
       </varlistentry>
 
@@ -154,7 +163,7 @@
 
         <listitem><para>Size in MiB of the fat partition where
         the kernel is. This is useful if you add extra hooks
-        in the mkinitcpio.conf and it's to big to fit in the 
+        in the mkinitcpio.conf and it's to big to fit in the
         partition. The default is "32M".
         </para></listitem>
       </varlistentry>
@@ -212,7 +221,7 @@
         <term><varname>addgroups=</varname></term>
 
         <listitem><para>Default groups of the default user
-        in the live-cd and the user created while installing 
+        in the live-cd and the user created while installing
         the iso using calamares.
         </para></listitem>
       </varlistentry>
@@ -232,7 +241,7 @@
         <listitem><para>Array of services that will be
         enabled in the openrc live-cd.
         </para></listitem>
-      </varlistentry>      
+      </varlistentry>
 
     </variablelist>
 
@@ -247,5 +256,5 @@
   </refsect1>
 
 </refentry>
- 
- 
+
+
