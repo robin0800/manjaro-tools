@@ -12,6 +12,75 @@ import(){
 	[[ -r $1 ]] && source $1
 }
 
+create_set(){
+	msg "[$1/${name}.set]"
+	if [[ -f $1/${name}.set ]];then
+		msg3 "Backing up $1/${name}.set.orig"
+		mv "$1/${name}.set" "$1/${name}.set.orig"
+	fi
+	local list=$(find * -maxdepth 0 -type d | sort)
+	for item in ${list[@]};do
+		if [[ -f $item/$2 ]];then
+			cd $item
+				msg2 "Adding ${item##*/}"
+				echo ${item##*/} >> $1/${name}.set || break
+			cd ..
+		fi
+	done
+}
+
+calculate_build_order(){
+	local is_split=false
+	for pkg in $(cat /tmp/${name}.set);do
+		cd $pkg
+			source PKGBUILD
+			if [[ -n $pkgbase ]];then
+			 	is_split=true; echo "$pkgbase" >> /tmp/${name}.split
+			fi
+			for m in ${makedepends[@]};do
+					echo $m >> /tmp/${name}.makedeps
+			done
+		cd ..
+	done
+	sort -u /tmp/${name}.split > /tmp/${name}.split.sort
+	sort -u /tmp/${name}.makedeps > /tmp/${name}.makedeps.sort
+
+	rm /tmp/${name}.split
+	#[[ -f /tmp/${name}.makedeps ]] && rm /tmp/${name}.makedeps
+
+	for d in $(cat /tmp/${name}.makedeps.sort);do
+		for pkg in $(cat /tmp/${name}.set);do
+			if [[ $pkg == $d ]];then
+				echo $d >> /tmp/${name}.makedeps
+			fi
+		done
+	done
+
+	sort -u /tmp/${name}.makedeps > /tmp/${name}.makedeps.sort
+	#[[ -f /tmp/${name}.makedeps ]] && rm /tmp/${name}.makedeps
+
+	rm /tmp/${name}.*sort
+}
+
+remove_set(){
+	if [[ -f $1/${name}.set ]]; then
+		msg "Removing [$1/${name}.set] ..."
+		rm $1/${name}.set
+	fi
+}
+
+show_set(){
+	local list=$(cat $1/${name}.set)
+	msg "Content of [$1/${name}.set] ..."
+	for item in ${list[@]}; do
+		msg2 "$item"
+	done
+}
+
+get_deps(){
+	echo $(pactree -u $1)
+}
+
 get_timer(){
 	echo $(date +%s)
 }
@@ -271,6 +340,8 @@ load_config(){
 
 	[[ -z ${sets_dir} ]] && sets_dir="${SYSCONFDIR}/sets"
 
+	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
+
 	###################
 	# buildtree
 	###################
@@ -290,8 +361,6 @@ load_config(){
 	sets_dir_pkg="${sets_dir}/pkg"
 
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
-
-	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
 
 	[[ -z ${blacklist_trigger[@]} ]] && blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
 
@@ -355,6 +424,8 @@ load_profile_config(){
 	[[ -z ${initsys} ]] && initsys="systemd"
 
 	[[ -z ${displaymanager} ]] && displaymanager="none"
+
+	[[ -z ${autologin} ]] && displaymanager="true"
 
 	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
 
