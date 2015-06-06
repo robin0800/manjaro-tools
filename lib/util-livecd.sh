@@ -426,6 +426,7 @@ configure_displaymanager(){
 			${autologin} && sed -i -e 's/^.*pam-autologin-service=.*/pam-autologin-service=lightdm-autologin/' /etc/lightdm/lightdm.conf
 		fi
 		${autologin} && sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
+		${autologin} && sed -i -e "s/^.*autologin-user-timeout=.*/autologin-user-timeout=0/" /etc/lightdm/lightdm.conf
 	elif [[ -f /usr/bin/kdm ]];then
 		if ${autologin},then
 			sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" /usr/share/config/kdm/kdmrc
