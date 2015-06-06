@@ -367,9 +367,9 @@ $update_first && chroot-run \
 
 [[ -n ${install_pkgs[*]} ]] && install_packages
 
-prepare_chroot
-
 download_sources
+
+prepare_chroot
 
 mountargs_ro="${PWD}:/startdir_host,${SRCDEST}:/srcdest_host"
 
