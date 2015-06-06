@@ -19,7 +19,13 @@ check_chroot_version(){
 
 check_requirements(){
 	[[ -z $(find . -maxdepth 2 -name 'PKGBUILD' -type f) ]] && die "${0##*/} must be run inside a valid PKGBUILD directory!"
-	[[ -z $(find $PWD -type d -name "${buildset_pkg}") ]] && die "${buildset_pkg} is not a valid package!"
+	if ${is_buildset};then
+		for i in $(cat ${sets_dir_pkg}/${buildset_pkg}.set);do
+			[[ -z $(find . -type d -name "${i}") ]] && die "${buildset_pkg} is not a valid buildset!"
+		done
+	else
+		[[ -z $(find . -type d -name "${buildset_pkg}") ]] && die "${buildset_pkg} is not a valid package!"
+	fi
 }
 
 chroot_create(){
