@@ -7,6 +7,9 @@
 
 # displaymanager="lightdm"
 
+# Set to false to disable autologin in the livecd
+# autologin="true"
+
 ################ install ################
 
 # unset defaults to given value
@@ -52,6 +55,3 @@
 # names must match openrc service names
 # services in start_openrc array don't need to be listed here
 # start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
-
-# Set to false to disable autologin in the livecd
-# autologin="true"
