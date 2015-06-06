@@ -10,9 +10,10 @@ seconds="0"
 while [ -e "/var/lib/pacman/db.lck" ];
 do
 	echo 'Pacman is not ready yet. Will try again in 10 seconds.' >> /var/log/livecd.log
-	echo '----' >> /var/log/livecd.log
-	ps -ef >> /var/log/livecd.log
-	echo '----' >> /var/log/livecd.log
+	echo 'Pacman is not ready yet. Will try again in 10 seconds.' >> /var/log/livecd-debug.log
+	echo '----' >> /var/log/livecd-debug.log
+	ps -ef >> /var/log/livecd-debug.log
+	echo '----' >> /var/log/livecd-debug.log
 	seconds=$(($seconds + 10))
 	sleep 10
 	if [[ "$seconds" == "60" ]]; then
@@ -20,6 +21,7 @@ do
 		# this might be related to https://github.com/manjaro/pamac/issues/25
 		# https://github.com/manjaro/manjaro-tools/issues/101
 		echo 'Warning: removing pacman db.lck!' >> /var/log/livecd.log
+		echo 'Warning: removing pacman db.lck!' >> /var/log/livecd-debug.log
 		rm /var/lib/pacman/db.lck
 	fi
 done
