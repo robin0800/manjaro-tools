@@ -420,14 +420,15 @@ configure_user_root(){
 
 configure_displaymanager(){
 	if [[ -f /usr/bin/lightdm ]];then
-		gpasswd -a ${username} autologin &> /dev/null
-		# hopefully fixes autologin on openrc livecd
-		if [[ -d /run/openrc ]];then
-			${autologin} && sed -i -e 's/^.*pam-autologin-service=.*/pam-autologin-service=lightdm-autologin/' /etc/lightdm/lightdm.conf
-		fi
 		if ${autologin};then
+			gpasswd -a ${username} autologin &> /dev/null
 			sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
 			sed -i -e "s/^.*autologin-user-timeout=.*/autologin-user-timeout=0/" /etc/lightdm/lightdm.conf
+			sed -i -e "s/^.*pam-autologin-service=.*/pam-autologin-service=lightdm-autologin/" /etc/lightdm/lightdm.conf
+			# hopefully fixes autologin on openrc livecd
+			if [[ -d /run/openrc ]];then
+				sed -i -e 's/^.*pam-autologin-service=.*/pam-autologin-service=lightdm-autologin/' /etc/lightdm/lightdm.conf
+			fi			
 		fi
 	elif [[ -f /usr/bin/kdm ]];then
 		if ${autologin};then
