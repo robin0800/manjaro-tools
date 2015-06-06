@@ -340,6 +340,8 @@ load_config(){
 
 	[[ -z ${sets_dir} ]] && sets_dir="${SYSCONFDIR}/sets"
 
+	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
+
 	###################
 	# buildtree
 	###################
@@ -359,8 +361,6 @@ load_config(){
 	sets_dir_pkg="${sets_dir}/pkg"
 
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
-
-	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
 
 	[[ -z ${blacklist_trigger[@]} ]] && blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
 
