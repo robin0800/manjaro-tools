@@ -84,16 +84,12 @@ display_settings(){
 
 	msg "ARGS:"
 	msg2 "clean_first: ${clean_first}"
-	msg2 "clean_cache_xorg: ${clean_cache_xorg}"
-	msg2 "clean_cache_lng: ${clean_cache_lng}"
 	msg2 "images_only: ${images_only}"
 	msg2 "iso_only: ${iso_only}"
 
 	msg "PATHS:"
 	msg2 "sets_dir_iso: ${sets_dir_iso}"
 	msg2 "cache_dir_iso: ${cache_dir_iso}"
-	msg2 "cache_dir_xorg: ${cache_dir_xorg}"
-	msg2 "cache_dir_lng: ${cache_dir_lng}"
 
 	msg "DIST SETTINGS:"
 	msg2 "dist_name: ${dist_name}"
@@ -120,9 +116,6 @@ load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 clean_first=true
 
-clean_cache_xorg=false
-clean_cache_lng=false
-
 pretend=false
 images_only=false
 iso_only=false
@@ -141,8 +134,6 @@ usage() {
 	echo '    -t <dir>           Target directory'
 	echo "                       [default: ${cache_dir_iso}]"
 	echo '    -c                 Disable clean work dir'
-	echo '    -x                 Clean xorg cache'
-	echo '    -l                 Clean lng cache'
 	echo '    -i                 Build images only'
 	echo '    -s                 Generate iso only'
 	echo '                       Requires pre built images (-i)'
@@ -156,7 +147,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:cxlisvqh'
+opts='p:a:b:r:t:cisvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -167,8 +158,6 @@ while getopts "${opts}" arg; do
 		t) cache_dir_iso="$OPTARG" ;;
 		k) keep_repo="$OPTARG" ;;
 		c) clean_first=false ;;
-		x) clean_cache_xorg=true ;;
-		l) clean_cache_lng=true ;;
 		i) images_only=true ;;
 		s) iso_only=true ;;
 		v) verbose=true ;;
@@ -183,9 +172,6 @@ shift $(($OPTIND - 1))
 timer_start=$(get_timer)
 
 [[ "$arch" == 'x86_64' ]] && pacman_conf_arch='multilib'
-
-cache_dir_lng="${cache_dir}/lng/${arch}"
-cache_dir_xorg="${cache_dir}/xorg/${arch}"
 
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 

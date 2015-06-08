@@ -71,28 +71,19 @@ copy_livecd_helpers(){
 }
 
 copy_cache_lng(){
-	msg2 "Copying lng cache ..."
-	cp ${cache_dir_lng}/* ${work_dir}/lng-image/opt/livecd/lng
-	msg2 "Trimming lng pkgs ..."
-	paccache -rv -k1 -c ${work_dir}/lng-image/opt/livecd/lng
+	msg2 "Copying language package cache ..."
+	rsync -v --files-from="${work_dir}/lng-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/lng-image/opt/livecd/lng"
+	rm -f "${work_dir}/lng-image/cache-packages.txt"
 }
 
 copy_cache_xorg(){
-	msg2 "Copying xorg pkgs cache ..."
-	cp ${cache_dir_xorg}/* ${work_dir}/pkgs-image/opt/livecd/pkgs
-	msg2 "Trimming xorg pkgs ..."
-	paccache -rv -k1 -c ${work_dir}/pkgs-image/opt/livecd/pkgs
+	msg2 "Copying xorg package cache ..."
+	rsync -v --files-from="${work_dir}/pkgs-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/pkgs-image/opt/livecd/pkgs"
+	rm -f "${work_dir}/pkgs-image/cache-packages.txt"
 }
 
 prepare_cachedirs(){
 	prepare_dir "${cache_dir_iso}"
-	prepare_dir "${cache_dir_xorg}"
-	prepare_dir "${cache_dir_lng}"
-}
-
-clean_cache(){
-    msg2 "Cleaning [$1] ..."
-    find "$1" -name '*.pkg.tar.xz' -delete &> /dev/null
 }
 
 # $1: image path
@@ -271,7 +262,7 @@ make_image_xorg() {
 		else
 			aufs_mount_root_image "${path}"
 		fi
-		download_to_cache "${path}" "${cache_dir_xorg}" "${packages_xorg}"
+		download_to_cache "${path}" "${packages_xorg}"
 		copy_cache_xorg
 		if [[ -n "${packages_xorg_cleanup}" ]]; then
 			for xorg_clean in ${packages_xorg_cleanup}; do
@@ -302,10 +293,10 @@ make_image_lng() {
 			aufs_mount_root_image "${path}"
 		fi
 		if [[ -n ${packages_lng_kde} ]]; then
-			download_to_cache "${path}" "${cache_dir_lng}" "${packages_lng} ${packages_lng_kde}"
+			download_to_cache "${path}" "${packages_lng} ${packages_lng_kde}"
 			copy_cache_lng
 		else
-			download_to_cache "${path}" "${cache_dir_lng}" "${packages_lng}"
+			download_to_cache "${path}" "${packages_lng}"
 			copy_cache_lng
 		fi
 		if [[ -n "${packages_lng_cleanup}" ]]; then
@@ -550,8 +541,6 @@ make_profile(){
 	cd $1
 		load_profile "$1"
 		${clean_first} && chroot_clean "${work_dir}"
-		${clean_cache_xorg} && clean_cache "${cache_dir_xorg}"
-		${clean_cache_lng} && clean_cache "${cache_dir_lng}"
 		if ${iso_only}; then
 			[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p ${buildset_iso} -i"
 			compress_images
