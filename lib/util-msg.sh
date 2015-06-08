@@ -11,6 +11,10 @@
 export LC_MESSAGES=C
 export LANG=C
 
+import(){
+	[[ -r $1 ]] && source $1
+}
+
 # check if messages are to be printed using color
 unset ALL_OFF BOLD BLUE GREEN RED YELLOW CYAN MAGENTA WHITE
 if [[ -t 2 ]]; then

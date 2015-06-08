@@ -8,10 +8,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import(){
-	[[ -r $1 ]] && source $1
-}
-
 create_set(){
 	msg "[$1/${name}.set]"
 	if [[ -f $1/${name}.set ]];then
@@ -30,48 +26,15 @@ create_set(){
 }
 
 calculate_build_order(){
-        local is_split=false path=/tmp/calc
-        mkdir -p $path
-        #[[ -f $path/*.{sort,set,makedeps,split} ]] &&
-        rm $path/*
-        pacman -Qqg base-devel  > $path/base-devel.set
-
-        for pkg in $(cat $1/${name}.set);do
-                cd $pkg
-                        source PKGBUILD
-                        if [[ -n $pkgbase ]];then
-                                is_split=true; echo "$pkgbase" >> $path/${name}.split
-                        fi
-                        for m in ${makedepends[@]};do
-                                        echo $m >> $path/${name}.makedeps
-                        done
-                cd ..
-        done
-        [[ -f $path/${name}.split ]] && sort -u $path/${name}.split > $path/${name}.split.sort
-        sort -u $path/${name}.makedeps > $path/${name}.makedeps.sort
-
-        [[ -f $path/${name}.split ]] && rm $path/${name}.split
-
-        for d in $(cat $path/${name}.makedeps.sort);do
-                for pkg in $(cat $1/${name}.set);do
-                        if [[ $pkg == $d ]];then
-                                echo $d >> $path/${name}.makedeps
-                        fi
-                done
-        done
-        sort -u $path/${name}.makedeps > $path/${name}.makedeps.sort
-        rm $path/${name}.makedeps
-        sort -u $path/${name}.makedeps.sort $path/base-devel.set > $path/filter.set
-
-
-        for b in $(cat $path/base-devel.set);do
-                for m in $(cat $path/filter.set);do
-                        if [[ $b == $m ]];then
-                                sed "/$m/d" -i $path/filter.set
-                        fi
-                done
-        done
-
+	local is_split=false path=/tmp/calc
+	mkdir -p $path
+	rm $path/*
+	msg3 "Calculating build order ..."
+	for pkg in $(cat $1/${name}.set);do
+		cd $pkg
+			mksrcinfio
+		cd ..
+	done
 }
 
 remove_set(){
@@ -345,6 +308,10 @@ init_common(){
 }
 
 init_buildtree(){
+	tree_dir=${cache_dir}/pkgtree
+
+	tree_dir_abs=${tree_dir}/packages-archlinux
+
 	[[ -z ${repo_tree[@]} ]] && repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
 
 	[[ -z ${host_tree} ]] && host_tree='https://github.com/manjaro'
@@ -553,11 +520,11 @@ check_profile(){
 
 # $1: file
 # $2: exit code
-check_sanity(){
-	if [[ ! -f $1 ]]; then
-		eval "$2"
-	fi
-}
+# check_sanity(){
+# 	if [[ ! -f $1 ]]; then
+# 		eval "$2"
+# 	fi
+# }
 
 show_version(){
 	msg "manjaro-tools"

@@ -9,9 +9,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-[[ -r ${LIBDIR}/util-iso-image.sh ]] && source ${LIBDIR}/util-iso-image.sh
-[[ -r ${LIBDIR}/util-iso-boot.sh ]] && source ${LIBDIR}/util-iso-boot.sh
-[[ -r ${LIBDIR}/util-iso-calamares.sh ]] && source ${LIBDIR}/util-iso-calamares.sh
+import ${LIBDIR}/util-iso-image.sh
+import ${LIBDIR}/util-iso-boot.sh
+import ${LIBDIR}/util-iso-calamares.sh
 
 # check_run_dir(){
 # 	if [[ ! -f shared/Packages-Systemd ]] || [[ ! -f shared/Packages-Openrc ]];then
@@ -573,11 +573,11 @@ make_profile(){
 build_iso(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			check_profile "$prof" "break"
+# 			check_profile "$prof" "break"
 			make_profile "$prof"
 		done
 	else
-		check_profile "${buildset_iso}" 'die "Profile sanity check failed."'
+# 		check_profile "${buildset_iso}" 'die "Profile sanity check failed."'
 		make_profile "${buildset_iso}"
 	fi
 }

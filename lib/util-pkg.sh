@@ -138,11 +138,11 @@ make_pkg(){
 chroot_build(){
 	if ${is_buildset};then
 		for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
-			check_sanity "$pkg/PKGBUILD" "break"
+			#check_sanity "$pkg/PKGBUILD" "break"
 			make_pkg "$pkg" "break"
 		done
 	else
-		check_sanity "${buildset_pkg}/PKGBUILD" 'die "Not a valid package!"'
+		#check_sanity "${buildset_pkg}/PKGBUILD" 'die "Not a valid package!"'
 		make_pkg "${buildset_pkg}" "abort"
 	fi
 }
