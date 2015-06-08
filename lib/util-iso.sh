@@ -115,10 +115,6 @@ copy_cache_xorg(){
 	rm -f "${work_dir}/pkgs-image/cache-packages.txt"
 }
 
-prepare_cachedirs(){
-	prepare_dir "${cache_dir_iso}"
-}
-
 # $1: image path
 squash_image_dir() {
 	if [[ ! -d "$1" ]]; then
