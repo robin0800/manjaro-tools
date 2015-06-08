@@ -357,10 +357,10 @@ download_to_cache(){
 		  -w "${mountargs_rw}" \
 		  -B "${build_mirror}/${branch}" \
 		  "$1" \
-		  pacman -v -Sp $2 --noconfirm > /list.xorg
+		  pacman -v -Sp $2 --noconfirm > "$1"/cache-packages.txt
 	sed -ni '/.pkg.tar.xz/p' "$1"/cache-packages.txt
 	sed -i "s/.*\///" "$1"/cache-packages.txt
-	find "$1/etc" -mindepth 1 -delete &> /dev/null
+	rm -rf "$1/etc"
 }
 
 # $1: image path
