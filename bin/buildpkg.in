@@ -18,8 +18,9 @@ PKGDATADIR='@pkgdatadir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
-[[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
-[[ -r ${LIBDIR}/util-pkg.sh ]] && source ${LIBDIR}/util-pkg.sh
+
+import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-pkg.sh
 
 show_build_queue(){
 	if ${is_buildset};then

@@ -15,8 +15,8 @@ LIBDIR='@libdir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
-[[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
-[[ -r ${LIBDIR}/util-pkgtree.sh ]] && source ${LIBDIR}/util-pkgtree.sh
+import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-pkgtree.sh
 
 display_settings(){
 	show_version
@@ -72,9 +72,6 @@ while getopts "${opts}" arg; do
 done
 
 shift $(($OPTIND - 1))
-
-tree_dir=${cache_dir}/buildtree
-tree_dir_abs=${tree_dir}/packages-archlinux
 
 check_root "$0" "${orig_argv[@]}"
 

@@ -17,8 +17,9 @@ PKGDATADIR='@pkgdatadir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
-[[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
-[[ -r ${LIBDIR}/util-iso.sh ]] && source ${LIBDIR}/util-iso.sh
+
+import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-iso.sh
 
 show_profile(){
 	cd $1
