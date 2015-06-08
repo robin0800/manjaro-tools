@@ -9,22 +9,21 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-check_chroot_version(){
-	[[ -f ${work_dir}/root/.manjaro-tools ]] && local chroot_version=$(cat ${work_dir}/root/.manjaro-tools)
-	msg "chroot version: $chroot_version"
-	if [[ ${version} != $chroot_version ]];then
-		clean_first=true
-	fi
+check_build(){
+	[[ ! -f $1/PKGBUILD ]] && die "Directory must contain a PKGBUILD!"
 }
 
 check_requirements(){
-	[[ -z $(find . -maxdepth 2 -name 'PKGBUILD' -type f) ]] && die "${0##*/} must be run inside a valid PKGBUILD directory!"
+# 	[[ -z $(find . -maxdepth 2 -name 'PKGBUILD' -type f) ]] && die "${0##*/} must be run inside a valid PKGBUILD directory!"
 	if ${is_buildset};then
-		for i in $(cat ${sets_dir_pkg}/${buildset_pkg}.set);do
-			[[ -z $(find . -type d -name "${i}") ]] && die "${buildset_pkg} is not a valid buildset!"
+		for p in $(cat ${sets_dir_pkg}/${buildset_pkg}.set);do
+			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_pkg} is not a valid buildset!"
+			check_build "$p"
 		done
 	else
 		[[ -z $(find . -type d -name "${buildset_pkg}") ]] && die "${buildset_pkg} is not a valid package!"
+		msg "$PWD/${buildset_pkg}/PKGBUILD"
+		check_build "${buildset_pkg}"
 	fi
 }
 
@@ -138,11 +137,9 @@ make_pkg(){
 chroot_build(){
 	if ${is_buildset};then
 		for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
-			#check_sanity "$pkg/PKGBUILD" "break"
 			make_pkg "$pkg" "break"
 		done
 	else
-		#check_sanity "${buildset_pkg}/PKGBUILD" 'die "Not a valid package!"'
 		make_pkg "${buildset_pkg}" "abort"
 	fi
 }

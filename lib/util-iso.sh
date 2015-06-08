@@ -13,11 +13,44 @@ import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
 
-# check_run_dir(){
-# 	if [[ ! -f shared/Packages-Systemd ]] || [[ ! -f shared/Packages-Openrc ]];then
-# 		die "${0##*/} is not run in a valid iso-profiles folder!"
-# 	fi
-# }
+# $1: path
+# $2: exit code
+check_profile(){
+	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
+	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
+	local has_keyfiles=false has_keydirs=false
+	for f in ${keyfiles[@]}; do
+		if [[ -f $1/$f ]];then
+			has_keyfiles=true
+		else
+			has_keyfiles=false
+			break
+		fi
+	done
+	for d in ${keydirs[@]}; do
+		if [[ -d $1/$d ]];then
+			has_keydirs=true
+		else
+			has_keydirs=false
+			break
+		fi
+	done
+	if ! ${has_keyfiles} && ! ${has_keydirs};then
+		die "Profile ($1) sanity check failed!"
+	fi
+}
+
+check_requirements(){
+	if ${is_buildset};then
+		for p in $(cat ${sets_dir_iso}/${buildset_iso}.set);do
+			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_iso} is not a valid buildset!"
+			check_profile "$p"
+		done
+	else
+		[[ -z $(find . -type d -name "${buildset_iso}") ]] && die "${buildset_iso} is not a valid profile directory!"
+		check_profile "${buildset_iso}"
+	fi
+}
 
 copy_overlay_root(){
 	msg2 "Copying overlay ..."
@@ -451,11 +484,6 @@ load_pkgs_lng(){
 	packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
-check_chroot_version(){
-	[[ -f ${work_dir}/root-image/.manjaro-tools ]] && local chroot_version=$(cat ${work_dir}/root-image/.manjaro-tools)
-	[[ ${version} != $chroot_version ]] && clean_first=true
-}
-
 check_plymouth(){
 	is_plymouth=false
 	source mkinitcpio.conf
@@ -496,7 +524,7 @@ load_profile(){
 
 	check_plymouth
 
-	[[ -d ${work_dir}/root-image ]] && check_chroot_version
+	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 }
 
 compress_images(){
@@ -562,11 +590,9 @@ make_profile(){
 build_iso(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-# 			check_profile "$prof" "break"
 			make_profile "$prof"
 		done
 	else
-# 		check_profile "${buildset_iso}" 'die "Profile sanity check failed."'
 		make_profile "${buildset_iso}"
 	fi
 }

@@ -489,43 +489,6 @@ load_user_info(){
 	USER_CONFIG="$USER_HOME/.config"
 }
 
-# $1: path
-# $2: exit code
-check_profile(){
-	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
-	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
-	local has_keyfiles=false has_keydirs=false
-	for f in ${keyfiles[@]}; do
-		if [[ -f $1/$f ]];then
-			has_keyfiles=true
-		else
-			has_keyfiles=false
-			break
-		fi
-	done
-	for d in ${keydirs[@]}; do
-		if [[ -d $1/$d ]];then
-			has_keydirs=true
-		else
-			has_keydirs=false
-			break
-		fi
-	done
-	if ! ${has_keyfiles} && ! ${has_keydirs};then
-# 		msg "Profile sanity check passed."
-# 	else
-		eval $2
-	fi
-}
-
-# $1: file
-# $2: exit code
-# check_sanity(){
-# 	if [[ ! -f $1 ]]; then
-# 		eval "$2"
-# 	fi
-# }
-
 show_version(){
 	msg "manjaro-tools"
 	msg2 "version: ${version}"
@@ -567,4 +530,9 @@ create_min_fs(){
 	mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
 	mkdir -m 1777 -p $1/tmp
 	mkdir -m 0555 -p $1/{sys,proc}
+}
+
+check_chroot_version(){
+	[[ -f $1/.manjaro-tools ]] && local chroot_version=$(cat $1/.manjaro-tools)
+	[[ ${version} != $chroot_version ]] && clean_first=true
 }
