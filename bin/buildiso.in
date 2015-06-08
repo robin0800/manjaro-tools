@@ -177,9 +177,11 @@ mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 check_root "$0" "${orig_argv[@]}"
 
+prepare_cachedirs
+
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
-prepare_cachedirs
+check_requirements
 
 ${pretend} && display_settings && exit 1
 

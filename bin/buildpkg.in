@@ -178,13 +178,13 @@ prepare_cachedir
 
 eval_buildset "${buildset_pkg}" "${sets_dir_pkg}"
 
+check_requirements
+
 ${pretend} && display_settings && exit
 
 ${wipe_clean} && clean_up
 
-[[ -d ${work_dir}/root ]] && check_chroot_version
-
-check_requirements
+[[ -d ${work_dir}/root ]] && check_chroot_version "${work_dir}/root"
 
 chroot_init
 
