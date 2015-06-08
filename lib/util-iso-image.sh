@@ -344,12 +344,23 @@ make_repo(){
 }
 
 # $1: work dir
-# $2: cache dir
-# $3: pkglist
+# $2: pkglist
 download_to_cache(){
-	pacman -v --config "${pacman_conf}" \
-			--arch "${arch}" --root "$1" \
-			--cache $2 -Syw $3 --noconfirm
+	chroot-run \
+		  -r "${mountargs_ro}" \
+		  -w "${mountargs_rw}" \
+		  -B "${build_mirror}/${branch}" \
+		  "$1" \
+		  pacman -v -Syw $2 --noconfirm
+	chroot-run \
+		  -r "${mountargs_ro}" \
+		  -w "${mountargs_rw}" \
+		  -B "${build_mirror}/${branch}" \
+		  "$1" \
+		  pacman -v -Sp $2 --noconfirm > /list.xorg
+	sed -ni '/.pkg.tar.xz/p' "$1"/cache-packages.txt
+	sed -i "s/.*\///" "$1"/cache-packages.txt
+	find "$1/etc" -mindepth 1 -delete &> /dev/null
 }
 
 # $1: image path

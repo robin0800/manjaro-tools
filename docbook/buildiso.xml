@@ -110,23 +110,6 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-x</option></term>
-
-				<listitem><para>Clean the xorg packages cache. Xorg packages
-				are the packages listed in Packages-Xorg file within each profile and are
-				used for the
-				<citerefentry project='mhwd'><refentrytitle>mhwd</refentrytitle><manvolnum>1</manvolnum></citerefentry> tool.</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><option>-l</option></term>
-
-				<listitem><para>Clean the language packages cache. Language
-				packages cache are listed in Packages-Lng and are used to bundle multiple
-				language packages with the iso.</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
 				<term><option>-i</option></term>
 
 				<listitem><para>Only build images, without creating an ISO file.</para></listitem>
