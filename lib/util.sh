@@ -26,13 +26,10 @@ create_set(){
 }
 
 calculate_build_order(){
-	local is_split=false path=/tmp/calc
-	mkdir -p $path
-	rm $path/*
 	msg3 "Calculating build order ..."
 	for pkg in $(cat $1/${name}.set);do
 		cd $pkg
-			mksrcinfio
+			mksrcinfo
 		cd ..
 	done
 }
