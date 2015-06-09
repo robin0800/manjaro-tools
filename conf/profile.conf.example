@@ -13,6 +13,9 @@
 # Set to false to disable autologin in the livecd
 # autologin="true"
 
+# nonfree xorg drivers
+# nonfree_xorg="true"
+
 ################ install ################
 
 # unset defaults to given value
