@@ -473,38 +473,6 @@ load_pkgs(){
 	fi
 }
 
-# $1: file name
-load_pkgs_new(){
-	msg3 "Loading Packages: [$1] ..."
-	local exp
-	if [[ ${initsys} == 'openrc' ]];then
-		exp="s|>openrc||g"
-	else
-		exp="s|>systemd||g"
-	fi
-	if [[ "${arch}" == "i686" ]]; then
-		packages=$(sed "s|#.*||g" "$1" \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>x86_64.*||g" \
-				| sed "s|>i686||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed "$exp" \
-				| sed ':a;N;$!ba;s/\n/ /g')
-	elif [[ "${arch}" == "x86_64" ]]; then
-		packages=$(sed "s|#.*||g" "$1" \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>i686.*||g" \
-				| sed "s|>x86_64||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed "$exp" \
-				| sed ':a;N;$!ba;s/\n/ /g')
-	fi
-}
-
 load_pkgs_xorg(){
 	msg3 "Loading Packages: [Packages-Xorg] ..."
 	if [[ "${arch}" == "i686" ]]; then
@@ -539,67 +507,6 @@ load_pkgs_xorg(){
 					| sed "s|KERNEL|$kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
 }
 
-load_pkgs_xorg_new(){
-	msg3 "Loading Packages: [Packages-Xorg] ..."
-	local exp
-	if [[ ${initsys} == 'openrc' ]];then
-		exp="s|>openrc||g"
-	else
-		exp="s|>systemd||g"
-	fi
-	if [[ "${arch}" == "i686" ]]; then
-		packages_xorg=$(sed "s|#.*||g" Packages-Xorg \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>cleanup.*||g" \
-				| sed "$exp" \
-				| sed "s|>x86_64.*||g" \
-				| sed "s|>i686||g" \
-				| sed "s|>free_x64.*||g" \
-				| sed "s|>free_uni||g" \
-				| sed "s|>nonfree_x64.*||g" \
-				| sed "s|>nonfree_uni||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed ':a;N;$!ba;s/\n/ /g')
-	elif [[ "${arch}" == "x86_64" ]]; then
-		if ${multilib};then
-			local exp2="s|>nonfree_multilib||g" exp3="s|>multilib||g"
-			packages_xorg=$(sed "s|#.*||g" Packages-Xorg \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>cleanup.*||g" \
-				| sed "s|>i686.*||g" \
-				| sed "s|>x86_64||g" \
-				| sed "s|>free_x64||g" \
-				| sed "s|>free_uni||g" \
-				| sed "s|>nonfree_uni||g" \
-				| sed "s|>nonfree_x64||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed "$exp" \
-				| sed "$exp2" \
-				| sed "$exp3" \
-				| sed ':a;N;$!ba;s/\n/ /g')
-		else
-			packages_xorg=$(sed "s|#.*||g" Packages-Xorg \
-				| sed "s| ||g" | sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>cleanup.*||g" \
-				| sed "s|>i686.*||g" \
-				| sed "s|>x86_64||g" \
-				| sed "s|>free_x64||g" \
-				| sed "s|>free_uni||g" \
-				| sed "s|>nonfree_uni||g" \
-				| sed "s|>nonfree_x64||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed "$exp" \
-				| sed ':a;N;$!ba;s/\n/ /g')
-		fi
-	fi
-	packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" | sed "s|KERNEL|$kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-}
-
 load_pkgs_lng(){
 	msg3 "Loading Packages: [Packages-Lng] ..."
 	if [[ "${arch}" == "i686" ]]; then
@@ -626,6 +533,232 @@ load_pkgs_lng(){
 	packages_lng_cleanup=$(sed "s|#.*||g" Packages-Lng | grep cleanup | sed "s|>cleanup||g")
 	packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
 }
+
+
+# # $1: file name
+# load_pkgs(){
+# 	msg3 "Loading Packages: [$1] ..."
+# 	local _init= \
+# 		_init_rm= \
+# 		_arch= \
+# 		_arch_rm= \
+# 		_blacklist_rm="s|>blacklist.*||g" \
+# 		_kernel="s|KERNEL|$kernel|g" \
+# 		_space="s| ||g" \
+# 		_clean=':a;N;$!ba;s/\n/ /g' \
+# 		_multi="s|>multilib||g" \
+# 		_multi_rm="s|>multilib.*||g" \
+# 		_com_rm="s|#.*||g"
+#
+# 	if [[ ${initsys} == 'openrc' ]];then
+# 		_init="s|>openrc||g"
+# 		_init_rm="s|>systemd.*||g"
+# 	else
+# 		_init="s|>systemd||g"
+# 		_init_rm="s|>openrc.*||g"
+# 	fi
+#
+# 	if [[ "${arch}" == "i686" ]]; then
+# 		_arch="s|>i686||g"
+# 		_arch_rm="s|>x86_64.*||g"
+# 		packages=$(sed "$_com_rm" "$1" \
+# 				| sed "$_space" \
+# 				| sed "$_blacklist_rm" \
+# 				| sed "$_arch_rm" \
+# 				| sed "$_arch" \
+# 				| sed "$_kernel" \
+# 				| sed "$_init" \
+# 				| sed "$_init_rm" \
+# 				| sed "$_clean")
+# 	elif [[ "${arch}" == "x86_64" ]]; then
+# 		_arch="s|>x86_64||g"
+# 		_arch_rm="s|>i686.*||g"
+# 		if ${multilib};then
+# 			packages=$(sed "$_com_rm" "$1" \
+# 				| sed "$_space" \
+# 				| sed "$_blacklist_rm" \
+# 				| sed "$_arch_rm" \
+# 				| sed "$_arch" \
+# 				| sed "$_kernel" \
+# 				| sed "$_init" \
+# 				| sed "$_init_rm" \
+# 				| sed "$_multi" \
+# 				| sed "$_clean")
+# 		else
+# 			packages=$(sed "$_com_rm" "$1" \
+# 				| sed "$_space" \
+# 				| sed "$_blacklist_rm" \
+# 				| sed "$_arch_rm" \
+# 				| sed "$_arch" \
+# 				| sed "$_kernel" \
+# 				| sed "$_init" \
+# 				| sed "$_init_rm" \
+# 				| sed "$_multi_rm" \
+# 				| sed "$_clean")
+# 		fi
+# 	fi
+# }
+#
+# load_pkgs_xorg(){
+# 	msg3 "Loading Packages: [Packages-Xorg] ..."
+# 	local _init= \
+# 		_init_rm= \
+# 		_arch= \
+# 		_arch_rm= \
+# 		_blacklist_rm="s|>blacklist.*||g" \
+# 		_kernel="s|KERNEL|$kernel|g" \
+# 		_space="s| ||g" \
+# 		_clean=':a;N;$!ba;s/\n/ /g' \
+# 		_multi="s|>multilib||g" \
+# 		_multi_rm="s|>multilib.*||g" \
+# 		_purge="s|>cleanup.*||g" \
+# 		_nonfree="s|>nonfree||g" \
+# 		_nonfree_rm="s|>nonfree.*||g" \
+# 		_nonfree_multi="s|>nonfree_multilib||g" \
+# 		_com_rm="s|#.*||g" \
+# 		_purge_rm="s|>cleanup||g"
+#
+# 	if [[ ${initsys} == 'openrc' ]];then
+# 		_init="s|>openrc||g"
+# 		_init_rm="s|>systemd.*||g"
+# 	else
+# 		_init="s|>systemd||g"
+# 		_init_rm="s|>openrc.*||g"
+# 	fi
+#
+# 	if [[ "${arch}" == "i686" ]]; then
+# 		_arch="s|>i686||g"
+# 		_arch_rm="s|>x86_64.*||g"
+# 		if ${nonfree_xorg};then
+# 			packages_xorg=$(sed "$_com_rm" Packages-Xorg \
+# 				| sed "$_space" \
+# 				| sed "$_blacklist_rm" \
+# 				| sed "$_purge" \
+# 				| sed "$_init" \
+# 				| sed "$_init_rm" \
+# 				| sed "$_arch_rm" \
+# 				| sed "$_arch" \
+# 				| sed "$_nonfree" \
+# 				| sed "$_kernel" \
+# 				| sed "$_clean")
+# 		else
+# 			packages_xorg=$(sed "$_com_rm" Packages-Xorg \
+# 				| sed "$_space" \
+# 				| sed "$_blacklist_rm" \
+# 				| sed "$_purge" \
+# 				| sed "$_init" \
+# 				| sed "$_init_rm" \
+# 				| sed "$_arch_rm" \
+# 				| sed "$_arch" \
+# 				| sed "$_nonfree_rm" \
+# 				| sed "$_kernel" \
+# 				| sed "$_clean")
+# 		fi
+#
+# 	elif [[ "${arch}" == "x86_64" ]]; then
+# 		_arch="s|>x86_64||g"
+# 		_arch_rm="s|>i686.*||g"
+#
+# 		if ${multilib};then
+# 			if ${nonfree_xorg};then
+# 				packages_xorg=$(sed "$_com_rm" Packages-Xorg \
+# 					| sed "$_space" \
+# 					| sed "$_blacklist_rm" \
+# 					| sed "$_purge" \
+# 					| sed "$_arch_rm" \
+# 					| sed "$_arch" \
+# 					| sed "$_nonfree" \
+# 					| sed "$_kernel" \
+# 					| sed "$_init" \
+# 					| sed "$_init_rm" \
+# 					| sed "$_nonfree_multi" \
+# 					| sed "$_multi" \
+# 					| sed "$_clean")
+# 			else
+# 				packages_xorg=$(sed "$_com_rm" Packages-Xorg \
+# 					| sed "$_space" \
+# 					| sed "$_blacklist_rm" \
+# 					| sed "$_purge" \
+# 					| sed "$_arch_rm" \
+# 					| sed "$_arch" \
+# 					| sed "$_kernel" \
+# 					| sed "$_init" \
+# 					| sed "$_init_rm" \
+# 					| sed "$_multi" \
+# 					| sed "$_clean")
+# 			fi
+#
+# 		else
+# 			if ${nonfree_xorg};then
+# 				packages_xorg=$(sed "$_com_rm" Packages-Xorg \
+# 					| sed "$_space" \
+# 					| sed "$_blacklist_rm" \
+# 					| sed "$_purge" \
+# 					| sed "$_arch_rm" \
+# 					| sed "$_arch" \
+# 					| sed "$_nonfree" \
+# 					| sed "$_kernel" \
+# 					| sed "$_init" \
+# 					| sed "$_init_rm" \
+# 					| sed "$_multi_rm" \
+# 					| sed "$_clean")
+# 			else
+# 				packages_xorg=$(sed "$_com_rm" Packages-Xorg \
+# 					| sed "$_space" \
+# 					| sed "$_blacklist_rm" \
+# 					| sed "$_purge" \
+# 					| sed "$_arch_rm" \
+# 					| sed "$_arch" \
+# 					| sed "$_nonfree_rm" \
+# 					| sed "$_kernel" \
+# 					| sed "$_init" \
+# 					| sed "$_init_rm" \
+# 					| sed "$_multi_rm" \
+# 					| sed "$_clean")
+# 			fi
+#
+# 		fi
+# 	fi
+# 	packages_xorg_cleanup=$(sed "$_com_rm" Packages-Xorg | grep cleanup | sed "$_purge_rm" | sed "$_kernel" | sed "$_clean")
+# }
+#
+# load_pkgs_lng(){
+# 	msg3 "Loading Packages: [Packages-Lng] ..."
+# 		local _arch= \
+# 		_arch_rm= \
+# 		_blacklist_rm="s|>blacklist.*||g" \
+# 		_kernel="s|KERNEL|$kernel|g" \
+# 		_space="s| ||g" \
+# 		_clean=':a;N;$!ba;s/\n/ /g' \
+# 		_purge="s|>cleanup.*||g" \
+# 		_com_rm="s|#.*||g" \
+# 		_purge_rm="s|>cleanup||g"
+#
+# 	if [[ "${arch}" == "i686" ]]; then
+# 		_arch="s|>i686||g"
+# 		_arch_rm="s|>x86_64.*||g"
+# 		packages_lng=$(sed "$_com_rm" Packages-Lng \
+# 				| sed "$_space" \
+# 				| sed "$_blacklist_rm" \
+# 				| sed "$_purge" \
+# 				| sed "$_arch_rm" \
+# 				| sed "$_arch" \
+# 				| sed "$_clean")
+# 	elif [[ "${arch}" == "x86_64" ]]; then
+# 		_arch="s|>x86_64||g"
+# 		_arch_rm="s|>i686.*||g"
+# 		packages_lng=$(sed "$_com_rm" Packages-Lng \
+# 				| sed "$_space" \
+# 				| sed "$_blacklist_rm" \
+# 				| sed "$_purge" \
+# 				| sed "$_arch_rm" \
+# 				| sed "$_arch" \
+# 				| sed "$_clean")
+# 	fi
+# 	packages_lng_cleanup=$(sed "$_com_rm" Packages-Lng | grep cleanup | sed "$_purge_rm")
+# 	packages_lng_kde=$(sed "$_com_rm" Packages-Lng | sed "$_clean")
+# }
+
 
 check_plymouth(){
 	is_plymouth=false
