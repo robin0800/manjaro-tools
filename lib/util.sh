@@ -405,6 +405,8 @@ load_profile_config(){
 
 	[[ -z ${multilib} ]] && multilib="true"
 
+	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
+
 	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
 
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
