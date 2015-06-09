@@ -403,6 +403,8 @@ load_profile_config(){
 
 	[[ -z ${autologin} ]] && autologin="true"
 
+	[[ -z ${multilib} ]] && multilib="true"
+
 	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
 
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
