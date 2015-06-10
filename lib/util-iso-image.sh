@@ -132,10 +132,7 @@ configure_accountsservice(){
 	fi
 }
 
-# $1: chroot
-configure_displaymanager(){
-	msg2 "Configuring Displaymanager ..."
-	# Try to detect desktop environment
+detect_desktop_env(){
 	if [[ "${default_desktop_executable}" == "none" ]] || [[ ${default_desktop_file} == "none" ]]; then
 		msg2 "No default desktop environment set, trying to detect it."
 		if [ -e "$1/usr/bin/startkde" ] && [ -e "$1/usr/share/xsessions/plasma.desktop" ]; then
@@ -204,6 +201,13 @@ configure_displaymanager(){
 			msg2 "No desktop environment detected"
 		fi
 	fi
+}
+
+# $1: chroot
+configure_displaymanager(){
+	msg2 "Configuring Displaymanager ..."
+	# Try to detect desktop environment
+	detect_desktop_env "$1"
 	# Configure display manager
 	case ${displaymanager} in
 		'lightdm')
