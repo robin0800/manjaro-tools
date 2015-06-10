@@ -36,7 +36,7 @@ check_profile(){
 		fi
 	done
 	if ! ${has_keyfiles} && ! ${has_keydirs};then
-		die "Profile ($1) sanity check failed!"
+		die "Profile [$1] sanity check failed!"
 	fi
 }
 
@@ -449,7 +449,12 @@ make_isomounts() {
 	fi
 }
 
-set_pkglist(){
+# $1: file name
+load_pkgs(){
+	msg3 "Loading Packages: [$1] ..."
+	#set_pkglist
+	local _init _init_rm _arch _arch_rm _multi _nonfree _nonfree_multi
+
 	if [[ ${initsys} == 'openrc' ]];then
 		_init="s|>openrc||g"
 		_init_rm="s|>systemd.*||g"
@@ -489,70 +494,63 @@ set_pkglist(){
 			fi
 		fi
 	fi
-	_blacklist="s|>blacklist.*||g"
-	_kernel="s|KERNEL|$kernel|g"
-	_space="s| ||g"
-	_clean=':a;N;$!ba;s/\n/ /g'
-	_com_rm="s|#.*||g"
-	_purge="s|>cleanup.*||g"
-	_purge_rm="s|>cleanup||g"
-}
+	local _blacklist="s|>blacklist.*||g" \
+		_kernel="s|KERNEL|$kernel|g" \
+		_space="s| ||g" \
+		_clean=':a;N;$!ba;s/\n/ /g' \
+		_com_rm="s|#.*||g" \
+		_purge="s|>cleanup.*||g" \
+		_purge_rm="s|>cleanup||g"
 
-# $1: file name
-load_pkgs(){
-	msg3 "Loading Packages: [$1] ..."
-	set_pkglist
-	packages=$(sed "$_com_rm" "$1" \
-		| sed "$_space" \
-		| sed "$_blacklist" \
-		| sed "$_arch" \
-		| sed "$_arch_rm" \
-		| sed "$_kernel" \
-		| sed "$_init" \
-		| sed "$_init_rm" \
-		| sed "$_multi" \
-		| sed "$_clean")
-}
+	case $1 in
+		'Packages-Xorg')
+			packages_xorg=$(sed "$_com_rm" "$1" \
+				| sed "$_space" \
+				| sed "$_blacklist" \
+				| sed "$_purge" \
+				| sed "$_init" \
+				| sed "$_init_rm" \
+				| sed "$_arch" \
+				| sed "$_arch_rm" \
+				| sed "$_nonfree" \
+				| sed "$_multi" \
+				| sed "$_nonfree_multi" \
+				| sed "$_kernel" \
+				| sed "$_clean")
 
-load_pkgs_xorg(){
-	msg3 "Loading Packages: [Packages-Xorg] ..."
-	set_pkglist
-	packages_xorg=$(sed "$_com_rm" Packages-Xorg \
-		| sed "$_space" \
-		| sed "$_blacklist" \
-		| sed "$_purge" \
-		| sed "$_init" \
-		| sed "$_init_rm" \
-		| sed "$_arch" \
-		| sed "$_arch_rm" \
-		| sed "$_nonfree" \
-		| sed "$_multi" \
-		| sed "$_nonfree_multi" \
-		| sed "$_kernel" \
-		| sed "$_clean")
+			packages_xorg_cleanup=$(sed "$_com_rm" "$1" \
+				| grep cleanup \
+				| sed "$_purge_rm" \
+				| sed "$_kernel" \
+				| sed "$_clean")
+		;;
+		'Packages-Lng')
+			packages_lng=$(sed "$_com_rm" "$1" \
+				| sed "$_space" \
+				| sed "$_blacklist" \
+				| sed "$_purge" \
+				| sed "$_arch_rm" \
+				| sed "$_arch" \
+				| sed "$_clean")
 
-	packages_xorg_cleanup=$(sed "$_com_rm" Packages-Xorg \
-		| grep cleanup \
-		| sed "$_purge_rm" \
-		| sed "$_kernel" \
-		| sed "$_clean")
-}
-
-load_pkgs_lng(){
-	msg3 "Loading Packages: [Packages-Lng] ..."
-	set_pkglist
-	packages_lng=$(sed "$_com_rm" Packages-Lng \
-		| sed "$_space" \
-		| sed "$_blacklist" \
-		| sed "$_purge" \
-		| sed "$_arch_rm" \
-		| sed "$_arch" \
-		| sed "$_clean")
-
-	packages_lng_cleanup=$(sed "$_com_rm" Packages-Lng \
-		| grep cleanup \
-		| sed "$_purge_rm")
-	packages_lng_kde=$(sed "$_com_rm" Packages-Lng | sed "$_clean")
+			packages_lng_cleanup=$(sed "$_com_rm" "$1" \
+				| grep cleanup \
+				| sed "$_purge_rm")
+			packages_lng_kde=$(sed "$_com_rm" "$1" | sed "$_clean")
+		;;
+		*)
+			packages=$(sed "$_com_rm" "$1" \
+				| sed "$_space" \
+				| sed "$_blacklist" \
+				| sed "$_arch" \
+				| sed "$_arch_rm" \
+				| sed "$_kernel" \
+				| sed "$_init" \
+				| sed "$_init_rm" \
+				| sed "$_multi" \
+				| sed "$_clean")
+		;;
+	esac
 }
 
 check_plymouth(){
@@ -618,11 +616,11 @@ build_images(){
 		make_image_livecd
 	fi
 	if [[ -f Packages-Xorg ]] ; then
-		load_pkgs_xorg
+		load_pkgs 'Packages-Xorg'
 		make_image_xorg
 	fi
 	if [[ -f Packages-Lng ]] ; then
-		load_pkgs_lng
+		load_pkgs 'Packages-Lng'
 		make_image_lng
 	fi
 	make_image_boot
