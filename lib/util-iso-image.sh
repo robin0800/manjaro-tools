@@ -203,6 +203,12 @@ detect_desktop_env(){
 	fi
 }
 
+configure_mhwd(){
+	if [[ ${arch} == "x86_64" ]];then
+		! ${multilib} && echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
+	fi
+}
+
 # $1: chroot
 configure_displaymanager(){
 	msg2 "Configuring Displaymanager ..."
