@@ -328,10 +328,6 @@ Build images only
 will stop after all packages have been installed. No iso sqfs compression will be executed
 ######* -s
 Use this to sqfs compress the chroots if you previously used -i.
-######* -x
-By default, xorg package cache is not cleaned on every build. Enabling the xorg cache cleaning will result in  dowloading the xorg drivers.
-######* -l
-By default, lng package cache is not cleaned on every build. Enabling the lng cache cleaning will result in  dowloading the lng packages.
 
 ###4. buildset
 
