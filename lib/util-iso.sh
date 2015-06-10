@@ -454,7 +454,7 @@ make_isomounts() {
 load_pkgs(){
 	msg3 "Loading Packages: [$1] ..."
 
-	local _init _init_rm _multi _nonfree _nonfree_multi
+	local _init _init_rm _multi _nonfree _nonfree_multi _arch _arch_rm
 
 	if [[ ${initsys} == 'openrc' ]];then
 		_init="s|>openrc||g"
@@ -464,6 +464,8 @@ load_pkgs(){
 		_init_rm="s|>openrc.*||g"
 	fi
 	if [[ "${arch}" == "i686" ]]; then
+		_arch="s|>i686||g"
+		_arch_rm="s|>x86_64.*||g"
 		_multi="s|>multilib.*||g"
 		if ${nonfree_xorg};then
 			_nonfree="s|>nonfree_default||g"
@@ -471,6 +473,8 @@ load_pkgs(){
 			_nonfree="s|>nonfree_default.*||g"
 		fi
 	else
+		_arch="s|>x86_64||g"
+		_arch_rm="s|>i686.*||g"
 		if ${multilib};then
 			_multi="s|>multilib||g"
 			if ${nonfree_xorg};then
@@ -507,6 +511,8 @@ load_pkgs(){
 				| sed "$_purge" \
 				| sed "$_init" \
 				| sed "$_init_rm" \
+				| sed "$_arch" \
+				| sed "$_arch_rm" \
 				| sed "$_nonfree" \
 				| sed "$_multi" \
 				| sed "$_nonfree_multi" \
@@ -523,6 +529,8 @@ load_pkgs(){
 			packages=$(sed "$_com_rm" "$1" \
 				| sed "$_space" \
 				| sed "$_blacklist" \
+				| sed "$_arch" \
+				| sed "$_arch_rm" \
 				| sed "$_purge" \
 				| sed "$_clean")
 
@@ -538,6 +546,8 @@ load_pkgs(){
 				| sed "$_kernel" \
 				| sed "$_init" \
 				| sed "$_init_rm" \
+				| sed "$_arch" \
+				| sed "$_arch_rm" \
 				| sed "$_multi" \
 				| sed "$_clean")
 		;;
