@@ -221,6 +221,7 @@ make_image_root() {
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_lsb "${path}"
+		configure_mhwd "${path}"
 		copy_overlay_root "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
