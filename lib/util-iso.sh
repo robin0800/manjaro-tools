@@ -291,10 +291,10 @@ make_image_xorg() {
 		else
 			aufs_mount_root_image "${path}"
 		fi
-		download_to_cache "${path}" "${packages_xorg}"
+		download_to_cache "${path}" "${packages}"
 		copy_cache_xorg
-		if [[ -n "${packages_xorg_cleanup}" ]]; then
-			for xorg_clean in ${packages_xorg_cleanup}; do
+		if [[ -n "${packages_cleanup}" ]]; then
+			for xorg_clean in ${packages_cleanup}; do
 				rm ${path}/opt/livecd/pkgs/${xorg_clean}
 			done
 		fi
@@ -322,14 +322,14 @@ make_image_lng() {
 			aufs_mount_root_image "${path}"
 		fi
 		if [[ -n ${packages_lng_kde} ]]; then
-			download_to_cache "${path}" "${packages_lng} ${packages_lng_kde}"
+			download_to_cache "${path}" "${packages} ${packages_lng_kde}"
 			copy_cache_lng
 		else
-			download_to_cache "${path}" "${packages_lng}"
+			download_to_cache "${path}" "${packages}"
 			copy_cache_lng
 		fi
-		if [[ -n "${packages_lng_cleanup}" ]]; then
-			for lng_clean in ${packages_lng_cleanup}; do
+		if [[ -n "${packages_cleanup}" ]]; then
+			for lng_clean in ${packages_cleanup}; do
 				rm ${path}/opt/livecd/lng/${lng_clean}
 			done
 		fi
@@ -452,8 +452,8 @@ make_isomounts() {
 # $1: file name
 load_pkgs(){
 	msg3 "Loading Packages: [$1] ..."
-	#set_pkglist
-	local _init _init_rm _arch _arch_rm _multi _nonfree _nonfree_multi
+
+	local _init _init_rm _multi _nonfree _nonfree_multi
 
 	if [[ ${initsys} == 'openrc' ]];then
 		_init="s|>openrc||g"
@@ -463,8 +463,6 @@ load_pkgs(){
 		_init_rm="s|>openrc.*||g"
 	fi
 	if [[ "${arch}" == "i686" ]]; then
-		_arch="s|>i686||g"
-		_arch_rm="s|>x86_64.*||g"
 		_multi="s|>multilib.*||g"
 		if ${nonfree_xorg};then
 			_nonfree="s|>nonfree_default||g"
@@ -472,8 +470,6 @@ load_pkgs(){
 			_nonfree="s|>nonfree_default.*||g"
 		fi
 	else
-		_arch="s|>x86_64||g"
-		_arch_rm="s|>i686.*||g"
 		if ${multilib};then
 			_multi="s|>multilib||g"
 			if ${nonfree_xorg};then
@@ -504,36 +500,32 @@ load_pkgs(){
 
 	case $1 in
 		'Packages-Xorg')
-			packages_xorg=$(sed "$_com_rm" "$1" \
+			packages=$(sed "$_com_rm" "$1" \
 				| sed "$_space" \
 				| sed "$_blacklist" \
 				| sed "$_purge" \
 				| sed "$_init" \
 				| sed "$_init_rm" \
-				| sed "$_arch" \
-				| sed "$_arch_rm" \
 				| sed "$_nonfree" \
 				| sed "$_multi" \
 				| sed "$_nonfree_multi" \
 				| sed "$_kernel" \
 				| sed "$_clean")
 
-			packages_xorg_cleanup=$(sed "$_com_rm" "$1" \
+			packages_cleanup=$(sed "$_com_rm" "$1" \
 				| grep cleanup \
 				| sed "$_purge_rm" \
 				| sed "$_kernel" \
 				| sed "$_clean")
 		;;
 		'Packages-Lng')
-			packages_lng=$(sed "$_com_rm" "$1" \
+			packages=$(sed "$_com_rm" "$1" \
 				| sed "$_space" \
 				| sed "$_blacklist" \
 				| sed "$_purge" \
-				| sed "$_arch_rm" \
-				| sed "$_arch" \
 				| sed "$_clean")
 
-			packages_lng_cleanup=$(sed "$_com_rm" "$1" \
+			packages_cleanup=$(sed "$_com_rm" "$1" \
 				| grep cleanup \
 				| sed "$_purge_rm")
 			packages_lng_kde=$(sed "$_com_rm" "$1" | sed "$_clean")
@@ -542,8 +534,6 @@ load_pkgs(){
 			packages=$(sed "$_com_rm" "$1" \
 				| sed "$_space" \
 				| sed "$_blacklist" \
-				| sed "$_arch" \
-				| sed "$_arch_rm" \
 				| sed "$_kernel" \
 				| sed "$_init" \
 				| sed "$_init_rm" \
