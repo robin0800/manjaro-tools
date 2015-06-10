@@ -205,7 +205,10 @@ detect_desktop_env(){
 
 configure_mhwd(){
 	if [[ ${arch} == "x86_64" ]];then
-		! ${multilib} && echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
+		if ! ${multilib};then
+			msg2 "Disable mhwd lib32 support ..."
+			echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
+		fi
 	fi
 }
 
