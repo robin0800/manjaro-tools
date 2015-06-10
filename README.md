@@ -129,10 +129,16 @@ Each iso profile must have these files or symlinks to shared:
 # possible values: openrc,systemd
 # initsys="systemd"
 
+# use multilib packages; x86_64 only
+# multilib="true"
+
 # displaymanager="lightdm"
 
-# autologin
-# autologin=true
+# Set to false to disable autologin in the livecd
+# autologin="true"
+
+# nonfree xorg drivers
+# nonfree_xorg="true"
 
 ################ install ################
 
@@ -291,8 +297,6 @@ Usage: buildiso [options]
     -t <dir>           Target directory
                        [default: /var/cache/manjaro-tools/iso]
     -c                 Disable clean work dir
-    -x                 Clean xorg cache
-    -l                 Clean lng cache
     -i                 Build images only
     -s                 Generate iso only
                        Requires pre built images (-i)
