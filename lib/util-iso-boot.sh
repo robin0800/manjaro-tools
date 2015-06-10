@@ -197,15 +197,17 @@ write_isolinux_cfg(){
 		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
 	fi
 	echo '' >> ${conf}
-	echo "label nonfree" >> ${conf}
-	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
-		msg2 "Using intel_ucode.img ..."
-		echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
-	else
-		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+	if ${nonfree_xorg};then
+		echo "label nonfree" >> ${conf}
+		echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+		if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+			msg2 "Using intel_ucode.img ..."
+			echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+		else
+			echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+		fi
+		echo '' >> ${conf}
 	fi
-	echo '' >> ${conf}
 	echo "label harddisk" >> ${conf}
 	echo "  com32 whichsys.c32" >> ${conf}
 	echo "  append -iso- chain.c32 hd0" >> ${conf}
@@ -228,7 +230,9 @@ write_isolinux_msg(){
 	echo '' >> ${conf}
 	echo "Available boot options:" >> ${conf}
 	echo "start                    - Start ${dist_name} Live System" >> ${conf}
-	echo "nonfree                  - Start with proprietary drivers" >> ${conf}
+	if ${nonfree_xorg};then
+		echo "nonfree                  - Start with proprietary drivers" >> ${conf}
+	fi
 	echo "harddisk                 - Boot from local hard disk" >> ${conf}
 	echo "hdt                      - Run Hardware Detection Tool" >> ${conf}
 	echo "memtest                  - Run Memory Test" >> ${conf}
