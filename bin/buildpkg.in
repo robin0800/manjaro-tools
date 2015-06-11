@@ -20,7 +20,7 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 
 import ${LIBDIR}/util.sh
-import ${LIBDIR}/util-pkg.sh
+import ${LIBDIR/pkg/util-pkg.sh
 
 show_build_queue(){
 	if ${is_buildset};then

@@ -9,10 +9,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import ${LIBDIR}/util-iso-image.sh
-import ${LIBDIR}/util-iso-boot.sh
-import ${LIBDIR}/util-iso-calamares.sh
-import ${LIBDIR}/util-iso-fs.sh
+import ${LIBDIR}/iso/util-iso-image.sh
+import ${LIBDIR}/iso/util-iso-boot.sh
+import ${LIBDIR}/iso/util-iso-calamares.sh
+import ${LIBDIR}/iso/util-iso-fs.sh
 
 # $1: path
 # $2: exit code
