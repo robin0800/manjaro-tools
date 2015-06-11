@@ -98,7 +98,7 @@ MAN_XML = \
 	manjaro-tools.conf.xml \
 	profile.conf.xml
 
-all: $(BIN) $(BIN_PKG) $(BIN_iso) doc #bin/bash_completion bin/zsh_completion
+all: $(BIN) $(BIN_PKG) $(BIN_ISO) doc #bin/bash_completion bin/zsh_completion
 
 edit = sed -e "s|@pkgdatadir[@]|$(DESTDIR)$(PREFIX)/share/manjaro-tools|g" \
 	-e "s|@bindir[@]|$(DESTDIR)$(PREFIX)/bin|g" \
