@@ -14,7 +14,6 @@ check_build(){
 }
 
 check_requirements(){
-# 	[[ -z $(find . -maxdepth 2 -name 'PKGBUILD' -type f) ]] && die "${0##*/} must be run inside a valid PKGBUILD directory!"
 	if ${is_buildset};then
 		for p in $(cat ${sets_dir_pkg}/${buildset_pkg}.set);do
 			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_pkg} is not a valid buildset!"
@@ -22,7 +21,6 @@ check_requirements(){
 		done
 	else
 		[[ -z $(find . -type d -name "${buildset_pkg}") ]] && die "${buildset_pkg} is not a valid package!"
-		msg "$PWD/${buildset_pkg}/PKGBUILD"
 		check_build "${buildset_pkg}"
 	fi
 }
@@ -37,6 +35,7 @@ chroot_create(){
 }
 
 chroot_clean(){
+	msg "Creating chroot for [${branch}] (${arch})..."
 	for copy in "${work_dir}"/*; do
 		[[ -d ${copy} ]] || continue
 		msg2 "Deleting chroot copy '$(basename "${copy}")'..."
