@@ -404,6 +404,8 @@ init_buildiso(){
 	[[ -z ${iso_compression} ]] && iso_compression='xz'
 
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
+
+	[[ -z ${use_overlayfs} ]] && use_overlayfs='false'
 }
 
 load_config(){
