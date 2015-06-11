@@ -504,22 +504,22 @@ load_pkgs(){
 		_purge="s|>cleanup.*||g" \
 		_purge_rm="s|>cleanup||g"
 
+	packages=$(sed "$_com_rm" "$1" \
+		| sed "$_space" \
+		| sed "$_blacklist" \
+		| sed "$_purge" \
+		| sed "$_init" \
+		| sed "$_init_rm" \
+		| sed "$_arch" \
+		| sed "$_arch_rm" \
+		| sed "$_nonfree" \
+		| sed "$_multi" \
+		| sed "$_nonfree_multi" \
+		| sed "$_kernel" \
+		| sed "$_clean")
+		
 	case $1 in
 		'Packages-Xorg')
-			packages=$(sed "$_com_rm" "$1" \
-				| sed "$_space" \
-				| sed "$_blacklist" \
-				| sed "$_purge" \
-				| sed "$_init" \
-				| sed "$_init_rm" \
-				| sed "$_arch" \
-				| sed "$_arch_rm" \
-				| sed "$_nonfree" \
-				| sed "$_multi" \
-				| sed "$_nonfree_multi" \
-				| sed "$_kernel" \
-				| sed "$_clean")
-
 			packages_cleanup=$(sed "$_com_rm" "$1" \
 				| grep cleanup \
 				| sed "$_purge_rm" \
@@ -527,30 +527,10 @@ load_pkgs(){
 				| sed "$_clean")
 		;;
 		'Packages-Lng')
-			packages=$(sed "$_com_rm" "$1" \
-				| sed "$_space" \
-				| sed "$_blacklist" \
-				| sed "$_arch" \
-				| sed "$_arch_rm" \
-				| sed "$_purge" \
-				| sed "$_clean")
-
 			packages_cleanup=$(sed "$_com_rm" "$1" \
 				| grep cleanup \
 				| sed "$_purge_rm")
 			packages_lng_kde=$(sed "$_com_rm" "$1" | sed "$_clean")
-		;;
-		*)
-			packages=$(sed "$_com_rm" "$1" \
-				| sed "$_space" \
-				| sed "$_blacklist" \
-				| sed "$_kernel" \
-				| sed "$_init" \
-				| sed "$_init_rm" \
-				| sed "$_arch" \
-				| sed "$_arch_rm" \
-				| sed "$_multi" \
-				| sed "$_clean")
 		;;
 	esac
 }
