@@ -73,13 +73,11 @@ copy_livecd_helpers(){
 copy_cache_lng(){
 	msg2 "Copying language package cache ..."
 	rsync -v --files-from="${work_dir}/lng-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/lng-image/opt/livecd/lng"
-	rm -f "${work_dir}/lng-image/cache-packages.txt"
 }
 
 copy_cache_xorg(){
 	msg2 "Copying xorg package cache ..."
 	rsync -v --files-from="${work_dir}/pkgs-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/pkgs-image/opt/livecd/pkgs"
-	rm -f "${work_dir}/pkgs-image/cache-packages.txt"
 }
 
 prepare_cachedirs(){
@@ -212,7 +210,6 @@ make_image_custom() {
 			aufs_mount_root_image "${path}"
 		fi
 		chroot_create "${path}" "${packages}"
-		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
@@ -225,6 +222,7 @@ make_image_custom() {
 			umount_image_handler
 			aufs_clean "${path}"
 		fi
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${custom} installation] (${custom}-image)"
 	fi
@@ -252,7 +250,6 @@ make_image_livecd() {
 			fi
 		fi
 		chroot_create "${path}" "${packages}"
-		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
 		# copy over setup helpers and config loader
@@ -269,6 +266,7 @@ make_image_livecd() {
 			umount_image_handler
 			aufs_clean "${path}"
 		fi
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [livecd-image]"
 	fi
@@ -313,6 +311,8 @@ make_image_xorg() {
 			umount_image_handler
 			aufs_clean "${path}"
 		fi
+		rm -rf "${work_dir}/pkgs-image/etc"
+		rm -f "${work_dir}/pkgs-image/cache-packages.txt"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [pkgs-image]"
 	fi
@@ -361,6 +361,8 @@ make_image_lng() {
 			umount_image_handler
 			aufs_clean "${path}"
 		fi
+		rm -f "${work_dir}/lng-image/etc"
+		rm -f "${work_dir}/lng-image/cache-packages.txt"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [lng-image]"
 	fi
