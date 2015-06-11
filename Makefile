@@ -2,26 +2,30 @@ V=0.9.9
 
 PREFIX = $(PREFIX)/local
 
-BINPROGS = \
+BIN = \
+	bin/mkchroot \
+	bin/basestrap \
+	bin/manjaro-chroot \
+	bin/fstabgen \
+	bin/buildset \
+	bin/chroot-run
+
+BIN_PKG = \
 	bin/checkpkg \
 	bin/lddd \
 	bin/finddeps \
 	bin/find-libdeps \
 	bin/signpkg \
 	bin/signpkgs \
-	bin/mkchroot \
 	bin/mkchrootpkg \
 	bin/buildpkg \
-	bin/basestrap \
-	bin/manjaro-chroot \
-	bin/fstabgen \
-	bin/buildset \
-	bin/chroot-run \
-	bin/buildiso \
-	bin/testiso \
 	bin/buildtree
 
-SYSCONFIGFILES = \
+BIN_ISO = \
+	bin/buildiso \
+	bin/testiso
+
+SYSCONF = \
 	conf/manjaro-tools.conf
 
 SETS_PKG = \
@@ -33,7 +37,7 @@ SETS_ISO = \
 	sets/iso/community.set \
 	sets/iso/openrc.set
 
-CONFIGFILES = \
+SHARED = \
 	conf/makepkg-i686.conf \
 	conf/makepkg-x86_64.conf \
 	conf/pacman-default.conf \
@@ -94,7 +98,7 @@ MAN_XML = \
 	manjaro-tools.conf.xml \
 	profile.conf.xml
 
-all: $(BINPROGS) doc #bin/bash_completion bin/zsh_completion
+all: $(BIN) $(BIN_PKG) $(BIN_iso) doc #bin/bash_completion bin/zsh_completion
 
 edit = sed -e "s|@pkgdatadir[@]|$(DESTDIR)$(PREFIX)/share/manjaro-tools|g" \
 	-e "s|@bindir[@]|$(DESTDIR)$(PREFIX)/bin|g" \
@@ -114,12 +118,12 @@ doc:
 	$(foreach var,$(MAN_XML),xsltproc /usr/share/docbook2X/xslt/man/docbook.xsl docbook/$(var) | db2x_manxml --output-dir man ;)
 
 clean:
-	rm -f $(BINPROGS) #bin/bash_completion bin/zsh_completion
+	rm -f $(BIN) #bin/bash_completion bin/zsh_completion
 	rm -rf man
 
 install:
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
-	install -m0644 ${SYSCONFIGFILES} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
+	install -m0644 ${SYSCONF} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
 	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
@@ -131,8 +135,11 @@ install:
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/manjaro-tools/pkg
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/manjaro-tools/iso
 
-	install -m0755 ${BINPROGS} $(DESTDIR)$(PREFIX)/bin
-	install -m0644 ${CONFIGFILES} $(DESTDIR)$(PREFIX)/share/manjaro-tools
+	install -m0755 ${BIN} $(DESTDIR)$(PREFIX)/bin
+	install -m0755 ${BIN_PKG} $(DESTDIR)$(PREFIX)/bin
+	install -m0755 ${BIN_ISO} $(DESTDIR)$(PREFIX)/bin
+
+	install -m0644 ${SHARED} $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	ln -sf find-libdeps $(DESTDIR)$(PREFIX)/bin/find-libprovides
 
 	install -m0644 ${LIBS} $(DESTDIR)$(PREFIX)/lib/manjaro-tools
@@ -160,11 +167,15 @@ install:
 # 	install -Dm0644 bin/zsh_completion $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
 
 uninstall:
-	for f in ${SYSCONFIGFILES}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/$$f; done
+	for f in ${SYSCONF}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/$$f; done
 	for f in ${SETS_PKG}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg/$$f; done
 	for f in ${SETS_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso/$$f; done
-	for f in ${BINPROGS}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
-	for f in ${CONFIGFILES}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
+
+	for f in ${BIN}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
+	for f in ${BIN_PKG}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
+	for f in ${BIN_ISO}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
+
+	for f in ${SHARED}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/bin/find-libprovides
 
 	for f in ${LIBS}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
