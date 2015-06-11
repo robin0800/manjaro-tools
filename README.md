@@ -63,7 +63,8 @@ Specifying args will override manjaro-tools.conf settings.
 
 # host_tree=https://github.com/manjaro
 
-# host_tree_abs=https://projects.archlinux.org/git/svntogit
+# default https seems slow; try this
+# host_tree_abs=git://projects.archlinux.org/svntogit
 
 ################ buildpkg ################
 
