@@ -11,19 +11,19 @@ BIN = \
 	bin/chroot-run
 
 BIN_PKG = \
-	bin/checkpkg \
-	bin/lddd \
-	bin/finddeps \
-	bin/find-libdeps \
-	bin/signpkg \
-	bin/signpkgs \
-	bin/mkchrootpkg \
-	bin/buildpkg \
-	bin/buildtree
+	bin/pkg/checkpkg \
+	bin/pkg/lddd \
+	bin/pkg/finddeps \
+	bin/pkg/find-libdeps \
+	bin/pkg/signpkg \
+	bin/pkg/signpkgs \
+	bin/pkg/mkchrootpkg \
+	bin/pkg/buildpkg \
+	bin/pkg/buildtree
 
 BIN_ISO = \
-	bin/buildiso \
-	bin/testiso
+	bin/iso/buildiso \
+	bin/iso/testiso
 
 SYSCONF = \
 	conf/manjaro-tools.conf
