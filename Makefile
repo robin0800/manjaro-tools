@@ -52,6 +52,7 @@ LIBS = \
 	lib/util-pkg.sh \
 	lib/util-fstab.sh \
 	lib/util-iso.sh \
+	lib/util-iso-fs.sh \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
 	lib/util-livecd.sh \
