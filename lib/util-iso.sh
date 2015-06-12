@@ -9,10 +9,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import ${LIBDIR}/iso/util-iso-image.sh
-import ${LIBDIR}/iso/util-iso-boot.sh
-import ${LIBDIR}/iso/util-iso-calamares.sh
-import ${LIBDIR}/iso/util-iso-fs.sh
+import ${LIBDIR}/util-iso-image.sh
+import ${LIBDIR}/util-iso-boot.sh
+import ${LIBDIR}/util-iso-calamares.sh
+import ${LIBDIR}/util-iso-fs.sh
 
 # $1: path
 # $2: exit code
@@ -94,7 +94,7 @@ write_profile_conf_entries(){
 copy_livecd_helpers(){
 	msg2 "Copying livecd helpers ..."
 	[[ ! -d $1 ]] && mkdir -p $1
-	cp ${LIBDIR}/iso/util-livecd.sh $1
+	cp ${LIBDIR}/util-livecd.sh $1
 	cp ${LIBDIR}/util-msg.sh $1
 	cp ${LIBDIR}/util.sh $1
 	cp ${PKGDATADIR}/scripts/kbd-model-map $1
