@@ -290,6 +290,10 @@ load_vars() {
 	return 0
 }
 
+prepare_dir(){
+	[[ ! -d $1 ]] && mkdir -p $1
+}
+
 init_common(){
 	[[ -z ${branch} ]] && branch='stable'
 
@@ -321,6 +325,8 @@ init_buildpkg(){
 
 	sets_dir_pkg="${sets_dir}/pkg"
 
+	prepare_dir "${sets_dir_pkg}"
+
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
 
 	[[ -z ${blacklist_trigger[@]} ]] && blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
@@ -332,6 +338,8 @@ init_buildiso(){
 	chroots_iso="${chroots_dir}/buildiso"
 
 	sets_dir_iso="${sets_dir}/iso"
+
+	prepare_dir "${sets_dir_iso}"
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
 
@@ -446,10 +454,6 @@ load_profile_config(){
 	fi
 
 	return 0
-}
-
-prepare_dir(){
-	[[ ! -d $1 ]] && mkdir -p $1
 }
 
 clean_dir(){
