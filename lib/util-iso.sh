@@ -626,11 +626,11 @@ make_profile(){
 			exit 1
 		fi
 		if ${images_only}; then
-			build_images
+			build_images || umount_image_handler
 			warning "Continue compress: buildiso -p ${buildset_iso} -sc ..."
 			exit 1
 		else
-			build_images
+			build_images || umount_image_handler
 			compress_images
 		fi
 	cd ..
