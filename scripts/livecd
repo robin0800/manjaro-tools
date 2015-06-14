@@ -44,7 +44,7 @@ depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
 
 install_localization
 
-if [[ ${autologin} == "true" ]] ; then
+if [[ ${autologin} != "false" ]] ; then
     configure_displaymanager_autologin
 fi
 
