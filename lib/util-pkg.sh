@@ -62,8 +62,12 @@ chroot_update(){
 
 clean_up(){
 	msg "Cleaning up ..."
+	msg2 "Cleaning [${cache_dir_pkg}]"
 	find ${cache_dir_pkg} -maxdepth 1 -name "*.*" -delete #&> /dev/null
-	[[ -z $SRCDEST ]] && find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
+	if [[ -z $SRCDEST ]];then
+		msg2 "Cleaning [source files]"
+		find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
+	fi
 }
 
 blacklist_pkg(){
