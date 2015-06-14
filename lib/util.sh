@@ -541,3 +541,11 @@ check_chroot_version(){
 	[[ -f $1/.manjaro-tools ]] && local chroot_version=$(cat $1/.manjaro-tools)
 	[[ ${version} != $chroot_version ]] && clean_first=true
 }
+
+is_valid_bool(){
+	case $1 in
+		'true') return 0 ;;
+		'false') return 0 ;;
+		*) return 1 ;;
+	esac
+}
