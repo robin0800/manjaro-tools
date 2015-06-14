@@ -1,6 +1,7 @@
 V=0.9.9
 
-PREFIX = $(PREFIX)/local
+PREFIX = /usr/local
+SYSCONFDIR = /etc
 
 BIN = \
 	bin/mkchroot \
