@@ -1,6 +1,7 @@
 V=0.9.9
 
 PREFIX = /usr/local
+SYSCONFDIR = /etc
 
 BINPROGS = \
 	bin/checkpkg \
