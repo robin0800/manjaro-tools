@@ -19,6 +19,7 @@ import ${LIBDIR}/util-iso-fs.sh
 check_profile(){
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
+	local err="Profile [$1] sanity check failed!"
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
 		if [[ -f $1/$f ]];then
@@ -554,10 +555,23 @@ check_custom_pacman_conf(){
 	fi
 }
 
+check_profile_conf(){
+	if ! is_valid_bool "${autologin}";then
+		die "autologin only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${multilib}";then
+		die "multilib only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${nonfree_xorg}";then
+		die "nonfree_xorg only accepts true/false value!"
+	fi
+}
+
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1]"
 	load_profile_config 'profile.conf'
+	check_profile_conf
 	local files=$(ls Packages*)
 	for f in ${files[@]};do
 		case $f in
