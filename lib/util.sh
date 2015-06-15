@@ -25,6 +25,10 @@ create_set(){
 	done
 }
 
+get_deps(){
+	echo $(pactree -u $1)
+}
+
 calculate_build_order(){
 	msg3 "Calculating build order ..."
 	for pkg in $(cat $1/${name}.set);do
@@ -47,10 +51,6 @@ show_set(){
 	for item in ${list[@]}; do
 		msg2 "$item"
 	done
-}
-
-get_deps(){
-	echo $(pactree -u $1)
 }
 
 get_timer(){
@@ -544,8 +544,14 @@ check_chroot_version(){
 
 is_valid_bool(){
 	case $1 in
-		'true') return 0 ;;
-		'false') return 0 ;;
+		'true'|'false') return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+is_valid_init(){
+	case $1 in
+		'openrc'|'systemd') return 0 ;;
 		*) return 1 ;;
 	esac
 }
