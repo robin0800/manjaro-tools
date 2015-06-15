@@ -413,6 +413,12 @@ configure_env(){
 	fi
 }
 
+configure_doc(){
+	[[ -e "/usr/share/doc/livecd/Beginner_User_Guide.pdf" ]] && \
+	ln -sf /usr/share/doc/livecd/Beginner_User_Guide.pdf \
+	"/home/${username}/$(xdg-user-dir DESKTOP)/Beginner User Guide.pdf"
+}
+
 configure_user_root(){
 	# set up root password
 	echo "root:${password}" | chroot $1 chpasswd
@@ -424,10 +430,6 @@ configure_displaymanager_autologin(){
 		sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
 		sed -i -e "s/^.*autologin-user-timeout=.*/autologin-user-timeout=0/" /etc/lightdm/lightdm.conf
 		sed -i -e "s/^.*pam-autologin-service=.*/pam-autologin-service=lightdm-autologin/" /etc/lightdm/lightdm.conf
-		# hopefully fixes autologin on openrc livecd
-# 		if [[ -d /run/openrc ]];then
-# 			sed -i -e 's/^.*pam-autologin-service=.*/pam-autologin-service=lightdm-autologin/' /etc/lightdm/lightdm.conf
-# 		fi
 	elif [[ -f /usr/bin/kdm ]];then
 		sed -i -e "s/^.*AutoLoginUser=.*/AutoLoginUser=${username}/" /usr/share/config/kdm/kdmrc
 		sed -i -e "s/^.*AutoLoginPass=.*/AutoLoginPass=${password}/" /usr/share/config/kdm/kdmrc
