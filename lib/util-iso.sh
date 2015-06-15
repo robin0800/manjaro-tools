@@ -556,6 +556,9 @@ check_custom_pacman_conf(){
 }
 
 check_profile_conf(){
+	if ! is_valid_init "${initsys}";then
+		die "initsys only accepts true/false value!"
+	fi
 	if ! is_valid_bool "${autologin}";then
 		die "autologin only accepts true/false value!"
 	fi
