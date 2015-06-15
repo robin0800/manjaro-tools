@@ -141,8 +141,8 @@ configure_calamares(){
 		if [[ -f $1/usr/bin/kdesu ]];then
 			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
 		fi
-		cp $1/usr/share/applications/calamares.desktop $1/home/${username}/$(xdg-user-dir DESKTOP)/calamares.desktop
-		chmod a+x $1/home/${username}/$(xdg-user-dir DESKTOP)/calamares.desktop
+# 		cp $1/usr/share/applications/calamares.desktop $1/home/${username}/$(xdg-user-dir DESKTOP)/calamares.desktop
+# 		chmod a+x $1/home/${username}/$(xdg-user-dir DESKTOP)/calamares.desktop
 	fi
 }
 
@@ -168,19 +168,19 @@ configure_thus(){
 		if [[ -f $1/usr/bin/kdesu ]];then
 			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
 		fi
-		cp $1/usr/share/applications/thus.desktop $1/home/${username}/$(xdg-user-dir DESKTOP)/thus.desktop
-		chmod a+x $1/home/${username}/$(xdg-user-dir DESKTOP)/thus.desktop
+# 		cp $1/usr/share/applications/thus.desktop $1/home/${username}/$(xdg-user-dir DESKTOP)/thus.desktop
+# 		chmod a+x $1/home/${username}/$(xdg-user-dir DESKTOP)/thus.desktop
 	fi
 }
 
-configure_cli(){
-	if [[ -f $1/usr/bin/setup ]]||[[ -L $1/usr/bin/setup ]];then
-		msg2 "Configuring cli-installer ..."
-		if [[ -f $1/usr/share/applications/installer-launcher-cli.desktop ]];then
-			#cp $1/etc/skel/$(xdg-user-dir DESKTOP)/installer-launcher-cli.desktop
-			cp $1/usr/share/applications/installer-launcher-cli.desktop
-			$1/home/${username}/$(xdg-user-dir DESKTOP)/installer-launcher-cli.desktop
-		fi
-		chmod a+x $1/home/${username}/$(xdg-user-dir DESKTOP)/installer-launcher-cli.desktop
-	fi
-}
+# configure_cli(){
+# 	if [[ -f $1/usr/bin/setup ]]||[[ -L $1/usr/bin/setup ]];then
+# 		msg2 "Configuring cli-installer ..."
+# 		if [[ -f $1/usr/share/applications/installer-launcher-cli.desktop ]];then
+# 			#cp $1/etc/skel/$(xdg-user-dir DESKTOP)/installer-launcher-cli.desktop
+# 			cp $1/usr/share/applications/installer-launcher-cli.desktop
+# 			$1/home/${username}/$(xdg-user-dir DESKTOP)/installer-launcher-cli.desktop
+# 		fi
+# 		chmod a+x $1/home/${username}/$(xdg-user-dir DESKTOP)/installer-launcher-cli.desktop
+# 	fi
+# }
