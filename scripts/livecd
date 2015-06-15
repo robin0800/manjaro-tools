@@ -57,6 +57,8 @@ cp -a /etc/skel/. /root/
 # configure documentation
 configure_doc
 
+configure_desktop_items
+
 # check if we are running inside a virtual machine and unistall kalu
 [[ -e "/usr/bin/kalu" ]] && rm_kalu /
 
@@ -64,5 +66,4 @@ configure_alsa /
 
 # save settings
 alsactl -f /etc/asound.state store &>/dev/null
-
 
