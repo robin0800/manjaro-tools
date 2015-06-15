@@ -56,7 +56,7 @@ cp -a /etc/skel/. /root/
 
 # configure documentation
 [[ -e "/etc/skel/Manjaro/Beginner_User_Guide.pdf" ]] && ln -sf \
-/etc/skel/Manjaro/Beginner_User_Guide.pdf "/home/${username}/$(xdg-user-dir DESKTOP)/Beginner User Guide.pdf"
+/etc/skel/Manjaro/Beginner_User_Guide.pdf "$(xdg-user-dir DESKTOP)/Beginner User Guide.pdf"
 
 # check if we are running inside a virtual machine and unistall kalu
 [[ -e "/usr/bin/kalu" ]] && rm_kalu /
