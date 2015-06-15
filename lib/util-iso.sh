@@ -12,7 +12,7 @@
 import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
-import ${LIBDIR}/util-iso-fs.sh
+import ${LIBDIR}/util-iso-aufs.sh
 
 # $1: path
 # $2: exit code
