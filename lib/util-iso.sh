@@ -456,7 +456,7 @@ make_isomounts() {
 load_pkgs(){
 	msg3 "Loading Packages: [$1] ..."
 
-	local _init _init_rm _multi _nonfree_default _nonfree_multi _arch _arch_rm
+	local _init _init_rm _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64
 
 	if [[ ${initsys} == 'openrc' ]];then
 		_init="s|>openrc||g"
@@ -470,30 +470,39 @@ load_pkgs(){
 		_arch_rm="s|>x86_64.*||g"
 		_multi="s|>multilib.*||g"
 		_nonfree_multi="s|>nonfree_multilib.*||g"
+		_nonfree_x86_64="s|>nonfree_x86_64.*||g"
 		if ${nonfree_xorg};then
 			_nonfree_default="s|>nonfree_default||g"
+			_nonfree_i686="s|>nonfree_i686||g"
+
 		else
 			_nonfree_default="s|>nonfree_default.*||g"
+			_nonfree_i686="s|>nonfree_i686.*||g"
 		fi
 	else
 		_arch="s|>x86_64||g"
 		_arch_rm="s|>i686.*||g"
+		_nonfree_i686="s|>nonfree_i686.*||g"
 		if ${multilib};then
 			_multi="s|>multilib||g"
 			if ${nonfree_xorg};then
 				_nonfree_default="s|>nonfree_default||g"
+				_nonfree_x86_64="s|>nonfree_x86_64||g"
 				_nonfree_multi="s|>nonfree_multilib||g"
 			else
 				_nonfree_default="s|>nonfree_default.*||g"
 				_nonfree_multi="s|>nonfree_multilib.*||g"
+				_nonfree_x86_64="s|>nonfree_x86_64.*||g"
 			fi
 		else
 			_multi="s|>multilib.*||g"
 			if ${nonfree_xorg};then
 				_nonfree_default="s|>nonfree_default||g"
+				_nonfree_x86_64="s|>nonfree_x86_64||g"
 				_nonfree_multi="s|>nonfree_multilib.*||g"
 			else
 				_nonfree_default="s|>nonfree_default.*||g"
+				_nonfree_x86_64="s|>nonfree_x86_64.*||g"
 				_nonfree_multi="s|>nonfree_multilib.*||g"
 			fi
 		fi
@@ -516,6 +525,8 @@ load_pkgs(){
 		| sed "$_arch_rm" \
 		| sed "$_nonfree_default" \
 		| sed "$_multi" \
+		| sed "$_nonfree_i686" \
+		| sed "$_nonfree_x86_64" \
 		| sed "$_nonfree_multi" \
 		| sed "$_kernel" \
 		| sed "$_clean")
