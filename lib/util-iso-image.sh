@@ -73,6 +73,7 @@ configure_services_live(){
 configure_lsb(){
 	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
 	if [ -e $1/etc/lsb-release ] ; then
+		msg2 "Configuring lsb-release"
 		sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${dist_release}/" $1/etc/lsb-release
 		sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${dist_codename}/" $1/etc/lsb-release
 	fi
@@ -206,7 +207,7 @@ detect_desktop_env(){
 configure_mhwd(){
 	if [[ ${arch} == "x86_64" ]];then
 		if ! ${multilib};then
-			msg2 "Disable mhwd lib32 support ..."
+			msg2 "Disable mhwd lib32 support"
 			echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
 		fi
 	fi
@@ -329,6 +330,26 @@ chroot_clean(){
 	done
 	exec 9>&-
 	rm -rf --one-file-system "$1"
+}
+
+configure_sysctl(){
+	if [[ ${initsys} == 'openrc' ]];
+		msg2 "Configuring sysctl for openrc"
+		touch $1/etc/sysctl.conf
+		local conf=$1/etc/sysctl.d/100-manjaro.conf
+		echo '# Virtual memory setting (swap file or partition)' > ${conf}
+		echo 'vm.swappiness = 30' >> ${conf}
+		echo '# Enable the SysRq key' >> ${conf}
+		echo 'kernel.sysrq = 1' >> ${conf}
+	fi
+}
+
+configure_root_image(){
+	msg "Configuring [root-image]"
+	configure_lsb "$1"
+	configure_mhwd "$1"
+	configure_sysctl "$1"
+	msg "Done configuring [root-image]"
 }
 
 configure_custom_image(){
