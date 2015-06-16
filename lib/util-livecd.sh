@@ -413,32 +413,6 @@ configure_env(){
 	fi
 }
 
-# configure_doc(){
-# 	[[ -e "/usr/share/doc/livecd/Beginner_User_Guide.pdf" ]] && \
-# 	ln -sf /usr/share/doc/livecd/Beginner_User_Guide.pdf \
-# 	"/home/${username}/$(xdg-user-dir DESKTOP)/Beginner User Guide.pdf"
-# }
-
-# configure_desktop_items(){
-# 	local xdg=$1/home/${username}/$(xdg-user-dir DESKTOP) \
-# 		src=$1/usr/share/applications
-#
-# 	if [[ -f $1/usr/bin/thus ]];then
-# 		cp $src/thus.desktop $xdg/thus.desktop
-# 		chmod a+x $xdg/thus.desktop
-# 	fi
-#
-# 	if [[ -f $1/usr/bin/calamares ]];then
-# 		cp $src/calamares.desktop $xdg/calamares.desktop
-# 		chmod a+x $xdg/calamares.desktop
-# 	fi
-#
-# 	if [[ -f $1/usr/bin/setup ]] || [[ -L $1/usr/bin/setup ]];then
-# 		cp $src/installer-launcher-cli.desktop $xdg/installer-launcher-cli.desktop
-# 		chmod a+x $xdg/installer-launcher-cli.desktop
-# 	fi
-# }
-
 configure_user_root(){
 	# set up root password
 	echo "root:${password}" | chroot $1 chpasswd
