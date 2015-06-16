@@ -333,7 +333,7 @@ chroot_clean(){
 }
 
 configure_sysctl(){
-	if [[ ${initsys} == 'openrc' ]];
+	if [[ ${initsys} == 'openrc' ]];then
 		msg2 "Configuring sysctl for openrc"
 		touch $1/etc/sysctl.conf
 		local conf=$1/etc/sysctl.d/100-manjaro.conf
