@@ -21,7 +21,7 @@
 # unset defaults to given value
 # kernel="linux319"
 
-# unset defaults to given value
+# possible values: grub;systemd-boot
 # efi_boot_loader="grub"
 
 # set uefi partition size
