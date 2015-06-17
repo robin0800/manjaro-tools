@@ -514,21 +514,42 @@ load_pkgs(){
 		_purge="s|>cleanup.*||g" \
 		_purge_rm="s|>cleanup||g"
 
-	packages=$(sed "$_com_rm" "$1" \
-		| sed "$_space" \
-		| sed "$_blacklist" \
-		| sed "$_purge" \
-		| sed "$_init" \
-		| sed "$_init_rm" \
-		| sed "$_arch" \
-		| sed "$_arch_rm" \
-		| sed "$_nonfree_default" \
-		| sed "$_multi" \
-		| sed "$_nonfree_i686" \
-		| sed "$_nonfree_x86_64" \
-		| sed "$_nonfree_multi" \
-		| sed "$_kernel" \
-		| sed "$_clean")
+	if [[ $1 == "${packages_custom}" ]];then
+		prepare_dir '/tmp/buildiso'
+		sort -u ../shared/Packages-Custom ${packages_custom} > /tmp/buildiso/Packages-Desktop
+		packages=$(sed "$_com_rm" "/tmp/buildiso/Packages-Desktop" \
+			| sed "$_space" \
+			| sed "$_blacklist" \
+			| sed "$_purge" \
+			| sed "$_init" \
+			| sed "$_init_rm" \
+			| sed "$_arch" \
+			| sed "$_arch_rm" \
+			| sed "$_nonfree_default" \
+			| sed "$_multi" \
+			| sed "$_nonfree_i686" \
+			| sed "$_nonfree_x86_64" \
+			| sed "$_nonfree_multi" \
+			| sed "$_kernel" \
+			| sed "$_clean")
+		#rm /tmp/buildiso/Packages-Desktop
+	else
+		packages=$(sed "$_com_rm" "$1" \
+			| sed "$_space" \
+			| sed "$_blacklist" \
+			| sed "$_purge" \
+			| sed "$_init" \
+			| sed "$_init_rm" \
+			| sed "$_arch" \
+			| sed "$_arch_rm" \
+			| sed "$_nonfree_default" \
+			| sed "$_multi" \
+			| sed "$_nonfree_i686" \
+			| sed "$_nonfree_x86_64" \
+			| sed "$_nonfree_multi" \
+			| sed "$_kernel" \
+			| sed "$_clean")
+	fi
 
 	case $1 in
 		'Packages-Xorg')
