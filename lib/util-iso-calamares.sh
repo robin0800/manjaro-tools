@@ -32,12 +32,13 @@ write_calamares_bootloader_conf(){
 	echo "kernel: \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
 	echo "img: \"$(echo ${default_image} | sed s'|/boot||')\"" >> "$conf"
 	echo "fallback: \"$(echo ${fallback_image} | sed s'|/boot||')\"" >> "$conf"
+	echo 'timeout: "10"' >> "$conf"
 	echo "kernelLine: \", with ${kernel}\"" >> "$conf"
 	echo "fallbackKernelLine: \", with ${kernel} (fallback initramfs)\"" >> "$conf"
-	echo 'timeout: "10"' >> "$conf"
 	echo 'grubInstall: "grub-install"' >> "$conf"
 	echo 'grubMkconfig: "grub-mkconfig"' >> "$conf"
 	echo 'grubCfg: "/boot/grub/grub.cfg"' >> "$conf"
+	echo '#efiBootloaderId: "dirname"' >> "$conf"
 }
 
 write_calamares_services_conf(){
@@ -161,7 +162,7 @@ configure_thus(){
 		echo "VMLINUZ = \"$(echo ${ALL_kver} | sed s'|/boot/||')\"" >> "$conf"
 		echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
 		echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
-		
+
 		if [[ -f $1/usr/bin/kdesu ]];then
 			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
 		fi
