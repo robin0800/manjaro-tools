@@ -515,9 +515,10 @@ load_pkgs(){
 		_purge_rm="s|>cleanup||g"
 
 	if [[ $1 == "${packages_custom}" ]];then
-		prepare_dir '/tmp/buildiso'
-		sort -u ../shared/Packages-Custom ${packages_custom} > /tmp/buildiso/Packages-Desktop
-		packages=$(sed "$_com_rm" "/tmp/buildiso/Packages-Desktop" \
+		local temp=/tmp/buildiso
+		prepare_dir ${temp}
+		sort -u ../shared/Packages-Custom ${packages_custom} > ${temp}/${packages_custom}
+		packages=$(sed "$_com_rm" "${temp}/${packages_custom}" \
 			| sed "$_space" \
 			| sed "$_blacklist" \
 			| sed "$_purge" \
@@ -532,7 +533,7 @@ load_pkgs(){
 			| sed "$_nonfree_multi" \
 			| sed "$_kernel" \
 			| sed "$_clean")
-		#rm /tmp/buildiso/Packages-Desktop
+		#rm ${temp}/${packages_custom}
 	else
 		packages=$(sed "$_com_rm" "$1" \
 			| sed "$_space" \
