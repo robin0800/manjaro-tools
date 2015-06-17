@@ -271,29 +271,6 @@ configure_translation_pkgs(){
 	esac
 }
 
-install_localization(){
-	if [ -e "/bootmnt/${iso_name}/${arch}/lng-image.sqfs" ] ; then
-		echo "install translation packages" >> /var/log/livecd.log
-		configure_translation_pkgs $1
-		${PACMAN_LNG} -Sy
-		if [ -e "/bootmnt/${iso_name}/${arch}/kde-image.sqfs" ] ; then
-			${PACMAN_LNG} -S ${KDE_LNG_INST} &> /dev/null
-		fi
-		if [ -e "/usr/bin/firefox" ] ; then
-			${PACMAN_LNG} -S ${FIREFOX_LNG_INST} &> /dev/null
-		fi
-		if [ -e "/usr/bin/thunderbird" ] ; then
-			${PACMAN_LNG} -S ${THUNDER_LNG_INST} &> /dev/null
-		fi
-		if [ -e "/usr/bin/libreoffice" ] ; then
-			${PACMAN_LNG} -S ${LIBRE_LNG_INST} &> /dev/null
-		fi
-		if [ -e "/usr/bin/hunspell" ] ; then
-			${PACMAN_LNG} -S ${HUNSPELL_LNG_INST} &> /dev/null
-		fi
-	fi
-}
-
 configure_alsa(){
 	echo "configure alsa" >> /var/log/livecd.log
 	# amixer binary

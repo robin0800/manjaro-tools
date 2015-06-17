@@ -105,12 +105,6 @@ copy_livecd_helpers(){
 	write_profile_conf_entries $1
 }
 
-copy_cache_lng(){
-	msg2 "Copying language package cache ..."
-	rsync -v --files-from="${work_dir}/lng-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/lng-image/opt/livecd/lng"
-	rm -f "${work_dir}/lng-image/cache-packages.txt"
-}
-
 copy_cache_xorg(){
 	msg2 "Copying xorg package cache ..."
 	rsync -v --files-from="${work_dir}/pkgs-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/pkgs-image/opt/livecd/pkgs"

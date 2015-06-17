@@ -45,6 +45,5 @@ umount_image_handler(){
 	aufs_remove_image "${work_dir}/${custom}-image"
 	aufs_remove_image "${work_dir}/root-image"
 	aufs_remove_image "${work_dir}/pkgs-image"
-	aufs_remove_image "${work_dir}/lng-image"
 	aufs_remove_image "${work_dir}/boot-image"
 }
