@@ -51,7 +51,6 @@ SHARED_PKG = \
 
 SHARED_ISO = \
 	conf/pacman-gfx.conf \
-	conf/pacman-lng.conf \
 	conf/profile.conf.example
 
 LIBS = \
