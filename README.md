@@ -195,15 +195,13 @@ ideally no xorg
 ######* Packages-Custom/desktop
 Contains the custom image packages
 desktop environment packages go here
+this file is joind at build time with shared/Packages-Custom to pull in shared desktop packages
 
 ######* Packages-Xorg
 Contains the Xorg package repo
 
-######* Packages-Lng
-Contains the language packages repo
-
 ######* Packages-Livecd
-Contains packages you only want on livecd but not installed on the target system with installer
+Contains packages you only want on livecd but not installed on the target system with installer  
 default files are in shared folder and can be symlinked or defined in a real file
 
 ###### optional custom pacman.conf in profile

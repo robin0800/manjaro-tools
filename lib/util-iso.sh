@@ -311,40 +311,6 @@ make_image_xorg() {
 	fi
 }
 
-make_image_lng() {
-	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [lng-image]"
-		local path="${work_dir}/lng-image"
-		mkdir -p ${path}/opt/livecd/lng
-		umount_image_handler
-		if [[ -n "${custom}" ]] ; then
-			aufs_mount_custom_image "${path}"
-			aufs_append_root_image "${path}"
-		else
-			aufs_mount_root_image "${path}"
-		fi
-		if [[ -n ${packages_lng_kde} ]]; then
-			download_to_cache "${path}" "${packages} ${packages_lng_kde}"
-			copy_cache_lng
-		else
-			download_to_cache "${path}" "${packages}"
-			copy_cache_lng
-		fi
-		if [[ -n "${packages_cleanup}" ]]; then
-			for lng_clean in ${packages_cleanup}; do
-				rm ${path}/opt/livecd/lng/${lng_clean}
-			done
-		fi
-		cp ${PKGDATADIR}/pacman-lng.conf ${path}/opt/livecd
-		rm -r ${path}/var
-		make_repo ${path}/opt/livecd/lng/lng-pkgs ${path}/opt/livecd/lng
-		umount_image_handler
-		aufs_clean "${path}"
-		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [lng-image]"
-	fi
-}
-
 make_image_boot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [${iso_name}/boot]"
@@ -552,21 +518,13 @@ load_pkgs(){
 			| sed "$_clean")
 	fi
 
-	case $1 in
-		'Packages-Xorg')
-			packages_cleanup=$(sed "$_com_rm" "$1" \
-				| grep cleanup \
-				| sed "$_purge_rm" \
-				| sed "$_kernel" \
-				| sed "$_clean")
-		;;
-		'Packages-Lng')
-			packages_cleanup=$(sed "$_com_rm" "$1" \
-				| grep cleanup \
-				| sed "$_purge_rm")
-			packages_lng_kde=$(sed "$_com_rm" "$1" | sed "$_clean")
-		;;
-	esac
+	if [[ $1 == 'Packages-Xorg' ]]; then
+		packages_cleanup=$(sed "$_com_rm" "$1" \
+			| grep cleanup \
+			| sed "$_purge_rm" \
+			| sed "$_kernel" \
+			| sed "$_clean")
+	fi
 }
 
 check_plymouth(){
@@ -610,7 +568,7 @@ load_profile(){
 	local files=$(ls Packages*)
 	for f in ${files[@]};do
 		case $f in
-			Packages|Packages-Livecd|Packages-Xorg|Packages-Lng) continue ;;
+			Packages|Packages-Livecd|Packages-Xorg) continue ;;
 			*) packages_custom="$f" ;;
 		esac
 	done
@@ -650,10 +608,6 @@ build_images(){
 	if [[ -f Packages-Xorg ]] ; then
 		load_pkgs 'Packages-Xorg'
 		make_image_xorg
-	fi
-	if [[ -f Packages-Lng ]] ; then
-		load_pkgs 'Packages-Lng'
-		make_image_lng
 	fi
 	make_image_boot
 	if [[ "${arch}" == "x86_64" ]]; then
