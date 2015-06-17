@@ -189,20 +189,20 @@ Each iso profile must have these files or symlinks to shared:
 ~~~
 
 ######* Packages
-Contains root image packages
-ideally no xorg
+* Contains root image packages
+* ideally no xorg
 
 ######* Packages-Custom/desktop
-Contains the custom image packages
-desktop environment packages go here
-this file is joind at build time with shared/Packages-Custom to pull in shared desktop packages
+* Contains the custom image packages
+* desktop environment packages go here
+* this file is joined at build time with shared/Packages-Custom to pull in shared desktop packages
 
 ######* Packages-Xorg
-Contains the Xorg package repo
+* Contains the Xorg package repo
 
 ######* Packages-Livecd
-Contains packages you only want on livecd but not installed on the target system with installer  
-default files are in shared folder and can be symlinked or defined in a real file
+* Contains packages you only want on livecd but not installed on the target system with installer
+* default files are in shared folder and can be symlinked or defined in a real file
 
 ###### optional custom pacman.conf in profile
 
@@ -264,14 +264,17 @@ You can drop the branch arg if you set the branch in manjaro-tools.conf
 The arch can also be set in manjaro-tools.conf, but under normal conditions, it is better to specify the non native arch by -a parameter.
 
 ######* -c
-Removes the chroot dir
-If the -c parameter is not used, buildpkg will update the existing chroot or create a new one if none is present.
+* Removes the chroot dir
+* If the -c parameter is not used, buildpkg will update the existing chroot or create a new one if none is present.
+
 ######* -w
-Cleans pkgcache, and logfiles
+* Cleans pkgcache, and logfiles
+
 ######* -s
-Signs the package when built
+* Signs the package when built
+
 ######* -n
-Installs the built package in the chroot and runs a namcap check
+* Installs the built package in the chroot and runs a namcap check
 
 ###3. buildiso
 
@@ -323,10 +326,11 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 ####Special parameters
 
 ######* -i
-Build images only
-will stop after all packages have been installed. No iso sqfs compression will be executed
+* Build images only
+* will stop after all packages have been installed. No iso sqfs compression will be executed
+
 ######* -s
-Use this to sqfs compress the chroots if you previously used -i.
+* Use this to sqfs compress the chroots if you previously used -i.
 
 ###4. buildset
 
