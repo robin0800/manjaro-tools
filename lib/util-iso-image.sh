@@ -152,9 +152,9 @@ detect_desktop_env(){
 			default_desktop_executable="startxfce4"
 			default_desktop_file="xfce"
 			msg2 "Detected Xfce desktop environment"
-		elif [ -e "$1/usr/bin/cinnamon-session" ] && [ -e "$1/usr/share/xsessions/cinnamon-session.desktop" ]; then
-			default_desktop_executable="cinnamon-session"
-			default_desktop_file="cinnamon-session"
+		elif [ -e "$1/usr/bin/cinnamon-session-cinnamon" ] && [ -e "$1/usr/share/xsessions/cinnamon.desktop" ]; then
+			default_desktop_executable="cinnamon-session-cinnamon"
+			default_desktop_file="cinnamon-session-cinnamon"
 			msg2 "Detected Cinnamon desktop environment"
 		elif [ -e "$1/usr/bin/mate-session" ] && [ -e "$1/usr/share/xsessions/mate.desktop" ]; then
 			default_desktop_executable="mate-session"
