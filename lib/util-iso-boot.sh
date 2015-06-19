@@ -33,15 +33,11 @@ copy_efi_shells(){
 }
 
 set_mkinicpio_hooks(){
-	local conf=$1/etc/mkinitcpio-${iso_name}.conf
 	if ! ${pxe_boot};then
-		sed -e 's/miso_pxe_common miso_pxe_http //' -i ${conf}
+		sed -e 's/miso_pxe_common miso_pxe_http //' -i $1
 	fi
 	if ! ${plymouth};then
-		sed -e 's/plymouth //' -i ${conf}
-	fi
-	if ! ${plymouth} && ! ${pxe_boot};then
-		sed -e 's/plymouth //' -e 's/miso_pxe_common miso_pxe_http //' -i ${conf}
+		sed -e 's/plymouth //' -i $1
 	fi
 }
 
@@ -50,7 +46,7 @@ copy_initcpio(){
 	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
 	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
-	set_mkinicpio_hooks "$1"
+	set_mkinicpio_hooks "$1/etc/mkinitcpio-${iso_name}.conf"
 }
 
 # $1: work_dir
