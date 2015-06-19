@@ -32,6 +32,17 @@ copy_efi_shells(){
 	fi
 }
 
+set_mkinicpio_hooks(){
+	local conf=$1/etc/mkinitcpio-${iso_name}.conf
+	if ! ${pxe_boot};then
+		sed -e 's/miso_pxe_common miso_pxe_http//' -i ${conf}
+	elif ! ${plymouth};then
+		sed -e 's/plymouth//' -i ${conf}
+	elif ! ${plymouth} && ! ${pxe_boot};then
+		sed -e 's/plymouth//' -e 's/miso_pxe_common miso_pxe_http//' -i ${conf}
+	fi
+}
+
 # $1: work_dir
 gen_boot_image(){
 	local _kernver=$(cat $1/usr/lib/modules/*/version)
@@ -63,6 +74,7 @@ copy_initcpio(){
 	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
 	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
+	set_mkinicpio_hooks "$1"
 }
 
 copy_ucode(){

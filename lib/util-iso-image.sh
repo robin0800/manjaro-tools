@@ -38,7 +38,7 @@ configure_hosts(){
 
 # $1: chroot
 configure_plymouth(){
-	if ${is_plymouth};then
+	if ${plymouth};then
 		msg2 "Setting plymouth $plymouth_theme ...."
 		sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" $1/etc/plymouth/plymouthd.conf
 	fi

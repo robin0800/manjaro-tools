@@ -521,14 +521,6 @@ load_pkgs(){
 	fi
 }
 
-check_plymouth(){
-	is_plymouth=false
-	source mkinitcpio.conf
-	for h in ${HOOKS[@]};do
-		[[ $h == 'plymouth' ]] && is_plymouth=true
-	done
-}
-
 check_custom_pacman_conf(){
 	if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
 		pacman_conf="pacman-${pacman_conf_arch}.conf"
@@ -574,8 +566,6 @@ load_profile(){
 
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
 	work_dir=${chroots_iso}/$1/${arch}
-
-	check_plymouth
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 }
