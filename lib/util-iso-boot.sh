@@ -32,6 +32,23 @@ copy_efi_shells(){
 	fi
 }
 
+set_mkinicpio_hooks(){
+	if ! ${pxe_boot};then
+		sed -e 's/miso_pxe_common miso_pxe_http //' -i $1
+	fi
+	if ! ${plymouth};then
+		sed -e 's/plymouth //' -i $1
+	fi
+}
+
+copy_initcpio(){
+	msg2 "Copying initcpio ..."
+	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
+	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
+	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
+	set_mkinicpio_hooks "$1/etc/mkinitcpio-${iso_name}.conf"
+}
+
 # $1: work_dir
 gen_boot_image(){
 	local _kernver=$(cat $1/usr/lib/modules/*/version)
@@ -56,13 +73,6 @@ copy_boot_images(){
 		msg2 "Using intel_ucode.img ..."
 		cp $1/intel_ucode.img $2/intel_ucode.img
 	fi
-}
-
-copy_initcpio(){
-	msg2 "Copying initcpio ..."
-	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
-	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
-	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
 }
 
 copy_ucode(){

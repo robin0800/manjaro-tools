@@ -16,6 +16,12 @@
 # nonfree xorg drivers
 # nonfree_xorg="true"
 
+# use plymouth
+# plymouth="true"
+
+# use pxe
+# pxe_boot="true"
+
 ################ install ################
 
 # unset defaults to given value

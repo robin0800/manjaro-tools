@@ -413,6 +413,10 @@ load_profile_config(){
 
 	[[ -z ${multilib} ]] && multilib="true"
 
+	[[ -z ${pxe_boot} ]] && pxe_boot="true"
+
+	[[ -z ${plymouth} ]] && plymouth="true"
+
 	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
 
 	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
