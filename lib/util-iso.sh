@@ -639,9 +639,9 @@ make_profile(){
 build_iso(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			make_profile "$prof"
+			make_profile "$prof" || umount_image_handler
 		done
 	else
-		make_profile "${buildset_iso}"
+		make_profile "${buildset_iso}" || umount_image_handler
 	fi
 }
