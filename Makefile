@@ -1,4 +1,4 @@
-V=0.9.9
+Version=0.9.9
 
 PREFIX = /usr/local
 SYSCONFDIR = /etc
@@ -108,7 +108,7 @@ edit = sed -e "s|@pkgdatadir[@]|$(DESTDIR)$(PREFIX)/share/manjaro-tools|g" \
 	-e "s|@bindir[@]|$(DESTDIR)$(PREFIX)/bin|g" \
 	-e "s|@sysconfdir[@]|$(DESTDIR)$(SYSCONFDIR)/manjaro-tools|g" \
 	-e "s|@libdir[@]|$(DESTDIR)$(PREFIX)/lib/manjaro-tools|g" \
-	-e "s|@version@|${V}|"
+	-e "s|@version@|${Version}|"
 
 %: %.in Makefile
 	@echo "GEN $@"
@@ -238,7 +238,7 @@ install: install_base install_pkg install_iso
 uninstall: uninstall_base uninstall_pkg uninstall_iso
 
 dist:
-	git archive --format=tar --prefix=manjaro-tools-$(V)/ $(V) | gzip -9 > manjaro-tools-$(V).tar.gz
-	gpg --detach-sign --use-agent manjaro-tools-$(V).tar.gz
+	git archive --format=tar --prefix=manjaro-tools-$(Version)/ $(Version) | gzip -9 > manjaro-tools-$(V).tar.gz
+	gpg --detach-sign --use-agent manjaro-tools-$(Version).tar.gz
 
 .PHONY: all clean install uninstall dist
