@@ -36,7 +36,7 @@ set_mkinicpio_hooks(){
 	if ! ${pxe_boot};then
 		sed -e 's/miso_pxe_common miso_pxe_http //' -i $1
 	fi
-	if ! {plymouth_boot};then
+	if ! ${plymouth_boot};then
 		sed -e 's/plymouth //' -i $1
 	fi
 }
