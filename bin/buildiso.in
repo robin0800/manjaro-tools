@@ -39,7 +39,7 @@ show_profile(){
 			msg2 "efi_boot_loader: ${efi_boot_loader}"
 			msg2 "efi_part_size: ${efi_part_size}"
 			msg2 "pxe_boot: ${pxe_boot}"
-			msg2 "plymouth: ${plymouth_boot}"
+			msg2 "plymouth_boot: ${plymouth_boot}"
 			${plymouth_boot} && msg2 "plymouth_theme: ${plymouth_theme}"
 			msg2 "hostname: ${hostname}"
 			msg2 "username: ${username}"
