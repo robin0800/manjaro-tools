@@ -238,7 +238,7 @@ install: install_base install_pkg install_iso
 uninstall: uninstall_base uninstall_pkg uninstall_iso
 
 dist:
-	git archive --format=tar --prefix=manjaro-tools-$(Version)/ $(Version) | gzip -9 > manjaro-tools-$(V).tar.gz
+	git archive --format=tar --prefix=manjaro-tools-$(Version)/ $(Version) | gzip -9 > manjaro-tools-$(Version).tar.gz
 	gpg --detach-sign --use-agent manjaro-tools-$(Version).tar.gz
 
 .PHONY: all clean install uninstall dist
