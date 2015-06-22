@@ -415,7 +415,7 @@ load_profile_config(){
 
 	[[ -z ${pxe_boot} ]] && pxe_boot="true"
 
-	[[ -z ${plymouth} ]] && plymouth="true"
+	[[ -z {plymouth_boot} ]] && plymouth_boot="true"
 
 	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
 

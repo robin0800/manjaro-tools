@@ -17,7 +17,7 @@
 # nonfree_xorg="true"
 
 # use plymouth
-# plymouth="true"
+# plymouth_boot="true"
 
 # use pxe
 # pxe_boot="true"
