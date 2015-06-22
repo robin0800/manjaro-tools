@@ -141,6 +141,12 @@ Each iso profile must have these files or symlinks to shared:
 # nonfree xorg drivers
 # nonfree_xorg="true"
 
+# use plymouth; initcpio hook
+# plymouth_boot="true"
+
+# use pxe boot; initcpio hook
+# pxe_boot="true"
+
 ################ install ################
 
 # unset defaults to given value
