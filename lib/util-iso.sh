@@ -544,6 +544,12 @@ check_profile_conf(){
 	if ! is_valid_bool "${nonfree_xorg}";then
 		die "nonfree_xorg only accepts true/false value!"
 	fi
+	if ! is_valid_bool "${plymouth_boot}";then
+		die "plymouth_boot only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${pxe_boot}";then
+		die "pxe_boot only accepts true/false value!"
+	fi
 }
 
 # $1: profile
