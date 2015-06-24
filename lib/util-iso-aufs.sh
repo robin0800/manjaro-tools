@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 # $1: new branch
-aufs_mount_root_image(){
+mount_root_image(){
 	msg2 "mount [root-image] on [${1##*/}]"
 	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
 }
@@ -35,15 +35,21 @@ aufs_remove_image(){
 	fi
 }
 
-# $1: image path
-aufs_clean(){
-	find $1 -name '.wh.*' -delete &> /dev/null
-}
-
 umount_image_handler(){
 	aufs_remove_image "${work_dir}/livecd-image"
 	aufs_remove_image "${work_dir}/${custom}-image"
 	aufs_remove_image "${work_dir}/root-image"
 	aufs_remove_image "${work_dir}/pkgs-image"
 	aufs_remove_image "${work_dir}/boot-image"
+}
+
+mount_custom_image(){
+	aufs_mount_custom_image "$1"
+	aufs_append_root_image "$1"
+}
+
+# $1: image path
+umount_image(){
+	umount_image_handler
+	find $1 -name '.wh.*' -delete &> /dev/null
 }

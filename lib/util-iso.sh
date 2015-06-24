@@ -12,7 +12,12 @@
 import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
-import ${LIBDIR}/util-iso-aufs.sh
+
+if ${use_overlayfs};then
+	import ${LIBDIR}/util-iso-overlayfs.sh
+else
+	import ${LIBDIR}/util-iso-aufs.sh
+fi
 
 # $1: path
 # $2: exit code
@@ -228,26 +233,18 @@ make_image_custom() {
 		msg "Prepare [${custom} installation] (${custom}-image)"
 		local path="${work_dir}/${custom}-image"
 		mkdir -p ${path}
-		if [[ ${use_overlayfs} == "true" ]];then
-			mkdir -p "${work_dir}/work"
-			mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
-		else
-			umount_image_handler
-			aufs_mount_root_image "${path}"
-		fi
+
+		mount_root_image "${path}"
+
 		chroot_create "${path}" "${packages}"
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
-		if [[ ${use_overlayfs} == "true" ]];then
-			umount "${path}"
-			rm -rf "${work_dir}/work"
-		else
-			umount_image_handler
-			aufs_clean "${path}"
-		fi
+
+		umount_image "${path}"
+
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${custom} installation] (${custom}-image)"
@@ -259,22 +256,13 @@ make_image_livecd() {
 		msg "Prepare [livecd installation] (livecd-image)"
 		local path="${work_dir}/livecd-image"
 		mkdir -p ${path}
-		if [[ ${use_overlayfs} == "true" ]];then
-			mkdir -p "${work_dir}/work"
-			if [[ -n "${custom}" ]] ; then
-				mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
-			else
-				mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
-			fi
+
+		if [[ -n "${custom}" ]] ; then
+			mount_custom_image "${path}"
 		else
-			umount_image_handler
-			if [[ -n "${custom}" ]] ; then
-				aufs_mount_custom_image "${path}"
-				aufs_append_root_image "${path}"
-			else
-				aufs_mount_root_image "${path}"
-			fi
+			mount_root_image "${path}"
 		fi
+
 		chroot_create "${path}" "${packages}"
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
@@ -283,13 +271,9 @@ make_image_livecd() {
 		copy_startup_scripts "${path}/usr/bin"
 		configure_livecd_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
-		if [[ ${use_overlayfs} == "true" ]];then
-			umount "${path}"
-			rm -rf "${work_dir}/work"
-		else
-			umount_image_handler
-			aufs_clean "${path}"
-		fi
+
+		umount_image "${path}"
+
 		# Clean up GnuPG keys
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		clean_up_image "${path}"
@@ -303,22 +287,13 @@ make_image_xorg() {
 		msg "Prepare [pkgs-image]"
 		local path="${work_dir}/pkgs-image"
 		mkdir -p ${path}/opt/livecd/pkgs
-		if [[ ${use_overlayfs} == "true" ]];then
-			mkdir -p "${work_dir}/work"
-			if [[ -n "${custom}" ]] ; then
-				mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
-			else
-				mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
-			fi
+
+		if [[ -n "${custom}" ]] ; then
+			mount_custom_image "${path}"
 		else
-			umount_image_handler
-			if [[ -n "${custom}" ]] ; then
-				aufs_mount_custom_image "${path}"
-				aufs_append_root_image "${path}"
-			else
-				aufs_mount_root_image "${path}"
-			fi
+			mount_root_image "${path}"
 		fi
+
 		download_to_cache "${path}" "${packages}"
 		copy_cache_xorg
 		if [[ -n "${packages_cleanup}" ]]; then
@@ -329,13 +304,9 @@ make_image_xorg() {
 		cp ${PKGDATADIR}/pacman-gfx.conf ${path}/opt/livecd
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 		configure_xorg_drivers "${path}"
-		if [[ ${use_overlayfs} == "true" ]];then
-			umount "${path}"
-			rm -rf "${work_dir}/work"
-		else
-			umount_image_handler
-			aufs_clean "${path}"
-		fi
+
+		umount_image "${path}"
+		
 		rm -r ${path}/var
 		rm -rf "${work_dir}/pkgs-image/etc"
 		rm -f "${work_dir}/pkgs-image/cache-packages.txt"

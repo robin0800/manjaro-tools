@@ -66,6 +66,7 @@ LIBS_PKG = \
 LIBS_ISO = \
 	lib/util-iso.sh \
 	lib/util-iso-aufs.sh \
+	lib/util-iso-overlayfs.sh \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
 	lib/util-livecd.sh \
