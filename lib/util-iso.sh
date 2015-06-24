@@ -108,7 +108,6 @@ copy_livecd_helpers(){
 copy_cache_xorg(){
 	msg2 "Copying xorg package cache ..."
 	rsync -v --files-from="${work_dir}/pkgs-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/pkgs-image/opt/livecd/pkgs"
-	rm -f "${work_dir}/pkgs-image/cache-packages.txt"
 }
 
 # $1: image path
@@ -229,17 +228,27 @@ make_image_custom() {
 		msg "Prepare [${custom} installation] (${custom}-image)"
 		local path="${work_dir}/${custom}-image"
 		mkdir -p ${path}
-		umount_image_handler
-		aufs_mount_root_image "${path}"
+		if [[ ${use_overlayfs} == "true" ]];then
+			mkdir -p "${work_dir}/work"
+			mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
+		else
+			umount_image_handler
+			aufs_mount_root_image "${path}"
+		fi
 		chroot_create "${path}" "${packages}"
-		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
-		umount_image_handler
-		aufs_clean "${path}"
+		if [[ ${use_overlayfs} == "true" ]];then
+			umount "${path}"
+			rm -rf "${work_dir}/work"
+		else
+			umount_image_handler
+			aufs_clean "${path}"
+		fi
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${custom} installation] (${custom}-image)"
 	fi
@@ -250,15 +259,23 @@ make_image_livecd() {
 		msg "Prepare [livecd installation] (livecd-image)"
 		local path="${work_dir}/livecd-image"
 		mkdir -p ${path}
-		umount_image_handler
-		if [[ -n "${custom}" ]] ; then
-			aufs_mount_custom_image "${path}"
-			aufs_append_root_image "${path}"
+		if [[ ${use_overlayfs} == "true" ]];then
+			mkdir -p "${work_dir}/work"
+			if [[ -n "${custom}" ]] ; then
+				mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
+			else
+				mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
+			fi
 		else
-			aufs_mount_root_image "${path}"
+			umount_image_handler
+			if [[ -n "${custom}" ]] ; then
+				aufs_mount_custom_image "${path}"
+				aufs_append_root_image "${path}"
+			else
+				aufs_mount_root_image "${path}"
+			fi
 		fi
 		chroot_create "${path}" "${packages}"
-		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
 		# copy over setup helpers and config loader
@@ -266,10 +283,16 @@ make_image_livecd() {
 		copy_startup_scripts "${path}/usr/bin"
 		configure_livecd_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
-		# Clean up GnuPG keys?
+		if [[ ${use_overlayfs} == "true" ]];then
+			umount "${path}"
+			rm -rf "${work_dir}/work"
+		else
+			umount_image_handler
+			aufs_clean "${path}"
+		fi
+		# Clean up GnuPG keys
 		rm -rf "${path}/etc/pacman.d/gnupg"
-		umount_image_handler
-		aufs_clean "${path}"
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [livecd-image]"
 	fi
@@ -280,12 +303,21 @@ make_image_xorg() {
 		msg "Prepare [pkgs-image]"
 		local path="${work_dir}/pkgs-image"
 		mkdir -p ${path}/opt/livecd/pkgs
-		umount_image_handler
-		if [[ -n "${custom}" ]] ; then
-			aufs_mount_custom_image "${path}"
-			aufs_append_root_image "${path}"
+		if [[ ${use_overlayfs} == "true" ]];then
+			mkdir -p "${work_dir}/work"
+			if [[ -n "${custom}" ]] ; then
+				mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
+			else
+				mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
+			fi
 		else
-			aufs_mount_root_image "${path}"
+			umount_image_handler
+			if [[ -n "${custom}" ]] ; then
+				aufs_mount_custom_image "${path}"
+				aufs_append_root_image "${path}"
+			else
+				aufs_mount_root_image "${path}"
+			fi
 		fi
 		download_to_cache "${path}" "${packages}"
 		copy_cache_xorg
@@ -295,11 +327,18 @@ make_image_xorg() {
 			done
 		fi
 		cp ${PKGDATADIR}/pacman-gfx.conf ${path}/opt/livecd
-		rm -r ${path}/var
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 		configure_xorg_drivers "${path}"
-		umount_image_handler
-		aufs_clean "${path}"
+		if [[ ${use_overlayfs} == "true" ]];then
+			umount "${path}"
+			rm -rf "${work_dir}/work"
+		else
+			umount_image_handler
+			aufs_clean "${path}"
+		fi
+		rm -r ${path}/var
+		rm -rf "${work_dir}/pkgs-image/etc"
+		rm -f "${work_dir}/pkgs-image/cache-packages.txt"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [pkgs-image]"
 	fi
@@ -314,18 +353,32 @@ make_image_boot() {
 		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${iso_name}
 		local path="${work_dir}/boot-image"
 		mkdir -p ${path}
-		umount_image_handler
-		if [[ -n "${custom}" ]] ; then
-			aufs_mount_custom_image "${path}"
-			aufs_append_root_image "${path}"
+		if [[ ${use_overlayfs} == "true" ]];then
+			mkdir -p "${work_dir}/work"
+			if [[ -n "${custom}" ]] ; then
+				mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
+			else
+				mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
+			fi
 		else
-			aufs_mount_root_image "${path}"
+			umount_image_handler
+			if [[ -n "${custom}" ]] ; then
+				aufs_mount_custom_image "${path}"
+				aufs_append_root_image "${path}"
+			else
+				aufs_mount_root_image "${path}"
+			fi
 		fi
 		copy_initcpio "${path}" || die "Failed to copy initcpio."
 		gen_boot_image "${path}"
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
-		umount_image_handler
+		if [[ ${use_overlayfs} == "true" ]];then
+			umount "${path}"
+			rm -rf "${work_dir}/work"
+		else
+			umount_image_handler
+		fi
 		rm -R ${path}
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${iso_name}/boot]"

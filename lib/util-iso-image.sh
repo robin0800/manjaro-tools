@@ -393,7 +393,6 @@ download_to_cache(){
 		  pacman -v -Sp $2 --noconfirm > "$1"/cache-packages.txt
 	sed -ni '/.pkg.tar.xz/p' "$1"/cache-packages.txt
 	sed -i "s/.*\///" "$1"/cache-packages.txt
-	rm -rf "$1/etc"
 }
 
 # $1: image path
