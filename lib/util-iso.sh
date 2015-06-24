@@ -257,8 +257,6 @@ make_image_livecd() {
 		copy_startup_scripts "${path}/usr/bin"
 		configure_livecd_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
-		# Clean up GnuPG keys?
-		rm -rf "${path}/etc/pacman.d/gnupg"
 		if [[ ${use_overlayfs} == "true" ]];then
 			umount "${path}"
 			rm -rf "${work_dir}/work"
@@ -266,6 +264,8 @@ make_image_livecd() {
 			umount_image_handler
 			aufs_clean "${path}"
 		fi
+		# Clean up GnuPG keys
+		rm -rf "${path}/etc/pacman.d/gnupg"
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [livecd-image]"
@@ -301,7 +301,6 @@ make_image_xorg() {
 			done
 		fi
 		cp ${PKGDATADIR}/pacman-gfx.conf ${path}/opt/livecd
-		rm -r ${path}/var
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 		configure_xorg_drivers "${path}"
 		if [[ ${use_overlayfs} == "true" ]];then
@@ -311,6 +310,7 @@ make_image_xorg() {
 			umount_image_handler
 			aufs_clean "${path}"
 		fi
+		rm -r ${path}/var
 		rm -rf "${work_dir}/pkgs-image/etc"
 		rm -f "${work_dir}/pkgs-image/cache-packages.txt"
 		: > ${work_dir}/build.${FUNCNAME}
@@ -352,7 +352,6 @@ make_image_lng() {
 			done
 		fi
 		cp ${PKGDATADIR}/pacman-lng.conf ${path}/opt/livecd
-		rm -r ${path}/var
 		make_repo ${path}/opt/livecd/lng/lng-pkgs ${path}/opt/livecd/lng
 		if [[ ${use_overlayfs} == "true" ]];then
 			umount "${path}"
@@ -361,6 +360,7 @@ make_image_lng() {
 			umount_image_handler
 			aufs_clean "${path}"
 		fi
+		rm -r ${path}/var
 		rm -f "${work_dir}/lng-image/etc"
 		rm -f "${work_dir}/lng-image/cache-packages.txt"
 		: > ${work_dir}/build.${FUNCNAME}
