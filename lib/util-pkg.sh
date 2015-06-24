@@ -9,22 +9,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-check_chroot_version(){
-	[[ -f ${work_dir}/root/.manjaro-tools ]] && local chroot_version=$(cat ${work_dir}/root/.manjaro-tools)
-	msg "chroot version: $chroot_version"
-	if [[ ${version} != $chroot_version ]];then
-		clean_first=true
-	fi
+check_build(){
+	[[ ! -f $1/PKGBUILD ]] && die "Directory must contain a PKGBUILD!"
 }
 
 check_requirements(){
-	[[ -z $(find . -maxdepth 2 -name 'PKGBUILD' -type f) ]] && die "${0##*/} must be run inside a valid PKGBUILD directory!"
 	if ${is_buildset};then
-		for i in $(cat ${sets_dir_pkg}/${buildset_pkg}.set);do
-			[[ -z $(find . -type d -name "${i}") ]] && die "${buildset_pkg} is not a valid buildset!"
+		for p in $(cat ${sets_dir_pkg}/${buildset_pkg}.set);do
+			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_pkg} is not a valid buildset!"
+			check_build "$p"
 		done
 	else
 		[[ -z $(find . -type d -name "${buildset_pkg}") ]] && die "${buildset_pkg} is not a valid package!"
+		check_build "${buildset_pkg}"
 	fi
 }
 
@@ -38,6 +35,7 @@ chroot_create(){
 }
 
 chroot_clean(){
+	msg "Creating chroot for [${branch}] (${arch})..."
 	for copy in "${work_dir}"/*; do
 		[[ -d ${copy} ]] || continue
 		msg2 "Deleting chroot copy '$(basename "${copy}")'..."
@@ -64,8 +62,12 @@ chroot_update(){
 
 clean_up(){
 	msg "Cleaning up ..."
+	msg2 "Cleaning [${cache_dir_pkg}]"
 	find ${cache_dir_pkg} -maxdepth 1 -name "*.*" -delete #&> /dev/null
-	[[ -z $SRCDEST ]] && find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
+	if [[ -z $SRCDEST ]];then
+		msg2 "Cleaning [source files]"
+		find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
+	fi
 }
 
 blacklist_pkg(){
@@ -138,11 +140,9 @@ make_pkg(){
 chroot_build(){
 	if ${is_buildset};then
 		for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
-			check_sanity "$pkg/PKGBUILD" "break"
 			make_pkg "$pkg" "break"
 		done
 	else
-		check_sanity "${buildset_pkg}/PKGBUILD" 'die "Not a valid package!"'
 		make_pkg "${buildset_pkg}" "abort"
 	fi
 }

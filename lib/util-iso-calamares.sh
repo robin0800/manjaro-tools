@@ -32,12 +32,13 @@ write_calamares_bootloader_conf(){
 	echo "kernel: \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
 	echo "img: \"$(echo ${default_image} | sed s'|/boot||')\"" >> "$conf"
 	echo "fallback: \"$(echo ${fallback_image} | sed s'|/boot||')\"" >> "$conf"
+	echo 'timeout: "10"' >> "$conf"
 	echo "kernelLine: \", with ${kernel}\"" >> "$conf"
 	echo "fallbackKernelLine: \", with ${kernel} (fallback initramfs)\"" >> "$conf"
-	echo 'timeout: "10"' >> "$conf"
 	echo 'grubInstall: "grub-install"' >> "$conf"
 	echo 'grubMkconfig: "grub-mkconfig"' >> "$conf"
 	echo 'grubCfg: "/boot/grub/grub.cfg"' >> "$conf"
+	echo '#efiBootloaderId: "dirname"' >> "$conf"
 }
 
 write_calamares_services_conf(){
@@ -137,12 +138,9 @@ configure_calamares(){
 		write_calamares_services_conf $1
 		write_calamares_users_conf $1
 
-		mkdir -p $1/home/${username}/Desktop
 		if [[ -f $1/usr/bin/kdesu ]];then
 			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
 		fi
-		cp $1/usr/share/applications/calamares.desktop $1/home/${username}/Desktop/calamares.desktop
-		chmod a+x $1/home/${username}/Desktop/calamares.desktop
 	fi
 }
 
@@ -164,22 +162,9 @@ configure_thus(){
 		echo "VMLINUZ = \"$(echo ${ALL_kver} | sed s'|/boot/||')\"" >> "$conf"
 		echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
 		echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
-		mkdir -p $1/home/${username}/Desktop
+
 		if [[ -f $1/usr/bin/kdesu ]];then
 			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
 		fi
-		cp $1/usr/share/applications/thus.desktop $1/home/${username}/Desktop/thus.desktop
-		chmod a+x $1/home/${username}/Desktop/thus.desktop
-	fi
-}
-
-configure_cli(){
-	if [[ -f $1/usr/bin/setup ]]||[[ -L $1/usr/bin/setup ]];then
-		msg2 "Configuring cli-installer ..."
-		if [[ ! -f $1/home/${username}/Desktop/installer-launcher-cli.desktop ]];then
-			cp $1/etc/skel/Desktop/installer-launcher-cli.desktop \
-			$1/home/${username}/Desktop/installer-launcher-cli.desktop
-		fi
-		chmod a+x $1/home/${username}/Desktop/installer-launcher-cli.desktop
 	fi
 }

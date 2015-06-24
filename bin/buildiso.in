@@ -17,8 +17,9 @@ PKGDATADIR='@pkgdatadir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
-[[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
-[[ -r ${LIBDIR}/util-iso.sh ]] && source ${LIBDIR}/util-iso.sh
+
+import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-iso.sh
 
 show_profile(){
 	cd $1
@@ -27,17 +28,17 @@ show_profile(){
 			msg2 "work_dir: ${work_dir}"
 			msg2 "iso_file: ${iso_file}"
 			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
-
 			msg2 "initsys: ${initsys}"
+			[[ ${arch} == 'x86_64' ]] && msg2 "multilib: ${multilib}"
 			msg2 "displaymanager: ${displaymanager}"
-			msg2 "default_desktop_executable: ${default_desktop_executable}"
-			msg2 "default_desktop_file: ${default_desktop_file}"
+			msg2 "autologin: ${autologin}"
+			msg2 "nonfree_xorg: ${nonfree_xorg}"
 			msg2 "kernel: ${kernel}"
 			msg2 "efi_boot_loader: ${efi_boot_loader}"
 			msg2 "efi_part_size: ${efi_part_size}"
-
-			${is_plymouth} && msg2 "plymouth_theme: ${plymouth_theme}"
-
+			msg2 "pxe_boot: ${pxe_boot}"
+			msg2 "plymouth_boot: ${plymouth_boot}"
+			${plymouth_boot} && msg2 "plymouth_theme: ${plymouth_theme}"
 			msg2 "hostname: ${hostname}"
 			msg2 "username: ${username}"
 			msg2 "password: ${password}"
@@ -176,9 +177,11 @@ mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 check_root "$0" "${orig_argv[@]}"
 
+prepare_dir "${cache_dir_iso}"
+
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
-prepare_cachedirs
+check_requirements
 
 ${pretend} && display_settings && exit 1
 

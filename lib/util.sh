@@ -8,10 +8,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import(){
-	[[ -r $1 ]] && source $1
-}
-
 create_set(){
 	msg "[$1/${name}.set]"
 	if [[ -f $1/${name}.set ]];then
@@ -29,49 +25,17 @@ create_set(){
 	done
 }
 
+get_deps(){
+	echo $(pactree -u $1)
+}
+
 calculate_build_order(){
-        local is_split=false path=/tmp/calc
-        mkdir -p $path
-        #[[ -f $path/*.{sort,set,makedeps,split} ]] &&
-        rm $path/*
-        pacman -Qqg base-devel  > $path/base-devel.set
-
-        for pkg in $(cat $1/${name}.set);do
-                cd $pkg
-                        source PKGBUILD
-                        if [[ -n $pkgbase ]];then
-                                is_split=true; echo "$pkgbase" >> $path/${name}.split
-                        fi
-                        for m in ${makedepends[@]};do
-                                        echo $m >> $path/${name}.makedeps
-                        done
-                cd ..
-        done
-        [[ -f $path/${name}.split ]] && sort -u $path/${name}.split > $path/${name}.split.sort
-        sort -u $path/${name}.makedeps > $path/${name}.makedeps.sort
-
-        [[ -f $path/${name}.split ]] && rm $path/${name}.split
-
-        for d in $(cat $path/${name}.makedeps.sort);do
-                for pkg in $(cat $1/${name}.set);do
-                        if [[ $pkg == $d ]];then
-                                echo $d >> $path/${name}.makedeps
-                        fi
-                done
-        done
-        sort -u $path/${name}.makedeps > $path/${name}.makedeps.sort
-        rm $path/${name}.makedeps
-        sort -u $path/${name}.makedeps.sort $path/base-devel.set > $path/filter.set
-
-
-        for b in $(cat $path/base-devel.set);do
-                for m in $(cat $path/filter.set);do
-                        if [[ $b == $m ]];then
-                                sed "/$m/d" -i $path/filter.set
-                        fi
-                done
-        done
-
+	msg3 "Calculating build order ..."
+	for pkg in $(cat $1/${name}.set);do
+		cd $pkg
+			mksrcinfo
+		cd ..
+	done
 }
 
 remove_set(){
@@ -87,10 +51,6 @@ show_set(){
 	for item in ${list[@]}; do
 		msg2 "$item"
 	done
-}
-
-get_deps(){
-	echo $(pactree -u $1)
 }
 
 get_timer(){
@@ -330,6 +290,10 @@ load_vars() {
 	return 0
 }
 
+prepare_dir(){
+	[[ ! -d $1 ]] && mkdir -p $1
+}
+
 init_common(){
 	[[ -z ${branch} ]] && branch='stable'
 
@@ -345,6 +309,10 @@ init_common(){
 }
 
 init_buildtree(){
+	tree_dir=${cache_dir}/pkgtree
+
+	tree_dir_abs=${tree_dir}/packages-archlinux
+
 	[[ -z ${repo_tree[@]} ]] && repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
 
 	[[ -z ${host_tree} ]] && host_tree='https://github.com/manjaro'
@@ -357,6 +325,8 @@ init_buildpkg(){
 
 	sets_dir_pkg="${sets_dir}/pkg"
 
+	prepare_dir "${sets_dir_pkg}"
+
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
 
 	[[ -z ${blacklist_trigger[@]} ]] && blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
@@ -368,6 +338,8 @@ init_buildiso(){
 	chroots_iso="${chroots_dir}/buildiso"
 
 	sets_dir_iso="${sets_dir}/iso"
+
+	prepare_dir "${sets_dir_iso}"
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
 
@@ -441,6 +413,14 @@ load_profile_config(){
 
 	[[ -z ${autologin} ]] && autologin="true"
 
+	[[ -z ${multilib} ]] && multilib="true"
+
+	[[ -z ${pxe_boot} ]] && pxe_boot="true"
+
+	[[ -z ${plymouth_boot} ]] && plymouth_boot="true"
+
+	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
+
 	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
 
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
@@ -482,10 +462,6 @@ load_profile_config(){
 	return 0
 }
 
-prepare_dir(){
-	[[ ! -d $1 ]] && mkdir -p $1
-}
-
 clean_dir(){
 	if [[ -d $1 ]]; then
 		msg "Cleaning [$1] ..."
@@ -522,43 +498,6 @@ load_user_info(){
 	fi
 
 	USER_CONFIG="$USER_HOME/.config"
-}
-
-# $1: path
-# $2: exit code
-check_profile(){
-	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
-	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
-	local has_keyfiles=false has_keydirs=false
-	for f in ${keyfiles[@]}; do
-		if [[ -f $1/$f ]];then
-			has_keyfiles=true
-		else
-			has_keyfiles=false
-			break
-		fi
-	done
-	for d in ${keydirs[@]}; do
-		if [[ -d $1/$d ]];then
-			has_keydirs=true
-		else
-			has_keydirs=false
-			break
-		fi
-	done
-	if ! ${has_keyfiles} && ! ${has_keydirs};then
-# 		msg "Profile sanity check passed."
-# 	else
-		eval $2
-	fi
-}
-
-# $1: file
-# $2: exit code
-check_sanity(){
-	if [[ ! -f $1 ]]; then
-		eval "$2"
-	fi
 }
 
 show_version(){
@@ -602,4 +541,23 @@ create_min_fs(){
 	mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
 	mkdir -m 1777 -p $1/tmp
 	mkdir -m 0555 -p $1/{sys,proc}
+}
+
+check_chroot_version(){
+	[[ -f $1/.manjaro-tools ]] && local chroot_version=$(cat $1/.manjaro-tools)
+	[[ ${version} != $chroot_version ]] && clean_first=true
+}
+
+is_valid_bool(){
+	case $1 in
+		'true'|'false') return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+is_valid_init(){
+	case $1 in
+		'openrc'|'systemd') return 0 ;;
+		*) return 1 ;;
+	esac
 }

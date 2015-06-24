@@ -13,10 +13,12 @@ version=@version@
 shopt -s extglob
 
 PKGDATADIR='@pkgdatadir@'
+LIBDIR='@libdir@'
 
-[[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
-[[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
-[[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
+[[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
+
+import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-mount.sh
 
 newroot=/mnt
 

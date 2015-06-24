@@ -32,6 +32,23 @@ copy_efi_shells(){
 	fi
 }
 
+set_mkinicpio_hooks(){
+	if ! ${pxe_boot};then
+		sed -e 's/miso_pxe_common miso_pxe_http //' -i $1
+	fi
+	if ! ${plymouth_boot};then
+		sed -e 's/plymouth //' -i $1
+	fi
+}
+
+copy_initcpio(){
+	msg2 "Copying initcpio ..."
+	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
+	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
+	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
+	set_mkinicpio_hooks "$1/etc/mkinitcpio-${iso_name}.conf"
+}
+
 # $1: work_dir
 gen_boot_image(){
 	local _kernver=$(cat $1/usr/lib/modules/*/version)
@@ -56,13 +73,6 @@ copy_boot_images(){
 		msg2 "Using intel_ucode.img ..."
 		cp $1/intel_ucode.img $2/intel_ucode.img
 	fi
-}
-
-copy_initcpio(){
-	msg2 "Copying initcpio ..."
-	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
-	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
-	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
 }
 
 copy_ucode(){
@@ -197,15 +207,17 @@ write_isolinux_cfg(){
 		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
 	fi
 	echo '' >> ${conf}
-	echo "label nonfree" >> ${conf}
-	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
-		msg2 "Using intel_ucode.img ..."
-		echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
-	else
-		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+	if ${nonfree_xorg};then
+		echo "label nonfree" >> ${conf}
+		echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+		if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+			msg2 "Using intel_ucode.img ..."
+			echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+		else
+			echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+		fi
+		echo '' >> ${conf}
 	fi
-	echo '' >> ${conf}
 	echo "label harddisk" >> ${conf}
 	echo "  com32 whichsys.c32" >> ${conf}
 	echo "  append -iso- chain.c32 hd0" >> ${conf}
@@ -228,7 +240,9 @@ write_isolinux_msg(){
 	echo '' >> ${conf}
 	echo "Available boot options:" >> ${conf}
 	echo "start                    - Start ${dist_name} Live System" >> ${conf}
-	echo "nonfree                  - Start with proprietary drivers" >> ${conf}
+	if ${nonfree_xorg};then
+		echo "nonfree                  - Start with proprietary drivers" >> ${conf}
+	fi
 	echo "harddisk                 - Boot from local hard disk" >> ${conf}
 	echo "hdt                      - Run Hardware Detection Tool" >> ${conf}
 	echo "memtest                  - Run Memory Test" >> ${conf}
@@ -254,10 +268,6 @@ write_isomounts(){
 	echo '' >> $1
 	msg2 "Writing livecd entry ..."
 	echo "${arch}/livecd-image.sqfs ${arch} / squashfs" >> $1
-	if [[ -f Packages-Lng ]] ; then
-		msg2 "Writing lng entry ..."
-		echo "${arch}/lng-image.sqfs ${arch} / squashfs" >> $1
-	fi
 	if [[ -f Packages-Xorg ]] ; then
 		msg2 "Writing pkgs entry ..."
 		echo "${arch}/pkgs-image.sqfs ${arch} / squashfs" >> $1

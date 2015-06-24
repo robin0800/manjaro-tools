@@ -18,8 +18,9 @@ PKGDATADIR='@pkgdatadir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
-[[ -r ${LIBDIR}/util.sh ]] && source ${LIBDIR}/util.sh
-[[ -r ${LIBDIR}/util-pkg.sh ]] && source ${LIBDIR}/util-pkg.sh
+
+import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-pkg.sh
 
 show_build_queue(){
 	if ${is_buildset};then
@@ -177,13 +178,13 @@ prepare_cachedir
 
 eval_buildset "${buildset_pkg}" "${sets_dir_pkg}"
 
+check_requirements
+
 ${pretend} && display_settings && exit
 
 ${wipe_clean} && clean_up
 
-[[ -d ${work_dir}/root ]] && check_chroot_version
-
-check_requirements
+[[ -d ${work_dir}/root ]] && check_chroot_version "${work_dir}/root"
 
 chroot_init
 

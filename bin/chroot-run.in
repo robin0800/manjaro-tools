@@ -11,9 +11,12 @@
 
 version=@version@
 
-[[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
-[[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
-[[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
+LIBDIR='@libdir@'
+
+[[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
+
+import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-mount.sh
 
 working_dir=''
 keep_mirrors=false

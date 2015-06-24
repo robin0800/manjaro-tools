@@ -13,8 +13,11 @@ version=@version@
 
 shopt -s extglob
 
-[[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
-[[ -r @libdir@/util-mount.sh ]] && source @libdir@/util-mount.sh
+LIBDIR='@libdir@'
+
+[[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
+
+import ${LIBDIR}/util-mount.sh
 
 usage() {
   cat <<EOF

@@ -12,9 +12,10 @@
 version=@version@
 
 SYSCONFDIR='@sysconfdir@'
+LIBDIR='@libdir@'
 
-[[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
-[[ -r @libdir@/util.sh ]] && source @libdir@/util.sh
+[[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
+import ${LIBDIR}/util.sh
 
 load_user_info
 
