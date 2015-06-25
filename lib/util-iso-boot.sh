@@ -40,7 +40,7 @@ set_mkinicpio_hooks(){
 		sed -e 's/plymouth //' -i $1
 	fi
 	if ${use_overlayfs};then
-		sed -e 's/miso /miso_overlayfs/' -i $1
+		sed -e 's/miso /miso_overlayfs /' -i $1
 	fi
 }
 
