@@ -17,10 +17,7 @@ mount_root_image(){
 
 mount_custom_image(){
 	msg2 "mount [${1##*/}] on [${custom}-image]"
-	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro none "$1"
-
-	msg2 "append [root-image] on [${1##*/}]"
-	mount -t aufs -o remount,append:${work_dir}/root-image=ro none "$1"
+	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro:${work_dir}/root-image=ro none "$1"
 }
 
 # $1: image path
