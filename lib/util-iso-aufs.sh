@@ -15,41 +15,19 @@ mount_root_image(){
 	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
 }
 
-# $1: add branch
-aufs_append_root_image(){
+mount_custom_image(){
+	msg2 "mount [${1##*/}] on [${custom}-image]"
+	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro none "$1"
+
 	msg2 "append [root-image] on [${1##*/}]"
 	mount -t aufs -o remount,append:${work_dir}/root-image=ro none "$1"
 }
 
-# $1: add branch
-aufs_mount_custom_image(){
-	msg2 "mount [${1##*/}] on [${custom}-image]"
-	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro none "$1"
-}
-
-# $1: del branch
-aufs_remove_image(){
+# $1: image path
+umount_image(){
 	if mountpoint -q "$1";then
 		msg2 "unmount ${1##*/}"
 		umount $1
 	fi
-}
-
-umount_image_handler(){
-	aufs_remove_image "${work_dir}/livecd-image"
-	aufs_remove_image "${work_dir}/${custom}-image"
-	aufs_remove_image "${work_dir}/root-image"
-	aufs_remove_image "${work_dir}/pkgs-image"
-	aufs_remove_image "${work_dir}/boot-image"
-}
-
-mount_custom_image(){
-	aufs_mount_custom_image "$1"
-	aufs_append_root_image "$1"
-}
-
-# $1: image path
-umount_image(){
-	umount_image_handler
 	find $1 -name '.wh.*' -delete &> /dev/null
 }

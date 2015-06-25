@@ -16,13 +16,16 @@ mount_root_image(){
 	mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
 }
 
-umount_image(){
-	umount "$1"
-	rm -rf "${work_dir}/work"
-}
-
 mount_custom_image(){
 	msg2 "mount [${1##*/}] on [${custom}-image]"
 	mkdir -p "${work_dir}/work"
 	mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
+}
+
+umount_image(){
+	if mountpoint -q "$1";then
+		msg2 "unmount ${1##*/}"
+		umount $1
+		rm -rf "${work_dir}/work"
+	fi
 }

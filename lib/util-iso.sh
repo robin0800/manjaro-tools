@@ -59,6 +59,14 @@ check_requirements(){
 	fi
 }
 
+umount_image_handler(){
+	umount_image "${work_dir}/livecd-image"
+	umount_image "${work_dir}/${custom}-image"
+	umount_image "${work_dir}/root-image"
+	umount_image "${work_dir}/pkgs-image"
+	umount_image "${work_dir}/boot-image"
+}
+
 copy_overlay_root(){
 	msg2 "Copying overlay ..."
 	cp -a --no-preserve=ownership overlay/* $1
@@ -306,10 +314,11 @@ make_image_xorg() {
 		configure_xorg_drivers "${path}"
 
 		umount_image "${path}"
-		
+
 		rm -r ${path}/var
-		rm -rf "${work_dir}/pkgs-image/etc"
-		rm -f "${work_dir}/pkgs-image/cache-packages.txt"
+		rm -rf "${path}/etc"
+		rm -f "${path}/cache-packages.txt"
+
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [pkgs-image]"
 	fi
@@ -324,32 +333,20 @@ make_image_boot() {
 		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${iso_name}
 		local path="${work_dir}/boot-image"
 		mkdir -p ${path}
-		if [[ ${use_overlayfs} == "true" ]];then
-			mkdir -p "${work_dir}/work"
-			if [[ -n "${custom}" ]] ; then
-				mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
-			else
-				mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="${path}",workdir="${work_dir}/work" "${path}"
-			fi
+
+		if [[ -n "${custom}" ]] ; then
+			mount_custom_image "${path}"
 		else
-			umount_image_handler
-			if [[ -n "${custom}" ]] ; then
-				aufs_mount_custom_image "${path}"
-				aufs_append_root_image "${path}"
-			else
-				aufs_mount_root_image "${path}"
-			fi
+			mount_root_image "${path}"
 		fi
+
 		copy_initcpio "${path}" || die "Failed to copy initcpio."
 		gen_boot_image "${path}"
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
-		if [[ ${use_overlayfs} == "true" ]];then
-			umount "${path}"
-			rm -rf "${work_dir}/work"
-		else
-			umount_image_handler
-		fi
+
+		umount_image "${path}"
+
 		rm -R ${path}
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${iso_name}/boot]"
