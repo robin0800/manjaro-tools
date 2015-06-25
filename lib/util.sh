@@ -25,6 +25,10 @@ create_set(){
 	done
 }
 
+get_deps(){
+	echo $(pactree -u $1)
+}
+
 calculate_build_order(){
 	msg3 "Calculating build order ..."
 	for pkg in $(cat $1/${name}.set);do
@@ -47,10 +51,6 @@ show_set(){
 	for item in ${list[@]}; do
 		msg2 "$item"
 	done
-}
-
-get_deps(){
-	echo $(pactree -u $1)
 }
 
 get_timer(){
@@ -290,6 +290,10 @@ load_vars() {
 	return 0
 }
 
+prepare_dir(){
+	[[ ! -d $1 ]] && mkdir -p $1
+}
+
 init_common(){
 	[[ -z ${branch} ]] && branch='stable'
 
@@ -321,6 +325,8 @@ init_buildpkg(){
 
 	sets_dir_pkg="${sets_dir}/pkg"
 
+	prepare_dir "${sets_dir_pkg}"
+
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
 
 	[[ -z ${blacklist_trigger[@]} ]] && blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
@@ -332,6 +338,8 @@ init_buildiso(){
 	chroots_iso="${chroots_dir}/buildiso"
 
 	sets_dir_iso="${sets_dir}/iso"
+
+	prepare_dir "${sets_dir_iso}"
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
 
@@ -368,6 +376,8 @@ init_buildiso(){
 	[[ -z ${iso_compression} ]] && iso_compression='xz'
 
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
+
+	[[ -z ${use_overlayfs} ]] && use_overlayfs='false'
 }
 
 load_config(){
@@ -405,6 +415,10 @@ load_profile_config(){
 
 	[[ -z ${multilib} ]] && multilib="true"
 
+	[[ -z ${pxe_boot} ]] && pxe_boot="true"
+
+	[[ -z ${plymouth_boot} ]] && plymouth_boot="true"
+
 	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
 
 	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
@@ -438,18 +452,14 @@ load_profile_config(){
 	fi
 
 	if [[ -z ${start_systemd_live[@]} ]];then
-		start_systemd_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
+		start_systemd_live=('livecd' 'mhwd-live' 'pacman-init')
 	fi
 
 	if [[ -z ${start_openrc_live[@]} ]];then
-		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
+		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init')
 	fi
 
 	return 0
-}
-
-prepare_dir(){
-	[[ ! -d $1 ]] && mkdir -p $1
 }
 
 clean_dir(){
@@ -536,4 +546,18 @@ create_min_fs(){
 check_chroot_version(){
 	[[ -f $1/.manjaro-tools ]] && local chroot_version=$(cat $1/.manjaro-tools)
 	[[ ${version} != $chroot_version ]] && clean_first=true
+}
+
+is_valid_bool(){
+	case $1 in
+		'true'|'false') return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+is_valid_init(){
+	case $1 in
+		'openrc'|'systemd') return 0 ;;
+		*) return 1 ;;
+	esac
 }

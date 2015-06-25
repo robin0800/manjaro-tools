@@ -11,10 +11,6 @@
 export LC_MESSAGES=C
 export LANG=C
 
-import(){
-	[[ -r $1 ]] && source $1
-}
-
 # check if messages are to be printed using color
 unset ALL_OFF BOLD BLUE GREEN RED YELLOW CYAN MAGENTA WHITE
 if [[ -t 2 ]]; then
@@ -116,5 +112,13 @@ slock() {
 		stat_busy "$3"
 		flock -s $1
 		stat_done
+	fi
+}
+
+import(){
+	if [[ -r $1 ]];then
+		source $1
+	else
+		die "Could not import $1"
 	fi
 }

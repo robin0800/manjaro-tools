@@ -13,11 +13,18 @@ import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
 
+if ${use_overlayfs};then
+	import ${LIBDIR}/util-iso-overlayfs.sh
+else
+	import ${LIBDIR}/util-iso-aufs.sh
+fi
+
 # $1: path
 # $2: exit code
 check_profile(){
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
+	local err="Profile [$1] sanity check failed!"
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
 		if [[ -f $1/$f ]];then
@@ -36,7 +43,7 @@ check_profile(){
 		fi
 	done
 	if ! ${has_keyfiles} && ! ${has_keydirs};then
-		die "Profile ($1) sanity check failed!"
+		die "Profile [$1] sanity check failed!"
 	fi
 }
 
@@ -50,6 +57,14 @@ check_requirements(){
 		[[ -z $(find . -type d -name "${buildset_iso}") ]] && die "${buildset_iso} is not a valid profile directory!"
 		check_profile "${buildset_iso}"
 	fi
+}
+
+umount_image_handler(){
+	umount_image "${work_dir}/livecd-image"
+	umount_image "${work_dir}/${custom}-image"
+	umount_image "${work_dir}/root-image"
+	umount_image "${work_dir}/pkgs-image"
+	umount_image "${work_dir}/boot-image"
 }
 
 copy_overlay_root(){
@@ -103,16 +118,9 @@ copy_livecd_helpers(){
 	write_profile_conf_entries $1
 }
 
-copy_cache_lng(){
-	msg2 "Copying language package cache ..."
-	rsync -v --files-from="${work_dir}/lng-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/lng-image/opt/livecd/lng"
-	rm -f "${work_dir}/lng-image/cache-packages.txt"
-}
-
 copy_cache_xorg(){
 	msg2 "Copying xorg package cache ..."
 	rsync -v --files-from="${work_dir}/pkgs-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/pkgs-image/opt/livecd/pkgs"
-	rm -f "${work_dir}/pkgs-image/cache-packages.txt"
 }
 
 # $1: image path
@@ -220,7 +228,7 @@ make_image_root() {
 		chroot_create "${path}" "${packages}"
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
-		configure_lsb "${path}"
+		configure_root_image "${path}"
 		copy_overlay_root "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
@@ -233,17 +241,19 @@ make_image_custom() {
 		msg "Prepare [${custom} installation] (${custom}-image)"
 		local path="${work_dir}/${custom}-image"
 		mkdir -p ${path}
-		umount_image_handler
-		aufs_mount_root_image "${path}"
+
+		mount_root_image "${path}"
+
 		chroot_create "${path}" "${packages}"
-		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
-		umount_image_handler
-		aufs_clean "${path}"
+
+		umount_image "${path}"
+
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${custom} installation] (${custom}-image)"
 	fi
@@ -254,15 +264,14 @@ make_image_livecd() {
 		msg "Prepare [livecd installation] (livecd-image)"
 		local path="${work_dir}/livecd-image"
 		mkdir -p ${path}
-		umount_image_handler
+
 		if [[ -n "${custom}" ]] ; then
-			aufs_mount_custom_image "${path}"
-			aufs_append_root_image "${path}"
+			mount_custom_image "${path}"
 		else
-			aufs_mount_root_image "${path}"
+			mount_root_image "${path}"
 		fi
+
 		chroot_create "${path}" "${packages}"
-		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
 		# copy over setup helpers and config loader
@@ -270,10 +279,12 @@ make_image_livecd() {
 		copy_startup_scripts "${path}/usr/bin"
 		configure_livecd_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
-		# Clean up GnuPG keys?
+
+		umount_image "${path}"
+
+		# Clean up GnuPG keys
 		rm -rf "${path}/etc/pacman.d/gnupg"
-		umount_image_handler
-		aufs_clean "${path}"
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [livecd-image]"
 	fi
@@ -284,62 +295,34 @@ make_image_xorg() {
 		msg "Prepare [pkgs-image]"
 		local path="${work_dir}/pkgs-image"
 		mkdir -p ${path}/opt/livecd/pkgs
-		umount_image_handler
+
 		if [[ -n "${custom}" ]] ; then
-			aufs_mount_custom_image "${path}"
-			aufs_append_root_image "${path}"
+			mount_custom_image "${path}"
 		else
-			aufs_mount_root_image "${path}"
+			mount_root_image "${path}"
 		fi
-		download_to_cache "${path}" "${packages_xorg}"
+		
+		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+
+		download_to_cache "${path}" "${packages}"
 		copy_cache_xorg
-		if [[ -n "${packages_xorg_cleanup}" ]]; then
-			for xorg_clean in ${packages_xorg_cleanup}; do
+		if [[ -n "${packages_cleanup}" ]]; then
+			for xorg_clean in ${packages_cleanup}; do
 				rm ${path}/opt/livecd/pkgs/${xorg_clean}
 			done
 		fi
 		cp ${PKGDATADIR}/pacman-gfx.conf ${path}/opt/livecd
-		rm -r ${path}/var
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
 		configure_xorg_drivers "${path}"
-		umount_image_handler
-		aufs_clean "${path}"
+
+		umount_image "${path}"
+
+		rm -r ${path}/var
+		rm -rf "${path}/etc"
+		rm -f "${path}/cache-packages.txt"
+
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [pkgs-image]"
-	fi
-}
-
-make_image_lng() {
-	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [lng-image]"
-		local path="${work_dir}/lng-image"
-		mkdir -p ${path}/opt/livecd/lng
-		umount_image_handler
-		if [[ -n "${custom}" ]] ; then
-			aufs_mount_custom_image "${path}"
-			aufs_append_root_image "${path}"
-		else
-			aufs_mount_root_image "${path}"
-		fi
-		if [[ -n ${packages_lng_kde} ]]; then
-			download_to_cache "${path}" "${packages_lng} ${packages_lng_kde}"
-			copy_cache_lng
-		else
-			download_to_cache "${path}" "${packages_lng}"
-			copy_cache_lng
-		fi
-		if [[ -n "${packages_lng_cleanup}" ]]; then
-			for lng_clean in ${packages_lng_cleanup}; do
-				rm ${path}/opt/livecd/lng/${lng_clean}
-			done
-		fi
-		cp ${PKGDATADIR}/pacman-lng.conf ${path}/opt/livecd
-		rm -r ${path}/var
-		make_repo ${path}/opt/livecd/lng/lng-pkgs ${path}/opt/livecd/lng
-		umount_image_handler
-		aufs_clean "${path}"
-		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [lng-image]"
 	fi
 }
 
@@ -352,18 +335,20 @@ make_image_boot() {
 		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${iso_name}
 		local path="${work_dir}/boot-image"
 		mkdir -p ${path}
-		umount_image_handler
+
 		if [[ -n "${custom}" ]] ; then
-			aufs_mount_custom_image "${path}"
-			aufs_append_root_image "${path}"
+			mount_custom_image "${path}"
 		else
-			aufs_mount_root_image "${path}"
+			mount_root_image "${path}"
 		fi
+
 		copy_initcpio "${path}" || die "Failed to copy initcpio."
 		gen_boot_image "${path}"
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
-		umount_image_handler
+
+		umount_image "${path}"
+
 		rm -R ${path}
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [${iso_name}/boot]"
@@ -452,320 +437,111 @@ make_isomounts() {
 # $1: file name
 load_pkgs(){
 	msg3 "Loading Packages: [$1] ..."
-	if [[ "${arch}" == "i686" ]]; then
-		packages=$(sed "s|#.*||g" "$1" \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>x86_64.*||g" \
-				| sed "s|>i686||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed ':a;N;$!ba;s/\n/ /g')
-	elif [[ "${arch}" == "x86_64" ]]; then
-		packages=$(sed "s|#.*||g" "$1" \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>i686.*||g" \
-				| sed "s|>x86_64||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed ':a;N;$!ba;s/\n/ /g')
+
+	local _init _init_rm _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64
+
+	if [[ ${initsys} == 'openrc' ]];then
+		_init="s|>openrc||g"
+		_init_rm="s|>systemd.*||g"
+	else
+		_init="s|>systemd||g"
+		_init_rm="s|>openrc.*||g"
 	fi
-}
-
-load_pkgs_xorg(){
-	msg3 "Loading Packages: [Packages-Xorg] ..."
 	if [[ "${arch}" == "i686" ]]; then
-		packages_xorg=$(sed "s|#.*||g" Packages-Xorg \
-				| sed "s| ||g" | sed "s|>dvd.*||g"  \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>cleanup.*||g" \
-				| sed "s|>x86_64.*||g" \
-				| sed "s|>i686||g" \
-				| sed "s|>free_x64.*||g" \
-				| sed "s|>free_uni||g" \
-				| sed "s|>nonfree_x64.*||g" \
-				| sed "s|>nonfree_uni||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed ':a;N;$!ba;s/\n/ /g')
-	elif [[ "${arch}" == "x86_64" ]]; then
-		packages_xorg=$(sed "s|#.*||g" Packages-Xorg \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>cleanup.*||g" \
-				| sed "s|>i686.*||g" \
-				| sed "s|>x86_64||g" \
-				| sed "s|>free_x64||g" \
-				| sed "s|>free_uni||g" \
-				| sed "s|>nonfree_uni||g" \
-				| sed "s|>nonfree_x64||g" \
-				| sed "s|KERNEL|$kernel|g" \
-				| sed ':a;N;$!ba;s/\n/ /g')
+		_arch="s|>i686||g"
+		_arch_rm="s|>x86_64.*||g"
+		_multi="s|>multilib.*||g"
+		_nonfree_multi="s|>nonfree_multilib.*||g"
+		_nonfree_x86_64="s|>nonfree_x86_64.*||g"
+		if ${nonfree_xorg};then
+			_nonfree_default="s|>nonfree_default||g"
+			_nonfree_i686="s|>nonfree_i686||g"
+
+		else
+			_nonfree_default="s|>nonfree_default.*||g"
+			_nonfree_i686="s|>nonfree_i686.*||g"
+		fi
+	else
+		_arch="s|>x86_64||g"
+		_arch_rm="s|>i686.*||g"
+		_nonfree_i686="s|>nonfree_i686.*||g"
+		if ${multilib};then
+			_multi="s|>multilib||g"
+			if ${nonfree_xorg};then
+				_nonfree_default="s|>nonfree_default||g"
+				_nonfree_x86_64="s|>nonfree_x86_64||g"
+				_nonfree_multi="s|>nonfree_multilib||g"
+			else
+				_nonfree_default="s|>nonfree_default.*||g"
+				_nonfree_multi="s|>nonfree_multilib.*||g"
+				_nonfree_x86_64="s|>nonfree_x86_64.*||g"
+			fi
+		else
+			_multi="s|>multilib.*||g"
+			if ${nonfree_xorg};then
+				_nonfree_default="s|>nonfree_default||g"
+				_nonfree_x86_64="s|>nonfree_x86_64||g"
+				_nonfree_multi="s|>nonfree_multilib.*||g"
+			else
+				_nonfree_default="s|>nonfree_default.*||g"
+				_nonfree_x86_64="s|>nonfree_x86_64.*||g"
+				_nonfree_multi="s|>nonfree_multilib.*||g"
+			fi
+		fi
 	fi
-	packages_xorg_cleanup=$(sed "s|#.*||g" Packages-Xorg | grep cleanup | sed "s|>cleanup||g" \
-					| sed "s|KERNEL|$kernel|g" | sed ':a;N;$!ba;s/\n/ /g')
-}
+	local _blacklist="s|>blacklist.*||g" \
+		_kernel="s|KERNEL|$kernel|g" \
+		_space="s| ||g" \
+		_clean=':a;N;$!ba;s/\n/ /g' \
+		_com_rm="s|#.*||g" \
+		_purge="s|>cleanup.*||g" \
+		_purge_rm="s|>cleanup||g"
 
-load_pkgs_lng(){
-	msg3 "Loading Packages: [Packages-Lng] ..."
-	if [[ "${arch}" == "i686" ]]; then
-		packages_lng=$(sed "s|#.*||g" Packages-Lng \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>cleanup.*||g" \
-				| sed "s|>x86_64.*||g" \
-				| sed "s|>i686||g" \
-				| sed "s|>kde.*||g" \
-				| sed ':a;N;$!ba;s/\n/ /g')
-	elif [[ "${arch}" == "x86_64" ]]; then
-		packages_lng=$(sed "s|#.*||g" Packages-Lng \
-				| sed "s| ||g" \
-				| sed "s|>dvd.*||g" \
-				| sed "s|>blacklist.*||g" \
-				| sed "s|>cleanup.*||g" \
-				| sed "s|>i686.*||g" \
-				| sed "s|>x86_64||g" \
-				| sed "s|>kde.*||g" \
-				| sed ':a;N;$!ba;s/\n/ /g')
+	if [[ $1 == "${packages_custom}" ]];then
+		local temp=/tmp/buildiso
+		prepare_dir ${temp}
+		sort -u ../shared/Packages-Custom ${packages_custom} > ${temp}/${packages_custom}
+		packages=$(sed "$_com_rm" "${temp}/${packages_custom}" \
+			| sed "$_space" \
+			| sed "$_blacklist" \
+			| sed "$_purge" \
+			| sed "$_init" \
+			| sed "$_init_rm" \
+			| sed "$_arch" \
+			| sed "$_arch_rm" \
+			| sed "$_nonfree_default" \
+			| sed "$_multi" \
+			| sed "$_nonfree_i686" \
+			| sed "$_nonfree_x86_64" \
+			| sed "$_nonfree_multi" \
+			| sed "$_kernel" \
+			| sed "$_clean")
+		#rm ${temp}/${packages_custom}
+	else
+		packages=$(sed "$_com_rm" "$1" \
+			| sed "$_space" \
+			| sed "$_blacklist" \
+			| sed "$_purge" \
+			| sed "$_init" \
+			| sed "$_init_rm" \
+			| sed "$_arch" \
+			| sed "$_arch_rm" \
+			| sed "$_nonfree_default" \
+			| sed "$_multi" \
+			| sed "$_nonfree_i686" \
+			| sed "$_nonfree_x86_64" \
+			| sed "$_nonfree_multi" \
+			| sed "$_kernel" \
+			| sed "$_clean")
 	fi
-	packages_lng_cleanup=$(sed "s|#.*||g" Packages-Lng | grep cleanup | sed "s|>cleanup||g")
-	packages_lng_kde=$(sed "s|#.*||g" Packages-Lng | grep kde | sed "s|>kde||g" | sed ':a;N;$!ba;s/\n/ /g')
-}
 
-
-# # $1: file name
-# load_pkgs(){
-# 	msg3 "Loading Packages: [$1] ..."
-# 	local _init= \
-# 		_init_rm= \
-# 		_arch= \
-# 		_arch_rm= \
-# 		_blacklist_rm="s|>blacklist.*||g" \
-# 		_kernel="s|KERNEL|$kernel|g" \
-# 		_space="s| ||g" \
-# 		_clean=':a;N;$!ba;s/\n/ /g' \
-# 		_multi="s|>multilib||g" \
-# 		_multi_rm="s|>multilib.*||g" \
-# 		_com_rm="s|#.*||g"
-#
-# 	if [[ ${initsys} == 'openrc' ]];then
-# 		_init="s|>openrc||g"
-# 		_init_rm="s|>systemd.*||g"
-# 	else
-# 		_init="s|>systemd||g"
-# 		_init_rm="s|>openrc.*||g"
-# 	fi
-#
-# 	if [[ "${arch}" == "i686" ]]; then
-# 		_arch="s|>i686||g"
-# 		_arch_rm="s|>x86_64.*||g"
-# 		packages=$(sed "$_com_rm" "$1" \
-# 				| sed "$_space" \
-# 				| sed "$_blacklist_rm" \
-# 				| sed "$_arch_rm" \
-# 				| sed "$_arch" \
-# 				| sed "$_kernel" \
-# 				| sed "$_init" \
-# 				| sed "$_init_rm" \
-# 				| sed "$_clean")
-# 	elif [[ "${arch}" == "x86_64" ]]; then
-# 		_arch="s|>x86_64||g"
-# 		_arch_rm="s|>i686.*||g"
-# 		if ${multilib};then
-# 			packages=$(sed "$_com_rm" "$1" \
-# 				| sed "$_space" \
-# 				| sed "$_blacklist_rm" \
-# 				| sed "$_arch_rm" \
-# 				| sed "$_arch" \
-# 				| sed "$_kernel" \
-# 				| sed "$_init" \
-# 				| sed "$_init_rm" \
-# 				| sed "$_multi" \
-# 				| sed "$_clean")
-# 		else
-# 			packages=$(sed "$_com_rm" "$1" \
-# 				| sed "$_space" \
-# 				| sed "$_blacklist_rm" \
-# 				| sed "$_arch_rm" \
-# 				| sed "$_arch" \
-# 				| sed "$_kernel" \
-# 				| sed "$_init" \
-# 				| sed "$_init_rm" \
-# 				| sed "$_multi_rm" \
-# 				| sed "$_clean")
-# 		fi
-# 	fi
-# }
-#
-# load_pkgs_xorg(){
-# 	msg3 "Loading Packages: [Packages-Xorg] ..."
-# 	local _init= \
-# 		_init_rm= \
-# 		_arch= \
-# 		_arch_rm= \
-# 		_blacklist_rm="s|>blacklist.*||g" \
-# 		_kernel="s|KERNEL|$kernel|g" \
-# 		_space="s| ||g" \
-# 		_clean=':a;N;$!ba;s/\n/ /g' \
-# 		_multi="s|>multilib||g" \
-# 		_multi_rm="s|>multilib.*||g" \
-# 		_purge="s|>cleanup.*||g" \
-# 		_nonfree="s|>nonfree||g" \
-# 		_nonfree_rm="s|>nonfree.*||g" \
-# 		_nonfree_multi="s|>nonfree_multilib||g" \
-# 		_com_rm="s|#.*||g" \
-# 		_purge_rm="s|>cleanup||g"
-#
-# 	if [[ ${initsys} == 'openrc' ]];then
-# 		_init="s|>openrc||g"
-# 		_init_rm="s|>systemd.*||g"
-# 	else
-# 		_init="s|>systemd||g"
-# 		_init_rm="s|>openrc.*||g"
-# 	fi
-#
-# 	if [[ "${arch}" == "i686" ]]; then
-# 		_arch="s|>i686||g"
-# 		_arch_rm="s|>x86_64.*||g"
-# 		if ${nonfree_xorg};then
-# 			packages_xorg=$(sed "$_com_rm" Packages-Xorg \
-# 				| sed "$_space" \
-# 				| sed "$_blacklist_rm" \
-# 				| sed "$_purge" \
-# 				| sed "$_init" \
-# 				| sed "$_init_rm" \
-# 				| sed "$_arch_rm" \
-# 				| sed "$_arch" \
-# 				| sed "$_nonfree" \
-# 				| sed "$_kernel" \
-# 				| sed "$_clean")
-# 		else
-# 			packages_xorg=$(sed "$_com_rm" Packages-Xorg \
-# 				| sed "$_space" \
-# 				| sed "$_blacklist_rm" \
-# 				| sed "$_purge" \
-# 				| sed "$_init" \
-# 				| sed "$_init_rm" \
-# 				| sed "$_arch_rm" \
-# 				| sed "$_arch" \
-# 				| sed "$_nonfree_rm" \
-# 				| sed "$_kernel" \
-# 				| sed "$_clean")
-# 		fi
-#
-# 	elif [[ "${arch}" == "x86_64" ]]; then
-# 		_arch="s|>x86_64||g"
-# 		_arch_rm="s|>i686.*||g"
-#
-# 		if ${multilib};then
-# 			if ${nonfree_xorg};then
-# 				packages_xorg=$(sed "$_com_rm" Packages-Xorg \
-# 					| sed "$_space" \
-# 					| sed "$_blacklist_rm" \
-# 					| sed "$_purge" \
-# 					| sed "$_arch_rm" \
-# 					| sed "$_arch" \
-# 					| sed "$_nonfree" \
-# 					| sed "$_kernel" \
-# 					| sed "$_init" \
-# 					| sed "$_init_rm" \
-# 					| sed "$_nonfree_multi" \
-# 					| sed "$_multi" \
-# 					| sed "$_clean")
-# 			else
-# 				packages_xorg=$(sed "$_com_rm" Packages-Xorg \
-# 					| sed "$_space" \
-# 					| sed "$_blacklist_rm" \
-# 					| sed "$_purge" \
-# 					| sed "$_arch_rm" \
-# 					| sed "$_arch" \
-# 					| sed "$_kernel" \
-# 					| sed "$_init" \
-# 					| sed "$_init_rm" \
-# 					| sed "$_multi" \
-# 					| sed "$_clean")
-# 			fi
-#
-# 		else
-# 			if ${nonfree_xorg};then
-# 				packages_xorg=$(sed "$_com_rm" Packages-Xorg \
-# 					| sed "$_space" \
-# 					| sed "$_blacklist_rm" \
-# 					| sed "$_purge" \
-# 					| sed "$_arch_rm" \
-# 					| sed "$_arch" \
-# 					| sed "$_nonfree" \
-# 					| sed "$_kernel" \
-# 					| sed "$_init" \
-# 					| sed "$_init_rm" \
-# 					| sed "$_multi_rm" \
-# 					| sed "$_clean")
-# 			else
-# 				packages_xorg=$(sed "$_com_rm" Packages-Xorg \
-# 					| sed "$_space" \
-# 					| sed "$_blacklist_rm" \
-# 					| sed "$_purge" \
-# 					| sed "$_arch_rm" \
-# 					| sed "$_arch" \
-# 					| sed "$_nonfree_rm" \
-# 					| sed "$_kernel" \
-# 					| sed "$_init" \
-# 					| sed "$_init_rm" \
-# 					| sed "$_multi_rm" \
-# 					| sed "$_clean")
-# 			fi
-#
-# 		fi
-# 	fi
-# 	packages_xorg_cleanup=$(sed "$_com_rm" Packages-Xorg | grep cleanup | sed "$_purge_rm" | sed "$_kernel" | sed "$_clean")
-# }
-#
-# load_pkgs_lng(){
-# 	msg3 "Loading Packages: [Packages-Lng] ..."
-# 		local _arch= \
-# 		_arch_rm= \
-# 		_blacklist_rm="s|>blacklist.*||g" \
-# 		_kernel="s|KERNEL|$kernel|g" \
-# 		_space="s| ||g" \
-# 		_clean=':a;N;$!ba;s/\n/ /g' \
-# 		_purge="s|>cleanup.*||g" \
-# 		_com_rm="s|#.*||g" \
-# 		_purge_rm="s|>cleanup||g"
-#
-# 	if [[ "${arch}" == "i686" ]]; then
-# 		_arch="s|>i686||g"
-# 		_arch_rm="s|>x86_64.*||g"
-# 		packages_lng=$(sed "$_com_rm" Packages-Lng \
-# 				| sed "$_space" \
-# 				| sed "$_blacklist_rm" \
-# 				| sed "$_purge" \
-# 				| sed "$_arch_rm" \
-# 				| sed "$_arch" \
-# 				| sed "$_clean")
-# 	elif [[ "${arch}" == "x86_64" ]]; then
-# 		_arch="s|>x86_64||g"
-# 		_arch_rm="s|>i686.*||g"
-# 		packages_lng=$(sed "$_com_rm" Packages-Lng \
-# 				| sed "$_space" \
-# 				| sed "$_blacklist_rm" \
-# 				| sed "$_purge" \
-# 				| sed "$_arch_rm" \
-# 				| sed "$_arch" \
-# 				| sed "$_clean")
-# 	fi
-# 	packages_lng_cleanup=$(sed "$_com_rm" Packages-Lng | grep cleanup | sed "$_purge_rm")
-# 	packages_lng_kde=$(sed "$_com_rm" Packages-Lng | sed "$_clean")
-# }
-
-
-check_plymouth(){
-	is_plymouth=false
-	source mkinitcpio.conf
-	for h in ${HOOKS[@]};do
-		[[ $h == 'plymouth' ]] && is_plymouth=true
-	done
+	if [[ $1 == 'Packages-Xorg' ]]; then
+		packages_cleanup=$(sed "$_com_rm" "$1" \
+			| grep cleanup \
+			| sed "$_purge_rm" \
+			| sed "$_kernel" \
+			| sed "$_clean")
+	fi
 }
 
 check_custom_pacman_conf(){
@@ -778,14 +554,36 @@ check_custom_pacman_conf(){
 	fi
 }
 
+check_profile_conf(){
+	if ! is_valid_init "${initsys}";then
+		die "initsys only accepts openrc/systemd value!"
+	fi
+	if ! is_valid_bool "${autologin}";then
+		die "autologin only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${multilib}";then
+		die "multilib only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${nonfree_xorg}";then
+		die "nonfree_xorg only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${plymouth_boot}";then
+		die "plymouth_boot only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${pxe_boot}";then
+		die "pxe_boot only accepts true/false value!"
+	fi
+}
+
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1]"
 	load_profile_config 'profile.conf'
+	check_profile_conf
 	local files=$(ls Packages*)
 	for f in ${files[@]};do
 		case $f in
-			Packages|Packages-Livecd|Packages-Xorg|Packages-Lng) continue ;;
+			Packages|Packages-Livecd|Packages-Xorg) continue ;;
 			*) packages_custom="$f" ;;
 		esac
 	done
@@ -797,8 +595,6 @@ load_profile(){
 
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
 	work_dir=${chroots_iso}/$1/${arch}
-
-	check_plymouth
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 }
@@ -823,12 +619,8 @@ build_images(){
 		make_image_livecd
 	fi
 	if [[ -f Packages-Xorg ]] ; then
-		load_pkgs_xorg
+		load_pkgs 'Packages-Xorg'
 		make_image_xorg
-	fi
-	if [[ -f Packages-Lng ]] ; then
-		load_pkgs_lng
-		make_image_lng
 	fi
 	make_image_boot
 	if [[ "${arch}" == "x86_64" ]]; then
@@ -851,11 +643,11 @@ make_profile(){
 			exit 1
 		fi
 		if ${images_only}; then
-			build_images
+			build_images || umount_image_handler
 			warning "Continue compress: buildiso -p ${buildset_iso} -sc ..."
 			exit 1
 		else
-			build_images
+			build_images || umount_image_handler
 			compress_images
 		fi
 	cd ..
@@ -866,9 +658,9 @@ make_profile(){
 build_iso(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			make_profile "$prof"
+			make_profile "$prof" || umount_image_handler
 		done
 	else
-		make_profile "${buildset_iso}"
+		make_profile "${buildset_iso}" || umount_image_handler
 	fi
 }

@@ -28,17 +28,17 @@ show_profile(){
 			msg2 "work_dir: ${work_dir}"
 			msg2 "iso_file: ${iso_file}"
 			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
-
 			msg2 "initsys: ${initsys}"
+			[[ ${arch} == 'x86_64' ]] && msg2 "multilib: ${multilib}"
 			msg2 "displaymanager: ${displaymanager}"
-			msg2 "default_desktop_executable: ${default_desktop_executable}"
-			msg2 "default_desktop_file: ${default_desktop_file}"
+			msg2 "autologin: ${autologin}"
+			msg2 "nonfree_xorg: ${nonfree_xorg}"
 			msg2 "kernel: ${kernel}"
 			msg2 "efi_boot_loader: ${efi_boot_loader}"
 			msg2 "efi_part_size: ${efi_part_size}"
-
-			${is_plymouth} && msg2 "plymouth_theme: ${plymouth_theme}"
-
+			msg2 "pxe_boot: ${pxe_boot}"
+			msg2 "plymouth_boot: ${plymouth_boot}"
+			${plymouth_boot} && msg2 "plymouth_theme: ${plymouth_theme}"
 			msg2 "hostname: ${hostname}"
 			msg2 "username: ${username}"
 			msg2 "password: ${password}"
@@ -104,6 +104,7 @@ display_settings(){
 	msg2 "iso_app_id: ${iso_app_id}"
 	msg2 "iso_compression: ${iso_compression}"
 	msg2 "iso_checksum: ${iso_checksum}"
+	msg2 "use_overlayfs: ${use_overlayfs}"
 
 	msg "BUILD QUEUE:"
 	show_build_queue

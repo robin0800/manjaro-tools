@@ -38,7 +38,7 @@ configure_hosts(){
 
 # $1: chroot
 configure_plymouth(){
-	if ${is_plymouth};then
+	if ${plymouth_boot};then
 		msg2 "Setting plymouth $plymouth_theme ...."
 		sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" $1/etc/plymouth/plymouthd.conf
 	fi
@@ -73,6 +73,7 @@ configure_services_live(){
 configure_lsb(){
 	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
 	if [ -e $1/etc/lsb-release ] ; then
+		msg2 "Configuring lsb-release"
 		sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${dist_release}/" $1/etc/lsb-release
 		sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${dist_codename}/" $1/etc/lsb-release
 	fi
@@ -132,10 +133,7 @@ configure_accountsservice(){
 	fi
 }
 
-# $1: chroot
-configure_displaymanager(){
-	msg2 "Configuring Displaymanager ..."
-	# Try to detect desktop environment
+detect_desktop_env(){
 	if [[ "${default_desktop_executable}" == "none" ]] || [[ ${default_desktop_file} == "none" ]]; then
 		msg2 "No default desktop environment set, trying to detect it."
 		if [ -e "$1/usr/bin/startkde" ] && [ -e "$1/usr/share/xsessions/plasma.desktop" ]; then
@@ -204,6 +202,22 @@ configure_displaymanager(){
 			msg2 "No desktop environment detected"
 		fi
 	fi
+}
+
+configure_mhwd(){
+	if [[ ${arch} == "x86_64" ]];then
+		if ! ${multilib};then
+			msg2 "Disable mhwd lib32 support"
+			echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
+		fi
+	fi
+}
+
+# $1: chroot
+configure_displaymanager(){
+	msg2 "Configuring Displaymanager ..."
+	# Try to detect desktop environment
+	detect_desktop_env "$1"
 	# Configure display manager
 	case ${displaymanager} in
 		'lightdm')
@@ -214,6 +228,7 @@ configure_displaymanager(){
 			fi
 			if [[ ${initsys} == 'openrc' ]];then
 				sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' ${conf}
+				sed -i -e 's/pam_systemd.so/pam_ck_connector.so nox11/' $1/etc/pam.d/lightdm-greeter
 			fi
 			local greeters=$(ls $1/etc/lightdm/*greeter.conf)
 			for g in ${greeters[@]};do
@@ -303,8 +318,7 @@ chroot_clean(){
 	msg "Cleaning up ..."
 	for image in "$1"/*-image; do
 		[[ -d ${image} ]] || continue
-		if [[ $(basename "${image}") != "pkgs-image" ]] || \
-		[[ $(basename "${image}") != "lng-image" ]];then
+		if [[ $(basename "${image}") != "pkgs-image" ]];then
 			msg2 "Deleting chroot '$(basename "${image}")'..."
 			lock 9 "${image}.lock" "Locking chroot '${image}'"
 			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
@@ -315,6 +329,32 @@ chroot_clean(){
 	done
 	exec 9>&-
 	rm -rf --one-file-system "$1"
+}
+
+configure_sysctl(){
+	if [[ ${initsys} == 'openrc' ]];then
+		msg2 "Configuring sysctl for openrc"
+		touch $1/etc/sysctl.conf
+		local conf=$1/etc/sysctl.d/100-manjaro.conf
+		echo '# Virtual memory setting (swap file or partition)' > ${conf}
+		echo 'vm.swappiness = 30' >> ${conf}
+		echo '# Enable the SysRq key' >> ${conf}
+		echo 'kernel.sysrq = 1' >> ${conf}
+	fi
+}
+
+# Remove pamac auto-update when the network is up, it causes problems when booting in the livecd
+# $1: chroot
+configure_pamac_live() {
+	rm -f $1/etc/NetworkManager/dispatcher.d/99_update_pamac_tray
+}
+
+configure_root_image(){
+	msg "Configuring [root-image]"
+	configure_lsb "$1"
+	configure_mhwd "$1"
+	configure_sysctl "$1"
+	msg "Done configuring [root-image]"
 }
 
 configure_custom_image(){
@@ -335,7 +375,7 @@ configure_livecd_image(){
 	configure_services_live "$1"
 	configure_calamares "$1"
 	configure_thus "$1"
-	configure_cli "$1"
+	configure_pamac_live "$1"
 	msg "Done configuring [livecd-image]"
 }
 
@@ -360,7 +400,6 @@ download_to_cache(){
 		  pacman -v -Sp $2 --noconfirm > "$1"/cache-packages.txt
 	sed -ni '/.pkg.tar.xz/p' "$1"/cache-packages.txt
 	sed -i "s/.*\///" "$1"/cache-packages.txt
-	rm -rf "$1/etc"
 }
 
 # $1: image path
@@ -370,46 +409,6 @@ chroot_create(){
 	setarch "${arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} \
 			$@ || die "Failed to retrieve one or more packages!"
-}
-
-# $1: new branch
-aufs_mount_root_image(){
-	msg2 "mount [root-image] on [${1##*/}]"
-	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
-}
-
-# $1: add branch
-aufs_append_root_image(){
-	msg2 "append [root-image] on [${1##*/}]"
-	mount -t aufs -o remount,append:${work_dir}/root-image=ro none "$1"
-}
-
-# $1: add branch
-aufs_mount_custom_image(){
-	msg2 "mount [${1##*/}] on [${custom}-image]"
-	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro none "$1"
-}
-
-# $1: del branch
-aufs_remove_image(){
-	if mountpoint -q "$1";then
-		msg2 "unmount ${1##*/}"
-		umount $1
-	fi
-}
-
-# $1: image path
-aufs_clean(){
-	find $1 -name '.wh.*' -delete &> /dev/null
-}
-
-umount_image_handler(){
-	aufs_remove_image "${work_dir}/livecd-image"
-	aufs_remove_image "${work_dir}/${custom}-image"
-	aufs_remove_image "${work_dir}/root-image"
-	aufs_remove_image "${work_dir}/pkgs-image"
-	aufs_remove_image "${work_dir}/lng-image"
-	aufs_remove_image "${work_dir}/boot-image"
 }
 
 # $1: image path
