@@ -115,7 +115,7 @@ Specifying args will override manjaro-tools.conf settings.
 # iso_checksum=md5
 
 # experimental; use overlayfs instead of aufs
-# requires minimum 4.0 kernel on the build host
+# requires minimum 4.0 kernel on the build host and on iso in profile.conf
 # use_overlayfs="false"
 ~~~
 
