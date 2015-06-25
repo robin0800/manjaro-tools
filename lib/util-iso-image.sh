@@ -389,14 +389,12 @@ download_to_cache(){
 	chroot-run \
 		  -r "${mountargs_ro}" \
 		  -w "${mountargs_rw}" \
-		  -C ${PKGDATADIR}/pacman-${pacman_conf_arch}.conf \
 		  -B "${build_mirror}/${branch}" \
 		  "$1" \
 		  pacman -v -Syw $2 --noconfirm
 	chroot-run \
 		  -r "${mountargs_ro}" \
 		  -w "${mountargs_rw}" \
-		  -C ${PKGDATADIR}/pacman-${pacman_conf_arch}.conf \
 		  -B "${build_mirror}/${branch}" \
 		  "$1" \
 		  pacman -v -Sp $2 --noconfirm > "$1"/cache-packages.txt

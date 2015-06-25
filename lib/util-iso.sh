@@ -301,6 +301,8 @@ make_image_xorg() {
 		else
 			mount_root_image "${path}"
 		fi
+		
+		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		download_to_cache "${path}" "${packages}"
 		copy_cache_xorg
