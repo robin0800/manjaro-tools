@@ -113,6 +113,10 @@ Specifying args will override manjaro-tools.conf settings.
 
 # valid: md5, sha1, sha256, sha384, sha512
 # iso_checksum=md5
+
+# experimental; use overlayfs instead of aufs
+# requires minimum 4.0 kernel on the build host
+# use_overlayfs="false"
 ~~~
 
 ####Config files in iso profiles
