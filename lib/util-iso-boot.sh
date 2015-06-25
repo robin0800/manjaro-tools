@@ -39,8 +39,8 @@ set_mkinicpio_hooks(){
 	if ! ${plymouth_boot};then
 		sed -e 's/plymouth //' -i $1
 	fi
-	if ${use_oberlayfs};then
-		sed -e 's/miso/miso_overlayfs/' -i $1
+	if ${use_overlayfs};then
+		sed -e 's/miso /miso_overlayfs/' -i $1
 	fi
 }
 
