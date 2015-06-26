@@ -501,7 +501,7 @@ load_pkgs(){
 	local list
 
 	if [[ $1 == "${packages_custom}" ]];then
-		sort -u ../shared/Packages-Custom ${packages_custom} > ${work_dir}/${packages_custom}
+		sort -u ../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
 		list=${work_dir}/${packages_custom}
 	else
 		list=$1
