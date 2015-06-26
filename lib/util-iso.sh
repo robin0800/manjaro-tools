@@ -24,7 +24,6 @@ fi
 check_profile(){
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
-	local err="Profile [$1] sanity check failed!"
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
 		if [[ -f $1/$f ]];then
@@ -245,6 +244,7 @@ make_image_custom() {
 		mount_root_image "${path}"
 
 		chroot_create "${path}" "${packages}"
+
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
@@ -272,6 +272,7 @@ make_image_livecd() {
 		fi
 
 		chroot_create "${path}" "${packages}"
+
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
 		# copy over setup helpers and config loader
@@ -301,7 +302,7 @@ make_image_xorg() {
 		else
 			mount_root_image "${path}"
 		fi
-		
+
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		download_to_cache "${path}" "${packages}"
@@ -497,28 +498,16 @@ load_pkgs(){
 		_purge="s|>cleanup.*||g" \
 		_purge_rm="s|>cleanup||g"
 
+	local list
+
 	if [[ $1 == "${packages_custom}" ]];then
-		local temp=/tmp/buildiso
-		prepare_dir ${temp}
-		sort -u ../shared/Packages-Custom ${packages_custom} > ${temp}/${packages_custom}
-		packages=$(sed "$_com_rm" "${temp}/${packages_custom}" \
-			| sed "$_space" \
-			| sed "$_blacklist" \
-			| sed "$_purge" \
-			| sed "$_init" \
-			| sed "$_init_rm" \
-			| sed "$_arch" \
-			| sed "$_arch_rm" \
-			| sed "$_nonfree_default" \
-			| sed "$_multi" \
-			| sed "$_nonfree_i686" \
-			| sed "$_nonfree_x86_64" \
-			| sed "$_nonfree_multi" \
-			| sed "$_kernel" \
-			| sed "$_clean")
-		#rm ${temp}/${packages_custom}
+		sort -u ../shared/Packages-Custom ${packages_custom} > ${work_dir}/${packages_custom}
+		list=${work_dir}/${packages_custom}
 	else
-		packages=$(sed "$_com_rm" "$1" \
+		list=$1
+	fi
+
+	packages=$(sed "$_com_rm" "$list" \
 			| sed "$_space" \
 			| sed "$_blacklist" \
 			| sed "$_purge" \
@@ -533,7 +522,6 @@ load_pkgs(){
 			| sed "$_nonfree_multi" \
 			| sed "$_kernel" \
 			| sed "$_clean")
-	fi
 
 	if [[ $1 == 'Packages-Xorg' ]]; then
 		packages_cleanup=$(sed "$_com_rm" "$1" \
