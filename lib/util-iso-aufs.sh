@@ -11,12 +11,12 @@
 
 # $1: new branch
 mount_root_image(){
-	msg2 "mount [root-image] on [${1##*/}]"
+	msg2 "aufs: mount [root-image] on [${1##*/}]"
 	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
 }
 
 mount_custom_image(){
-	msg2 "mount [${1##*/}] on [${custom}-image]"
+	msg2 "aufs: mount [${1##*/}] on [${custom}-image]"
 	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro:${work_dir}/root-image=ro none "$1"
 }
 
