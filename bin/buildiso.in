@@ -28,6 +28,11 @@ show_profile(){
 			msg2 "iso_file: ${iso_file}"
 			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 			msg2 "initsys: ${initsys}"
+			if ${use_overlayfs};then
+				msg2 "mount system: overlayfs"
+			else
+				msg2 "mount system: aufs"
+			fi
 			[[ ${arch} == 'x86_64' ]] && msg2 "multilib: ${multilib}"
 			msg2 "displaymanager: ${displaymanager}"
 			msg2 "autologin: ${autologin}"
