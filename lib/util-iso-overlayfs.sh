@@ -24,7 +24,7 @@ mount_custom_image(){
 
 umount_image(){
 	if mountpoint -q "$1";then
-		msg2 "unmount ${1##*/}"
+		msg2 "overlayfs: unmount ${1##*/}"
 		umount $1
 		rm -rf "${work_dir}/work"
 	fi
