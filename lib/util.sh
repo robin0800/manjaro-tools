@@ -378,6 +378,8 @@ init_buildiso(){
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
 
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='false'
+	used_kernel=$(uname -r | cut -d . -f1)
+	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
 }
 
 load_config(){
