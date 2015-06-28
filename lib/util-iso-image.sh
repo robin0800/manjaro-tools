@@ -343,6 +343,12 @@ configure_sysctl(){
 	fi
 }
 
+# Remove pamac auto-update when the network is up, it causes problems when booting in the livecd
+# $1: chroot
+configure_pamac_live() {
+	rm -f $1/etc/NetworkManager/dispatcher.d/99_update_pamac_tray
+}
+
 configure_root_image(){
 	msg "Configuring [root-image]"
 	configure_lsb "$1"
@@ -369,6 +375,7 @@ configure_livecd_image(){
 	configure_services_live "$1"
 	configure_calamares "$1"
 	configure_thus "$1"
+	configure_pamac_live "$1"
 	msg "Done configuring [livecd-image]"
 }
 
@@ -393,7 +400,6 @@ download_to_cache(){
 		  pacman -v -Sp $2 --noconfirm > "$1"/cache-packages.txt
 	sed -ni '/.pkg.tar.xz/p' "$1"/cache-packages.txt
 	sed -i "s/.*\///" "$1"/cache-packages.txt
-	rm -rf "$1/etc"
 }
 
 # $1: image path

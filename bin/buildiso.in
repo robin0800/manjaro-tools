@@ -104,6 +104,7 @@ display_settings(){
 	msg2 "iso_app_id: ${iso_app_id}"
 	msg2 "iso_compression: ${iso_compression}"
 	msg2 "iso_checksum: ${iso_checksum}"
+	msg2 "use_overlayfs: ${use_overlayfs}"
 
 	msg "BUILD QUEUE:"
 	show_build_queue

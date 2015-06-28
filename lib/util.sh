@@ -376,6 +376,8 @@ init_buildiso(){
 	[[ -z ${iso_compression} ]] && iso_compression='xz'
 
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
+
+	[[ -z ${use_overlayfs} ]] && use_overlayfs='false'
 }
 
 load_config(){
@@ -450,11 +452,11 @@ load_profile_config(){
 	fi
 
 	if [[ -z ${start_systemd_live[@]} ]];then
-		start_systemd_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
+		start_systemd_live=('livecd' 'mhwd-live' 'pacman-init')
 	fi
 
 	if [[ -z ${start_openrc_live[@]} ]];then
-		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init' 'pacman-boot')
+		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init')
 	fi
 
 	return 0

@@ -1,4 +1,4 @@
-Version=0.9.9
+Version=0.9.10
 
 PREFIX = /usr/local
 SYSCONFDIR = /etc
@@ -66,6 +66,7 @@ LIBS_PKG = \
 LIBS_ISO = \
 	lib/util-iso.sh \
 	lib/util-iso-aufs.sh \
+	lib/util-iso-overlayfs.sh \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
 	lib/util-livecd.sh \
@@ -74,12 +75,14 @@ LIBS_ISO = \
 
 CPIOHOOKS = \
 	initcpio/hooks/miso \
+	initcpio/hooks/miso_overlayfs \
 	initcpio/hooks/miso_loop_mnt \
 	initcpio/hooks/miso_pxe_common \
 	initcpio/hooks/miso_pxe_http
 
 CPIOINST = \
 	initcpio/inst/miso \
+	initcpio/inst/miso_overlayfs \
 	initcpio/inst/miso_loop_mnt \
 	initcpio/inst/miso_pxe_common \
 	initcpio/inst/miso_pxe_http \

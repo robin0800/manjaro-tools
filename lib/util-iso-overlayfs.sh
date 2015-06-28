@@ -12,19 +12,20 @@
 # $1: new branch
 mount_root_image(){
 	msg2 "mount [root-image] on [${1##*/}]"
-	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
+	mkdir -p "${work_dir}/work"
+	mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
 }
 
 mount_custom_image(){
 	msg2 "mount [${1##*/}] on [${custom}-image]"
-	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro:${work_dir}/root-image=ro none "$1"
+	mkdir -p "${work_dir}/work"
+	mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
 }
 
-# $1: image path
 umount_image(){
 	if mountpoint -q "$1";then
 		msg2 "unmount ${1##*/}"
 		umount $1
+		rm -rf "${work_dir}/work"
 	fi
-	find $1 -name '.wh.*' -delete &> /dev/null
 }
