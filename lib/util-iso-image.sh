@@ -115,7 +115,7 @@ configure_services(){
 # $1: chroot
 configure_environment(){
 	case ${custom} in
-		gnome|xfce|openbox|enlightenment|cinnamon|pekwm|lxde|mate)
+		cinnamon|enlightenment|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce|xfce-minimal|xfce-openrc)
 			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 		;;
 	esac
