@@ -203,11 +203,15 @@ write_isolinux_cfg(){
 	echo '' >> ${conf}
 	echo "label start" >> ${conf}
 	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+	plymouth_settings="quiet splash"
+	if ! ${plymouth_boot};then
+		plymouth_settings=""
+	fi
 	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
-		echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
+		echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free ${plymouth_settings} showopts" >> ${conf}
 	else
-		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free quiet splash showopts" >> ${conf}
+		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free ${plymouth_settings} showopts" >> ${conf}
 	fi
 	echo '' >> ${conf}
 	if ${nonfree_xorg};then
@@ -215,9 +219,9 @@ write_isolinux_cfg(){
 		echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
 		if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
 			msg2 "Using intel_ucode.img ..."
-			echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+			echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree ${plymouth_settings} showopts" >> ${conf}
 		else
-			echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree quiet splash showopts" >> ${conf}
+			echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree ${plymouth_settings} showopts" >> ${conf}
 		fi
 		echo '' >> ${conf}
 	fi
