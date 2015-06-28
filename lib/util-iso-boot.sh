@@ -204,8 +204,14 @@ write_isolinux_cfg(){
 	echo "label start" >> ${conf}
 	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
 	plymouth_settings=" quiet splash"
+	# on openrc, you would want quite initramfs boot, except you want to debug hooks
+	# quite doesn't affect openrc verbosity, so only splash is useless on openrc
 	if ! ${plymouth_boot};then
-		plymouth_settings=""
+		if [[ ${initsys} == 'systemd' ]]; then
+			plymouth_settings=""
+		else
+			plymouth_settings="quiet"
+		fi
 	fi
 	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
