@@ -14,8 +14,10 @@ import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
 
 if ${use_overlayfs};then
+	msg2 "We are using overlayfs ..."
 	import ${LIBDIR}/util-iso-overlayfs.sh
 else
+	msg2 "We are using aufs ..."
 	import ${LIBDIR}/util-iso-aufs.sh
 fi
 
