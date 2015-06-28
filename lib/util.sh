@@ -428,6 +428,8 @@ load_profile_config(){
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
 
 	[[ -z ${kernel} ]] && kernel="linux318"
+	used_kernel=$(echo ${kernel} | cut -c 6)
+	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
