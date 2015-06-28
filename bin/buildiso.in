@@ -19,7 +19,6 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 
 import ${LIBDIR}/util.sh
-import ${LIBDIR}/util-iso.sh
 
 show_profile(){
 	cd $1
@@ -181,6 +180,8 @@ check_root "$0" "${orig_argv[@]}"
 prepare_dir "${cache_dir_iso}"
 
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
+
+import ${LIBDIR}/util-iso.sh
 
 check_requirements
 
