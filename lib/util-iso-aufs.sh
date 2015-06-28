@@ -23,7 +23,7 @@ mount_custom_image(){
 # $1: image path
 umount_image(){
 	if mountpoint -q "$1";then
-		msg2 "unmount ${1##*/}"
+		msg2 "aufs: unmount ${1##*/}"
 		umount $1
 	fi
 	find $1 -name '.wh.*' -delete &> /dev/null
