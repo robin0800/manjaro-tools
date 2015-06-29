@@ -407,8 +407,7 @@ download_to_cache(){
 chroot_create(){
 	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
 	setarch "${arch}" \
-		mkchroot ${mkchroot_args[*]} ${flag} \
-			$@ || die "Failed to retrieve one or more packages!"
+		mkchroot ${mkchroot_args[*]} ${flag} $@
 }
 
 # $1: image path

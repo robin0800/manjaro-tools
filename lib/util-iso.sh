@@ -58,14 +58,6 @@ check_requirements(){
 	fi
 }
 
-umount_image_handler(){
-	umount_image "${work_dir}/livecd-image"
-	umount_image "${work_dir}/${custom}-image"
-	umount_image "${work_dir}/root-image"
-	umount_image "${work_dir}/pkgs-image"
-	umount_image "${work_dir}/boot-image"
-}
-
 copy_overlay_root(){
 	msg2 "Copying overlay ..."
 	cp -a --no-preserve=ownership overlay/* $1
@@ -224,7 +216,12 @@ make_image_root() {
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
 		mkdir -p ${path}
-		chroot_create "${path}" "${packages}"
+
+		if ! chroot_create "${path}" "${packages}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
+
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_root_image "${path}"
@@ -243,7 +240,10 @@ make_image_custom() {
 
 		mount_root_image "${path}"
 
-		chroot_create "${path}" "${packages}"
+		if ! chroot_create "${path}" "${packages}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
 
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
@@ -271,7 +271,10 @@ make_image_livecd() {
 			mount_root_image "${path}"
 		fi
 
-		chroot_create "${path}" "${packages}"
+		if ! chroot_create "${path}" "${packages}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
 
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
@@ -305,7 +308,11 @@ make_image_xorg() {
 
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
-		download_to_cache "${path}" "${packages}"
+		if ! download_to_cache "${path}" "${packages}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
+
 		copy_cache_xorg
 		if [[ -n "${packages_cleanup}" ]]; then
 			for xorg_clean in ${packages_cleanup}; do
@@ -344,7 +351,12 @@ make_image_boot() {
 		fi
 
 		copy_initcpio "${path}" || die "Failed to copy initcpio."
-		gen_boot_image "${path}"
+
+		if ! gen_boot_image "${path}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
+
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
 
@@ -631,11 +643,11 @@ make_profile(){
 			exit 1
 		fi
 		if ${images_only}; then
-			build_images || umount_image_handler
+			build_images
 			warning "Continue compress: buildiso -p ${buildset_iso} -sc ..."
 			exit 1
 		else
-			build_images || umount_image_handler
+			build_images
 			compress_images
 		fi
 	cd ..
@@ -646,9 +658,9 @@ make_profile(){
 build_iso(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			make_profile "$prof" || umount_image_handler
+			make_profile "$prof"
 		done
 	else
-		make_profile "${buildset_iso}" || umount_image_handler
+		make_profile "${buildset_iso}"
 	fi
 }
