@@ -24,7 +24,6 @@ fi
 check_profile(){
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
-	local err="Profile [$1] sanity check failed!"
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
 		if [[ -f $1/$f ]];then
@@ -57,14 +56,6 @@ check_requirements(){
 		[[ -z $(find . -type d -name "${buildset_iso}") ]] && die "${buildset_iso} is not a valid profile directory!"
 		check_profile "${buildset_iso}"
 	fi
-}
-
-umount_image_handler(){
-	umount_image "${work_dir}/livecd-image"
-	umount_image "${work_dir}/${custom}-image"
-	umount_image "${work_dir}/root-image"
-	umount_image "${work_dir}/pkgs-image"
-	umount_image "${work_dir}/boot-image"
 }
 
 copy_overlay_root(){
@@ -225,7 +216,12 @@ make_image_root() {
 		msg "Prepare [Base installation] (root-image)"
 		local path="${work_dir}/root-image"
 		mkdir -p ${path}
-		chroot_create "${path}" "${packages}"
+
+		if ! chroot_create "${path}" "${packages}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
+
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_root_image "${path}"
@@ -244,7 +240,11 @@ make_image_custom() {
 
 		mount_root_image "${path}"
 
-		chroot_create "${path}" "${packages}"
+		if ! chroot_create "${path}" "${packages}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
+
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
@@ -271,7 +271,11 @@ make_image_livecd() {
 			mount_root_image "${path}"
 		fi
 
-		chroot_create "${path}" "${packages}"
+		if ! chroot_create "${path}" "${packages}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
+
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
 		copy_overlay_livecd "${path}"
 		# copy over setup helpers and config loader
@@ -301,10 +305,14 @@ make_image_xorg() {
 		else
 			mount_root_image "${path}"
 		fi
-		
+
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
-		download_to_cache "${path}" "${packages}"
+		if ! download_to_cache "${path}" "${packages}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
+
 		copy_cache_xorg
 		if [[ -n "${packages_cleanup}" ]]; then
 			for xorg_clean in ${packages_cleanup}; do
@@ -343,7 +351,12 @@ make_image_boot() {
 		fi
 
 		copy_initcpio "${path}" || die "Failed to copy initcpio."
-		gen_boot_image "${path}"
+
+		if ! gen_boot_image "${path}"; then
+			umount_image "${path}"
+			die "Exit ${FUNCNAME}"
+		fi
+
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
 
@@ -497,28 +510,16 @@ load_pkgs(){
 		_purge="s|>cleanup.*||g" \
 		_purge_rm="s|>cleanup||g"
 
+	local list
+
 	if [[ $1 == "${packages_custom}" ]];then
-		local temp=/tmp/buildiso
-		prepare_dir ${temp}
-		sort -u ../shared/Packages-Custom ${packages_custom} > ${temp}/${packages_custom}
-		packages=$(sed "$_com_rm" "${temp}/${packages_custom}" \
-			| sed "$_space" \
-			| sed "$_blacklist" \
-			| sed "$_purge" \
-			| sed "$_init" \
-			| sed "$_init_rm" \
-			| sed "$_arch" \
-			| sed "$_arch_rm" \
-			| sed "$_nonfree_default" \
-			| sed "$_multi" \
-			| sed "$_nonfree_i686" \
-			| sed "$_nonfree_x86_64" \
-			| sed "$_nonfree_multi" \
-			| sed "$_kernel" \
-			| sed "$_clean")
-		#rm ${temp}/${packages_custom}
+		sort -u ../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
+		list=${work_dir}/${packages_custom}
 	else
-		packages=$(sed "$_com_rm" "$1" \
+		list=$1
+	fi
+
+	packages=$(sed "$_com_rm" "$list" \
 			| sed "$_space" \
 			| sed "$_blacklist" \
 			| sed "$_purge" \
@@ -533,7 +534,6 @@ load_pkgs(){
 			| sed "$_nonfree_multi" \
 			| sed "$_kernel" \
 			| sed "$_clean")
-	fi
 
 	if [[ $1 == 'Packages-Xorg' ]]; then
 		packages_cleanup=$(sed "$_com_rm" "$1" \
@@ -643,11 +643,11 @@ make_profile(){
 			exit 1
 		fi
 		if ${images_only}; then
-			build_images || umount_image_handler
+			build_images
 			warning "Continue compress: buildiso -p ${buildset_iso} -sc ..."
 			exit 1
 		else
-			build_images || umount_image_handler
+			build_images
 			compress_images
 		fi
 	cd ..
@@ -658,9 +658,9 @@ make_profile(){
 build_iso(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			make_profile "$prof" || umount_image_handler
+			make_profile "$prof"
 		done
 	else
-		make_profile "${buildset_iso}" || umount_image_handler
+		make_profile "${buildset_iso}"
 	fi
 }
