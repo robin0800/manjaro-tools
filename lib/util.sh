@@ -208,7 +208,7 @@ check_root() {
 parse_section() {
 	local is_section=0
 	while read line; do
-	[[ $line =~ ^\ {0,}# ]] && continue
+		[[ $line =~ ^\ {0,}# ]] && continue
 		[[ -z "$line" ]] && continue
 		if [ $is_section == 0 ]; then
 			if [[ $line =~ ^\[.*?\] ]]; then
