@@ -13,6 +13,39 @@ ignore_error() {
 	return 0
 }
 
+parse_fstab(){
+# 	perl -ane 'printf("Device: %s\nMountpoint: %s\n", @F[0,1]) if $F[0] =~ m#^/dev#;' $1
+	mounts=$(perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^UUID=#;' $1)
+# 	perl -ane 'printf("Device: %s\nMountpoint: %s\n", @F[0,1]) if $F[0] =~ m#^LABEL=#;' $1
+}
+
+get_os(){
+	local detected=( "$(os-prober | tr ' ' '_' | paste -s -d ' ')" )
+	echo ${detected[@]}
+}
+
+chroot_mount_partitions(){
+	for os in $(get_os);do
+		if [[ "${os##*:}" == 'linux' ]];then
+			mount ${os%%:*} $1
+			parse_fstab "$1/etc/fstab"
+			#umount $1
+		fi
+	done
+	local m_args=()
+	for entry in ${mounts[@]};do
+		entry=${entry//UUID=}
+		local dev=${entry%:*}
+		m_args+=("$dev")
+		if [[ "${entry#*:}" != '/' && "${entry#*:}" != 'none' ]];then
+			local mp=$1${entry#*:}
+			m_args+=("$mp")
+			mount /dev/disk/by-uuid/${m_args[@]}
+		fi
+		unset m_args
+	done
+}
+
 chroot_mount() {
 	mount "$@" && CHROOT_ACTIVE_MOUNTS=("$2" "${CHROOT_ACTIVE_MOUNTS[@]}")
 }
