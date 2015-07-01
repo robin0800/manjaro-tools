@@ -510,16 +510,11 @@ load_pkgs(){
 		_purge="s|>cleanup.*||g" \
 		_purge_rm="s|>cleanup||g"
 
-	local list
-
 	if [[ $1 == "${packages_custom}" ]];then
-		sort -u ../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
-		list=${work_dir}/${packages_custom}
-	else
-		list=$1
-	fi
-
-	packages=$(sed "$_com_rm" "$list" \
+		local temp=/tmp/buildiso
+		prepare_dir ${temp}
+		sort -u ../shared/Packages-Custom ${packages_custom} > ${temp}/${packages_custom}
+		packages=$(sed "$_com_rm" "${temp}/${packages_custom}" \
 			| sed "$_space" \
 			| sed "$_blacklist" \
 			| sed "$_purge" \
@@ -534,6 +529,24 @@ load_pkgs(){
 			| sed "$_nonfree_multi" \
 			| sed "$_kernel" \
 			| sed "$_clean")
+		#rm ${temp}/${packages_custom}
+	else
+		packages=$(sed "$_com_rm" "$1" \
+			| sed "$_space" \
+			| sed "$_blacklist" \
+			| sed "$_purge" \
+			| sed "$_init" \
+			| sed "$_init_rm" \
+			| sed "$_arch" \
+			| sed "$_arch_rm" \
+			| sed "$_nonfree_default" \
+			| sed "$_multi" \
+			| sed "$_nonfree_i686" \
+			| sed "$_nonfree_x86_64" \
+			| sed "$_nonfree_multi" \
+			| sed "$_kernel" \
+			| sed "$_clean")
+	fi
 
 	if [[ $1 == 'Packages-Xorg' ]]; then
 		packages_cleanup=$(sed "$_com_rm" "$1" \
