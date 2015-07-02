@@ -15,7 +15,7 @@ ignore_error() {
 
 parse_fstab(){
 	echo $(perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^UUID=#;' $1/etc/fstab)
-# 	perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^/dev#;' $1/etc/fstab	
+# 	perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^/dev#;' $1/etc/fstab
 # 	perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^LABEL=#;' $1/etc/fstab
 }
 
@@ -38,44 +38,36 @@ chroot_part_mount() {
 }
 
 chroot_mount_partitions(){
-	for os in $(get_os);do
-		case "${os##*:}" in
-			'linux')
-				msg "Detected OS: $(get_os_name $os)"
-                                
-				CHROOT_ACTIVE_PART_MOUNTS=()
-				CHROOT_ACTIVE_MOUNTS=()
-				
-				[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
-				trap 'trap_handler' EXIT
+	CHROOT_ACTIVE_PART_MOUNTS=()
+	CHROOT_ACTIVE_MOUNTS=()
 
-				chroot_part_mount ${os%%:*} $1
-				local mounts=$(parse_fstab "$1")
-				
-				for entry in ${mounts[@]}; do
-					entry=${entry//UUID=}
-					local dev=${entry%:*}
-					local mp=${entry#*:}
-					case "${entry#*:}" in
-						'/'|'/home'|'swap'|'none') continue ;;
-						*) chroot_part_mount "/dev/disk/by-uuid/${dev}" "$1${mp}" ;;
-					esac
-				done
-				
-				chroot_mount_conditional "! mountpoint -q '$1'" "$1" "$1" --bind &&
-				chroot_mount proc "$1/proc" -t proc -o nosuid,noexec,nodev &&
-				chroot_mount sys "$1/sys" -t sysfs -o nosuid,noexec,nodev,ro &&
-# 				ignore_error chroot_mount_conditional "[[ -d '$1/sys/firmware/efi/efivars' ]]" \
-# 					efivarfs "$1/sys/firmware/efi/efivars" -t efivarfs -o nosuid,noexec,nodev &&
-				chroot_mount udev "$1/dev" -t devtmpfs -o mode=0755,nosuid &&
-				chroot_mount devpts "$1/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec &&
-				chroot_mount shm "$1/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev &&
-				chroot_mount run "$1/run" -t tmpfs -o nosuid,nodev,mode=0755 &&
-				chroot_mount tmp "$1/tmp" -t tmpfs -o mode=1777,strictatime,nodev,nosuid
-				chroot_mount /etc/resolv.conf "$1/etc/resolv.conf" --bind
-			;;
+	[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
+	trap 'trap_handler' EXIT
+
+	chroot_part_mount ${2%%:*} $1
+	local mounts=$(parse_fstab "$1")
+
+	for entry in ${mounts[@]}; do
+		entry=${entry//UUID=}
+		local dev=${entry%:*}
+		local mp=${entry#*:}
+		case "${entry#*:}" in
+			'/'|'/home'|'swap'|'none') continue ;;
+			*) chroot_part_mount "/dev/disk/by-uuid/${dev}" "$1${mp}" ;;
 		esac
 	done
+
+	chroot_mount_conditional "! mountpoint -q '$1'" "$1" "$1" --bind &&
+	chroot_mount proc "$1/proc" -t proc -o nosuid,noexec,nodev &&
+	chroot_mount sys "$1/sys" -t sysfs -o nosuid,noexec,nodev,ro &&
+# 	ignore_error chroot_mount_conditional "[[ -d '$1/sys/firmware/efi/efivars' ]]" \
+# 	efivarfs "$1/sys/firmware/efi/efivars" -t efivarfs -o nosuid,noexec,nodev &&
+	chroot_mount udev "$1/dev" -t devtmpfs -o mode=0755,nosuid &&
+	chroot_mount devpts "$1/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec &&
+	chroot_mount shm "$1/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev &&
+	chroot_mount run "$1/run" -t tmpfs -o nosuid,nodev,mode=0755 &&
+	chroot_mount tmp "$1/tmp" -t tmpfs -o mode=1777,strictatime,nodev,nosuid
+	chroot_mount /etc/resolv.conf "$1/etc/resolv.conf" --bind
 }
 
 chroot_mount() {
