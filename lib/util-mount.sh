@@ -27,22 +27,23 @@ get_os(){
 chroot_mount_partitions(){
 	for os in $(get_os);do
 		if [[ "${os##*:}" == 'linux' ]];then
+			msg "mount ${os##*:} ${os%%:*}"
 			mount ${os%%:*} $1
 			parse_fstab "$1/etc/fstab"
 			#umount $1
 		fi
 	done
-	local m_args=()
 	for entry in ${mounts[@]};do
 		entry=${entry//UUID=}
 		local dev=${entry%:*}
-		m_args+=("$dev")
-		if [[ "${entry#*:}" != '/' && "${entry#*:}" != 'none' ]];then
-			local mp=$1${entry#*:}
-			m_args+=("$mp")
-			mount /dev/disk/by-uuid/${m_args[@]}
-		fi
-		unset m_args
+		local mp=$1${entry#*:}
+		case "${entry#*:}" in
+			/|/home|swap) continue ;;
+			*)
+				msg2 "mount /dev/disk/by-uuid/${dev} ${mp}"
+				mount /dev/disk/by-uuid/${dev} ${mp}
+			;;
+		esac
 	done
 }
 

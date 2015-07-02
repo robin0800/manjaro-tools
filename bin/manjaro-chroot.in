@@ -48,7 +48,7 @@ check_root "$0" "${orig_argv[@]}"
 
 if ${automount};then
 	chrootdir=/mnt
-	chroot_mount_partitions
+	chroot_mount_partitions $chrootdir
 else
 	chrootdir=$1
 	shift
