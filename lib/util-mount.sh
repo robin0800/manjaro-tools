@@ -57,7 +57,7 @@ chroot_mount_partitions(){
 					local dev=${entry%:*}
 					local mp=${entry#*:}
 					case "${entry#*:}" in
-						'/'|'/home'|'swap') continue ;;
+						'/'|'/home'|'swap'|'none') continue ;;
 						*) chroot_part_mount "/dev/disk/by-uuid/${dev}" "$1${mp}" ;;
 					esac
 				done
