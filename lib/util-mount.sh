@@ -14,9 +14,9 @@ ignore_error() {
 }
 
 parse_fstab(){
-# 	perl -ane 'printf("Device: %s\nMountpoint: %s\n", @F[0,1]) if $F[0] =~ m#^/dev#;' $1
-	mounts=$(perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^UUID=#;' $1)
-# 	perl -ane 'printf("Device: %s\nMountpoint: %s\n", @F[0,1]) if $F[0] =~ m#^LABEL=#;' $1
+	mounts=$(perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^UUID=#;' $1/etc/fstab)
+# 	perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^/dev#;' $1/etc/fstab	
+# 	perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^LABEL=#;' $1/etc/fstab
 }
 
 get_os(){
@@ -27,37 +27,39 @@ get_os(){
 chroot_part_mount() {
 	msg2 "mount $@"
 	mount "$@" && CHROOT_ACTIVE_PART_MOUNTS=("$2" "${CHROOT_ACTIVE_PART_MOUNTS[@]}")
-	#msg2 "active mounts: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
+	msg2 "active mounts: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 }
 
 chroot_mount_partitions(){
 	for os in $(get_os);do
-		if [[ "${os##*:}" == 'linux' ]];then
-			CHROOT_ACTIVE_PART_MOUNTS=()
-			[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
-			trap 'chroot_part_umount' EXIT
-			#msg "mount ${os%%:*} $1"
-			chroot_part_mount ${os%%:*} $1
-			parse_fstab "$1/etc/fstab"
-			#msg "umount $1"
-			#umount $1
-		fi
+		case "${os##*:}" in
+			'linux')
+				msg "Detected OS: ${os##*:}"
+				CHROOT_ACTIVE_PART_MOUNTS=()
+				[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
+				trap 'chroot_part_umount' EXIT
+
+				chroot_part_mount ${os%%:*} $1
+				parse_fstab "$1"
+			;;
+                esac
 	done
 
-	for entry in ${mounts[@]};do
+	for entry in ${mounts[@]}; do
 		entry=${entry//UUID=}
 		local dev=${entry%:*}
-		local mp=$1${entry#*:}
+		local mp=${entry#*:}
 		case "${entry#*:}" in
-			/|/home|swap) continue ;;
+			'/'|'/home'|'swap') continue ;;
 			*)
-				chroot_part_mount /dev/disk/by-uuid/${dev} ${mp}
+				chroot_part_mount "/dev/disk/by-uuid/${dev}" "$1${mp}"
 			;;
 		esac
 	done
 }
 
 chroot_part_umount() {
+	msg2 "umount "${CHROOT_ACTIVE_PART_MOUNTS[@]}""
 	umount "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 	unset CHROOT_ACTIVE_PART_MOUNTS
 }
