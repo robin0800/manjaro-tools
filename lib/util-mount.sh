@@ -24,19 +24,28 @@ get_os(){
 	echo ${detected[@]}
 }
 
+get_os_name(){
+        local str=$1
+        str="${str#*:}"
+        str="${str#*:}"
+        str="${str//:/}"
+        echo "$str"
+}
+
 chroot_part_mount() {
-	msg2 "mount $@"
 	mount "$@" && CHROOT_ACTIVE_PART_MOUNTS=("$2" "${CHROOT_ACTIVE_PART_MOUNTS[@]}")
-	msg2 "active mounts: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
+	msg2 "active_mounts: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 }
 
 chroot_mount_partitions(){
 	for os in $(get_os);do
 		case "${os##*:}" in
 			'linux')
-				msg "Detected OS: ${os##*:}"
+				msg "Detected OS: $(get_os_name $os)"
+                                
 				CHROOT_ACTIVE_PART_MOUNTS=()
 				CHROOT_ACTIVE_MOUNTS=()
+				
 				[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
 				trap 'trap_handler' EXIT
 
@@ -70,9 +79,8 @@ chroot_mount_partitions(){
 }
 
 chroot_mount() {
-        msg2 "mount $@"
 	mount "$@" && CHROOT_ACTIVE_MOUNTS=("$2" "${CHROOT_ACTIVE_MOUNTS[@]}")
-	msg2 "active mounts: ${CHROOT_ACTIVE_MOUNTS[@]}"
+	msg2 "active_mounts: ${CHROOT_ACTIVE_MOUNTS[@]}"
 }
 
 chroot_mount_conditional() {
@@ -100,13 +108,11 @@ chroot_api_mount() {
 }
 
 chroot_part_umount() {
-	msg2 "umount "${CHROOT_ACTIVE_PART_MOUNTS[@]}""
 	umount "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 	unset CHROOT_ACTIVE_PART_MOUNTS
 }
 
 chroot_api_umount() {
-        msg2 "umount "${CHROOT_ACTIVE_MOUNTS[@]}""
 	umount "${CHROOT_ACTIVE_MOUNTS[@]}"
 	unset CHROOT_ACTIVE_MOUNTS
 }
