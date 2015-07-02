@@ -70,19 +70,18 @@ ${pretend} && display_settings && exit 1
 
 if ${automount};then
 	chrootdir=${chroots_dir}/manjaro-chroot
-	prepare_dir $chrootdir
+	prepare_dir ${chrootdir}
 	
-	chroot_mount_partitions $chrootdir
+	chroot_mount_partitions ${chrootdir}
 
-	$@="/bin/bash"
+	SHELL=/bin/sh unshare --fork --pid chroot "${chrootdir}" "/bin/bash"
 else
 	chrootdir=$1
 	shift
-fi
-
-[[ -d $chrootdir ]] || die "Can't create chroot on non-directory %s" "$chrootdir"
+	[[ -d ${chrootdir} ]] || die "Can't create chroot on non-directory %s" "${chrootdir}"
 	
-chroot_api_mount "$chrootdir" || die "failed to setup API filesystems in chroot %s" "$chrootdir"
-chroot_mount /etc/resolv.conf "$chrootdir/etc/resolv.conf" --bind
-
-SHELL=/bin/sh unshare --fork --pid chroot "$chrootdir" "$@"
+	chroot_api_mount "${chrootdir}" || die "failed to setup API filesystems in chroot %s" "${chrootdir}"
+	chroot_mount /etc/resolv.conf "${chrootdir}/etc/resolv.conf" --bind
+	
+	SHELL=/bin/sh unshare --fork --pid chroot "${chrootdir}" "$@"
+fi
