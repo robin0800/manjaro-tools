@@ -70,7 +70,9 @@ chroot_mount_partitions(){
 }
 
 chroot_mount() {
+        msg2 "mount $@"
 	mount "$@" && CHROOT_ACTIVE_MOUNTS=("$2" "${CHROOT_ACTIVE_MOUNTS[@]}")
+	msg2 "active mounts: ${CHROOT_ACTIVE_MOUNTS[@]}"
 }
 
 chroot_mount_conditional() {
