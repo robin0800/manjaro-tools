@@ -25,29 +25,34 @@ get_os(){
 }
 
 chroot_part_mount() {
+	msg2 "mount $@"
 	mount "$@" && CHROOT_ACTIVE_PART_MOUNTS=("$2" "${CHROOT_ACTIVE_PART_MOUNTS[@]}")
+	#msg2 "active mounts: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 }
 
 chroot_mount_partitions(){
-        CHROOT_ACTIVE_PART_MOUNTS=()
-	[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
-	trap 'chroot_part_umount' EXIT
 	for os in $(get_os);do
 		if [[ "${os##*:}" == 'linux' ]];then
-			chroot_part_mount ${os%%:*} $chrootdir
-			parse_fstab "$chrootdir/etc/fstab"
-			#msg "umount $chrootdir"
-			#umount $chrootdir
+			CHROOT_ACTIVE_PART_MOUNTS=()
+			[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
+			trap 'chroot_part_umount' EXIT
+			#msg "mount ${os%%:*} $1"
+			chroot_part_mount ${os%%:*} $1
+			parse_fstab "$1/etc/fstab"
+			#msg "umount $1"
+			#umount $1
 		fi
 	done
 
 	for entry in ${mounts[@]};do
 		entry=${entry//UUID=}
 		local dev=${entry%:*}
-		local mp=$chrootdir${entry#*:}
+		local mp=$1${entry#*:}
 		case "${entry#*:}" in
 			/|/home|swap) continue ;;
-			*) chroot_mount /dev/disk/by-uuid/${dev} ${mp} ;;
+			*)
+				chroot_part_mount /dev/disk/by-uuid/${dev} ${mp}
+			;;
 		esac
 	done
 }
