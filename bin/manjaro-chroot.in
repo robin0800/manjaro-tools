@@ -43,7 +43,7 @@ pretend=false
 usage() {
 	echo 'usage: ${0##*/} chroot-dir [command]'
 	echo '-a             Automount detected linux system'
-	eche '-q             Query settings and pretend'
+	echo '-q             Query settings and pretend'
 	echo '-h             Print this help message'
 	echo ''
 	echo "If 'command' is unspecified, ${0##*/} will launch /bin/sh."
@@ -69,9 +69,9 @@ check_root "$0" "${orig_argv[@]}"
 ${pretend} && display_settings && exit 1
 
 if ${automount};then
-	chrootdir=${chroots_dir}/manjaro-chroot
-	prepare_dir ${chrootdir}
-	
+        chrootdir=${chroots_dir}/manjaro-chroot
+        prepare_dir ${chrootdir}
+
 	chroot_mount_partitions ${chrootdir}
 
 	SHELL=/bin/sh unshare --fork --pid chroot "${chrootdir}" "/bin/bash"
