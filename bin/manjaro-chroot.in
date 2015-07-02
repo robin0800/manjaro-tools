@@ -17,14 +17,33 @@ LIBDIR='@libdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 
-import ${LIBDIR}/util-mount.sh
 import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-mount.sh
+
+display_settings(){
+	show_version
+	show_config
+
+	msg "ARGS:"
+	msg2 "automount: ${automount}"
+	msg2 "chroot_args: $@"
+
+	msg "PATHS:"
+	msg2 "chrootdir: ${chrootdir}"
+}
+
+load_user_info
+
+load_config "${USER_CONFIG}/manjaro-tools.conf"
+load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 automount=false
+pretend=false
 
 usage() {
 	echo 'usage: ${0##*/} chroot-dir [command]'
 	echo '-a             Automount detected linux system'
+	eche '-q             Query settings and pretend'
 	echo '-h             Print this help message'
 	echo ''
 	echo "If 'command' is unspecified, ${0##*/} will launch /bin/sh."
@@ -33,11 +52,12 @@ usage() {
 
 orig_argv=("$@")
 
-opts=':ha'
+opts=':haq'
 
 while getopts ${opts} arg; do
 	case "${arg}" in
 		a) automount=true ;;
+		q) pretend=true ;;
 		*) echo "invalid argument ${arg}"; usage 1;;
 		h|?) usage 0 ;;
 	esac
@@ -46,15 +66,22 @@ shift $(( OPTIND - 1 ))
 
 check_root "$0" "${orig_argv[@]}"
 
+${pretend} && display_settings && exit 1
+
 if ${automount};then
-	chrootdir=/mnt
+	chrootdir=${chroots_dir}/manjaro-chroot
+	prepare_dir $chrootdir
+	
 	chroot_mount_partitions $chrootdir
+
+	$@="/bin/bash"
 else
 	chrootdir=$1
 	shift
 fi
 
 [[ -d $chrootdir ]] || die "Can't create chroot on non-directory %s" "$chrootdir"
+	
 chroot_api_mount "$chrootdir" || die "failed to setup API filesystems in chroot %s" "$chrootdir"
 chroot_mount /etc/resolv.conf "$chrootdir/etc/resolv.conf" --bind
 
