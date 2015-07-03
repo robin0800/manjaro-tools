@@ -47,11 +47,11 @@ set_os(){
 
 # $1: os-prober array
 get_os_name(){
-        local str=$1
-        str="${str#*:}"
-        str="${str#*:}"
-        str="${str//:/}"
-        echo "$str"
+	local str=$1
+	str="${str#*:}"
+	str="${str#*:}"
+	str="${str//:/}"
+	echo "$str"
 }
 
 get_chroot_arch(){
@@ -66,10 +66,9 @@ chroot_part_mount() {
 }
 
 # $1: os-prober string
-# $2: index
 get_root(){
-    local os_string=$1
-    echo ${os_string[$2]%%:*}
+	local os_string=$1
+	echo ${os_string%%:*}
 }
 
 select_os(){
@@ -88,9 +87,9 @@ chroot_mount_partitions(){
 	[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
 	trap 'trap_handler' EXIT
 
-	local osind=$(set_os)
-	msg "Selected OS: $(get_os_name ${os_list[$osind]})"
-	local root=$(get_root "${os_list}" "$osind")
+	local index=$(set_os)
+	msg "Selected OS: $(get_os_name ${os_list[$index]})"
+	local root=$(get_root "${os_list[$index]}")
 
 	chroot_part_mount ${root} $1
 
@@ -105,7 +104,7 @@ chroot_mount_partitions(){
 			*) chroot_part_mount "/dev/disk/by-uuid/${dev}" "$1${mp}" ;;
 		esac
 	done
-	
+
         local chroot_arch=$(get_chroot_arch $1)
 	[[ ${chroot_arch} == x86-64 ]] && chroot_arch=${chroot_arch/-/_}
 	case ${arch} in
@@ -169,6 +168,6 @@ chroot_api_umount() {
 }
 
 trap_handler(){
-    chroot_api_umount
-    chroot_part_umount
+	chroot_api_umount
+	chroot_part_umount
 }
