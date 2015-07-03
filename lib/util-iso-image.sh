@@ -386,20 +386,28 @@ make_repo(){
 # $1: work dir
 # $2: pkglist
 download_to_cache(){
+        local ret=$?
 	chroot-run \
 		  -r "${mountargs_ro}" \
 		  -w "${mountargs_rw}" \
 		  -B "${build_mirror}/${branch}" \
 		  "$1" \
 		  pacman -v -Syw $2 --noconfirm
+        if [[ $ret == 1 ]];then
+		ret=1
+	fi
 	chroot-run \
 		  -r "${mountargs_ro}" \
 		  -w "${mountargs_rw}" \
 		  -B "${build_mirror}/${branch}" \
 		  "$1" \
 		  pacman -v -Sp $2 --noconfirm > "$1"/cache-packages.txt
+        if [[ $ret == 1 ]];then
+		ret=1
+	fi
 	sed -ni '/.pkg.tar.xz/p' "$1"/cache-packages.txt
 	sed -i "s/.*\///" "$1"/cache-packages.txt
+	return $ret
 }
 
 # $1: image path
