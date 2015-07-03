@@ -37,10 +37,12 @@ set_os(){
 			if [[ $selection -ne $index ]];then
 				msg "Please enter your choice [0-$((count-1))] : "
 			else
+                                msg "Selected OS ${oslist[$selection]}"
 				echo $selection
 			fi
 		done
 	else
+                msg "Selected OS ${oslist[0]}"
 		echo 0
 	fi
 }
