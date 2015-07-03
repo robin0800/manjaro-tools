@@ -72,12 +72,8 @@ if ${automount};then
 	chrootdir=${chroots_dir}/manjaro-chroot
 	prepare_dir ${chrootdir}
 	run_args=/bin/bash
-	
-	for os in $(get_os);do
-		case "${os##*:}" in
-			'linux') chroot_mount_partitions ${chrootdir} ${os} ;;
-		esac
-	done
+	os_list=$(detect)
+	select_os
 else
 	chrootdir=$1
 	shift
