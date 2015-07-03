@@ -19,34 +19,33 @@ parse_fstab(){
 # 	perl -ane 'printf("%s:%s\n", @F[0,1]) if $F[0] =~ m#^LABEL=#;' $1/etc/fstab
 }
 
-get_os(){
+detect(){
 	local detected=( "$(os-prober | tr ' ' '_' | paste -s -d ' ')" )
 	echo ${detected[@]}
 }
 
 set_os(){
-	local count=${#oslist[@]}
-	if [[ $count -gt 1 ]];then
+	local count=${#os_list[@]}
+	if [[ ${count} -gt 1 ]];then
 		msg "List of found systems"
 		for((i=0; i < ${count}; i++)); do
-			msg2 "$i) ${oslist[$i]}"
+			msg3 "$i) $(get_os_name ${os_list[$i]})"
 		done
 		msg "Please enter your choice [0-$((count-1))] : "
-		read selection
-		for index in ${!oslist[@]};do
-			if [[ $selection -ne $index ]];then
-				msg "Please enter your choice [0-$((count-1))] : "
+		while read selection; do
+			if [[ -n ${os_list[$selection]} ]];then
+				echo ${selection}
+				break
 			else
-                                msg "Selected OS ${oslist[$selection]}"
-				echo $selection
+				msg "Please enter your choice [0-$((count-1))] : "
 			fi
 		done
 	else
-                msg "Selected OS ${oslist[0]}"
 		echo 0
 	fi
 }
 
+# $1: os-prober array
 get_os_name(){
         local str=$1
         str="${str#*:}"
@@ -55,9 +54,31 @@ get_os_name(){
         echo "$str"
 }
 
+get_chroot_arch(){
+	local elf=$(file $1/usr/bin/file)
+	elf=${elf//*executable,}
+	echo ${elf%%,*}
+}
+
 chroot_part_mount() {
 	mount "$@" && CHROOT_ACTIVE_PART_MOUNTS=("$2" "${CHROOT_ACTIVE_PART_MOUNTS[@]}")
 	msg2 "active_mounts: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
+}
+
+# $1: os-prober string
+# $2: index
+get_root(){
+    local os_string=$1
+    echo ${os_string[$2]%%:*}
+}
+
+select_os(){
+	for system in ${os_list[@]};do
+		case "${system##*:}" in
+			'linux') chroot_mount_partitions "${chrootdir}" "${system}" ;;
+			*) die "Detected: ${system##*:} is not a Linux" ;;
+		esac
+	done
 }
 
 chroot_mount_partitions(){
@@ -68,8 +89,11 @@ chroot_mount_partitions(){
 	trap 'trap_handler' EXIT
 
 	local osind=$(set_os)
-	chroot_part_mount ${os[$osind]%%:*} $1
-	
+	msg "Selected OS: $(get_os_name ${os_list[$osind]})"
+	local root=$(get_root "${os_list}" "$osind")
+
+	chroot_part_mount ${root} $1
+
 	local mounts=$(parse_fstab "$1")
 
 	for entry in ${mounts[@]}; do
@@ -81,6 +105,16 @@ chroot_mount_partitions(){
 			*) chroot_part_mount "/dev/disk/by-uuid/${dev}" "$1${mp}" ;;
 		esac
 	done
+	
+        local chroot_arch=$(get_chroot_arch $1)
+	[[ ${chroot_arch} == x86-64 ]] && chroot_arch=${chroot_arch/-/_}
+	case ${arch} in
+		i686)
+			if [[ ${chroot_arch} == x86_64 ]];then
+				die "You can't chroot from ${arch} host into ${chroot_arch}!"
+			fi
+		;;
+	esac
 
 	chroot_mount_conditional "! mountpoint -q '$1'" "$1" "$1" --bind &&
 	chroot_mount proc "$1/proc" -t proc -o nosuid,noexec,nodev &&
