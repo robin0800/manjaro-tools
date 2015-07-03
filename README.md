@@ -305,3 +305,31 @@ Usage: buildtree [options]
 ~~~
 buildtree -as
 ~~~
+
+###6. manjaro-chroot
+
+manjaro-chroot is a little tool to quickly chroot into a second system installed on the host.
+If the automount option is enabled, manjaro-chroot will detect installed systems with os-prober, and pops up a list with linux systems to select from.
+If there is only 1 system installed besides the host system, no list will pop up and it will automatically mount the second system.
+
+~~~
+$ manjaro-chroot -h
+usage: ${0##*/} chroot-dir [command]
+    -a             Automount detected linux system
+    -q             Query settings and pretend
+    -h             Print this help message
+
+    If 'command' is unspecified, manjaro-chroot will launch /bin/sh.
+~~~
+
+######* automount
+
+~~~
+manjaro-chroot -a
+~~~
+
+######* mount manually
+
+~~~
+manjaro-chroot /mnt /bin/bash
+~~~
