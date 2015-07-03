@@ -41,12 +41,16 @@ automount=false
 pretend=false
 
 usage() {
-	echo 'usage: ${0##*/} chroot-dir [command]'
-	echo '-a             Automount detected linux system'
-	echo '-q             Query settings and pretend'
-	echo '-h             Print this help message'
+	echo "usage: ${0##*/} -a [or] ${0##*/} chroot-dir [command]"
+	echo '    -a             Automount detected linux system'
+	echo '    -q             Query settings and pretend'
+	echo '    -h             Print this help message'
 	echo ''
 	echo "If 'command' is unspecified, ${0##*/} will launch /bin/sh."
+	echo ''
+	echo "If 'automount' is true, ${0##*/} will launch /bin/bash"
+	echo "and ${chroots_dir}/manjaro-chroot."
+	echo ''
 	exit $1
 }
 
@@ -70,20 +74,20 @@ if ${automount};then
 	chrootdir=${chroots_dir}/manjaro-chroot
 	prepare_dir ${chrootdir}
 	run_args=/bin/bash
-	
+
 	${pretend} && display_settings && exit 1
-	
+
 	os_list=$(detect)
 	select_os
 else
 	chrootdir=$1
 	shift
 	run_args=$@
-	
+
 	[[ -d ${chrootdir} ]] || die "Can't create chroot on non-directory %s" "${chrootdir}"
 
 	${pretend} && display_settings && exit 1
-	
+
 	chroot_api_mount "${chrootdir}" || die "failed to setup API filesystems in chroot %s" "${chrootdir}"
 	chroot_mount /etc/resolv.conf "${chrootdir}/etc/resolv.conf" --bind
 fi
