@@ -62,7 +62,7 @@ get_chroot_arch(){
 
 chroot_part_mount() {
 	mount "$@" && CHROOT_ACTIVE_PART_MOUNTS=("$2" "${CHROOT_ACTIVE_PART_MOUNTS[@]}")
-	msg2 "active_mounts: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
+	msg2 "mounted: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 }
 
 # $1: os-prober string
@@ -131,7 +131,7 @@ chroot_mount_partitions(){
 
 chroot_mount() {
 	mount "$@" && CHROOT_ACTIVE_MOUNTS=("$2" "${CHROOT_ACTIVE_MOUNTS[@]}")
-	msg2 "active_mounts: ${CHROOT_ACTIVE_MOUNTS[@]}"
+	#msg2 "mounted: ${CHROOT_ACTIVE_MOUNTS[@]}"
 }
 
 chroot_mount_conditional() {
