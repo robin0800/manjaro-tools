@@ -24,6 +24,27 @@ get_os(){
 	echo ${detected[@]}
 }
 
+set_os(){
+	local count=${#oslist[@]}
+	if [[ $count -gt 1 ]];then
+		msg "List of found systems"
+		for((i=0; i < ${count}; i++)); do
+			msg2 "$i) ${oslist[$i]}"
+		done
+		msg "Please enter your choice [0-$((count-1))] : "
+		read selection
+		for index in ${!oslist[@]};do
+			if [[ $selection -ne $index ]];then
+				msg "Please enter your choice [0-$((count-1))] : "
+			else
+				echo $selection
+			fi
+		done
+	else
+		echo 0
+	fi
+}
+
 get_os_name(){
         local str=$1
         str="${str#*:}"
@@ -44,7 +65,9 @@ chroot_mount_partitions(){
 	[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
 	trap 'trap_handler' EXIT
 
-	chroot_part_mount ${2%%:*} $1
+	local osind=$(set_os)
+	chroot_part_mount ${os[$osind]%%:*} $1
+	
 	local mounts=$(parse_fstab "$1")
 
 	for entry in ${mounts[@]}; do
