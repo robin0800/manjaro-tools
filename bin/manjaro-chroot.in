@@ -66,12 +66,13 @@ shift $(( OPTIND - 1 ))
 
 check_root "$0" "${orig_argv[@]}"
 
-${pretend} && display_settings && exit 1
-
 if ${automount};then
 	chrootdir=${chroots_dir}/manjaro-chroot
 	prepare_dir ${chrootdir}
 	run_args=/bin/bash
+	
+	${pretend} && display_settings && exit 1
+	
 	os_list=$(detect)
 	select_os
 else
@@ -81,6 +82,8 @@ else
 	
 	[[ -d ${chrootdir} ]] || die "Can't create chroot on non-directory %s" "${chrootdir}"
 
+	${pretend} && display_settings && exit 1
+	
 	chroot_api_mount "${chrootdir}" || die "failed to setup API filesystems in chroot %s" "${chrootdir}"
 	chroot_mount /etc/resolv.conf "${chrootdir}/etc/resolv.conf" --bind
 fi
