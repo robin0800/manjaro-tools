@@ -26,7 +26,7 @@ display_settings(){
 
 	msg "ARGS:"
 	msg2 "automount: ${automount}"
-	msg2 "chroot_args: $@"
+	msg2 "run_args: ${run_args}"
 
 	msg "PATHS:"
 	msg2 "chrootdir: ${chrootdir}"
@@ -71,22 +71,22 @@ ${pretend} && display_settings && exit 1
 if ${automount};then
 	chrootdir=${chroots_dir}/manjaro-chroot
 	prepare_dir ${chrootdir}
+	run_args=/bin/bash
+	
 	for os in $(get_os);do
 		case "${os##*:}" in
-			'linux')
-				msg "Detected OS: $(get_os_name $os)"
-				chroot_mount_partitions ${chrootdir} ${os}
-			;;
+			'linux') chroot_mount_partitions ${chrootdir} ${os} ;;
 		esac
 	done
-	SHELL=/bin/sh unshare --fork --pid chroot "${chrootdir}" "/bin/bash"
 else
 	chrootdir=$1
 	shift
+	run_args=$@
+	
 	[[ -d ${chrootdir} ]] || die "Can't create chroot on non-directory %s" "${chrootdir}"
 
 	chroot_api_mount "${chrootdir}" || die "failed to setup API filesystems in chroot %s" "${chrootdir}"
 	chroot_mount /etc/resolv.conf "${chrootdir}/etc/resolv.conf" --bind
-
-	SHELL=/bin/sh unshare --fork --pid chroot "${chrootdir}" "$@"
 fi
+
+SHELL=/bin/sh unshare --fork --pid chroot "${chrootdir}" "${run_args}"
