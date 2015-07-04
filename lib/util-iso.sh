@@ -111,7 +111,7 @@ copy_livecd_helpers(){
 
 copy_cache_mhwd(){
 	msg2 "Copying mhwd package cache ..."
-	rsync -v --files-from="${work_dir}/pkgs-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/pkgs-image/opt/livecd/pkgs"
+	rsync -v --files-from="${work_dir}/mhwd-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/mhwd-image/opt/livecd/pkgs"
 }
 
 # $1: image path
@@ -296,8 +296,8 @@ make_image_livecd() {
 
 make_image_mhwd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [pkgs-image]"
-		local path="${work_dir}/pkgs-image"
+		msg "Prepare [mhwd-image]"
+		local path="${work_dir}/mhwd-image"
 		mkdir -p ${path}/opt/livecd/pkgs
 
 		if [[ -n "${custom}" ]] ; then
@@ -330,7 +330,7 @@ make_image_mhwd() {
 		rm -f "${path}/cache-packages.txt"
 
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [pkgs-image]"
+		msg "Done [mhwd-image]"
 	fi
 }
 

@@ -318,7 +318,7 @@ chroot_clean(){
 	msg "Cleaning up ..."
 	for image in "$1"/*-image; do
 		[[ -d ${image} ]] || continue
-		if [[ $(basename "${image}") != "pkgs-image" ]];then
+		if [[ $(basename "${image}") != "mhwd-image" ]];then
 			msg2 "Deleting chroot '$(basename "${image}")'..."
 			lock 9 "${image}.lock" "Locking chroot '${image}'"
 			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
@@ -380,7 +380,7 @@ configure_livecd_image(){
 }
 
 make_repo(){
-	repo-add ${work_dir}/pkgs-image/opt/livecd/pkgs/gfx-pkgs.db.tar.gz ${work_dir}/pkgs-image/opt/livecd/pkgs/*pkg*z
+	repo-add ${work_dir}/mhwd-image/opt/livecd/pkgs/gfx-pkgs.db.tar.gz ${work_dir}/mhwd-image/opt/livecd/pkgs/*pkg*z
 }
 
 # $1: work dir
