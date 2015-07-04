@@ -46,10 +46,11 @@ usage() {
 	echo '    -q             Query settings and pretend'
 	echo '    -h             Print this help message'
 	echo ''
-	echo "If 'command' is unspecified, ${0##*/} will launch /bin/sh."
+	echo "    If 'command' is unspecified, ${0##*/} will launch /bin/sh."
 	echo ''
-	echo "If 'automount' is true, ${0##*/} will launch /bin/bash"
-	echo "and ${chroots_dir}/manjaro-chroot."
+	echo "    If 'automount' is true, ${0##*/} will launch /bin/bash"
+	echo "    and ${chroots_dir}/manjaro-chroot."
+	echo ''
 	echo ''
 	exit $1
 }
@@ -62,8 +63,8 @@ while getopts ${opts} arg; do
 	case "${arg}" in
 		a) automount=true ;;
 		q) pretend=true ;;
-		*) echo "invalid argument ${arg}"; usage 1;;
 		h|?) usage 0 ;;
+		*) echo "invalid argument ${arg}"; usage 1 ;;
 	esac
 done
 shift $(( OPTIND - 1 ))
