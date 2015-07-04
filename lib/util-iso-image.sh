@@ -284,7 +284,7 @@ configure_displaymanager(){
 }
 
 # $1: chroot
-configure_xorg_drivers(){
+configure_mhwd_drivers(){
 	# Disable Catalyst if not present
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Catalyst driver"
@@ -391,7 +391,7 @@ download_to_cache(){
 		  -w "${mountargs_rw}" \
 		  -B "${build_mirror}/${branch}" \
 		  "$1" \
-		  pacman -v -Syw $2 --noconfirm
+		  pacman -v -Syw $2 --noconfirm || return 1
 	chroot-run \
 		  -r "${mountargs_ro}" \
 		  -w "${mountargs_rw}" \

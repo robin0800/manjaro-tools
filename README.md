@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.9.9
+Manjaro-tools-0.9.10
 
 User manual
 
@@ -118,117 +118,6 @@ Specifying args will override manjaro-tools.conf settings.
 # requires minimum 4.0 kernel on the build host and on iso in profile.conf
 # use_overlayfs="false"
 ~~~
-
-####Config files in iso profiles
-
-Each iso profile must have these files or symlinks to shared:
-
-
-######* profile.conf
-
-~~~
-##########################################
-###### use this file in the profile ######
-##########################################
-
-# possible values: openrc,systemd
-# initsys="systemd"
-
-# use multilib packages; x86_64 only
-# multilib="true"
-
-# displaymanager="lightdm"
-
-# Set to false to disable autologin in the livecd
-# autologin="true"
-
-# nonfree xorg drivers
-# nonfree_xorg="true"
-
-# use plymouth; initcpio hook
-# plymouth_boot="true"
-
-# use pxe boot; initcpio hook
-# pxe_boot="true"
-
-################ install ################
-
-# unset defaults to given value
-# kernel="linux319"
-
-# unset defaults to given value
-# efi_boot_loader="grub"
-
-# set uefi partition size
-# efi_part_size=32M
-
-# unset defaults to given value
-# plymouth_theme=manjaro-elegant
-
-# unset defaults to given values
-# names must match systemd service names
-# start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
-
-# unset defaults to given values,
-# names must match openrc service names
-# start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
-
-################# livecd #################
-
-# unset defaults to given value
-# hostname="manjaro"
-
-# unset defaults to given value
-# username="manjaro"
-
-# unset defaults to given value
-# password="manjaro"
-
-# unset defaults to given values
-# addgroups="video,audio,power,disk,storage,optical,network,lp,scanner,wheel"
-
-# unset defaults to given values
-# names must match systemd service names
-# services in start_systemd array don't need to be listed here
-# start_systemd_live=('livecd' 'mhwd-live' 'pacman-init')
-
-# unset defaults to given values,
-# names must match openrc service names
-# services in start_openrc array don't need to be listed here
-# start_openrc_live=('livecd' 'mhwd-live' 'pacman-init')
-~~~
-
-######* Packages
-* Contains root image packages
-* ideally no xorg
-
-######* Packages-Custom/desktop
-* Contains the custom image packages
-* desktop environment packages go here
-* this file is joined at build time with shared/Packages-Custom to pull in shared desktop packages
-
-######* Packages-Xorg
-* Contains the Xorg package repo
-
-######* Packages-Livecd
-* Contains packages you only want on livecd but not installed on the target system with installer
-* default files are in shared folder and can be symlinked or defined in a real file
-
-###### optional custom pacman.conf in profile
-
-* for i686
-
-~~~
-pacman-default.conf
-~~~
-
-* for x86_64
-
-~~~
-pacman-multilib.conf
-~~~
-
-If you need a custom livecd-overlay, create overlay-livecd folder in  profile, and  symlink from shared/overlay-livecd/your_selection to the overlay-livecd folder.
 
 ###2. buildpkg
 
@@ -415,4 +304,32 @@ Usage: buildtree [options]
 
 ~~~
 buildtree -as
+~~~
+
+###6. manjaro-chroot
+
+manjaro-chroot is a little tool to quickly chroot into a second system installed on the host.
+If the automount option is enabled, manjaro-chroot will detect installed systems with os-prober, and pops up a list with linux systems to select from.
+If there is only 1 system installed besides the host system, no list will pop up and it will automatically mount the second system.
+
+~~~
+$ manjaro-chroot -h
+usage: ${0##*/} chroot-dir [command]
+    -a             Automount detected linux system
+    -q             Query settings and pretend
+    -h             Print this help message
+
+    If 'command' is unspecified, manjaro-chroot will launch /bin/sh.
+~~~
+
+######* automount
+
+~~~
+manjaro-chroot -a
+~~~
+
+######* mount manually
+
+~~~
+manjaro-chroot /mnt /bin/bash
 ~~~

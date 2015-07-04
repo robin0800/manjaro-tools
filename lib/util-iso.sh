@@ -109,8 +109,8 @@ copy_livecd_helpers(){
 	write_profile_conf_entries $1
 }
 
-copy_cache_xorg(){
-	msg2 "Copying xorg package cache ..."
+copy_cache_mhwd(){
+	msg2 "Copying mhwd package cache ..."
 	rsync -v --files-from="${work_dir}/pkgs-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/pkgs-image/opt/livecd/pkgs"
 }
 
@@ -294,7 +294,7 @@ make_image_livecd() {
 	fi
 }
 
-make_image_xorg() {
+make_image_mhwd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [pkgs-image]"
 		local path="${work_dir}/pkgs-image"
@@ -313,15 +313,16 @@ make_image_xorg() {
 			die "Exit ${FUNCNAME}"
 		fi
 
-		copy_cache_xorg
+		copy_cache_mhwd
+
 		if [[ -n "${packages_cleanup}" ]]; then
-			for xorg_clean in ${packages_cleanup}; do
-				rm ${path}/opt/livecd/pkgs/${xorg_clean}
+			for mhwd_clean in ${packages_cleanup}; do
+				rm ${path}/opt/livecd/pkgs/${mhwd_clean}
 			done
 		fi
 		cp ${PKGDATADIR}/pacman-gfx.conf ${path}/opt/livecd
 		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
-		configure_xorg_drivers "${path}"
+		configure_mhwd_drivers "${path}"
 
 		umount_image "${path}"
 
@@ -510,45 +511,32 @@ load_pkgs(){
 		_purge="s|>cleanup.*||g" \
 		_purge_rm="s|>cleanup||g"
 
+	local list
+
 	if [[ $1 == "${packages_custom}" ]];then
-		local temp=/tmp/buildiso
-		prepare_dir ${temp}
-		sort -u ../shared/Packages-Custom ${packages_custom} > ${temp}/${packages_custom}
-		packages=$(sed "$_com_rm" "${temp}/${packages_custom}" \
-			| sed "$_space" \
-			| sed "$_blacklist" \
-			| sed "$_purge" \
-			| sed "$_init" \
-			| sed "$_init_rm" \
-			| sed "$_arch" \
-			| sed "$_arch_rm" \
-			| sed "$_nonfree_default" \
-			| sed "$_multi" \
-			| sed "$_nonfree_i686" \
-			| sed "$_nonfree_x86_64" \
-			| sed "$_nonfree_multi" \
-			| sed "$_kernel" \
-			| sed "$_clean")
-		#rm ${temp}/${packages_custom}
+		sort -u ../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
+		list=${work_dir}/${packages_custom}
 	else
-		packages=$(sed "$_com_rm" "$1" \
-			| sed "$_space" \
-			| sed "$_blacklist" \
-			| sed "$_purge" \
-			| sed "$_init" \
-			| sed "$_init_rm" \
-			| sed "$_arch" \
-			| sed "$_arch_rm" \
-			| sed "$_nonfree_default" \
-			| sed "$_multi" \
-			| sed "$_nonfree_i686" \
-			| sed "$_nonfree_x86_64" \
-			| sed "$_nonfree_multi" \
-			| sed "$_kernel" \
-			| sed "$_clean")
+		list=$1
 	fi
 
-	if [[ $1 == 'Packages-Xorg' ]]; then
+	packages=$(sed "$_com_rm" "$list" \
+			| sed "$_space" \
+			| sed "$_blacklist" \
+			| sed "$_purge" \
+			| sed "$_init" \
+			| sed "$_init_rm" \
+			| sed "$_arch" \
+			| sed "$_arch_rm" \
+			| sed "$_nonfree_default" \
+			| sed "$_multi" \
+			| sed "$_nonfree_i686" \
+			| sed "$_nonfree_x86_64" \
+			| sed "$_nonfree_multi" \
+			| sed "$_kernel" \
+			| sed "$_clean")
+
+	if [[ $1 == 'Packages-Mhwd' ]]; then
 		packages_cleanup=$(sed "$_com_rm" "$1" \
 			| grep cleanup \
 			| sed "$_purge_rm" \
@@ -596,7 +584,7 @@ load_profile(){
 	local files=$(ls Packages*)
 	for f in ${files[@]};do
 		case $f in
-			Packages|Packages-Livecd|Packages-Xorg) continue ;;
+			Packages|Packages-Livecd|Packages-Mhwd) continue ;;
 			*) packages_custom="$f" ;;
 		esac
 	done
@@ -631,9 +619,9 @@ build_images(){
 		load_pkgs "Packages-Livecd"
 		make_image_livecd
 	fi
-	if [[ -f Packages-Xorg ]] ; then
-		load_pkgs 'Packages-Xorg'
-		make_image_xorg
+	if [[ -f Packages-Mhwd ]] ; then
+		load_pkgs 'Packages-Mhwd'
+		make_image_mhwd
 	fi
 	make_image_boot
 	if [[ "${arch}" == "x86_64" ]]; then
