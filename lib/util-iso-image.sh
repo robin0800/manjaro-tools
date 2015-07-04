@@ -284,7 +284,7 @@ configure_displaymanager(){
 }
 
 # $1: chroot
-configure_xorg_drivers(){
+configure_mhwd_drivers(){
 	# Disable Catalyst if not present
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Catalyst driver"
