@@ -78,6 +78,16 @@ if ${automount};then
 
 	${pretend} && display_settings && exit 1
 
+	if [[ -z $(cat /proc/modules | grep dm_mod) ]];then
+		vgscan
+		vgchange -ay
+		if [[ -d /run/systemd ]]; then
+			systemctl start lvmetad
+		else
+			rc-service lvmetad start
+		fi
+	fi
+
 	os_list=$(detect)
 	select_os
 else
