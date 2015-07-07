@@ -116,7 +116,6 @@ write_calamares_users_conf(){
 
 brand_calamares_settings_conf(){
 	local conf="$1/usr/share/calamares/settings.conf"
-
 	local branding="$1/usr/share/calamares/branding/${iso_name}-${custom}"
 	if [[ -d $branding ]];then
 		sed -i -e "s|^.*branding:.*|branding: ${iso_name}-${custom}|" "$conf"
