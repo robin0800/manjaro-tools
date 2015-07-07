@@ -589,7 +589,11 @@ load_profile(){
 	done
 	custom=${packages_custom#*-}
 	custom=${custom,,}
-	iso_file="${iso_name}-${custom}-${dist_release}-${arch}.iso"
+	if [[ ${initsys} == 'openrc' ]];then
+		iso_file="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}.iso"
+	else
+		iso_file="${iso_name}-${custom}-${dist_release}-${arch}.iso"
+	fi
 
 	check_custom_pacman_conf
 
