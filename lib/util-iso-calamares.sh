@@ -122,7 +122,7 @@ brand_calamares_settings_conf(){
 	else
 		local branding="$1/usr/share/calamares/branding/${iso_name}"
 		if [[ -d $branding ]];then
-			sed -i -e "s|^.*branding:.*|branding: ${iso_name}-${custom}|" "$conf"
+			sed -i -e "s|^.*branding:.*|branding: ${iso_name}|" "$conf"
 		fi
 	fi
 }
