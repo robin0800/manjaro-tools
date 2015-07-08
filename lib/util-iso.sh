@@ -195,7 +195,6 @@ make_iso() {
 
 	run_xorriso
 
-	chown -R "${OWNER}:users" "${cache_dir_iso}"
 	msg "Done [Build ISO]"
 }
 
@@ -607,6 +606,7 @@ compress_images(){
 	local timer=$(get_timer)
 	make_iso
 	make_checksum "${iso_file}"
+	chown -R "${OWNER}:users" "${cache_dir_iso}"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
