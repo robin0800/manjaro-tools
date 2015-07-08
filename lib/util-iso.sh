@@ -246,7 +246,12 @@ make_image_custom() {
 		fi
 
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
-		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
+		if [[ ${initsys} == 'openrc' ]];then
+			local pkgs_file="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}-pkgs.txt"
+		else
+			local pkgs_file="${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt"
+		fi
+		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${pkgs_file}
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
