@@ -116,19 +116,15 @@ write_calamares_users_conf(){
 
 brand_calamares_settings_conf(){
 	local conf="$1/usr/share/calamares/settings.conf"
-
-	if [[ ${iso_name} == 'manjaro' ]];then
-		local branding="$1/usr/share/calamares/branding/${iso_name}-${custom}"
-		if [[ -d $branding ]];then
-			sed -i -e "s|branding: manjaro|branding: ${iso_name}-${custom}|g" "$conf"
-		fi
+	local branding="$1/usr/share/calamares/branding/${iso_name}-${custom}"
+	if [[ -d $branding ]];then
+		sed -i -e "s|^.*branding:.*|branding: ${iso_name}-${custom}|" "$conf"
 	else
 		local branding="$1/usr/share/calamares/branding/${iso_name}"
 		if [[ -d $branding ]];then
-			sed -i -e "s|branding: manjaro|branding: ${iso_name}|g" "$conf"
+			sed -i -e "s|^.*branding:.*|branding: ${iso_name}|" "$conf"
 		fi
 	fi
-
 }
 
 configure_calamares(){
