@@ -111,7 +111,7 @@ copy_livecd_helpers(){
 
 copy_cache_mhwd(){
 	msg2 "Copying mhwd package cache ..."
-	rsync -v --files-from="${work_dir}/pkgs-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/pkgs-image/opt/livecd/pkgs"
+	rsync -v --files-from="${work_dir}/mhwd-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/mhwd-image/opt/livecd/pkgs"
 }
 
 # $1: image path
@@ -195,7 +195,6 @@ make_iso() {
 
 	run_xorriso
 
-	chown -R "${OWNER}:users" "${cache_dir_iso}"
 	msg "Done [Build ISO]"
 }
 
@@ -246,7 +245,12 @@ make_image_custom() {
 		fi
 
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
-		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt
+		if [[ ${initsys} == 'openrc' ]];then
+			local pkgs_file="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}-pkgs.txt"
+		else
+			local pkgs_file="${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt"
+		fi
+		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${pkgs_file}
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
@@ -296,8 +300,8 @@ make_image_livecd() {
 
 make_image_mhwd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [pkgs-image]"
-		local path="${work_dir}/pkgs-image"
+		msg "Prepare [mhwd-image]"
+		local path="${work_dir}/mhwd-image"
 		mkdir -p ${path}/opt/livecd/pkgs
 
 		if [[ -n "${custom}" ]] ; then
@@ -331,7 +335,7 @@ make_image_mhwd() {
 		rm -f "${path}/cache-packages.txt"
 
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [pkgs-image]"
+		msg "Done [mhwd-image]"
 	fi
 }
 
@@ -590,7 +594,11 @@ load_profile(){
 	done
 	custom=${packages_custom#*-}
 	custom=${custom,,}
-	iso_file="${iso_name}-${custom}-${dist_release}-${arch}.iso"
+	if [[ ${initsys} == 'openrc' ]];then
+		iso_file="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}.iso"
+	else
+		iso_file="${iso_name}-${custom}-${dist_release}-${arch}.iso"
+	fi
 
 	check_custom_pacman_conf
 
@@ -604,6 +612,7 @@ compress_images(){
 	local timer=$(get_timer)
 	make_iso
 	make_checksum "${iso_file}"
+	chown -R "${OWNER}:users" "${cache_dir_iso}"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 

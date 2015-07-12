@@ -73,10 +73,9 @@ get_root(){
 
 select_os(){
 	for system in ${os_list[@]};do
-		case "${system##*:}" in
-			'linux') chroot_mount_partitions "${chrootdir}" "${system}" ;;
-			*) die "Detected: ${system##*:} is not a Linux" ;;
-		esac
+		if [[ "${system##*:}" == 'linux' ]];then
+			chroot_mount_partitions "${chrootdir}" "${system}"
+		fi
 	done
 }
 
@@ -105,7 +104,7 @@ chroot_mount_partitions(){
 		esac
 	done
 
-        local chroot_arch=$(get_chroot_arch $1)
+	local chroot_arch=$(get_chroot_arch $1)
 	[[ ${chroot_arch} == x86-64 ]] && chroot_arch=${chroot_arch/-/_}
 	case ${arch} in
 		i686)

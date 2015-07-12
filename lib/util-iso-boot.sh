@@ -281,9 +281,9 @@ write_isomounts(){
 	echo '' >> $1
 	msg2 "Writing livecd entry ..."
 	echo "${arch}/livecd-image.sqfs ${arch} / squashfs" >> $1
-	if [[ -f Packages-Xorg ]] ; then
-		msg2 "Writing pkgs entry ..."
-		echo "${arch}/pkgs-image.sqfs ${arch} / squashfs" >> $1
+	if [[ -f Packages-Mhwd ]] ; then
+		msg2 "Writing mhwd entry ..."
+		echo "${arch}/mhwd-image.sqfs ${arch} / squashfs" >> $1
 	fi
 	if [[ -f "${packages_custom}" ]] ; then
 		msg2 "Writing ${custom} entry ..."
