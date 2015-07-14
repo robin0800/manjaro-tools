@@ -116,60 +116,54 @@ write_calamares_users_conf(){
 
 brand_calamares_settings_conf(){
 	local conf="$1/usr/share/calamares/settings.conf"
-	local branding="$1/usr/share/calamares/branding/${iso_name}-${custom}"
-	if [[ -d $branding ]];then
-		sed -i -e "s|^.*branding:.*|branding: ${iso_name}-${custom}|" "$conf"
-	else
-		local branding="$1/usr/share/calamares/branding/${iso_name}"
-		if [[ -d $branding ]];then
+	if [[ -f $conf ]];then
+		if [[ -d $1/usr/share/calamares/branding/${iso_name}-${custom} ]];then
+			sed -i -e "s|^.*branding:.*|branding: ${iso_name}-${custom}|" "$conf"
+		elif [[ -d $1/usr/share/calamares/branding/${iso_name} ]];then
 			sed -i -e "s|^.*branding:.*|branding: ${iso_name}|" "$conf"
 		fi
 	fi
 }
 
 configure_calamares(){
-	if [[ -f $1/usr/bin/calamares ]];then
-		msg2 "Configuring Calamares ..."
-		mkdir -p $1/etc/calamares/modules
-		write_calamares_bootloader_conf $1
-		write_calamares_unpack_conf $1
-		write_calamares_displaymanager_conf $1
-		write_calamares_initcpio_conf $1
-		brand_calamares_settings_conf $1
-		if [[ ${initsys} == 'openrc' ]];then
-			write_calamares_machineid_conf $1
-			write_calamares_finished_conf $1
-		fi
-		write_calamares_services_conf $1
-		write_calamares_users_conf $1
+	msg2 "Configuring Calamares ..."
+	mkdir -p $1/etc/calamares/modules
+	write_calamares_bootloader_conf $1
+	write_calamares_unpack_conf $1
+	write_calamares_displaymanager_conf $1
+	write_calamares_initcpio_conf $1
+	brand_calamares_settings_conf $1
+	if [[ ${initsys} == 'openrc' ]];then
+		write_calamares_machineid_conf $1
+		write_calamares_finished_conf $1
+	fi
+	write_calamares_services_conf $1
+	write_calamares_users_conf $1
 
-		if [[ -f $1/usr/bin/kdesu ]];then
-			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
-		fi
+	if [[ -f $1/usr/share/applications/calamares.desktop && -f $1/usr/bin/kdesu ]];then
+		sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
 	fi
 }
 
 configure_thus(){
-	if [[ -f $1/usr/bin/thus ]];then
-		msg2 "Configuring Thus ..."
-		source "$1/etc/mkinitcpio.d/${kernel}.preset"
-		local conf="$1/etc/thus.conf"
-		echo "[distribution]" > "$conf"
-		echo "DISTRIBUTION_NAME = \"${dist_name} Linux\"" >> "$conf"
-		echo "DISTRIBUTION_VERSION = \"${dist_release}\"" >> "$conf"
-		echo "SHORT_NAME = \"${dist_name}\"" >> "$conf"
-		echo "[install]" >> "$conf"
-		echo "LIVE_MEDIA_SOURCE = \"/bootmnt/${iso_name}/${arch}/root-image.sqfs\"" >> "$conf"
-		echo "LIVE_MEDIA_DESKTOP = \"/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs\"" >> "$conf"
-		echo "LIVE_MEDIA_TYPE = \"squashfs\"" >> "$conf"
-		echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
-		echo "KERNEL = \"${kernel}\"" >> "$conf"
-		echo "VMLINUZ = \"$(echo ${ALL_kver} | sed s'|/boot/||')\"" >> "$conf"
-		echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
-		echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
+	msg2 "Configuring Thus ..."
+	source "$1/etc/mkinitcpio.d/${kernel}.preset"
+	local conf="$1/etc/thus.conf"
+	echo "[distribution]" > "$conf"
+	echo "DISTRIBUTION_NAME = \"${dist_name} Linux\"" >> "$conf"
+	echo "DISTRIBUTION_VERSION = \"${dist_release}\"" >> "$conf"
+	echo "SHORT_NAME = \"${dist_name}\"" >> "$conf"
+	echo "[install]" >> "$conf"
+	echo "LIVE_MEDIA_SOURCE = \"/bootmnt/${iso_name}/${arch}/root-image.sqfs\"" >> "$conf"
+	echo "LIVE_MEDIA_DESKTOP = \"/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs\"" >> "$conf"
+	echo "LIVE_MEDIA_TYPE = \"squashfs\"" >> "$conf"
+	echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
+	echo "KERNEL = \"${kernel}\"" >> "$conf"
+	echo "VMLINUZ = \"$(echo ${ALL_kver} | sed s'|/boot/||')\"" >> "$conf"
+	echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
+	echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
 
-		if [[ -f $1/usr/bin/kdesu ]];then
-			sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
-		fi
+	if [[ -f $1/usr/share/applications/thus.desktop && -f $1/usr/bin/kdesu ]];then
+		sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
 	fi
 }

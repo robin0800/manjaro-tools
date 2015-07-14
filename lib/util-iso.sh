@@ -318,6 +318,7 @@ make_image_mhwd() {
 		fi
 
 		copy_cache_mhwd
+
 		if [[ -n "${packages_cleanup}" ]]; then
 			for mhwd_clean in ${packages_cleanup}; do
 				rm ${path}/opt/livecd/pkgs/${mhwd_clean}
