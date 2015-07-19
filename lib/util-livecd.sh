@@ -411,6 +411,6 @@ configure_displaymanager_autologin(){
 	elif [[ -f /usr/bin/lxdm ]];then
 		sed -i -e "s/^.*autologin=.*/autologin=${username}/" /etc/lxdm/lxdm.conf
 	elif [[ -f /usr/bin/gdm ]];then
-		sed -i -e "s/^.*AutomaticLogin=.*/AutomaticLogin=${username}/" /etc/gdm/custom.conf
+		sed -i -e "s/\[daemon\]/\[daemon\]\nAutomaticLogin=${username}\nAutomaticLoginEnable=True/" /etc/gdm/custom.conf
 	fi
 }
