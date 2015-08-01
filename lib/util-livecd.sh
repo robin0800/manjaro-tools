@@ -348,6 +348,11 @@ rm_kalu(){
 ### end shared functions with cli installer
 
 configure_machine_id(){
+	if [ -e "/etc/machine-id" ] ; then
+		# delete existing machine-id
+		echo "Deleting existing machine-id ..." >> /var/log/livecd.log
+		rm /etc/machine-id
+	fi
 	# set unique machine-id
 	echo "Setting machine-id ..." >> /var/log/livecd.log
 	dbus-uuidgen --ensure=/etc/machine-id
