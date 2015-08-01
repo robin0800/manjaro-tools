@@ -377,7 +377,7 @@ init_buildiso(){
 
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
 
-	[[ -z ${use_overlayfs} ]] && use_overlayfs='false'
+	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
 	used_kernel=$(uname -r | cut -d . -f1)
 	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
 }
@@ -427,7 +427,7 @@ load_profile_config(){
 
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
 
-	[[ -z ${kernel} ]] && kernel="linux318"
+	[[ -z ${kernel} ]] && kernel="linux41"
 	used_kernel=$(echo ${kernel} | cut -c 6)
 	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
 
