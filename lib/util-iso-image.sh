@@ -196,6 +196,10 @@ detect_desktop_env(){
 			default_desktop_executable="openbox-session"
 			default_desktop_file="openbox"
 			msg2 "Detected Openbox desktop environment"
+		elif [ -e "$1/usr/bin/fluxbox" ] && [ -e "$1/usr/share/xsessions/fluxbox.desktop" ]; then
+			default_desktop_executable="startfluxbox"
+			default_desktop_file="fluxbox"
+			msg2 "Detected Fluxbox desktop environment"
 		else
 			default_desktop_executable="none"
 			default_desktop_file="none"
