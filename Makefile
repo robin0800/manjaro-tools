@@ -95,7 +95,8 @@ SCRIPTS = \
 
 EFISHELL = \
 	efi_shell/shellx64_v1.efi \
-	efi_shell/shellx64_v2.efi
+	efi_shell/shellx64_v2.efi \
+	efi_shell/systemd-bootx64.efi
 
 MAN_XML = \
 	buildset.xml \
