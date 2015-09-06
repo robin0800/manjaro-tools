@@ -9,26 +9,14 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-download_efi_shellv2(){
-	curl -o $1/iso/EFI/shellx64_v2.efi https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/X64/Shell.efi
-}
-
-download_efi_shellv1(){
-	curl -o $1/iso/EFI/shellx64_v1.efi https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/X64/Shell_Full.efi
-}
-
 copy_efi_shells(){
 	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v1.efi ]];then
 		msg2 "Copying shellx64_v1.efi ..."
 		cp ${PKGDATADIR}/efi_shell/shellx64_v1.efi $1/
-	else
-		download_efi_shellv1 "$1"
 	fi
 	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v2.efi ]];then
 		msg2 "Copying shellx64_v2.efi ..."
 		cp ${PKGDATADIR}/efi_shell/shellx64_v2.efi $1/
-	else
-		download_efi_shellv2 "$1"
 	fi
 }
 
