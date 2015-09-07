@@ -1,4 +1,4 @@
-Version=0.9.11
+Version=0.9.12
 
 PREFIX = /usr/local
 SYSCONFDIR = /etc
@@ -93,10 +93,6 @@ SCRIPTS = \
 	scripts/livecd \
 	scripts/kbd-model-map
 
-EFISHELL = \
-	efi_shell/shellx64_v1.efi \
-	efi_shell/shellx64_v2.efi
-
 MAN_XML = \
 	buildset.xml \
 	buildpkg.xml \
@@ -190,9 +186,6 @@ install_iso:
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
 	install -m0644 ${SCRIPTS} $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
 
-	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell
-	install -m0644 ${EFISHELL} $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell
-
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/man/man1
 	gzip -c man/buildiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
 
@@ -230,7 +223,6 @@ uninstall_iso:
 	for f in ${CPIOHOOKS}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/hooks/$$f; done
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
 	for f in ${SCRIPTS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts/$$f; done
-	for f in ${EFISHELL}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/efi_shell/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/profile.conf.5.gz

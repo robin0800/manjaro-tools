@@ -9,26 +9,14 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-download_efi_shellv2(){
-	curl -k -o $1/shellx64_v2.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi
-}
-
-download_efi_shellv1(){
-	curl -k -o $1/shellx64_v1.efi https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi
-}
-
 copy_efi_shells(){
 	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v1.efi ]];then
 		msg2 "Copying shellx64_v1.efi ..."
 		cp ${PKGDATADIR}/efi_shell/shellx64_v1.efi $1/
-	else
-		download_efi_shellv1 "$1"
 	fi
 	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v2.efi ]];then
 		msg2 "Copying shellx64_v2.efi ..."
 		cp ${PKGDATADIR}/efi_shell/shellx64_v2.efi $1/
-	else
-		download_efi_shellv2 "$1"
 	fi
 }
 
@@ -65,7 +53,7 @@ copy_efi_loaders(){
 	msg2 "Copying efi loaders ..."
 	cp $1/usr/lib/prebootloader/PreLoader.efi $2/bootx64.efi
 	cp $1/usr/lib/prebootloader/HashTool.efi $2/
-	cp $1/usr/lib/gummiboot/gummibootx64.efi $2/loader.efi
+	cp ${PKGDATADIR}/efi_shell/systemd-bootx64.efi $2/loader.efi
 }
 
 copy_boot_images(){
