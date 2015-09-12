@@ -68,7 +68,6 @@ write_calamares_services_conf(){
 			echo '   - name: '"$s" >> "$conf"
 			echo '     mandatory: false' >> "$conf"
 			echo '' >> "$conf"
-		echo '' >> "$conf"
 		done
 		echo 'targets:' >> "$conf"
 		echo '    - name: "graphical"' >> "$conf"
@@ -78,7 +77,6 @@ write_calamares_services_conf(){
 			echo '    - name: '"$s" >> "$conf"
 			echo '      mandatory: false' >> "$conf"
 			echo '' >> "$conf"
-		echo '' >> "$conf"
 		done
 	fi
 }
