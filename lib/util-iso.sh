@@ -288,6 +288,10 @@ make_image_livecd() {
 		configure_livecd_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
+		# Prevent some services to be started in the livecd
+		echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
+		     | tee "${path}/etc/.updated" >"${path}/var/.updated"
+
 		umount_image "${path}"
 
 		# Clean up GnuPG keys
