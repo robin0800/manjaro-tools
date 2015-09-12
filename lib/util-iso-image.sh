@@ -103,6 +103,8 @@ configure_services(){
 				msg2 "Setting $svc ..."
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
+			sed -i -e "s/^.*HandleSuspendKey.*/HandleSuspendKey=ignore/" $1/etc/systemd/logind.conf
+			sed -i -e "s/^.*HandleLidSwitch.*/HandleLidSwitch=ignore/" $1/etc/systemd/logind.conf
 			msg3 "Done configuring [${initsys}]"
 		;;
 		*)
