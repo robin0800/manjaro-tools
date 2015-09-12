@@ -61,6 +61,8 @@ write_calamares_services_conf(){
 			echo '    - name: '"$s" >> "$conf"
 			echo '      mandatory: false' >> "$conf"
 			echo '' >> "$conf"
+		echo '' >> "$conf"
+		done
 		echo 'disable:' >> "$conf"
 		for s in ${disable_openrc[@]};do
 			echo '   - name: '"$s" >> "$conf"
@@ -77,6 +79,7 @@ write_calamares_services_conf(){
 			echo '      mandatory: false' >> "$conf"
 			echo '' >> "$conf"
 		echo '' >> "$conf"
+		done
 	fi
 }
 
