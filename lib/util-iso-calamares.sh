@@ -61,10 +61,22 @@ write_calamares_services_conf(){
 			echo '    - name: '"$s" >> "$conf"
 			echo '      mandatory: false' >> "$conf"
 			echo '' >> "$conf"
+		echo 'disable:' >> "$conf"
+		for s in ${disable_openrc[@]};do
+			echo '   - name: '"$s" >> "$conf"
+			echo '     mandatory: false' >> "$conf"
+			echo '' >> "$conf"
+		echo '' >> "$conf"
 		done
 		echo 'targets:' >> "$conf"
 		echo '    - name: "graphical"' >> "$conf"
 		echo '      mandatory: true' >> "$conf"
+		echo 'disable:' >> "$conf"
+		for s in ${disable_systemd[@]};do
+			echo '    - name: '"$s" >> "$conf"
+			echo '      mandatory: false' >> "$conf"
+			echo '' >> "$conf"
+		echo '' >> "$conf"
 	fi
 }
 
