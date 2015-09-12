@@ -451,8 +451,16 @@ load_profile_config(){
 		start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 	fi
 
+	if [[ -z ${disable_systemd[@]} ]];then
+		disable_systemd=('pacman-init')
+	fi
+
 	if [[ -z ${start_openrc[@]} ]];then
 		start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+	fi
+
+	if [[ -z ${disable_openrc[@]} ]];then
+		disable_openrc=('pacman-init')
 	fi
 
 	if [[ -z ${start_systemd_live[@]} ]];then
