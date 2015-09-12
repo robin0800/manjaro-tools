@@ -51,9 +51,11 @@ show_profile(){
 			if [[ ${initsys} == 'systemd' ]];then
 				msg2 "start_systemd: ${start_systemd[*]}"
 				msg2 "start_systemd_live: ${start_systemd_live[*]}"
+				msg2 "disable_systemd: ${disable_systemd[*]}"
 			else
 				msg2 "start_openrc: ${start_openrc[*]}"
 				msg2 "start_openrc_live: ${start_openrc_live[*]}"
+				msg2 "disable_openrc: ${disable_openrc[*]}"
 			fi
 		fi
 	cd ..
