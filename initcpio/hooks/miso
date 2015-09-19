@@ -257,7 +257,7 @@ miso_mount_handler() {
     done < "${isomounts}"
 
     if [ "${copytoram}" = "y" ]; then
-        /bin/umount /bootmnt
+        /bin/umount -d /bootmnt
     else
         _mnt_bind /bootmnt "${newroot}/bootmnt"
     fi
