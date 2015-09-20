@@ -38,7 +38,7 @@ copy_initcpio(){
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
 	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
 	set_mkinicpio_hooks "$1/etc/mkinitcpio-${iso_name}.conf"
-	sed -e 's|"$@"|"$@" > /dev/null|' -i $1/usr/lib/initcpio/init
+	sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
 }
 
 # $1: work_dir
