@@ -1,36 +1,61 @@
 #!/bin/sh
 
+livetimer=$(date +%s)
 [[ -r /opt/livecd/util.sh ]] && source /opt/livecd/util.sh
 
 load_profile_config "/opt/livecd/profile.conf"
 
 [[ -r /opt/livecd/util-livecd.sh ]] && source /opt/livecd/util-livecd.sh
+echo "Loaded scripts - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
+livetimer=$(get_timer)
 CONSOLEFONT="$(kernel_cmdline vconsole.font)"
 CONSOLEMAP="$(kernel_cmdline vconsole.font.map)"
 arch=$(uname -m)
+echo "Got consolefont and arch - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
 # Activate swap
+livetimer=$(get_timer)
 configure_swap
+echo "Activated swap and added to fstab - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
+livetimer=$(get_timer)
 configure_language
+echo "Languaged configured - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+
+livetimer=$(get_timer)
 locale-gen
+echo "Ran locale-gen - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
 # Add BROWSER var in env and workaround for mate-terminal
+livetimer=$(get_timer)
 configure_env
+echo "Configured env - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
+livetimer=$(get_timer)
 configure_machine_id
+echo "Configured machine-id - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
+livetimer=$(get_timer)
 configure_sudo
+echo "Configured sudoers - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
+livetimer=$(get_timer)
 depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
+echo "Configured extramodules - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
+livetimer=$(get_timer)
 ${autologin} && configure_displaymanager_autologin
+echo "Configured displaymanager autologin - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
-configure_user_root /
+livetimer=$(get_timer)
+echo "root:${password}" | chpasswd
 cp -a /etc/skel/. /root/
+echo "Configured root user - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
+livetimer=$(get_timer)
 configure_alsa /
 # Save settings
 alsactl -f /etc/asound.state store &>/dev/null
+echo "Configured alsa - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 

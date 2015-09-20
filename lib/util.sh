@@ -62,6 +62,11 @@ elapsed_time(){
 	echo $(echo $1 $(get_timer) | awk '{ printf "%0.2f",($2-$1)/60 }')
 }
 
+# $1: start timer
+elapsed_time_seconds(){
+	echo $(echo $1 $(get_timer) | awk '{ printf "%0.2f",($2-$1) }')
+}
+
 ##
 #  usage : in_array( $needle, $haystack )
 # return : 0 - found

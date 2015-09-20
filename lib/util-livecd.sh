@@ -272,7 +272,6 @@ configure_translation_pkgs(){
 }
 
 configure_alsa(){
-	echo "configure alsa" >> /var/log/livecd.log
 	# amixer binary
 	local alsa_amixer="chroot $1 /usr/bin/amixer"
 
@@ -365,16 +364,15 @@ configure_env(){
 	echo "BROWSER=/usr/bin/xdg-open" >> /etc/profile
 
 	# add TERM var
-
 	if [ -e "/usr/bin/mate-session" ] ; then
-	echo "TERM=mate-terminal" >> /etc/environment
-	echo "TERM=mate-terminal" >> /etc/profile
+		echo "TERM=mate-terminal" >> /etc/environment
+		echo "TERM=mate-terminal" >> /etc/profile
 	fi
 
 	## FIXME - Workaround to launch mate-terminal
 	if [ -e "/usr/bin/mate-session" ] ; then
-	sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
-	sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
+		sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
+		sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
 	fi
 }
 
