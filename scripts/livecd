@@ -41,10 +41,6 @@ configure_sudo
 echo "Configured sudoers - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
 livetimer=$(get_timer)
-depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
-echo "Configured extramodules - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
-
-livetimer=$(get_timer)
 ${autologin} && configure_displaymanager_autologin
 echo "Configured displaymanager autologin - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
