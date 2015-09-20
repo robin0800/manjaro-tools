@@ -64,7 +64,6 @@ configure_services_live(){
 		;;
 		*)
 			msg3 "Unsupported: [${initsys}]!"
-			break
 		;;
 	esac
 }
@@ -109,7 +108,6 @@ configure_services(){
 		;;
 		*)
 			msg3 "Unsupported: [${initsys}]!"
-			break
 		;;
 	esac
 }
@@ -270,7 +268,9 @@ configure_displaymanager(){
 				sed -i -e "s|^.*session=.*|session=/usr/bin/$default_desktop_executable|" ${conf}
 			fi
 		;;
-		*) break ;;
+		*)
+			msg3 "Unsupported: [${displaymanager}]!"
+		;;
 	esac
 	if [[ ${displaymanager} != "none" ]];then
 		if [[ ${initsys} == 'openrc' ]];then
