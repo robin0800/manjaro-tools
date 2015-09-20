@@ -139,7 +139,11 @@ squash_image_dir() {
 	local highcomp="-b 256K -Xbcj x86"
 	[[ "${iso_compression}" != "xz" ]] && highcomp=""
 	msg2 "Creating SquashFS image. This may take some time..."
-	mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp} || die "Exit ..."
+	if [[ "$(basename "$1")" == "mhwd-image" ]]; then
+		mksquashfs "${1}" "${sq_img}" -noappend -comp lz4 || die "Exit ..."
+	else
+		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp} || die "Exit ..."
+	fi
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
