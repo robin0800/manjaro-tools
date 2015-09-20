@@ -49,7 +49,7 @@ ${autologin} && configure_displaymanager_autologin
 echo "Configured displaymanager autologin - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
 livetimer=$(get_timer)
-echo "root:${password}" | chpasswd
+configure_user_root /
 cp -a /etc/skel/. /root/
 echo "Configured root user - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
 
