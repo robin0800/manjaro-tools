@@ -1,57 +1,57 @@
 #!/bin/sh
 
-livetimer=$(date +%s)
+livetimer=$(date +%s%3N)
 [[ -r /opt/livecd/util.sh ]] && source /opt/livecd/util.sh
 
 load_profile_config "/opt/livecd/profile.conf"
 
 [[ -r /opt/livecd/util-livecd.sh ]] && source /opt/livecd/util-livecd.sh
-echo "Loaded scripts - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Loaded scripts - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 CONSOLEFONT="$(kernel_cmdline vconsole.font)"
 CONSOLEMAP="$(kernel_cmdline vconsole.font.map)"
 arch=$(uname -m)
-echo "Got consolefont and arch - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Got consolefont and arch - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
 # Activate swap
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 configure_swap
-echo "Activated swap and added to fstab - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Activated swap and added to fstab - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 configure_language
-echo "Languaged configured - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Languaged configured - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 locale-gen
-echo "Ran locale-gen - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Ran locale-gen - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
 # Add BROWSER var in env and workaround for mate-terminal
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 configure_env
-echo "Configured env - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Configured env - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 configure_machine_id
-echo "Configured machine-id - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Configured machine-id - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 configure_sudo
-echo "Configured sudoers - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Configured sudoers - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
 livetimer=$(get_timer)
 ${autologin} && configure_displaymanager_autologin
-echo "Configured displaymanager autologin - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Configured displaymanager autologin - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 configure_user_root /
 cp -a /etc/skel/. /root/
-echo "Configured root user - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Configured root user - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 configure_alsa /
 # Save settings
 alsactl -f /etc/asound.state store &>/dev/null
-echo "Configured alsa - Time: $(elapsed_time_seconds ${livetimer}) seconds" >> /var/log/livecd.log
+echo "Configured alsa - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
