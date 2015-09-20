@@ -48,9 +48,6 @@ echo "configure root password" >> /var/log/livecd.log
 configure_user_root /
 cp -a /etc/skel/. /root/
 
-# check if we are running inside a virtual machine and unistall kalu
-[[ -e "/usr/bin/kalu" ]] && rm_kalu /
-
 configure_alsa /
 
 # save settings

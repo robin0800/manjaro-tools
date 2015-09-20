@@ -328,23 +328,6 @@ configure_alsa(){
 	$alsa_amixer -c 0 sset "Audigy Analog/Digital Output Jack" off &>/dev/null
 }
 
-rm_kalu(){
-	local base_check_virtualbox=`dmidecode | grep innotek`
-	local base_check_vmware=`dmidecode | grep VMware`
-	local base_check_qemu=`dmidecode | grep QEMU`
-	local base_check_vpc=`dmidecode | grep Microsoft`
-
-	if [ -n "$base_check_virtualbox" ]; then
-		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
-	elif [ -n "$base_check_vmware" ]; then
-		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
-	elif [ -n "$base_check_qemu" ]; then
-		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
-	elif [ -n "$base_check_vpc" ]; then
-		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
-	fi
-}
-
 ### end shared functions with cli installer
 
 configure_machine_id(){
