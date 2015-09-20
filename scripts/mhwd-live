@@ -6,42 +6,40 @@
 USENONFREE="$(kernel_cmdline nonfree no)"
 VIDEO="$(kernel_cmdline xdriver no)"
 
+# In a live session we should never have a database lock at boot, this is a bug!
+# In the past pamac caused issues about that.
+# Fixed here: https://github.com/manjaro/manjaro-tools/commit/57a039088ae4485bc5dc411e36a90c0753e670f1
 seconds="0"
 while [ -e "/var/lib/pacman/db.lck" ];
 do
-	echo 'Pacman is not ready yet. Will try again in 10 seconds.' >> /var/log/livecd.log
-	echo 'Pacman is not ready yet. Will try again in 10 seconds.' >> /var/log/livecd-debug.log
-	echo '----' >> /var/log/livecd-debug.log
-	ps -ef >> /var/log/livecd-debug.log
-	echo '----' >> /var/log/livecd-debug.log
+	echo 'Pacman is not ready yet. Will try again in 10 seconds.' >> /var/log/mhwd-live.log
+	echo '----' >> /var/log/mhwd-live.log
+	ps -ef >> /var/log/mhwd-live.log
+	echo '----' >> /var/log/mhwd-live.log
 	seconds=$(($seconds + 10))
 	sleep 10
-	if [[ "$seconds" == "60" ]]; then
-		# remove database lock after 60s
-		# this might be related to https://github.com/manjaro/pamac/issues/25
-		# https://github.com/manjaro/manjaro-tools/issues/101
-		echo 'Warning: removing pacman db.lck!' >> /var/log/livecd.log
-		echo 'Warning: removing pacman db.lck!' >> /var/log/livecd-debug.log
+	if [[ "$seconds" == "30" ]]; then
+		echo 'Warning: removing pacman db.lck!' >> /var/log/mhwd-live.log
 		rm /var/lib/pacman/db.lck
 	fi
 done
 
 # hwdetect_graphics
 if [[ -e "/opt/livecd/pacman-gfx.conf" ]]; then
-   echo "run mhwd" >> /var/log/livecd.log
+   echo "Running MHWD..." >> /var/log/mhwd-live.log
    if  [[ "${USENONFREE}" == "yes" ]] || [[ "${USENONFREE}" == "true" ]]; then
    	if  [[ "${VIDEO}" == "vesa" ]]; then
-		mhwd --install pci video-vesa --pmconfig "/opt/livecd/pacman-gfx.conf" >> /var/log/livecd.log
+		mhwd --install pci video-vesa --pmconfig "/opt/livecd/pacman-gfx.conf" >> /var/log/mhwd-live.log
 	else
-		mhwd --auto pci nonfree 0300 --pmconfig "/opt/livecd/pacman-gfx.conf" >> /var/log/livecd.log
+		mhwd --auto pci nonfree 0300 --pmconfig "/opt/livecd/pacman-gfx.conf" >> /var/log/mhwd-live.log
 	fi
    else
    	if  [[ "${VIDEO}" == "vesa" ]]; then
-		mhwd --install pci video-vesa --pmconfig "/opt/livecd/pacman-gfx.conf" >> /var/log/livecd.log
+		mhwd --install pci video-vesa --pmconfig "/opt/livecd/pacman-gfx.conf" >> /var/log/mhwd-live.log
 	else
-		mhwd --auto pci free 0300 --pmconfig "/opt/livecd/pacman-gfx.conf" >> /var/log/livecd.log
+		mhwd --auto pci free 0300 --pmconfig "/opt/livecd/pacman-gfx.conf" >> /var/log/mhwd-live.log
 	fi
    fi
 fi
 
-echo "MHWD DONE" >> /var/log/livecd.log
+echo "MHWD DONE" >> /var/log/mhwd-live.log
