@@ -54,7 +54,7 @@ copy_efi_loaders(){
 	msg2 "Copying efi loaders ..."
 	cp $1/usr/lib/prebootloader/PreLoader.efi $2/bootx64.efi
 	cp $1/usr/lib/prebootloader/HashTool.efi $2/
-	cp ${PKGDATADIR}/efi_shell/systemd-bootx64.efi $2/loader.efi
+	cp $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi $2/loader.efi
 }
 
 copy_boot_images(){
