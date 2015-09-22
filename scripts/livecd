@@ -40,7 +40,7 @@ livetimer=$(get_timer_ms)
 configure_sudo
 echo "Configured sudoers - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-livetimer=$(get_timer)
+livetimer=$(get_timer_ms)
 ${autologin} && configure_displaymanager_autologin
 echo "Configured displaymanager autologin - Time: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
