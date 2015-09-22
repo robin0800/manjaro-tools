@@ -106,11 +106,9 @@ configure_language(){
 	[[ -z "$KEYMAP" ]] && KEYMAP="us"
 	[[ -z "$KBLAYOUT" ]] && KBLAYOUT="us"
 
-# 	local FALLBACK="en_US"
 	local TLANG=${LOCALE%.*}
 
 	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
-# 	sed -i -r "s/#(${FALLBACK}.*UTF-8)/\1/g" $1/etc/locale.gen
 
 	echo "LANG=${LOCALE}.UTF-8" >> $1/etc/environment
 
@@ -121,8 +119,6 @@ configure_language(){
 	echo "LANG=${LOCALE}.UTF-8" > $1/etc/locale.conf
 
 	write_x11_config $1
-
-# 	echo "LANGUAGE=${LOCALE}:${FALLBACK}" >> $1/etc/locale.conf
 
 	loadkeys "${KEYMAP}"
 }
