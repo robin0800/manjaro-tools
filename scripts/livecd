@@ -24,13 +24,7 @@ configure_language
 echo "Languaged configured: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
 livetimer=$(get_timer_ms)
-CURRENT_LOCALE=$(cat $1/etc/locale.conf | grep LANG= | cut -d= -f2 | cut -d. -f1)
-# en_US and de_DE are the only locales that are generated in buildiso
-if [[ "${CURRENT_LOCALE}" != "en_US" && "${CURRENT_LOCALE}" != "de_DE" ]];then
-	locale-gen
-else
-	echo "Skipped locale-gen for en_US or de_DE" >> /var/log/livecd.log
-fi
+locale-gen
 echo "Ran locale-gen: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
 configure_clock
