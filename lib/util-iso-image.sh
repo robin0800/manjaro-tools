@@ -349,6 +349,12 @@ configure_sysctl(){
 	fi
 }
 
+configure_time(){
+    if [[ ${initsys} == 'openrc' ]];then
+        rm $1/etc/runlevels/boot/hwclock
+    fi
+}
+
 # $1: chroot
 configure_systemd_live(){
 	if [[ ${initsys} == 'systemd' ]];then
@@ -374,6 +380,7 @@ configure_root_image(){
 	configure_lsb "$1"
 	configure_mhwd "$1"
 	configure_sysctl "$1"
+	configure_time "$1"
 	msg "Done configuring [root-image]"
 }
 

@@ -123,6 +123,13 @@ configure_language(){
 	loadkeys "${KEYMAP}"
 }
 
+configure_clock(){
+    if [[ -d /run/openrc ]];then
+        ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
+        echo "Europe/London" > /etc/timezone
+    fi
+}
+
 configure_translation_pkgs(){
 	# Determind which language we are using
 	local LNG_INST=$(cat $1/etc/locale.conf | grep LANG= | cut -d= -f2 | cut -d. -f1)
