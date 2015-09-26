@@ -126,6 +126,7 @@ write_calamares_users_conf(){
 	unset IFS
 	echo "autologinGroup: autologin" >> "$conf"
 	echo "sudoersGroup:   wheel" >> "$conf"
+	echo "setRootPassword: true" >> "$conf"
 }
 
 brand_calamares_settings_conf(){
