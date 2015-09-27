@@ -57,9 +57,18 @@ get_timer(){
 	echo $(date +%s)
 }
 
+get_timer_ms(){
+	echo $(date +%s%3N)
+}
+
 # $1: start timer
 elapsed_time(){
 	echo $(echo $1 $(get_timer) | awk '{ printf "%0.2f",($2-$1)/60 }')
+}
+
+# $1: start timer
+elapsed_time_ms(){
+	echo $(echo $1 $(get_timer_ms) | awk '{ printf "%0.3f",($2-$1)/1000 }')
 }
 
 ##
@@ -451,8 +460,16 @@ load_profile_config(){
 		start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 	fi
 
+	if [[ -z ${disable_systemd[@]} ]];then
+		disable_systemd=('pacman-init')
+	fi
+
 	if [[ -z ${start_openrc[@]} ]];then
 		start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+	fi
+
+	if [[ -z ${disable_openrc[@]} ]];then
+		disable_openrc=('pacman-init')
 	fi
 
 	if [[ -z ${start_systemd_live[@]} ]];then

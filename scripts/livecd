@@ -1,58 +1,59 @@
 #!/bin/sh
 
+livetimer=$(date +%s%3N)
 [[ -r /opt/livecd/util.sh ]] && source /opt/livecd/util.sh
 
 load_profile_config "/opt/livecd/profile.conf"
 
 [[ -r /opt/livecd/util-livecd.sh ]] && source /opt/livecd/util-livecd.sh
+echo "Loaded scripts: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
+livetimer=$(get_timer_ms)
 CONSOLEFONT="$(kernel_cmdline vconsole.font)"
 CONSOLEMAP="$(kernel_cmdline vconsole.font.map)"
 arch=$(uname -m)
+echo "Got consolefont and arch: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-echo "update fstab for swap" > /var/log/livecd.log
-
-# scan_swap
-## Systemd should do it
-# should or should not?
-# [[ -d /run/openrc ]] && configure_swap
+# Activate swap
+livetimer=$(get_timer_ms)
 configure_swap
+echo "Activated swap and added to fstab: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-echo "set locale" >> /var/log/livecd.log
-
-# set language
+livetimer=$(get_timer_ms)
 configure_language
+echo "Languaged configured: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
+
+livetimer=$(get_timer_ms)
 locale-gen
+echo "Ran locale-gen: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-echo "configure system" >> /var/log/livecd.log
+configure_clock
 
-# add BROWSER var
+# Add BROWSER var in env and workaround for mate-terminal
+livetimer=$(get_timer_ms)
 configure_env
+echo "Configured env: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
+livetimer=$(get_timer_ms)
 configure_machine_id
+echo "Configured machine-id: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-echo "configure sudoers" >> /var/log/livecd.log
-
-# do_fix_perms
+livetimer=$(get_timer_ms)
 configure_sudo
+echo "Configured sudoers: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-echo "depmod extramodules" >> /var/log/livecd.log
-
-# depmod extramodules
-depmod $(cat /usr/lib/modules/$(uname -r)/extramodules/version)
-
+livetimer=$(get_timer_ms)
 ${autologin} && configure_displaymanager_autologin
+echo "Configured displaymanager autologin: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-echo "configure root password" >> /var/log/livecd.log
-
+livetimer=$(get_timer_ms)
 configure_user_root /
 cp -a /etc/skel/. /root/
+echo "Configured root user: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
-# check if we are running inside a virtual machine and unistall kalu
-[[ -e "/usr/bin/kalu" ]] && rm_kalu /
-
+livetimer=$(get_timer_ms)
 configure_alsa /
-
-# save settings
+# Save settings
 alsactl -f /etc/asound.state store &>/dev/null
+echo "Configured alsa: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 

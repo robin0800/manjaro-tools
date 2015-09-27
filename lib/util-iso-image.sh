@@ -64,7 +64,6 @@ configure_services_live(){
 		;;
 		*)
 			msg3 "Unsupported: [${initsys}]!"
-			break
 		;;
 	esac
 }
@@ -103,11 +102,12 @@ configure_services(){
 				msg2 "Setting $svc ..."
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
+			sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
+			sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
 			msg3 "Done configuring [${initsys}]"
 		;;
 		*)
 			msg3 "Unsupported: [${initsys}]!"
-			break
 		;;
 	esac
 }
@@ -268,7 +268,9 @@ configure_displaymanager(){
 				sed -i -e "s|^.*session=.*|session=/usr/bin/$default_desktop_executable|" ${conf}
 			fi
 		;;
-		*) break ;;
+		*)
+			msg3 "Unsupported: [${displaymanager}]!"
+		;;
 	esac
 	if [[ ${displaymanager} != "none" ]];then
 		if [[ ${initsys} == 'openrc' ]];then
@@ -347,7 +349,27 @@ configure_sysctl(){
 	fi
 }
 
-# Remove pamac auto-update when the network is up, it causes problems when booting in the livecd
+configure_time(){
+    if [[ ${initsys} == 'openrc' ]];then
+        rm $1/etc/runlevels/boot/hwclock
+    fi
+}
+
+# $1: chroot
+configure_systemd_live(){
+	if [[ ${initsys} == 'systemd' ]];then
+		msg2 "Configuring systemd for livecd"
+		sed -i 's/#\(Storage=\)auto/\1volatile/' $1/etc/systemd/journald.conf
+		sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
+		sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' $1/etc/systemd/logind.conf
+		sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
+		# Prevent some services to be started in the livecd
+		echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
+		     | tee "${path}/etc/.updated" >"${path}/var/.updated"
+	fi
+}
+
+# Remove pamac auto-update when the network is up, it locks de pacman db when booting in the livecd
 # $1: chroot
 configure_pamac_live() {
 	rm -f $1/etc/NetworkManager/dispatcher.d/99_update_pamac_tray
@@ -358,6 +380,7 @@ configure_root_image(){
 	configure_lsb "$1"
 	configure_mhwd "$1"
 	configure_sysctl "$1"
+	configure_time "$1"
 	msg "Done configuring [root-image]"
 }
 
@@ -377,6 +400,7 @@ configure_livecd_image(){
 	configure_accountsservice "$1" "${username}"
 	configure_user "$1"
 	configure_services_live "$1"
+	configure_systemd_live "$1"
 	configure_calamares "$1"
 	configure_thus "$1"
 	configure_pamac_live "$1"

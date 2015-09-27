@@ -55,6 +55,13 @@ write_calamares_services_conf(){
 		echo 'targets:' >> "$conf"
 		echo '    - name: "graphical"' >> "$conf"
 		echo '      mandatory: false' >> "$conf"
+		echo '' >> "$conf"
+		echo 'disable:' >> "$conf"
+		for s in ${disable_openrc[@]};do
+			echo '   - name: '"$s" >> "$conf"
+			echo '     mandatory: false' >> "$conf"
+			echo '' >> "$conf"
+		done
 	else
 		echo 'services:' > "$conf"
 		for s in ${start_systemd[@]};do
@@ -65,6 +72,13 @@ write_calamares_services_conf(){
 		echo 'targets:' >> "$conf"
 		echo '    - name: "graphical"' >> "$conf"
 		echo '      mandatory: true' >> "$conf"
+		echo '' >> "$conf"
+		echo 'disable:' >> "$conf"
+		for s in ${disable_systemd[@]};do
+			echo '    - name: '"$s" >> "$conf"
+			echo '      mandatory: false' >> "$conf"
+			echo '' >> "$conf"
+		done
 	fi
 }
 
@@ -112,6 +126,7 @@ write_calamares_users_conf(){
 	unset IFS
 	echo "autologinGroup: autologin" >> "$conf"
 	echo "sudoersGroup:   wheel" >> "$conf"
+	echo "setRootPassword: true" >> "$conf"
 }
 
 brand_calamares_settings_conf(){

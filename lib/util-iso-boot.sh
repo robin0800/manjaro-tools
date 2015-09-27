@@ -38,6 +38,7 @@ copy_initcpio(){
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
 	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
 	set_mkinicpio_hooks "$1/etc/mkinitcpio-${iso_name}.conf"
+	sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
 }
 
 # $1: work_dir
@@ -53,7 +54,7 @@ copy_efi_loaders(){
 	msg2 "Copying efi loaders ..."
 	cp $1/usr/lib/prebootloader/PreLoader.efi $2/bootx64.efi
 	cp $1/usr/lib/prebootloader/HashTool.efi $2/
-	cp ${PKGDATADIR}/efi_shell/systemd-bootx64.efi $2/loader.efi
+	cp $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi $2/loader.efi
 }
 
 copy_boot_images(){

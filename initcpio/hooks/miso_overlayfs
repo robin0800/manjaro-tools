@@ -248,7 +248,7 @@ miso_mount_handler() {
     mount -t overlay overlay -olowerdir="${overlayfs:1}",upperdir="/rw_branch/upper",workdir="/rw_branch/work" "${newroot}/"
 
     if [ "${copytoram}" = "y" ]; then
-        /bin/umount /bootmnt
+        /bin/umount -d /bootmnt
     else
         _mnt_bind /bootmnt "${newroot}/bootmnt"
     fi

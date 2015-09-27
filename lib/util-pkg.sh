@@ -54,7 +54,7 @@ chroot_clean(){
 
 chroot_update(){
 	msg "Updating chroot for [${branch}] (${arch})..."
-	chroot-run ${mkchroot_args[*]} \
+	chroot-run ${chroot_run_args[*]} \
 			"${work_dir}/${OWNER}" \
 			pacman -Syu --noconfirm || abort
 

@@ -106,11 +106,9 @@ configure_language(){
 	[[ -z "$KEYMAP" ]] && KEYMAP="us"
 	[[ -z "$KBLAYOUT" ]] && KBLAYOUT="us"
 
-# 	local FALLBACK="en_US"
 	local TLANG=${LOCALE%.*}
 
 	sed -i -r "s/#(${TLANG}.*UTF-8)/\1/g" $1/etc/locale.gen
-# 	sed -i -r "s/#(${FALLBACK}.*UTF-8)/\1/g" $1/etc/locale.gen
 
 	echo "LANG=${LOCALE}.UTF-8" >> $1/etc/environment
 
@@ -122,9 +120,14 @@ configure_language(){
 
 	write_x11_config $1
 
-# 	echo "LANGUAGE=${LOCALE}:${FALLBACK}" >> $1/etc/locale.conf
-
 	loadkeys "${KEYMAP}"
+}
+
+configure_clock(){
+    if [[ -d /run/openrc ]];then
+        ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
+        echo "Europe/London" > /etc/timezone
+    fi
 }
 
 configure_translation_pkgs(){
@@ -272,7 +275,6 @@ configure_translation_pkgs(){
 }
 
 configure_alsa(){
-	echo "configure alsa" >> /var/log/livecd.log
 	# amixer binary
 	local alsa_amixer="chroot $1 /usr/bin/amixer"
 
@@ -328,23 +330,6 @@ configure_alsa(){
 	$alsa_amixer -c 0 sset "Audigy Analog/Digital Output Jack" off &>/dev/null
 }
 
-rm_kalu(){
-	local base_check_virtualbox=`dmidecode | grep innotek`
-	local base_check_vmware=`dmidecode | grep VMware`
-	local base_check_qemu=`dmidecode | grep QEMU`
-	local base_check_vpc=`dmidecode | grep Microsoft`
-
-	if [ -n "$base_check_virtualbox" ]; then
-		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
-	elif [ -n "$base_check_vmware" ]; then
-		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
-	elif [ -n "$base_check_qemu" ]; then
-		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
-	elif [ -n "$base_check_vpc" ]; then
-		pacman -R kalu --noconfirm --noprogressbar --root $1 &> /dev/null
-	fi
-}
-
 ### end shared functions with cli installer
 
 configure_machine_id(){
@@ -382,16 +367,15 @@ configure_env(){
 	echo "BROWSER=/usr/bin/xdg-open" >> /etc/profile
 
 	# add TERM var
-
 	if [ -e "/usr/bin/mate-session" ] ; then
-	echo "TERM=mate-terminal" >> /etc/environment
-	echo "TERM=mate-terminal" >> /etc/profile
+		echo "TERM=mate-terminal" >> /etc/environment
+		echo "TERM=mate-terminal" >> /etc/profile
 	fi
 
 	## FIXME - Workaround to launch mate-terminal
 	if [ -e "/usr/bin/mate-session" ] ; then
-	sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
-	sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
+		sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
+		sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
 	fi
 }
 

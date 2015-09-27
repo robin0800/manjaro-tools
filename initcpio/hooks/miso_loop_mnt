@@ -35,6 +35,6 @@ miso_loop_mount_handler () {
         msg "::: Deataching loop device ${_dev_loop}"
         losetup -d ${_dev_loop}
         msg "::: Unmounting ${img_dev}"
-        umount ${img_dev}
+        umount -d ${img_dev}
     fi
 }
