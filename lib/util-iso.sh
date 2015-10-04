@@ -140,7 +140,7 @@ squash_image_dir() {
 	[[ "${iso_compression}" != "xz" ]] && highcomp=""
 	msg2 "Creating SquashFS image. This may take some time..."
 	local used_kernel=$(echo ${kernel} | cut -c 6)
-	if [[ "$(basename "$1")" == "mhwd-image" && ${used_kernel} -ge "4"]]; then
+	if [[ "$(basename "$1")" == "mhwd-image" && ${used_kernel} -ge "4" ]]; then
 		mksquashfs "${1}" "${sq_img}" -noappend -comp lz4 || die "Exit ..."
 	else
 		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp} || die "Exit ..."
