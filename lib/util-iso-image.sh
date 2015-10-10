@@ -200,6 +200,10 @@ detect_desktop_env(){
 			default_desktop_executable="startfluxbox"
 			default_desktop_file="fluxbox"
 			msg2 "Detected Fluxbox desktop environment"
+		elif [ -e "$1/usr/bin/dde-desktop" ] && [ -e "$1/usr/share/xsessions/deepin.desktop" ]; then
+			default_desktop_executable="dde-desktop"
+			default_desktop_file="deepin"
+			msg2 "Detected Deepin desktop environment"
 		else
 			default_desktop_executable="none"
 			default_desktop_file="none"
