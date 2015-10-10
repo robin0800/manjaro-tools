@@ -13,11 +13,13 @@ import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
 
-if ${use_overlayfs};then
-	import ${LIBDIR}/util-iso-overlayfs.sh
-else
-	import ${LIBDIR}/util-iso-aufs.sh
-fi
+import_util_iso_fs(){
+	if ${use_overlayfs};then
+		import ${LIBDIR}/util-iso-overlayfs.sh
+	else
+		import ${LIBDIR}/util-iso-aufs.sh
+	fi
+}
 
 # $1: path
 # $2: exit code
@@ -651,6 +653,7 @@ make_profile(){
 	msg "Start building [$1]"
 	cd $1
 		load_profile "$1"
+		import_util_iso_fs
 		${clean_first} && chroot_clean "${work_dir}"
 		if ${iso_only}; then
 			[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p ${buildset_iso} -i"
