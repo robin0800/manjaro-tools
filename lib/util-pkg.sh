@@ -25,6 +25,42 @@ check_requirements(){
 	fi
 }
 
+load_group()[
+	local _multi \
+                _space="s| ||g" \
+		_clean=':a;N;$!ba;s/\n/ /g' \
+		_com_rm="s|#.*||g" \
+		devel_packages='' \
+                file=${PKGDATADIR}/base-devel-udev
+
+        msg3 "Loading Packages: [$file] ..."
+
+	if ${is_multilib}; then
+		_multi="s|>multilib||g"
+	else
+		_multi="s|>multilib.*||g"
+	fi
+
+	devel_packages=$(sed "$_com_rm" "$file" \
+			| sed "$_space" \
+			| sed "$_multi" \
+			| sed "$_clean")
+
+        echo ${devel_packages}
+}
+
+init_base_devel(){
+        if ${udev_root};then
+                base_packages=( "$(load_group)" )
+        else
+                if ${is_multilib};then
+                    base_packages=('base-devel' 'multilib-devel')
+                else
+                    base_packages=('base-devel')
+                fi
+        fi
+}
+
 chroot_create(){
 	msg "Creating chroot for [${branch}] (${arch})..."
 	mkdir -p "${work_dir}"
@@ -54,7 +90,7 @@ chroot_clean(){
 
 chroot_update(){
 	msg "Updating chroot for [${branch}] (${arch})..."
-	chroot-run ${chroot_run_args[*]} \
+	chroot-run ${mkchroot_args[*]} \
 			"${work_dir}/${OWNER}" \
 			pacman -Syu --noconfirm || abort
 
@@ -68,13 +104,6 @@ clean_up(){
 		msg2 "Cleaning [source files]"
 		find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
 	fi
-}
-
-blacklist_pkg(){
-	msg "Removing ${blacklist[@]}..."
-	for item in "${blacklist[@]}"; do
-		chroot-run $1/root pacman -Rdd "$item" --noconfirm
-	done
 }
 
 prepare_cachedir(){
@@ -126,9 +155,6 @@ run_post_build(){
 make_pkg(){
 	msg "Start building [$1]"
 	cd $1
-		for p in ${blacklist_trigger[@]}; do
-			[[ $1 == $p ]] && blacklist_pkg "${work_dir}"
-		done
 		setarch "${arch}" \
 			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
 		run_post_build

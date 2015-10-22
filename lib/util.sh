@@ -337,10 +337,6 @@ init_buildpkg(){
 	prepare_dir "${sets_dir_pkg}"
 
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
-
-	[[ -z ${blacklist_trigger[@]} ]] && blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
-
-	[[ -z ${blacklist[@]} ]] && blacklist=('libsystemd')
 }
 
 init_buildiso(){
