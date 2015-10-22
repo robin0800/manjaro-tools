@@ -1,4 +1,4 @@
-Version=0.9.13.2
+Version=0.9.14
 
 PREFIX = /usr/local
 SYSCONFDIR = /etc
@@ -47,6 +47,7 @@ SHARED = \
 
 SHARED_PKG = \
 	conf/makepkg-i686.conf \
+	conf/base-devel-udev \
 	conf/makepkg-x86_64.conf
 
 SHARED_ISO = \
