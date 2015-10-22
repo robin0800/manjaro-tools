@@ -25,7 +25,7 @@ check_requirements(){
 	fi
 }
 
-load_group()[
+load_group(){
 	local _multi \
                 _space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \
