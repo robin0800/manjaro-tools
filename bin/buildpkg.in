@@ -164,7 +164,6 @@ makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}")
-[[ ! -d ${work_dir} ]] && mkchroot_args+=(-L)
 
 mkchrootpkg_args+=(-r ${work_dir})
 
