@@ -67,8 +67,9 @@ display_settings(){
 	msg2 "wipe_clean: ${wipe_clean}"
 	msg2 "namcap: ${namcap}"
 	msg2 "sign: ${sign}"
-	msg2 "makepkg_args: ${makepkg_args[*]}"
-        msg2 "udev_root: ${udev_root}"
+	msg2 "udev_root: ${udev_root}"
+	msg2 "mkchroot_args: ${mkchroot_args[*]}"
+        msg2 "makepkg_args: ${makepkg_args[*]}"
 
 	msg "PATHS:"
 	msg2 "work_dir: ${work_dir}"
@@ -115,7 +116,7 @@ usage() {
 	echo '    -w                 Clean up cache and sources'
 	echo '    -n                 Install and run namcap check'
 	echo '    -s                 Sign packages'
-	echo '    -u                 udev base-devel group(no systemd)'
+	echo '    -u                 Udev base-devel group(no systemd)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
 	echo ''
@@ -163,6 +164,7 @@ makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}")
+[[ ! -d ${work_dir} ]] && mkchroot_args+=(-L)
 
 mkchrootpkg_args+=(-r ${work_dir})
 

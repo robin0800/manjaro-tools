@@ -27,13 +27,13 @@ check_requirements(){
 
 load_group(){
 	local _multi \
-                _space="s| ||g" \
+		_space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \
 		_com_rm="s|#.*||g" \
 		devel_packages='' \
-                file=${PKGDATADIR}/base-devel-udev
+		file=${PKGDATADIR}/base-devel-udev
 
-        msg3 "Loading Packages: [$file] ..."
+        msg3 "Loading Group [$file] ..."
 
 	if ${is_multilib}; then
 		_multi="s|>multilib||g"
@@ -50,24 +50,24 @@ load_group(){
 }
 
 init_base_devel(){
-        if ${udev_root};then
-                base_packages=( "$(load_group)" )
-        else
-                if ${is_multilib};then
-                    base_packages=('base-devel' 'multilib-devel')
-                else
-                    base_packages=('base-devel')
-                fi
-        fi
+	if ${udev_root};then
+		base_packages=( "$(load_group)" )
+	else
+		if ${is_multilib};then
+			base_packages=('base-devel' 'multilib-devel')
+		else
+			base_packages=('base-devel')
+		fi
+	fi
 }
 
 chroot_create(){
 	msg "Creating chroot for [${branch}] (${arch})..."
 	mkdir -p "${work_dir}"
-	setarch "${arch}" mkchroot \
-			${mkchroot_args[*]} \
-			"${work_dir}/root" \
-			${base_packages[*]} || abort
+	setarch "${arch}" \
+		mkchroot ${mkchroot_args[*]} \
+		"${work_dir}/root" \
+		${base_packages[*]} || abort
 }
 
 chroot_clean(){
