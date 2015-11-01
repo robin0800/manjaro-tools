@@ -116,7 +116,7 @@ usage() {
 	echo '    -w                 Clean up cache and sources'
 	echo '    -n                 Install and run namcap check'
 	echo '    -s                 Sign packages'
-	echo '    -u                 Udev base-devel group(no systemd)'
+	echo '    -u                 Udev base-devel group (no systemd)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
 	echo ''

@@ -133,7 +133,7 @@ Usage: buildpkg [options] [--] [makepkg args]
     -w                 Clean up cache and sources
     -n                 Install and run namcap check
     -s                 Sign packages
-    -u                 udev base-devel group(no systemd)
+    -u                 udev base-devel group (no systemd)
     -q                 Query settings and pretend build
     -h                 This help
 ~~~
