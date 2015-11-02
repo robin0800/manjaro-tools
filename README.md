@@ -44,7 +44,7 @@ Specifying args will override manjaro-tools.conf settings.
 # default arch: auto detect
 # arch=$(uname -m)
 
-# cache dir where buildpkg or buildiso cache packages
+# cache dir where buildpkg, buildtree cache packages/pkgbuild, builiso iso files
 # cache_dir=/var/cache/manjaro-tools
 
 # build dir where buildpkg or buildiso chroots are created
