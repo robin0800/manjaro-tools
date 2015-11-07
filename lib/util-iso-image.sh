@@ -184,9 +184,9 @@ detect_desktop_env(){
 			default_desktop_executable="pantheon-session"
 			default_desktop_file="pantheon"
 			msg2 "Detected Pantheon desktop environment"
-		elif [ -e "$1/usr/bin/budgie-session" ] && [ -e "$1/usr/share/xsessions/budgie-session.desktop" ]; then
+		elif [ -e "$1/usr/bin/budgie-session" ] && [ -e "$1/usr/share/xsessions/budgie-desktop.desktop" ]; then
 			default_desktop_executable="budgie-session"
-			default_desktop_file="budgie-session"
+			default_desktop_file="budgie-desktop"
 			msg2 "Detected Budgie desktop environment"
 		elif [ -e "$1/usr/bin/i3" ] && [ -e "$1/usr/share/xsessions/i3.desktop" ]; then
 			default_desktop_executable="i3"
@@ -200,6 +200,10 @@ detect_desktop_env(){
 			default_desktop_executable="startfluxbox"
 			default_desktop_file="fluxbox"
 			msg2 "Detected Fluxbox desktop environment"
+		elif [ -e "$1/usr/bin/dde-desktop" ] && [ -e "$1/usr/share/xsessions/deepin.desktop" ]; then
+			default_desktop_executable="dde-desktop"
+			default_desktop_file="deepin"
+			msg2 "Detected Deepin desktop environment"
 		else
 			default_desktop_executable="none"
 			default_desktop_file="none"

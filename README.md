@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.9.10
+Manjaro-tools-0.9.14
 
 User manual
 
@@ -44,7 +44,7 @@ Specifying args will override manjaro-tools.conf settings.
 # default arch: auto detect
 # arch=$(uname -m)
 
-# cache dir where buildpkg or buildiso cache packages
+# cache dir where buildpkg, buildtree cache packages/pkgbuild, builiso iso files
 # cache_dir=/var/cache/manjaro-tools
 
 # build dir where buildpkg or buildiso chroots are created
@@ -70,14 +70,6 @@ Specifying args will override manjaro-tools.conf settings.
 
 # default pkg buildset; name without .set extension
 # buildset_pkg=default
-
-# Next settings are only useful if you compile packages against eudev
-
-# default packages to trigger blacklist
-# blacklist_trigger=('eudev' 'upower-pm-utils' 'eudev-systemdcompat')
-
-# default blacklisted packages to remove from chroot
-# blacklist=('libsystemd')
 
 ################ buildiso ################
 
@@ -141,6 +133,7 @@ Usage: buildpkg [options] [--] [makepkg args]
     -w                 Clean up cache and sources
     -n                 Install and run namcap check
     -s                 Sign packages
+    -u                 udev base-devel group (no systemd)
     -q                 Query settings and pretend build
     -h                 This help
 ~~~
@@ -174,6 +167,9 @@ The arch can also be set in manjaro-tools.conf, but under normal conditions, it 
 
 ######* -n
 * Installs the built package in the chroot and runs a namcap check
+
+######* -u
+* Create udev build root (for eudev builds)
 
 ###3. buildiso
 
