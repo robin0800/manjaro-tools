@@ -23,6 +23,27 @@ import ${LIBDIR}/util.sh
 display_settings(){
 	show_version
 	show_config
+
+	msg "HOST:"
+	msg2 "cache_dir_iso: ${cache_dir_iso}"
+	msg2 "dist_version: ${dist_version}"
+
+	msg "REMOTE:"
+	msg2 "remote_url: ${remote_url}"
+	msg2 "remote_project: ${remote_project}"
+	msg2 "remote_target: ${remote_target}"
+	msg2 "remote_user: ${remote_user}"
+	msg2 "remote_pwd: ${remote_pwd}"
+
+}
+
+upload(){
+	msg "Start upload ..."
+# 	local url=${remote_user},${remote_project}@frs.sourceforge.net:/home/frs/project/m/ma/${remote_project}/${remote_target}
+	local files=$(ls ${cache_dir_iso})
+	sshpass -f ${remote_pwd} rsync -vP  --progress -e ssh $files ${remote_url}
+	msg "Done upload"
+	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
 
 load_user_info
@@ -30,12 +51,8 @@ load_user_info
 load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
-publish=true
+publish=false
 pretend=false
-
-upload(){
-	# do something
-}
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
@@ -53,7 +70,7 @@ opts='uqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-		q) publish=false ;;
+		q) publish=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -64,7 +81,7 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-check_root "$0" "${orig_argv[@]}"
+# check_root "$0" "${orig_argv[@]}"
 
 ${pretend} && display_settings && exit 1
 

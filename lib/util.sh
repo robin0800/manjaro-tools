@@ -387,6 +387,21 @@ init_buildiso(){
 	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
 }
 
+init_deployiso(){
+
+	[[ -z ${remote_target} ]] && remote_target="${dist_version}"
+
+	[[ -z ${remote_project} ]] && remote_project="manjaro"
+
+	[[ -z ${remote_user} ]] && remote_user="Please set your user!"
+
+	[[ -z ${remote_pwd} ]] && remote_pwd="Please set your password!"
+
+	[[ -z ${remote_url} ]] && remote_url="${remote_user},${remote_project}@frs.sourceforge.net:/home/frs/project/m/ma/${remote_project}/${remote_target}"
+
+
+}
+
 load_config(){
 
 	[[ -f $1 ]] || return 1
@@ -402,6 +417,8 @@ load_config(){
 	init_buildpkg
 
 	init_buildiso
+
+	init_deployiso
 
 	return 0
 }

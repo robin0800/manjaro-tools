@@ -9,7 +9,8 @@ BIN = \
 	bin/manjaro-chroot \
 	bin/fstabgen \
 	bin/buildset \
-	bin/chroot-run
+	bin/chroot-run \
+	bin/deployiso
 
 BIN_PKG = \
 	bin/checkpkg \
