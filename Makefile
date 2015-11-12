@@ -9,8 +9,7 @@ BIN = \
 	bin/manjaro-chroot \
 	bin/fstabgen \
 	bin/buildset \
-	bin/chroot-run \
-	bin/deployiso
+	bin/chroot-run
 
 BIN_PKG = \
 	bin/checkpkg \
@@ -25,7 +24,8 @@ BIN_PKG = \
 
 BIN_ISO = \
 	bin/buildiso \
-	bin/testiso
+	bin/testiso \
+	bin/deployiso
 
 SYSCONF = \
 	conf/manjaro-tools.conf

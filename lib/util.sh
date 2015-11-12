@@ -389,7 +389,7 @@ init_buildiso(){
 
 init_deployiso(){
 
-	[[ -z ${remote_target} ]] && remote_target="${dist_version}"
+	[[ -z ${remote_target} ]] && remote_target="${dist_release}"
 
 	[[ -z ${remote_project} ]] && remote_project="manjaro"
 
@@ -397,9 +397,7 @@ init_deployiso(){
 
 	[[ -z ${remote_pwd} ]] && remote_pwd="Please set your password!"
 
-	[[ -z ${remote_url} ]] && remote_url="${remote_user},${remote_project}@frs.sourceforge.net:/home/frs/project/m/ma/${remote_project}/${remote_target}"
-
-
+	[[ -z ${remote_url} ]] && remote_url="sourceforge.net"
 }
 
 load_config(){

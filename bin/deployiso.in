@@ -11,9 +11,7 @@
 
 version=@version@
 
-BINDIR='@bindir@'
 LIBDIR='@libdir@'
-PKGDATADIR='@pkgdatadir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
@@ -24,9 +22,13 @@ display_settings(){
 	show_version
 	show_config
 
+        msg "ARGS:"
+        msg2 "publish: ${publish}"
+        msg2 "is_sf: ${is_sf}"
+
 	msg "HOST:"
 	msg2 "cache_dir_iso: ${cache_dir_iso}"
-	msg2 "dist_version: ${dist_version}"
+	msg2 "dist_release: ${dist_release}"
 
 	msg "REMOTE:"
 	msg2 "remote_url: ${remote_url}"
@@ -34,14 +36,13 @@ display_settings(){
 	msg2 "remote_target: ${remote_target}"
 	msg2 "remote_user: ${remote_user}"
 	msg2 "remote_pwd: ${remote_pwd}"
-
+	msg2 "url: ${url}"
+	#msg2 "files: ${files[*]}"
 }
 
 upload(){
 	msg "Start upload ..."
-# 	local url=${remote_user},${remote_project}@frs.sourceforge.net:/home/frs/project/m/ma/${remote_project}/${remote_target}
-	local files=$(ls ${cache_dir_iso})
-	sshpass -f ${remote_pwd} rsync -vP  --progress -e ssh $files ${remote_url}
+        sshpass -f ${remote_pwd} rsync -vP  --progress -e ssh $files $url
 	msg "Done upload"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
@@ -53,6 +54,9 @@ load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 publish=false
 pretend=false
+is_sf=false
+
+[[ ${remote_url} == 'sourceforge.net' ]] && is_sf=true
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
@@ -66,11 +70,11 @@ usage() {
 
 orig_argv=("$@")
 
-opts='uqh'
+opts=':uqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-		q) publish=true ;;
+		u) publish=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -80,6 +84,10 @@ done
 shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
+
+url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
+
+files=$(ls ${cache_dir_iso})
 
 # check_root "$0" "${orig_argv[@]}"
 
