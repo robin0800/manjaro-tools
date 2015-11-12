@@ -521,20 +521,11 @@ load_set(){
 
 eval_edition(){
 	eval "case $1 in
-		$(load_set 'official'))
+		$(load_set 'official')|$(load_set 'official-minimal'))
 			iso_edition='official'
 		;;
-		$(load_set 'community'))
+		$(load_set 'community')|$(load_set 'community-minimal'))
 			iso_edition='community'
-		;;
-		$(load_set 'official-minimal'))
-			iso_edition='official-minimal'
-		;;
-		$(load_set 'community-minimal'))
-			iso_edition='community-minimal'
-		;;
-		$(load_set 'community-openrc'))
-			iso_edition='community-openrc'
 		;;
 	esac"
 }
