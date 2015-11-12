@@ -613,7 +613,8 @@ load_profile(){
 	work_dir=${chroots_iso}/$1/${arch}
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
-
+	
+	eval_edition "$1"
 	cache_dir_iso="${cache_dir}/iso/${iso_edition}/$1"
 	prepare_dir "${cache_dir_iso}"
 }
