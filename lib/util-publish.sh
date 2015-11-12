@@ -10,21 +10,21 @@
 # GNU General Public License for more details.
 
 remote_login(){
+	#sshpass -f ${remote_pwd} ssh -t ${shell_url} create
 	ssh -t ${shell_url} create
-	# need a input param here for profile
-	create_server_tree
-	exit
+	cd ${remote_target}/${remote_project}
 }
 
 create_server_tree(){
+	remote_login
+	cd ${type}
 	# need to establish tree
-	mkdir -pv ${dist_release}/$isotype
+	mkdir -pv ${dist_release}
 }
 
 upload(){
 	msg "Start upload ..."
 	if ${is_sf};then
-		#sshpass -f ${remote_pwd} remote_login
 		local files=$(ls ${cache_dir_iso})
 		sshpass -f ${remote_pwd} rsync -vP  --progress -e ssh $files ${sf_url}
 	else
