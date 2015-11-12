@@ -73,6 +73,7 @@ LIBS_ISO = \
 	lib/util-iso-calamares.sh \
 	lib/util-livecd.sh \
 	lib/util-iso-boot.sh \
+	lib/util-publish.sh \
 	lib/util-iso-log.sh
 
 CPIOHOOKS = \
