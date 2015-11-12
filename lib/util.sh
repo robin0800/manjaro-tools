@@ -389,9 +389,9 @@ init_buildiso(){
 
 init_deployiso(){
 
-	[[ -z ${remote_target} ]] && remote_target="${dist_release}"
+	[[ -z ${remote_target} ]] && remote_target="/home/frs/project"
 
-	[[ -z ${remote_project} ]] && remote_project="manjaro"
+	[[ -z ${remote_project} ]] && remote_project="manjaro-testing"
 
 	[[ -z ${remote_user} ]] && remote_user="Please set your user!"
 
@@ -509,6 +509,34 @@ load_sets(){
 		prof=${prof:-}${prof:+|}${temp%.set}
 	done
 	echo $prof
+}
+
+load_set(){
+	local profs
+	for item in $(cat ${sets_dir_iso}/$1.set);do
+		profs=${profs:-}${profs:+|}${item}
+	done
+	echo $profs
+}
+
+eval_edition(){
+	eval "case $1 in
+		$(load_set 'official'))
+			iso_edition='official'
+		;;
+		$(load_set 'community'))
+			iso_edition='community'
+		;;
+		$(load_set 'official-minimal'))
+			iso_edition='official-minimal'
+		;;
+		$(load_set 'community-minimal'))
+			iso_edition='community-minimal'
+		;;
+		$(load_set 'community-openrc'))
+			iso_edition='community-openrc'
+		;;
+	esac"
 }
 
 # $1: buildset
