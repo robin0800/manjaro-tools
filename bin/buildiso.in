@@ -24,6 +24,7 @@ show_profile(){
 	cd $1
 		load_profile "$1"
 		if ${verbose};then
+			msg2 "iso_edition: ${iso_edition}"
 			msg2 "work_dir: ${work_dir}"
 			msg2 "iso_file: ${iso_file}"
 			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
@@ -129,7 +130,6 @@ iso_only=false
 verbose=false
 
 pacman_conf_arch='default'
-cache_dir_iso="${cache_dir}/iso"
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
@@ -184,9 +184,9 @@ mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
 check_root "$0" "${orig_argv[@]}"
 
-prepare_dir "${cache_dir_iso}"
-
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
+
+eval_iso_edition "${buildset_iso}"
 
 import ${LIBDIR}/util-iso.sh
 
