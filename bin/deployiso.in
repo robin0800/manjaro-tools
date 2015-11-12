@@ -36,13 +36,26 @@ display_settings(){
 	msg2 "remote_target: ${remote_target}"
 	msg2 "remote_user: ${remote_user}"
 	msg2 "remote_pwd: ${remote_pwd}"
-	msg2 "url: ${url}"
-	#msg2 "files: ${files[*]}"
+	${is_sf} && msg2 "sf_url: ${sf_url}"
+	${is_sf} && msg2 "shell_url: ${shell_url}"
+}
+
+remote_login(){
+	ssh -t ${shell_url} create
+	# need a input param here for profile
+	mkdir -pv ${dist_release}/$isotype
+	exit
 }
 
 upload(){
 	msg "Start upload ..."
-        sshpass -f ${remote_pwd} rsync -vP  --progress -e ssh $files $url
+	if ${is_sf};then
+		#sshpass -f ${remote_pwd} remote_login
+		local files=$(ls ${cache_dir_iso})
+		sshpass -f ${remote_pwd} rsync -vP  --progress -e ssh $files ${sf_url}
+	else
+		msg3 "Do something here if not sf"
+	fi
 	msg "Done upload"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
@@ -61,7 +74,7 @@ is_sf=false
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo '    -u                 Upload iso file(s)'
-	echo '    -q                 Query settings and pretend build'
+	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'
 	echo ''
 	echo ''
@@ -85,9 +98,14 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
+cache_dir_iso="${cache_dir}/iso"
 
-files=$(ls ${cache_dir_iso})
+if ${is_sf};then
+	sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
+	shell_url=${remote_user},${remote_project}@shell.${remote_url}:${remote_target}/${remote_project}
+else
+	msg3 "Do something here if not sf"
+fi
 
 # check_root "$0" "${orig_argv[@]}"
 
