@@ -186,7 +186,7 @@ check_root "$0" "${orig_argv[@]}"
 
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
-eval_iso_edition "${buildset_iso}"
+eval_edition "${buildset_iso}"
 
 import ${LIBDIR}/util-iso.sh
 
