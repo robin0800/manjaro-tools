@@ -37,7 +37,9 @@ SETS_ISO = \
 	sets/iso/default.set \
 	sets/iso/official.set \
 	sets/iso/community.set \
-	sets/iso/openrc.set
+	sets/iso/official-minimal.set \
+	sets/iso/community-minimal.set \
+	sets/iso/community-openrc.set
 
 SHARED = \
 	conf/pacman-default.conf \
