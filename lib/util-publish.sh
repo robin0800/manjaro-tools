@@ -10,12 +10,15 @@
 # GNU General Public License for more details.
 
 create_release(){
-        ssh ${shell_url} mkdir -pv ${remote_target}/${remote_project}/${iso_edition}/${dist_release}
+        ssh !${remote_user}@${shell_url} mkdir -pv ${remote_target}/${remote_project}/${iso_edition}/${dist_release}
 }
 
 upload(){
 	msg "Start upload ..."
-        rsync -av --progress -e ssh ${src_dir}/ ${sf_url}/${iso_edition}/${dist_release}/${profile}
+	local empty=/tmp/deploy
+	rsync -e ssh $empty/ ${sf_url}/${iso_edition}/
+        rsync -e ssh $empty/ ${sf_url}/${iso_edition}/${dist_release}/
+        rsync -avP --progress -e ssh ${src_dir}/ ${sf_url}/${iso_edition}/${dist_release}/${profile}
 	msg "Done upload"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }

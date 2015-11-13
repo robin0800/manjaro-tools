@@ -322,6 +322,11 @@ version_gen(){
     done
 }
 
+version_gen2(){
+    local y=$(date +%Y) m=$(date +%m)
+    dist_release=${y:2}.$m
+}
+
 init_common(){
 	[[ -z ${branch} ]] && branch='stable'
 
@@ -372,7 +377,7 @@ init_buildiso(){
 	if [[ -z ${dist_release} ]];then
 # 		source /etc/lsb-release
 # 		dist_release=${DISTRIB_RELEASE}
-		version_gen
+		version_gen2
 	fi
 
 	if [[ -z ${dist_codename} ]];then
