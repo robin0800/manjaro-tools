@@ -102,7 +102,6 @@ display_settings(){
 	msg2 "dist_name: ${dist_name}"
 	msg2 "dist_release: ${dist_release}"
 	msg2 "dist_codename: ${dist_codename}"
-	msg2 "dist_version: ${dist_version}"
 
 	msg "ISO SETTINGS:"
 	msg2 "iso_label: ${iso_label}"

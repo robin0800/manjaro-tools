@@ -387,8 +387,6 @@ init_buildiso(){
 
 	[[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
-	[[ -z ${dist_version} ]] && dist_version=$(date +%Y.%m)
-
 	[[ -z ${dist_name} ]] && dist_name="Manjaro"
 
 	[[ -z ${iso_name} ]] && iso_name="manjaro"

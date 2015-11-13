@@ -88,9 +88,6 @@ Specifying args will override manjaro-tools.conf settings.
 # unset defaults to given value
 # dist_branding="MJRO"
 
-# unset defaults to given value, specify a date here of have it automatically set
-# dist_version="$(date +%Y.%m)"
-
 # unset defaults to given value
 # iso_name=manjaro
 
