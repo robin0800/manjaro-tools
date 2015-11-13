@@ -550,6 +550,9 @@ eval_edition(){
 		$(load_set 'community')|$(load_set 'community-minimal'))
 			iso_edition='community'
 		;;
+		$(load_set 'netrunner'))
+			iso_edition='netrunner'
+		;;
 	esac"
 }
 
