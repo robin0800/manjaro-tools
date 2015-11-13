@@ -39,7 +39,8 @@ SETS_ISO = \
 	sets/iso/community.set \
 	sets/iso/official-minimal.set \
 	sets/iso/community-minimal.set \
-	sets/iso/community-openrc.set
+	sets/iso/community-openrc.set \
+	sets/iso/netrunner-official.set
 
 SHARED = \
 	conf/pacman-default.conf \
