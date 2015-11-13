@@ -26,9 +26,6 @@ display_settings(){
 	msg "OPTIONS:"
 	msg2 "profile: ${profile}"
 
-        msg "ARGS:"
-        msg2 "release: ${release}"
-
 	msg "HOST:"
 	msg2 "dist_release: ${dist_release}"
 	msg2 "src_dir: ${src_dir}"
@@ -46,15 +43,12 @@ load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 pretend=false
-is_sf=false
-release=false
 
 src_dir=${cache_dir}/iso
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p                 Source folder to upload [default:${profile}]"
-	echo "    -c                 Create release [${dist_release}]"
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'
 	echo ''
@@ -62,12 +56,11 @@ usage() {
 	exit $1
 }
 
-opts='d:cqh'
+opts='p:cqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-                d) profile="$OPTARG" ;;
-		c) release=true ;;
+                p) profile="$OPTARG" ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -81,12 +74,10 @@ timer_start=$(get_timer)
 eval_edition "${profile}"
 
 sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
-shell_url=${remote_user},${remote_project}@shell.${remote_url}
+#shell_url=${remote_user},${remote_project}@shell.${remote_url}
 
 src_dir=${src_dir}/${iso_edition}/${dist_release}/${profile}
 
 ${pretend} && display_settings && exit 1
-
-${create} && create_release && exit 1
 
 upload
