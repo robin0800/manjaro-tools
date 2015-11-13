@@ -303,6 +303,25 @@ prepare_dir(){
 	[[ ! -d $1 ]] && mkdir -p $1
 }
 
+version_gen(){
+    local y=$(date +%Y) m=$(date +%m)
+    local release_versions=($y.03 $y.06 $y.09 $y.12)
+
+    for ver in ${release_versions[@]};do
+        case $m in
+            01) dist_release=${y:2}.12.1 ;;
+            02) dist_release=${y:2}.12.2 ;;
+            03|06|09|12) dist_release=${y:2}.${ver#.*} ;;
+            04) dist_release=${y:2}.03.1 ;;
+            05) dist_release=${y:2}.03.2 ;;
+            07) dist_release=${y:2}.06.1 ;;
+            08) dist_release=${y:2}.06.2 ;;
+            10) dist_release=${y:2}.09.1 ;;
+            11) dist_release=${y:2}.09.2 ;;
+        esac
+    done
+}
+
 init_common(){
 	[[ -z ${branch} ]] && branch='stable'
 
@@ -351,8 +370,9 @@ init_buildiso(){
 	##### iso settings #####
 
 	if [[ -z ${dist_release} ]];then
-		source /etc/lsb-release
-		dist_release=${DISTRIB_RELEASE}
+# 		source /etc/lsb-release
+# 		dist_release=${DISTRIB_RELEASE}
+		version_gen
 	fi
 
 	if [[ -z ${dist_codename} ]];then
@@ -393,9 +413,7 @@ init_deployiso(){
 
 	[[ -z ${remote_project} ]] && remote_project="manjaro-testing"
 
-	[[ -z ${remote_user} ]] && remote_user="Please set your user!"
-
-	[[ -z ${remote_pwd} ]] && remote_pwd="Please set your password!"
+	[[ -z ${remote_user} ]] && remote_user="[SetUser]"
 
 	[[ -z ${remote_url} ]] && remote_url="sourceforge.net"
 }
