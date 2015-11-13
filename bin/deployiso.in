@@ -23,22 +23,21 @@ display_settings(){
 	show_version
 	show_config
 
+	msg "OPTIONS:"
+	msg2 "profile: ${profile}"
+
         msg "ARGS:"
-        msg2 "publish: ${publish}"
-        msg2 "is_sf: ${is_sf}"
+        msg2 "release: ${release}"
 
 	msg "HOST:"
-	msg2 "cache_dir_iso: ${cache_dir_iso}"
 	msg2 "dist_release: ${dist_release}"
+	msg2 "src_dir: ${src_dir}"
 
 	msg "REMOTE:"
 	msg2 "remote_url: ${remote_url}"
 	msg2 "remote_project: ${remote_project}"
 	msg2 "remote_target: ${remote_target}"
 	msg2 "remote_user: ${remote_user}"
-	msg2 "remote_pwd: ${remote_pwd}"
-	${is_sf} && msg2 "sf_url: ${sf_url}"
-	${is_sf} && msg2 "shell_url: ${shell_url}"
 }
 
 load_user_info
@@ -46,15 +45,16 @@ load_user_info
 load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
-publish=false
 pretend=false
 is_sf=false
+release=false
 
-[[ ${remote_url} == 'sourceforge.net' ]] && is_sf=true
+src_dir=${cache_dir}/iso
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
-	echo '    -u                 Upload iso file(s)'
+	echo "    -p                 Source folder to upload [default:${profile}]"
+	echo "    -c                 Create release [${dist_release}]"
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'
 	echo ''
@@ -62,13 +62,12 @@ usage() {
 	exit $1
 }
 
-orig_argv=("$@")
-
-opts=':uqh'
+opts='d:cqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-		u) publish=true ;;
+                d) profile="$OPTARG" ;;
+		c) release=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -79,17 +78,15 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-cache_dir_iso="${cache_dir}/iso"
+eval_edition "${profile}"
 
-if ${is_sf};then
-	sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
-	shell_url=${remote_user},${remote_project}@shell.${remote_url}
-else
-	msg3 "Do something here if not sf"
-fi
+sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
+shell_url=${remote_user},${remote_project}@shell.${remote_url}
 
-# check_root "$0" "${orig_argv[@]}"
+src_dir=${src_dir}/${iso_edition}/${dist_release}/${profile}
 
 ${pretend} && display_settings && exit 1
 
-${publish} && upload
+${create} && create_release && exit 1
+
+upload
