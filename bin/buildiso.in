@@ -26,6 +26,7 @@ show_profile(){
 		if ${verbose};then
 			msg2 "iso_edition: ${iso_edition}"
 			msg2 "work_dir: ${work_dir}"
+			msg2 "cache_dir_iso: ${cache_dir_iso}"
 			msg2 "iso_file: ${iso_file}"
 			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 			msg2 "initsys: ${initsys}"
@@ -80,6 +81,7 @@ display_settings(){
 	show_config
 
 	msg "PROFILE:"
+	msg2 "sets_dir_iso: ${sets_dir_iso}"
 	msg2 "buildsets: $(load_sets ${sets_dir_iso})"
 	msg2 "buildset_iso: ${buildset_iso}"
 	msg2 "is_buildset: ${is_buildset}"
@@ -93,10 +95,6 @@ display_settings(){
 	msg2 "clean_first: ${clean_first}"
 	msg2 "images_only: ${images_only}"
 	msg2 "iso_only: ${iso_only}"
-
-	msg "PATHS:"
-	msg2 "sets_dir_iso: ${sets_dir_iso}"
-	msg2 "cache_dir_iso: ${cache_dir_iso}"
 
 	msg "DIST SETTINGS:"
 	msg2 "dist_name: ${dist_name}"
