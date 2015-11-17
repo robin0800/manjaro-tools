@@ -19,12 +19,29 @@ SYSCONFDIR='@sysconfdir@'
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-publish.sh
 
+show_upload_queue(){
+	if ${is_buildset};then
+		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
+		for item in ${list[@]}; do
+			msg2 "$item"
+		done
+	else
+            msg2 "${buildset_iso}"
+	fi
+}
+
 display_settings(){
 	show_version
 	show_config
 
+	msg "PROFILE:"
+	msg2 "sets_dir_iso: ${sets_dir_iso}"
+	msg2 "buildsets: $(load_sets ${sets_dir_iso})"
+	msg2 "buildset_iso: ${buildset_iso}"
+	msg2 "is_buildset: ${is_buildset}"
+
 	msg "OPTIONS:"
-	msg2 "profile: ${profile}"
+	msg2 "buildset_iso: ${buildset_iso}"
 
 	msg "HOST:"
 	msg2 "dist_release: ${dist_release}"
@@ -35,6 +52,9 @@ display_settings(){
 	msg2 "remote_project: ${remote_project}"
 	msg2 "remote_target: ${remote_target}"
 	msg2 "remote_user: ${remote_user}"
+
+	msg "UPLOAD QUEUE:"
+	show_upload_queue
 }
 
 load_user_info
@@ -48,7 +68,7 @@ src_dir=${cache_dir}/iso
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
-	echo "    -p                 Source folder to upload [default:${profile}]"
+	echo "    -p                 Source folder to upload [default:${buildset_iso}]"
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'
 	echo ''
@@ -60,7 +80,7 @@ opts='p:cqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-                p) profile="$OPTARG" ;;
+                p) buildset_iso="$OPTARG" ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -71,13 +91,19 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-eval_edition "${profile}"
+if [[ -z ${buildset_iso} ]];then
+    up_dirs=$(ls ${src_dir})
+fi
+
+eval_buildset "${buildset_iso}" "${sets_dir_iso}"
+
+eval_edition "${buildset_iso}"
 
 sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
 #shell_url=${remote_user},${remote_project}@shell.${remote_url}
 
-src_dir=${src_dir}/${iso_edition}/${dist_release}/${profile}
+src_dir=${src_dir}/${iso_edition}/${dist_release}/${buildset_iso}
 
 ${pretend} && display_settings && exit 1
 
-upload
+upload "${buildset_iso}"
