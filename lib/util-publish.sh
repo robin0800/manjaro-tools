@@ -26,12 +26,20 @@ sync_dir(){
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
 
+set_src_dir(){
+        src_dir=${cache_dir}/iso/${iso_edition}/${dist_release}/$1
+}
+
 upload(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/$1.set); do
+                        eval_edition "$prof"
+                        set_src_dir "$prof"
 			sync_dir "$prof"
 		done
 	else
+                eval_edition "$1"
+                set_src_dir "$1"
 		sync_dir "$1"
 	fi
 }
