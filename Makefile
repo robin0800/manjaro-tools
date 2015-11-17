@@ -38,7 +38,6 @@ SETS_ISO = \
 	sets/iso/official.set \
 	sets/iso/community.set \
 	sets/iso/community-minimal.set \
-	sets/iso/community-openrc.set \
 	sets/iso/netrunner-official.set
 
 SHARED = \
