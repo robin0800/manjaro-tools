@@ -308,6 +308,44 @@ version_gen(){
 	dist_release=${y:2}.$m
 }
 
+version_gen2(){
+    local y=$(date +%Y) m=$(date +%m)
+    local release_versions=($y.03 $y.06 $y.09 $y.12)
+
+    for ver in ${release_versions[@]};do
+        case $m in
+            01) dist_release=${y:2}.12.1 ;;
+            02) dist_release=${y:2}.12.2 ;;
+            03|06|09|12) dist_release=${y:2}.${ver#.*} ;;
+            04) dist_release=${y:2}.03.1 ;;
+            05) dist_release=${y:2}.03.2 ;;
+            07) dist_release=${y:2}.06.1 ;;
+            08) dist_release=${y:2}.06.2 ;;
+            10) dist_release=${y:2}.09.1 ;;
+            11) dist_release=${y:2}.09.2 ;;
+        esac
+    done
+}
+
+version_gen3(){
+    local y=$(date +%Y) m=$(date +%m)
+    local release_versions=($y.03 $y.06 $y.09 $y.12)
+
+    for ver in ${release_versions[@]};do
+        case $m in
+            01) dist_release=${y:2}.12-r1 ;;
+            02) dist_release=${y:2}.12-r2 ;;
+            03|06|09|12) dist_release=${y:2}.${ver#.*} ;;
+            04) dist_release=${y:2}.03-r1 ;;
+            05) dist_release=${y:2}.03-r2 ;;
+            07) dist_release=${y:2}.06-r1 ;;
+            08) dist_release=${y:2}.06-r2 ;;
+            10) dist_release=${y:2}.09-r1 ;;
+            11) dist_release=${y:2}.09-r2 ;;
+        esac
+    done
+}
+
 init_common(){
 	[[ -z ${branch} ]] && branch='stable'
 
@@ -358,7 +396,7 @@ init_buildiso(){
 	if [[ -z ${dist_release} ]];then
 # 		source /etc/lsb-release
 # 		dist_release=${DISTRIB_RELEASE}
-		version_gen
+		version_gen2
 	fi
 
 	if [[ -z ${dist_codename} ]];then
@@ -523,15 +561,16 @@ load_set(){
 
 eval_edition(){
 	eval "case $1 in
-		$(load_set 'official')|$(load_set 'official-minimal'))
+		$(load_set 'official'))
 			iso_edition='official'
 		;;
 		$(load_set 'community')|$(load_set 'community-minimal'))
 			iso_edition='community'
 		;;
 		$(load_set 'netrunner-official'))
-			iso_edition='netrunner-official'
+			iso_edition='netrunner'
 		;;
+		*) iso_edition='community' ;;
 	esac"
 }
 
