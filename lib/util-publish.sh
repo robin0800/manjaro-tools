@@ -13,12 +13,25 @@ create_release(){
         ssh !${remote_user}@${shell_url} mkdir -pv ${remote_target}/${remote_project}/${iso_edition}/${dist_release}
 }
 
-upload(){
-	msg "Start upload ..."
+sync_dir(){
+	msg "Start upload [$1] ..."
 	local empty=/tmp/deploy
-	rsync -e ssh $empty/ ${sf_url}/${iso_edition}/
-        rsync -e ssh $empty/ ${sf_url}/${iso_edition}/${dist_release}/
-        rsync -avP --progress -e ssh ${src_dir}/ ${sf_url}/${iso_edition}/${dist_release}/${profile}
+        rsync -aR -e ssh $empty/ ${sf_url}/${iso_edition}/
+        rsync -aR -e ssh $empty/ ${sf_url}/${iso_edition}/${dist_release}/
+        rsync -avP --progress -e ssh ${src_dir}/ ${sf_url}/${iso_edition}/${dist_release}/$1
+
+# 	rsync -aq --rsync-path=”mkdir -p /tmp/${iso_edition}/${dist_release}/${profile}/ && rsync” ${src_dir}/ ${remote_user}@${shell_url}/${remote_target}/${remote_project}
+
 	msg "Done upload"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
+}
+
+upload(){
+	if ${is_buildset};then
+		for prof in $(cat ${sets_dir_iso}/$1.set); do
+			sync_dir "$prof"
+		done
+	else
+		sync_dir "$1"
+	fi
 }
