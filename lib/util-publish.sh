@@ -25,6 +25,7 @@ sync_dir(){
 }
 
 set_src_dir(){
+	cache_tree=iso/${iso_edition}/${dist_release}
         src_dir=${cache_dir}/${cache_tree}/$1
 }
 
