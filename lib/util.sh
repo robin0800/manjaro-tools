@@ -427,6 +427,8 @@ init_buildiso(){
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
 	used_kernel=$(uname -r | cut -d . -f1)
 	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
+
+	cache_tree=iso/${iso_edition}/${dist_release}
 }
 
 init_deployiso(){
