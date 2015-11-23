@@ -19,7 +19,7 @@ sync_dir(){
 		msg "Start upload [$1] ..."
 		if ${remote_create}; then
 			local empty=/tmp/deploy
-		# 	rsync ${rsync_args[*]} $empty/ ${sf_url}/${edition_type}/
+			rsync ${rsync_args[*]} $empty/ ${sf_url}/${edition_type}/
 			rsync ${rsync_args[*]} $empty/ ${sf_url}/${remote_tree}/
 		fi
 		rsync ${rsync_args[*]} -v ${cache_dir_iso}/ ${sf_url}/${remote_tree}/$1
