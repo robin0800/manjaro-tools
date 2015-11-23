@@ -10,35 +10,28 @@
 # GNU General Public License for more details.
 
 create_release(){
-        ssh !${remote_user}@${shell_url} mkdir -pv ${remote_target}/${remote_project}/${cache_tree}
+        ssh !${remote_user}@${shell_url} mkdir -pv ${remote_target}/${remote_project}/${edition_type}/${dist_release}
 }
 
 sync_dir(){
 	msg "Start upload [$1] ..."
 	local empty=/tmp/deploy
-        rsync -aR -e ssh $empty/ ${sf_url}/${iso_edition}/
-        rsync -aR -e ssh $empty/ ${sf_url}/${cache_tree}/
-        rsync -avP --progress -e ssh ${src_dir}/ ${sf_url}/${cache_tree}/$1
+        rsync -aR -e ssh $empty/ ${sf_url}/${edition_type}/
+        rsync -aR -e ssh $empty/ ${sf_url}/${edition_type}/${dist_release}/
+        rsync -avP --progress -e ssh ${cache_dir_iso}/ ${sf_url}/${edition_type}/${dist_release}/$1
 
 	msg "Done upload"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
 
-set_src_dir(){
-	cache_tree=iso/${iso_edition}/${dist_release}
-        src_dir=${cache_dir}/${cache_tree}/$1
-}
-
 upload(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/$1.set); do
-                        eval_edition "$prof"
-                        set_src_dir "$prof"
+			load_profile "$prof"
 			sync_dir "$prof"
 		done
 	else
-                eval_edition "$1"
-                set_src_dir "$1"
+		load_profile "$1"
 		sync_dir "$1"
 	fi
 }
