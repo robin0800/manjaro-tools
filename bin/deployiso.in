@@ -17,23 +17,24 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 
 import ${LIBDIR}/util.sh
+import ${LIBDIR}/util-iso.sh
 import ${LIBDIR}/util-publish.sh
 
+show_profile(){
+	load_profile "$1"
+	msg2 "cache_dir_iso: ${cache_dir_iso}"
+	msg2 "edition_type: ${edition_type}"
+}
+
 show_upload_queue(){
+	msg3 "Upload: ${buildset_iso}"
 	if ${is_buildset};then
 		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
 		for item in ${list[@]}; do
-			msg3 "Iso: $item"
-			eval_edition "$item"
-			set_src_dir $item
-			msg2 "src_dir: ${src_dir}"
+			show_profile "$item"
 		done
 	else
-            msg3 "Upload: ${buildset_iso}"
-            eval_edition "${buildset_iso}"
-            set_src_dir ${buildset_iso}
-            msg2 "src_dir: ${src_dir}"
-            msg2 "iso_edition: ${iso_edition}"
+		show_profile "${buildset_iso}"
 	fi
 }
 
