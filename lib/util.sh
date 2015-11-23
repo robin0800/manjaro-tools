@@ -531,6 +531,8 @@ load_profile_config(){
 		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init')
 	fi
 
+	[[ -z ${edition_type} ]] && edition_type="official"
+
 	return 0
 }
 
@@ -551,28 +553,28 @@ load_sets(){
 	echo $prof
 }
 
-load_set(){
-	local profs
-	for item in $(cat ${sets_dir_iso}/$1.set);do
-		profs=${profs:-}${profs:+|}${item}
-	done
-	echo $profs
-}
-
-eval_edition(){
-	eval "case $1 in
-		$(load_set 'official'))
-			iso_edition='official'
-		;;
-		$(load_set 'community')|$(load_set 'community-minimal'))
-			iso_edition='community'
-		;;
-		$(load_set 'netrunner-official'))
-			iso_edition='netrunner'
-		;;
-		*) iso_edition='community' ;;
-	esac"
-}
+# load_set(){
+# 	local profs
+# 	for item in $(cat ${sets_dir_iso}/$1.set);do
+# 		profs=${profs:-}${profs:+|}${item}
+# 	done
+# 	echo $profs
+# }
+#
+# eval_edition(){
+# 	eval "case $1 in
+# 		$(load_set 'official'))
+# 			iso_edition='official'
+# 		;;
+# 		$(load_set 'community')|$(load_set 'community-minimal'))
+# 			iso_edition='community'
+# 		;;
+# 		$(load_set 'netrunner-official'))
+# 			iso_edition='netrunner'
+# 		;;
+# 		*) iso_edition='community' ;;
+# 	esac"
+# }
 
 # $1: buildset
 # $2: sets_dir
