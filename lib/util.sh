@@ -390,7 +390,7 @@ init_buildtree(){
 init_buildpkg(){
 	chroots_pkg="${chroots_dir}/buildpkg"
 
-	sets_dir_pkg="${sets_dir}/pkg"
+	sets_dir_pkg="${sets_dir}/pkg.d"
 
 	prepare_dir "${sets_dir_pkg}"
 
@@ -400,7 +400,7 @@ init_buildpkg(){
 init_buildiso(){
 	chroots_iso="${chroots_dir}/buildiso"
 
-	sets_dir_iso="${sets_dir}/iso"
+	sets_dir_iso="${sets_dir}/iso.d"
 
 	prepare_dir "${sets_dir_iso}"
 

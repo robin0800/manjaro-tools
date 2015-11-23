@@ -31,13 +31,13 @@ SYSCONF = \
 	conf/manjaro-tools.conf
 
 SETS_PKG = \
-	sets/pkg/default.set
+	sets/pkg.d/default.set
 
 SETS_ISO = \
-	sets/iso/default.set \
-	sets/iso/official.set \
-	sets/iso/community.set \
-	sets/iso/community-minimal.set
+	sets/iso.d/default.set \
+	sets/iso.d/official.set \
+	sets/iso.d/community.set \
+	sets/iso.d/community-minimal.set
 
 SHARED = \
 	conf/pacman-default.conf \
@@ -148,8 +148,8 @@ install_base:
 
 
 install_pkg:
-	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
-	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg.d
+	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg.d
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/bin
 	install -m0755 ${BIN_PKG} $(DESTDIR)$(PREFIX)/bin
@@ -168,8 +168,8 @@ install_pkg:
 
 
 install_iso:
-	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
-	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso.d
+	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso.d
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/bin
 	install -m0755 ${BIN_ISO} $(DESTDIR)$(PREFIX)/bin
@@ -209,7 +209,7 @@ uninstall_base:
 
 
 uninstall_pkg:
-	for f in ${SETS_PKG}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg/$$f; done
+	for f in ${SETS_PKG}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/pkg.d/$$f; done
 	for f in ${BIN_PKG}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/bin/find-libprovides
 	for f in ${SHARED_PKG}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
@@ -219,7 +219,7 @@ uninstall_pkg:
 
 
 uninstall_iso:
-	for f in ${SETS_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso/$$f; done
+	for f in ${SETS_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/sets/iso.d/$$f; done
 	for f in ${BIN_ISO}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${SHARED_ISO}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
 	for f in ${LIBS_ISO}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
