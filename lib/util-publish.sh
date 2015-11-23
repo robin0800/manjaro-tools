@@ -15,23 +15,29 @@ create_release(){
 
 sync_dir(){
 	msg "Start upload [$1] ..."
-	local empty=/tmp/deploy
-        rsync -aR -e ssh $empty/ ${sf_url}/${edition_type}/
-        rsync -aR -e ssh $empty/ ${sf_url}/${edition_type}/${dist_release}/
+	if ${remote_create}; then
+		local empty=/tmp/deploy
+		rsync -aR -e ssh $empty/ ${sf_url}/${edition_type}/
+		rsync -aR -e ssh $empty/ ${sf_url}/${edition_type}/${dist_release}/
+        fi
         rsync -avP --progress -e ssh ${cache_dir_iso}/ ${sf_url}/${edition_type}/${dist_release}/$1
 
-	msg "Done upload"
+	msg "Done upload [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
 
 upload(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/$1.set); do
-			load_profile "$prof"
-			sync_dir "$prof"
+			cd $prof
+				load_profile "$prof"
+				sync_dir "$prof"
+			cd ..
 		done
 	else
-		load_profile "$1"
-		sync_dir "$1"
+		cd $1
+			load_profile "$1"
+			sync_dir "$1"
+		cd ..
 	fi
 }
