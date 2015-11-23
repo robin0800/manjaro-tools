@@ -14,6 +14,7 @@ create_release(){
 }
 
 sync_dir(){
+	load_profile "$1"
 	msg "Start upload [$1] ..."
 	if ${remote_create}; then
 		local empty=/tmp/deploy
@@ -30,13 +31,11 @@ upload(){
 	if ${is_buildset};then
 		for prof in $(cat ${sets_dir_iso}/$1.set); do
 			cd $prof
-				load_profile "$prof"
 				sync_dir "$prof"
 			cd ..
 		done
 	else
 		cd $1
-			load_profile "$1"
 			sync_dir "$1"
 		cd ..
 	fi
