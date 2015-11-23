@@ -165,7 +165,8 @@ make_pkg(){
 
 chroot_build(){
 	if ${is_buildset};then
-		for pkg in $(cat ${sets_dir_pkg}/${buildset_pkg}.set); do
+		local list=$(read_set ${sets_dir_pkg}/${buildset_pkg}.set)
+		for pkg in ${list[@]}; do
 			make_pkg "$pkg" "break"
 		done
 	else

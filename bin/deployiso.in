@@ -21,24 +21,21 @@ import ${LIBDIR}/util-iso.sh
 import ${LIBDIR}/util-publish.sh
 
 show_profile(){
-	load_profile "$1"
-	msg2 "cache_dir_iso: ${cache_dir_iso}"
-	msg2 "edition_type: ${edition_type}"
+	cd $1
+		load_profile "$1"
+		msg2 "cache_dir_iso: ${cache_dir_iso}"
+		msg2 "remote_tree: ${remote_tree}/$1"
+	cd ..
 }
 
 show_upload_queue(){
-	msg3 "Upload: ${buildset_iso}"
 	if ${is_buildset};then
-		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
+		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
 		for item in ${list[@]}; do
-			cd $item
-				show_profile "$item"
-			cd ..
+			show_profile "$item"
 		done
 	else
-		cd ${buildset_iso}
-			show_profile "${buildset_iso}"
-		cd ..
+		show_profile "${buildset_iso}"
 	fi
 }
 
@@ -51,6 +48,11 @@ display_settings(){
 	msg2 "buildsets: $(load_sets ${sets_dir_iso})"
 	msg2 "buildset_iso: ${buildset_iso}"
 	msg2 "is_buildset: ${is_buildset}"
+
+	msg "ARGS:"
+	msg2 "update: ${update}"
+	msg2 "remote_create: ${remote_create}"
+	msg2 "rsync_args: ${rsync_args[*]}"
 
 	msg "HOST:"
 	msg2 "dist_release: ${dist_release}"
@@ -72,11 +74,15 @@ load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 pretend=false
 remote_create=false
+update=false
+
+rsync_args=(-aP --progress -e ssh)
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p                 Source folder to upload [default:${buildset_iso}]"
 	echo '    -c                 Create new remote edition_type with subtree'
+	echo '    -u                 Update remote iso (diff only)'
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'
 	echo ''
@@ -84,12 +90,13 @@ usage() {
 	exit $1
 }
 
-opts='p:cqh'
+opts='p:cuqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
                 p) buildset_iso="$OPTARG" ;;
                 c) remote_create=true ;;
+                u) update=true; rsync_args+=(-u) ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -107,4 +114,4 @@ shell_url=${remote_user},${remote_project}@shell.${remote_url}
 
 ${pretend} && display_settings && exit 1
 
-upload "${buildset_iso}"
+upload

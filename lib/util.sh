@@ -8,6 +8,21 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+read_set(){
+	local _space="s| ||g" \
+		_clean=':a;N;$!ba;s/\n/ /g' \
+		_com_rm="s|#.*||g" \
+		buildlist=''
+
+        msg3 "Loading [$1] ..."
+
+	buildlist=$(sed "$_com_rm" "$1" \
+			| sed "$_space" \
+			| sed "$_clean")
+
+        echo ${buildlist}
+}
+
 create_set(){
 	msg "[$1/${name}.set]"
 	if [[ -f $1/${name}.set ]];then
@@ -31,7 +46,7 @@ get_deps(){
 
 calculate_build_order(){
 	msg3 "Calculating build order ..."
-	for pkg in $(cat $1/${name}.set);do
+	for pkg in $(read_set $1/${name}.set);do
 		cd $pkg
 			mksrcinfo
 		cd ..
@@ -46,7 +61,7 @@ remove_set(){
 }
 
 show_set(){
-	local list=$(cat $1/${name}.set)
+	local list=$(read_set $1/${name}.set)
 	msg "Content of [$1/${name}.set] ..."
 	for item in ${list[@]}; do
 		msg2 "$item"
@@ -552,29 +567,6 @@ load_sets(){
 	done
 	echo $prof
 }
-
-# load_set(){
-# 	local profs
-# 	for item in $(cat ${sets_dir_iso}/$1.set);do
-# 		profs=${profs:-}${profs:+|}${item}
-# 	done
-# 	echo $profs
-# }
-#
-# eval_edition(){
-# 	eval "case $1 in
-# 		$(load_set 'official'))
-# 			iso_edition='official'
-# 		;;
-# 		$(load_set 'community')|$(load_set 'community-minimal'))
-# 			iso_edition='community'
-# 		;;
-# 		$(load_set 'netrunner-official'))
-# 			iso_edition='netrunner'
-# 		;;
-# 		*) iso_edition='community' ;;
-# 	esac"
-# }
 
 # $1: buildset
 # $2: sets_dir

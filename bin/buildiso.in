@@ -65,7 +65,7 @@ show_profile(){
 
 show_build_queue(){
 	if ${is_buildset};then
-		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
+		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
 		for item in ${list[@]}; do
 			check_profile "$item" "break"
 			show_profile "$item"

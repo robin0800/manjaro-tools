@@ -50,7 +50,8 @@ check_profile(){
 
 check_requirements(){
 	if ${is_buildset};then
-		for p in $(cat ${sets_dir_iso}/${buildset_iso}.set);do
+		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
+		for p in ${list[@]};do
 			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_iso} is not a valid buildset!"
 			check_profile "$p"
 		done
@@ -614,10 +615,9 @@ load_profile(){
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 
-# 	eval_edition "$1"
-# 	local cache_tree=iso/${edition_type}/${dist_release}
+	remote_tree="${edition_type}/${dist_release}"
 
-	cache_dir_iso="${cache_dir}/iso/${edition_type}/${dist_release}/$1"
+	cache_dir_iso="${cache_dir}/iso/${remote_tree}/$1"
 	prepare_dir "${cache_dir_iso}"
 }
 
@@ -681,7 +681,8 @@ make_profile(){
 
 build_iso(){
 	if ${is_buildset};then
-		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
+		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
+		for prof in ${list[@]}; do
 			make_profile "$prof"
 		done
 	else

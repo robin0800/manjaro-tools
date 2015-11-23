@@ -24,7 +24,7 @@ import ${LIBDIR}/util-pkg.sh
 
 show_build_queue(){
 	if ${is_buildset};then
-		local list=$(cat ${sets_dir_pkg}/${buildset_pkg}.set)
+		local list=$(read_set ${sets_dir_pkg}/${buildset_pkg}.set)
 		for item in ${list[@]}; do
 			msg3 "Package: [$item]"
 		done

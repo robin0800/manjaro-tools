@@ -10,33 +10,32 @@
 # GNU General Public License for more details.
 
 create_release(){
-        ssh !${remote_user}@${shell_url} mkdir -pv ${remote_target}/${remote_project}/${edition_type}/${dist_release}
+        ssh !${remote_user}@${shell_url} mkdir -pv ${remote_target}/${remote_project}/${remote_tree}
 }
 
 sync_dir(){
-	load_profile "$1"
-	msg "Start upload [$1] ..."
-	if ${remote_create}; then
-		local empty=/tmp/deploy
-		rsync -aR -e ssh $empty/ ${sf_url}/${edition_type}/
-		rsync -aR -e ssh $empty/ ${sf_url}/${edition_type}/${dist_release}/
-        fi
-        rsync -avP --progress -e ssh ${cache_dir_iso}/ ${sf_url}/${edition_type}/${dist_release}/$1
+	cd $1
+		load_profile "$1"
+		msg "Start upload [$1] ..."
+		if ${remote_create}; then
+			local empty=/tmp/deploy
+		# 	rsync ${rsync_args[*]} $empty/ ${sf_url}/${edition_type}/
+			rsync ${rsync_args[*]} $empty/ ${sf_url}/${remote_tree}/
+		fi
+		rsync ${rsync_args[*]} -v ${cache_dir_iso}/ ${sf_url}/${remote_tree}/$1
 
-	msg "Done upload [$1]"
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
+		msg "Done upload [$1]"
+		msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
+	cd ..
 }
 
 upload(){
 	if ${is_buildset};then
-		for prof in $(cat ${sets_dir_iso}/$1.set); do
-			cd $prof
-				sync_dir "$prof"
-			cd ..
+		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
+		for prof in ${list[@]}; do
+			sync_dir "$prof"
 		done
 	else
-		cd $1
-			sync_dir "$1"
-		cd ..
+		sync_dir "${buildset_iso}"
 	fi
 }
