@@ -24,7 +24,7 @@ show_profile(){
 	cd $1
 		load_profile "$1"
 		if ${verbose};then
-			msg2 "iso_edition: ${iso_edition}"
+			msg2 "edition_type: ${edition_type}"
 			msg2 "work_dir: ${work_dir}"
 			msg2 "cache_dir_iso: ${cache_dir_iso}"
 			msg2 "iso_file: ${iso_file}"
