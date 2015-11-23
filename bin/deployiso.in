@@ -31,10 +31,14 @@ show_upload_queue(){
 	if ${is_buildset};then
 		local list=$(cat ${sets_dir_iso}/${buildset_iso}.set)
 		for item in ${list[@]}; do
-			show_profile "$item"
+			cd $item
+				show_profile "$item"
+			cd ..
 		done
 	else
-		show_profile "${buildset_iso}"
+		cd ${buildset_iso}
+			show_profile "${buildset_iso}"
+		cd ..
 	fi
 }
 
@@ -67,10 +71,12 @@ load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 pretend=false
+remote_create=false
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p                 Source folder to upload [default:${buildset_iso}]"
+	echo '    -c                 Create new remote edition_type with subtree'
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'
 	echo ''
@@ -83,6 +89,7 @@ opts='p:cqh'
 while getopts "${opts}" arg; do
 	case "${arg}" in
                 p) buildset_iso="$OPTARG" ;;
+                c) remote_create=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
