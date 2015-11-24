@@ -30,8 +30,7 @@ show_profile(){
 
 show_upload_queue(){
 	if ${is_buildset};then
-		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
-		for item in ${list[@]}; do
+		for item in ${buildlist[@]}; do
 			show_profile "$item"
 		done
 	else
@@ -111,6 +110,8 @@ eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
 sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
 shell_url=${remote_user},${remote_project}@shell.${remote_url}
+
+${is_buildset} && buildlist=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
 
 ${pretend} && display_settings && exit 1
 

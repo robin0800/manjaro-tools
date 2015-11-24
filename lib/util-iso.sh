@@ -50,8 +50,7 @@ check_profile(){
 
 check_requirements(){
 	if ${is_buildset};then
-		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
-		for p in ${list[@]};do
+		for p in ${buildlist[@]};do
 			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_iso} is not a valid buildset!"
 			check_profile "$p"
 		done
@@ -681,8 +680,7 @@ make_profile(){
 
 build_iso(){
 	if ${is_buildset};then
-		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
-		for prof in ${list[@]}; do
+		for prof in ${buildlist[@]}; do
 			make_profile "$prof"
 		done
 	else

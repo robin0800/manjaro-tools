@@ -18,9 +18,8 @@ sync_dir(){
 		load_profile "$1"
 		msg "Start upload [$1] ..."
 		if ${remote_create}; then
-			local empty=/tmp/deploy
-			rsync ${rsync_args[*]} $empty/ ${sf_url}/${edition_type}/
-			rsync ${rsync_args[*]} $empty/ ${sf_url}/${remote_tree}/
+			rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/
+			rsync ${rsync_args[*]} /dev/null ${sf_url}/${remote_tree}/
 		fi
 		rsync ${rsync_args[*]} -v ${cache_dir_iso}/ ${sf_url}/${remote_tree}/$1
 
@@ -31,8 +30,7 @@ sync_dir(){
 
 upload(){
 	if ${is_buildset};then
-		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
-		for prof in ${list[@]}; do
+		for prof in ${buildlist[@]}; do
 			sync_dir "$prof"
 		done
 	else

@@ -14,7 +14,7 @@ read_set(){
 		_com_rm="s|#.*||g" \
 		buildlist=''
 
-        msg3 "Loading [$1] ..."
+#         msg3 "Loading [$1] ..."
 
 	buildlist=$(sed "$_com_rm" "$1" \
 			| sed "$_space" \

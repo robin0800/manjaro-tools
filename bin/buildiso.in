@@ -65,8 +65,7 @@ show_profile(){
 
 show_build_queue(){
 	if ${is_buildset};then
-		local list=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
-		for item in ${list[@]}; do
+		for item in ${buildlist[@]}; do
 			check_profile "$item" "break"
 			show_profile "$item"
 		done
@@ -184,6 +183,8 @@ check_root "$0" "${orig_argv[@]}"
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
 import ${LIBDIR}/util-iso.sh
+
+${is_buildset} && buildlist=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
 
 check_requirements
 

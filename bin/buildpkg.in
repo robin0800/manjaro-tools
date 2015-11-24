@@ -24,8 +24,7 @@ import ${LIBDIR}/util-pkg.sh
 
 show_build_queue(){
 	if ${is_buildset};then
-		local list=$(read_set ${sets_dir_pkg}/${buildset_pkg}.set)
-		for item in ${list[@]}; do
+		for item in ${buildlist[@]}; do
 			msg3 "Package: [$item]"
 		done
 	else
@@ -176,6 +175,8 @@ timer_start=$(get_timer)
 prepare_cachedir
 
 eval_buildset "${buildset_pkg}" "${sets_dir_pkg}"
+
+${is_buildset} && buildlist=$(read_set ${sets_dir_pkg}/${buildset_pkg}.set)
 
 check_requirements
 

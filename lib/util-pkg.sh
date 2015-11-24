@@ -15,7 +15,7 @@ check_build(){
 
 check_requirements(){
 	if ${is_buildset};then
-		for p in $(cat ${sets_dir_pkg}/${buildset_pkg}.set);do
+		for p in ${buildlist[@]};do
 			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_pkg} is not a valid buildset!"
 			check_build "$p"
 		done
@@ -165,8 +165,7 @@ make_pkg(){
 
 chroot_build(){
 	if ${is_buildset};then
-		local list=$(read_set ${sets_dir_pkg}/${buildset_pkg}.set)
-		for pkg in ${list[@]}; do
+		for pkg in ${buildlist[@]}; do
 			make_pkg "$pkg" "break"
 		done
 	else
