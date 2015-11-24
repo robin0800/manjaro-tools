@@ -48,6 +48,11 @@ display_settings(){
 	msg2 "buildset_iso: ${buildset_iso}"
 	msg2 "is_buildset: ${is_buildset}"
 
+	if [[ -n ${limit} ]];then
+            msg "OPTIONS:"
+            msg2 "limit: ${limit} kB/s"
+	fi
+
 	msg "ARGS:"
 	msg2 "update: ${update}"
 	msg2 "remote_create: ${remote_create}"
@@ -82,6 +87,7 @@ usage() {
 	echo "    -p                 Source folder to upload [default:${buildset_iso}]"
 	echo '    -c                 Create new remote edition_type with subtree'
 	echo '    -u                 Update remote iso (diff only)'
+	echo '    -l                 Limit bandwidth in kB/s'
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'
 	echo ''
@@ -89,11 +95,12 @@ usage() {
 	exit $1
 }
 
-opts='p:cuqh'
+opts='p:l:cuqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
                 p) buildset_iso="$OPTARG" ;;
+                l) limit="$OPTARG"; rsync_args+=(--bwlimit=${limit}) ;;
                 c) remote_create=true ;;
                 u) update=true; rsync_args+=(-u) ;;
 		q) pretend=true ;;
