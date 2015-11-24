@@ -249,8 +249,8 @@ buildpkg and buildiso support building from buildsets
 Default location of sets is:
 
 ~~~
-/etc/manjaro-tools/manjaro-tools/sets/pkg
-/etc/manjaro-tools/manjaro-tools/sets/iso
+/etc/manjaro-tools/manjaro-tools/sets/pkg.d
+/etc/manjaro-tools/manjaro-tools/sets/iso.d
 ~~~
 
 but it can be configured in the manjaro-tools.conf.
@@ -291,8 +291,8 @@ If you create a buildset manually, the buildset must have a .set extension.
 * Examples:
 
 ~~~
-/etc/manjaro-tools/sets/pkg/lxqt-0.8.set
-/etc/manjaro-tools/sets/iso/manjaro-0.9.0.set
+/etc/manjaro-tools/sets/pkg.d/lxqt-0.8.set
+/etc/manjaro-tools/sets/iso.d/manjaro-0.9.0.set
 ~~~
 
 ###5. buildtree
@@ -323,6 +323,8 @@ manjaro-chroot is a little tool to quickly chroot into a second system installed
 If the automount option is enabled, manjaro-chroot will detect installed systems with os-prober, and pops up a list with linux systems to select from.
 If there is only 1 system installed besides the host system, no list will pop up and it will automatically mount the second system.
 
+####Arguments
+
 ~~~
 $ manjaro-chroot -h
 usage: ${0##*/} chroot-dir [command]
@@ -352,6 +354,8 @@ It needs to be run inside the iso-profiles directory.
 
 Ideally, you have a running ssh agent on the host, and your key added, and your public key provided to your SF account. You can then upload without being asked for ssh password.
 
+####Arguments
+
 ~~~
 $ deployiso -h
 Usage: deployiso [options]
@@ -363,7 +367,7 @@ Usage: deployiso [options]
     -h                 This help
 ~~~
 
-######* upload official buildset
+######* upload official buildset, ie all built iso defined in a buildset
 
 ~~~
 deployiso -p official -c
