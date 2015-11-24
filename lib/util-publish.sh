@@ -21,7 +21,7 @@ sync_dir(){
 			rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/
 			rsync ${rsync_args[*]} /dev/null ${sf_url}/${remote_tree}/
 		fi
-		rsync ${rsync_args[*]} -v ${cache_dir_iso}/ ${sf_url}/${remote_tree}/$1
+		rsync ${rsync_args[*]} ${cache_dir_iso}/ ${sf_url}/${remote_tree}/$1
 
 		msg "Done upload [$1]"
 		msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"

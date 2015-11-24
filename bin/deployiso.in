@@ -48,10 +48,8 @@ display_settings(){
 	msg2 "buildset_iso: ${buildset_iso}"
 	msg2 "is_buildset: ${is_buildset}"
 
-	if [[ -n ${limit} ]];then
-            msg "OPTIONS:"
-            msg2 "limit: ${limit} kB/s"
-	fi
+	msg "OPTIONS:"
+	msg2 "limit: ${limit} kB/s"
 
 	msg "ARGS:"
 	msg2 "update: ${update}"
@@ -80,13 +78,13 @@ pretend=false
 remote_create=false
 update=false
 
-rsync_args=(-aP --progress -e ssh)
+rsync_args=(-av --progress -e ssh)
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p                 Source folder to upload [default:${buildset_iso}]"
 	echo '    -c                 Create new remote edition_type with subtree'
-	echo '    -u                 Update remote iso (diff only)'
+	echo '    -u                 Update remote iso'
 	echo '    -l                 Limit bandwidth in kB/s'
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'

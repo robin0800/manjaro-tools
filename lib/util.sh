@@ -453,6 +453,8 @@ init_deployiso(){
 	[[ -z ${remote_user} ]] && remote_user="[SetUser]"
 
 	[[ -z ${remote_url} ]] && remote_url="sourceforge.net"
+
+	[[ -z ${limit} ]] && limit=100
 }
 
 load_config(){

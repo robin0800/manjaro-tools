@@ -326,3 +326,31 @@ manjaro-chroot -a
 ~~~
 manjaro-chroot /mnt /bin/bash
 ~~~
+
+###7. deployiso
+
+deployiso is a script to upload a specific iso or a buiildset to SF.
+It needs to be run inside the iso-profiles directory.
+
+~~~
+$ deployiso -h
+Usage: deployiso [options]
+    -p                 Source folder to upload [default:default]
+    -c                 Create new remote edition_type with subtree
+    -u                 Update remote iso (diff only)
+    -l                 Limit bandwidth in kB/s
+    -q                 Query settings and pretend upload
+    -h                 This help
+~~~
+
+######* upload official buildset
+
+~~~
+deployiso -p official -c
+~~~
+
+######* upload xfce
+
+~~~
+deployiso -p xfce -c
+~~~
