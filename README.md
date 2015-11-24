@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.9.14
+Manjaro-tools-0.9.15
 
 User manual
 
@@ -80,7 +80,7 @@ Specifying args will override manjaro-tools.conf settings.
 # dist_name="Manjaro"
 
 # unset defaults to given value
-# dist_release=0.9.0
+# dist_release=15.09
 
 # unset defaults to value sourced from /etc/lsb-release
 # dist_codename="Bellatrix"
@@ -97,7 +97,8 @@ Specifying args will override manjaro-tools.conf settings.
 # iso app id
 # iso_app_id="Manjaro Linux Live/Rescue CD"
 
-# default compression
+# compression used, possible values xz (default, best compression), gzip, lzma, lzo, lz4
+# lz4 is faster but worst compression, may be useful for locally testing isos
 # iso_compression=xz
 
 # valid: md5, sha1, sha256, sha384, sha512
@@ -106,6 +107,23 @@ Specifying args will override manjaro-tools.conf settings.
 # experimental; use overlayfs instead of aufs
 # requires minimum 4.0 kernel on the build host and on iso in profile.conf
 # use_overlayfs="false"
+
+################ deployiso ################
+
+# the server url
+# remote_url=sourceforge.net
+
+# the server project
+# remote_project=manjaro-testing
+
+# the server home
+# remote_target=/home/frs/project
+
+# the server user
+# remote_user=[SetUser]
+
+# set upload bandwidth limit in kB/s
+# limit=100
 ~~~
 
 ###2. buildpkg
@@ -332,12 +350,14 @@ manjaro-chroot /mnt /bin/bash
 deployiso is a script to upload a specific iso or a buiildset to SF.
 It needs to be run inside the iso-profiles directory.
 
+Ideally, you have a running ssh agent on the host, and your key added, and your public key provided to your SF account. You can then upload without being asked for ssh password.
+
 ~~~
 $ deployiso -h
 Usage: deployiso [options]
     -p                 Source folder to upload [default:default]
     -c                 Create new remote edition_type with subtree
-    -u                 Update remote iso (diff only)
+    -u                 Update remote iso
     -l                 Limit bandwidth in kB/s
     -q                 Query settings and pretend upload
     -h                 This help
