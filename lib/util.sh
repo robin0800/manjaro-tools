@@ -14,8 +14,6 @@ read_set(){
 		_com_rm="s|#.*||g" \
 		buildlist=''
 
-#         msg3 "Loading [$1] ..."
-
 	buildlist=$(sed "$_com_rm" "$1" \
 			| sed "$_space" \
 			| sed "$_clean")
@@ -23,49 +21,23 @@ read_set(){
         echo ${buildlist}
 }
 
-create_set(){
-	msg "[$1/${name}.set]"
-	if [[ -f $1/${name}.set ]];then
-		msg3 "Backing up $1/${name}.set.orig"
-		mv "$1/${name}.set" "$1/${name}.set.orig"
-	fi
-	local list=$(find * -maxdepth 0 -type d | sort)
-	for item in ${list[@]};do
-		if [[ -f $item/$2 ]];then
-			cd $item
-				msg2 "Adding ${item##*/}"
-				echo ${item##*/} >> $1/${name}.set || break
-			cd ..
-		fi
+# $1: sets_dir
+load_sets(){
+	local prof temp
+	for item in $(ls $1/*.set); do
+		temp=${item##*/}
+		prof=${prof:-}${prof:+|}${temp%.set}
 	done
+	echo $prof
 }
 
-get_deps(){
-	echo $(pactree -u $1)
-}
-
-calculate_build_order(){
-	msg3 "Calculating build order ..."
-	for pkg in $(read_set $1/${name}.set);do
-		cd $pkg
-			mksrcinfo
-		cd ..
-	done
-}
-
-remove_set(){
-	if [[ -f $1/${name}.set ]]; then
-		msg "Removing [$1/${name}.set] ..."
-		rm $1/${name}.set
-	fi
-}
-
-show_set(){
-	local list=$(read_set $1/${name}.set)
-	msg "Content of [$1/${name}.set] ..."
-	for item in ${list[@]}; do
-		msg2 "$item"
-	done
+# $1: buildset
+# $2: sets_dir
+eval_buildset(){
+	eval "case $1 in
+		$(load_sets $2)) is_buildset=true ;;
+		*) is_buildset=false ;;
+	esac"
 }
 
 get_timer(){
@@ -117,107 +89,6 @@ process_sofile() {
 	fi
 }
 
-##
-#  usage : get_full_version( [$pkgname] )
-# return : full version spec, including epoch (if necessary), pkgver, pkgrel
-##
-get_full_version() {
-	# set defaults if they weren't specified in buildfile
-	pkgbase=${pkgbase:-${pkgname[0]}}
-	epoch=${epoch:-0}
-	if [[ -z $1 ]]; then
-		if [[ $epoch ]] && (( ! $epoch )); then
-			echo $pkgver-$pkgrel
-		else
-			echo $epoch:$pkgver-$pkgrel
-		fi
-	else
-		for i in pkgver pkgrel epoch; do
-			local indirect="${i}_override"
-			eval $(declare -f package_$1 | sed -n "s/\(^[[:space:]]*$i=\)/${i}_override=/p")
-			[[ -z ${!indirect} ]] && eval ${indirect}=\"${!i}\"
-		done
-		if (( ! $epoch_override )); then
-			echo $pkgver_override-$pkgrel_override
-		else
-			echo $epoch_override:$pkgver_override-$pkgrel_override
-		fi
-	fi
-}
-
-##
-#  usage: find_cached_package( $pkgname, $pkgver, $arch )
-#
-#    $pkgver can be supplied with or without a pkgrel appended.
-#    If not supplied, any pkgrel will be matched.
-##
-find_cached_package() {
-	local searchdirs=("$PWD" "$PKGDEST") results=()
-	local targetname=$1 targetver=$2 targetarch=$3
-	local dir pkg pkgbasename pkgparts name ver rel arch size r results
-
-	for dir in "${searchdirs[@]}"; do
-		[[ -d $dir ]] || continue
-
-		for pkg in "$dir"/*.pkg.tar.xz; do
-			[[ -f $pkg ]] || continue
-
-			# avoid adding duplicates of the same inode
-			for r in "${results[@]}"; do
-				[[ $r -ef $pkg ]] && continue 2
-			done
-
-			# split apart package filename into parts
-			pkgbasename=${pkg##*/}
-			pkgbasename=${pkgbasename%.pkg.tar?(.?z)}
-
-			arch=${pkgbasename##*-}
-			pkgbasename=${pkgbasename%-"$arch"}
-
-			rel=${pkgbasename##*-}
-			pkgbasename=${pkgbasename%-"$rel"}
-
-			ver=${pkgbasename##*-}
-			name=${pkgbasename%-"$ver"}
-
-			if [[ $targetname = "$name" && $targetarch = "$arch" ]] &&
-				pkgver_equal "$targetver" "$ver-$rel"; then
-				results+=("$pkg")
-			fi
-		done
-	done
-
-	case ${#results[*]} in
-		0)
-		return 1
-		;;
-		1)
-		printf '%s\n' "$results"
-		return 0
-		;;
-		*)
-		error 'Multiple packages found:'
-		printf '\t%s\n' "${results[@]}" >&2
-		return 1
-		;;
-	esac
-}
-
-##
-# usage: pkgver_equal( $pkgver1, $pkgver2 )
-##
-pkgver_equal() {
-	local left right
-
-	if [[ $1 = *-* && $2 = *-* ]]; then
-		# if both versions have a pkgrel, then they must be an exact match
-		[[ $1 = "$2" ]]
-	else
-		# otherwise, trim any pkgrel and compare the bare version.
-		[[ ${1%%-*} = "${2%%-*}" ]]
-	fi
-}
-
 check_root() {
 	(( EUID == 0 )) && return
 	if type -P sudo >/dev/null; then
@@ -225,71 +96,6 @@ check_root() {
 	else
 		exec su root -c "$(printf ' %q' "$@")"
 	fi
-}
-
-
-# $1: section
-parse_section() {
-	local is_section=0
-	while read line; do
-		[[ $line =~ ^\ {0,}# ]] && continue
-		[[ -z "$line" ]] && continue
-		if [ $is_section == 0 ]; then
-			if [[ $line =~ ^\[.*?\] ]]; then
-				line=${line:1:$((${#line}-2))}
-				section=${line// /}
-				if [[ $section == $1 ]]; then
-					is_section=1
-					continue
-				fi
-				continue
-			fi
-		elif [[ $line =~ ^\[.*?\] && $is_section == 1 ]]; then
-			break
-		else
-			pc_key=${line%%=*}
-			pc_key=${pc_key// /}
-			pc_value=${line##*=}
-			pc_value=${pc_value## }
-			eval "$pc_key='$pc_value'"
-		fi
-	done < "${pacman_conf}"
-}
-
-get_repos() {
-	local section repos=() filter='^\ {0,}#'
-	while read line; do
-		[[ $line =~ "${filter}" ]] && continue
-		[[ -z "$line" ]] && continue
-		if [[ $line =~ ^\[.*?\] ]]; then
-			line=${line:1:$((${#line}-2))}
-			section=${line// /}
-			case ${section} in
-				"options") continue ;;
-				*) repos+=("${section}") ;;
-			esac
-		fi
-	done < "${pacman_conf}"
-	echo ${repos[@]}
-}
-
-clean_pacman_conf(){
-	local repositories=$(get_repos) uri='file://'
-	msg "Cleaning [$1/etc/pacman.conf] ..."
-	for repo in ${repositories[@]}; do
-		case ${repo} in
-			'options'|'core'|'extra'|'community'|'multilib') continue ;;
-			*)
-				msg2 "parsing [${repo}] ..."
-				parse_section ${repo}
-				if [[ ${pc_value} == $uri* ]]; then
-					msg2 "Removing local repo [${repo}] ..."
-					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
-				fi
-			;;
-		esac
-	done
-	msg "Done cleaning [$1/etc/pacman.conf]"
 }
 
 copy_mirrorlist(){
@@ -558,25 +364,6 @@ clean_dir(){
 		msg "Cleaning [$1] ..."
 		rm -r $1/*
 	fi
-}
-
-# $1: sets_dir
-load_sets(){
-	local prof temp
-	for item in $(ls $1/*.set); do
-		temp=${item##*/}
-		prof=${prof:-}${prof:+|}${temp%.set}
-	done
-	echo $prof
-}
-
-# $1: buildset
-# $2: sets_dir
-eval_buildset(){
-	eval "case $1 in
-		$(load_sets $2)) is_buildset=true ;;
-		*) is_buildset=false ;;
-	esac"
 }
 
 load_user_info(){

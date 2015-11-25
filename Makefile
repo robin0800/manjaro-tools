@@ -74,6 +74,7 @@ LIBS_ISO = \
 	lib/util-livecd.sh \
 	lib/util-iso-boot.sh \
 	lib/util-publish.sh \
+	lib/util-sets.sh \
 	lib/util-iso-log.sh
 
 CPIOHOOKS = \
