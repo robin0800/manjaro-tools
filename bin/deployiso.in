@@ -78,14 +78,14 @@ pretend=false
 remote_create=false
 update=false
 
-rsync_args=(-av --progress -e ssh)
+rsync_args=(-avP --progress -e ssh)
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p                 Source folder to upload [default:${buildset_iso}]"
+	echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
 	echo '    -c                 Create new remote edition_type with subtree'
 	echo '    -u                 Update remote iso'
-	echo '    -l                 Limit bandwidth in kB/s'
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -h                 This help'
 	echo ''
@@ -98,7 +98,7 @@ opts='p:l:cuqh'
 while getopts "${opts}" arg; do
 	case "${arg}" in
                 p) buildset_iso="$OPTARG" ;;
-                l) limit="$OPTARG"; rsync_args+=(--bwlimit=${limit}) ;;
+                l) limit="$OPTARG" ;;
                 c) remote_create=true ;;
                 u) update=true; rsync_args+=(-u) ;;
 		q) pretend=true ;;
@@ -112,6 +112,8 @@ shift $(($OPTIND - 1))
 timer_start=$(get_timer)
 
 eval_buildset "${buildset_iso}" "${sets_dir_iso}"
+
+rsync_args+=(--bwlimit=${limit})
 
 sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
 shell_url=${remote_user},${remote_project}@shell.${remote_url}
