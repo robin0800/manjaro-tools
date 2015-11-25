@@ -67,6 +67,7 @@ display_settings(){
 
 	msg "UPLOAD QUEUE:"
 	show_upload_queue
+	upload
 }
 
 load_user_info
@@ -101,7 +102,7 @@ while getopts "${opts}" arg; do
                 l) limit="$OPTARG" ;;
                 c) remote_create=true ;;
                 u) update=true; rsync_args+=(-u) ;;
-		q) pretend=true ;;
+		q) pretend=true; rsync_args+=(-n) ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
 	esac
