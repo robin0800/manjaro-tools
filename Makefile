@@ -59,6 +59,7 @@ LIBS = \
 	lib/util.sh \
 	lib/util-mount.sh \
 	lib/util-msg.sh \
+	lib/util-pac-conf.sh \
 	lib/util-fstab.sh
 
 LIBS_PKG = \
