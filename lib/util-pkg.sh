@@ -286,3 +286,20 @@ find_cached_package() {
 		;;
 	esac
 }
+
+# $1: sofile
+# $2: soarch
+process_sofile() {
+	# extract the library name: libfoo.so
+	local soname="${1%.so?(+(.+([0-9])))}".so
+	# extract the major version: 1
+	soversion="${1##*\.so\.}"
+	if [[ "$soversion" = "$1" ]] && (($IGNORE_INTERNAL)); then
+		continue
+	fi
+	if ! in_array "${soname}=${soversion}-$2" ${soobjects[@]}; then
+	# libfoo.so=1-64
+		msg "${soname}=${soversion}-$2"
+		soobjects+=("${soname}=${soversion}-$2")
+	fi
+}
