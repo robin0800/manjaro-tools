@@ -15,9 +15,9 @@ create_subtree_ssh(){
 }
 
 create_subtree(){
-	msg "Create ${edition_type}/$1 ..."
-	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}
-	rsync ${rsync_args[*]} /dev/null ${sf_url}/$1
+	msg "Create (${edition_type}/$1) ..."
+	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/
+	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/$1/
 	msg "Done"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
