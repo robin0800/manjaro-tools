@@ -9,18 +9,20 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-create_release(){
+create_subtree_ssh(){
         ssh !${remote_user}@${shell_url} mkdir -pv ${remote_target}/${remote_project}/${remote_tree}
+}
+
+create_subtree(){
+	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/
+	rsync ${rsync_args[*]} /dev/null ${sf_url}/${remote_tree}/
 }
 
 sync_dir(){
 	cd $1
 		load_profile "$1"
 		msg "Start upload [$1] ..."
-		if ${remote_create}; then
-			rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/
-			rsync ${rsync_args[*]} /dev/null ${sf_url}/${remote_tree}/
-		fi
+		${remote_create} && create_subtree
 		rsync ${rsync_args[*]} ${cache_dir_iso}/ ${sf_url}/${remote_tree}/$1
 
 		msg "Done upload [$1]"
