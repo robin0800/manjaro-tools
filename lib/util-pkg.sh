@@ -186,9 +186,6 @@ chroot_init(){
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
-##
-# usage: pkgver_equal( $pkgver1, $pkgver2 )
-##
 pkgver_equal() {
 	local left right
 
@@ -201,10 +198,6 @@ pkgver_equal() {
 	fi
 }
 
-##
-#  usage : get_full_version( [$pkgname] )
-# return : full version spec, including epoch (if necessary), pkgver, pkgrel
-##
 get_full_version() {
 	# set defaults if they weren't specified in buildfile
 	pkgbase=${pkgbase:-${pkgname[0]}}
@@ -229,12 +222,6 @@ get_full_version() {
 	fi
 }
 
-##
-#  usage: find_cached_package( $pkgname, $pkgver, $arch )
-#
-#    $pkgver can be supplied with or without a pkgrel appended.
-#    If not supplied, any pkgrel will be matched.
-##
 find_cached_package() {
 	local searchdirs=("$PWD" "$PKGDEST") results=()
 	local targetname=$1 targetver=$2 targetarch=$3
@@ -285,6 +272,15 @@ find_cached_package() {
 		return 1
 		;;
 	esac
+}
+
+in_array() {
+	local needle=$1; shift
+	local item
+	for item in "$@"; do
+		[[ $item = $needle ]] && return 0 # Found
+	done
+	return 1 # Not Found
 }
 
 # $1: sofile

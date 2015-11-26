@@ -58,20 +58,6 @@ elapsed_time_ms(){
 	echo $(echo $1 $(get_timer_ms) | awk '{ printf "%0.3f",($2-$1)/1000 }')
 }
 
-##
-#  usage : in_array( $needle, $haystack )
-# return : 0 - found
-#          1 - not found
-##
-in_array() {
-	local needle=$1; shift
-	local item
-	for item in "$@"; do
-		[[ $item = $needle ]] && return 0 # Found
-	done
-	return 1 # Not Found
-}
-
 check_root() {
 	(( EUID == 0 )) && return
 	if type -P sudo >/dev/null; then
@@ -382,16 +368,16 @@ fix_dbus(){
 	#msg "running processes: "
 	#lsof | grep $1
 
-	local PREFIX="$1" LINK PID NAME
-	for ROOT in /proc/*/root; do
-		LINK=$(readlink $ROOT)
-		if [ "x$LINK" != "x" ]; then
-			if [ "x${LINK:0:${#PREFIX}}" = "x$PREFIX" ]; then
+	local prefix="$1" flink pid name
+	for root_dir in /proc/*/root; do
+		flink=$(readlink $root_dir)
+		if [ "x$flink" != "x" ]; then
+			if [ "x${flink:0:${#prefix}}" = "x$prefix" ]; then
 				# this process is in the chroot...
-				PID=$(basename $(dirname "$ROOT"))
-				NAME=$(ps -p $PID -o comm=)
-				msg3 "Killing chroot process: $NAME ($PID)"
-				kill -9 "$PID"
+				pid=$(basename $(dirname "$root_dir"))
+				name=$(ps -p $pid -o comm=)
+				msg3 "Killing chroot process: $name ($pid)"
+				kill -9 "$pid"
 			fi
 		fi
 	done
@@ -419,6 +405,13 @@ is_valid_bool(){
 is_valid_init(){
 	case $1 in
 		'openrc'|'systemd') return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+is_valid_edition(){
+	case $1 in
+		'official'|'community'|'community-minimal'|'sonar'|'netrunner') return 0 ;;
 		*) return 1 ;;
 	esac
 }
