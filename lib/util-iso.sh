@@ -571,6 +571,9 @@ check_profile_conf(){
 	if ! is_valid_init "${initsys}";then
 		die "initsys only accepts openrc/systemd value!"
 	fi
+	if ! is_valid_edition "${edition_type}";then
+		die "edition_type only accepts official/community/community-minimal/sonar/netrunner value!"
+	fi
 	if ! is_valid_bool "${autologin}";then
 		die "autologin only accepts true/false value!"
 	fi
@@ -615,9 +618,9 @@ load_profile(){
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 
-	remote_tree="${edition_type}/${dist_release}"
+	remote_tree="${edition_type}/$1/${dist_release}"
 
-	cache_dir_iso="${cache_dir}/iso/${remote_tree}/$1"
+	cache_dir_iso="${cache_dir}/iso/${remote_tree}"
 	prepare_dir "${cache_dir_iso}"
 }
 
