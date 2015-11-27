@@ -618,7 +618,7 @@ load_profile(){
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 
-	remote_tree="${edition_type}/$1/${dist_release}"
+	remote_tree="${edition_type}/$1/${dist_release}/${arch}"
 
 	cache_dir_iso="${cache_dir}/iso/${remote_tree}"
 	prepare_dir "${cache_dir_iso}"

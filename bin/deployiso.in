@@ -49,6 +49,7 @@ display_settings(){
 	msg2 "is_buildset: ${is_buildset}"
 
 	msg "OPTIONS:"
+	msg2 "arch: ${arch}"
 	msg2 "limit: ${limit} kB/s"
 
 	msg "ARGS:"
@@ -86,6 +87,7 @@ rsync_args=(-aP --progress -e ssh)
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p                 Source folder to upload [default:${buildset_iso}]"
+	echo "    -a                 Arch to upload [default:${arch}]"
 	echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
 	echo '    -c                 Create new remote edition_type with subtree'
 	echo '    -u                 Update remote iso'
@@ -97,11 +99,12 @@ usage() {
 	exit $1
 }
 
-opts='p:l:cuvqh'
+opts='p:a:l:cuvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
                 p) buildset_iso="$OPTARG" ;;
+                a) arch="$OPTARG" ;;
                 l) limit="$OPTARG" ;;
                 c) remote_create=true ;;
                 u) update=true; rsync_args+=(-u) ;;

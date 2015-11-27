@@ -415,3 +415,17 @@ is_valid_edition(){
 		*) return 1 ;;
 	esac
 }
+
+is_valid_arch_pkg(){
+	case $1 in
+		'i686'|'x86_64'|'multilib') return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+is_valid_arch_iso(){
+	case $1 in
+		'i686'|'x86_64') return 0 ;;
+		*) return 1 ;;
+	esac
+}
