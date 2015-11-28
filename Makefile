@@ -103,6 +103,7 @@ MAN_XML = \
 	buildpkg.xml \
 	buildtree.xml \
 	buildiso.xml \
+	deployiso.xml \
 	manjaro-tools.conf.xml \
 	profile.conf.xml
 
