@@ -14,8 +14,8 @@ read_set(){
 		_com_rm="s|#.*||g"
 
 	stack=$(sed "$_com_rm" "$1" \
-			| sed "$_space" \
-			| sed "$_clean")
+		| sed "$_space" \
+		| sed "$_clean")
 }
 
 # $1: sets_dir
@@ -111,25 +111,6 @@ version_gen2(){
             08) dist_release=${y:2}.06.2 ;;
             10) dist_release=${y:2}.09.1 ;;
             11) dist_release=${y:2}.09.2 ;;
-        esac
-    done
-}
-
-version_gen3(){
-    local y=$(date +%Y) m=$(date +%m)
-    local release_versions=($y.03 $y.06 $y.09 $y.12)
-
-    for ver in ${release_versions[@]};do
-        case $m in
-            01) dist_release=${y:2}.12-r1 ;;
-            02) dist_release=${y:2}.12-r2 ;;
-            03|06|09|12) dist_release=${y:2}.${ver#.*} ;;
-            04) dist_release=${y:2}.03-r1 ;;
-            05) dist_release=${y:2}.03-r2 ;;
-            07) dist_release=${y:2}.06-r1 ;;
-            08) dist_release=${y:2}.06-r2 ;;
-            10) dist_release=${y:2}.09-r1 ;;
-            11) dist_release=${y:2}.09-r2 ;;
         esac
     done
 }
@@ -359,7 +340,7 @@ show_config(){
 }
 
 # $1: chroot
-fix_dbus(){
+kill_chroot_process(){
 	# enable to have more debug info
 	#msg "machine-id (etc): $(cat $1/etc/machine-id)"
 	#[[ -e $1/var/lib/dbus/machine-id ]] && msg "machine-id (lib): $(cat $1/var/lib/dbus/machine-id)"
@@ -437,8 +418,8 @@ is_valid_branch(){
 
 run(){
 	if ${is_buildset};then
-		for p in ${stack[@]};do
-			$1 $p
+		for item in ${stack[@]};do
+			$1 $item
 		done
 	else
 		$1 $2

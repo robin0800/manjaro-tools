@@ -104,11 +104,6 @@ clean_up(){
 	fi
 }
 
-# prepare_cachedir(){
-# 	prepare_dir "${cache_dir_pkg}"
-# 	chown -R "${OWNER}:users" "${cache_dir_pkg}"
-# }
-
 sign_pkg(){
 	su ${OWNER} -c "signpkg ${cache_dir_pkg}/$1"
 }
@@ -168,23 +163,12 @@ make_pkg(){
 	msg "Start building [$1]"
 	cd $1
 		setarch "${arch}" \
-			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
+			mkchrootpkg ${mkchrootpkg_args[*]} || eval "$2"
 		run_post_build
 	cd ..
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
-
-# chroot_build(){
-# 	if ${is_buildset};then
-# 		for pkg in ${buildlist[@]}; do
-# 			make_pkg "$pkg" "break"
-# 		done
-# 	else
-# 		make_pkg "${buildset_pkg}" "abort"
-# 	fi
-# }
-
 
 pkgver_equal() {
 	local left right
