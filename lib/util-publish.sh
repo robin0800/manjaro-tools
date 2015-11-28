@@ -33,13 +33,3 @@ sync_dir(){
 		msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 	cd ..
 }
-
-upload(){
-	if ${is_buildset};then
-		for prof in ${buildlist[@]}; do
-			sync_dir "$prof"
-		done
-	else
-		sync_dir "${buildset_iso}"
-	fi
-}

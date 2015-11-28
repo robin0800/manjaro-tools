@@ -11,14 +11,11 @@
 read_set(){
 	local _space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \
-		_com_rm="s|#.*||g" \
-		buildlist=''
+		_com_rm="s|#.*||g"
 
-	buildlist=$(sed "$_com_rm" "$1" \
+	stack=$(sed "$_com_rm" "$1" \
 			| sed "$_space" \
 			| sed "$_clean")
-
-        echo ${buildlist}
 }
 
 # $1: sets_dir
@@ -38,6 +35,7 @@ eval_buildset(){
 		$(load_sets $2)) is_buildset=true ;;
 		*) is_buildset=false ;;
 	esac"
+	${is_buildset} && read_set $2/$1.set
 }
 
 get_timer(){
@@ -428,4 +426,21 @@ is_valid_arch_iso(){
 		'i686'|'x86_64') return 0 ;;
 		*) return 1 ;;
 	esac
+}
+
+is_valid_branch(){
+	case $1 in
+		'stable'|'testing'|'unstable') return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+run(){
+	if ${is_buildset};then
+		for p in ${stack[@]};do
+			$1 $p
+		done
+	else
+		$1 $2
+	fi
 }

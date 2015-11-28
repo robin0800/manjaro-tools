@@ -63,18 +63,6 @@ show_profile(){
 	cd ..
 }
 
-show_build_queue(){
-	if ${is_buildset};then
-		for item in ${buildlist[@]}; do
-			check_profile "$item" "break"
-			show_profile "$item"
-		done
-	else
-		check_profile "${buildset_iso}" 'die "Profile sanity check failed."'
-		show_profile "${buildset_iso}"
-	fi
-}
-
 display_settings(){
 	show_version
 	show_config
@@ -110,7 +98,7 @@ display_settings(){
 	msg2 "use_overlayfs: ${use_overlayfs}"
 
 	msg "BUILD QUEUE:"
-	show_build_queue
+	run show_profile "${buildset_iso}"
 }
 
 load_user_info
@@ -174,7 +162,7 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-[[ "$arch" == 'x86_64' ]] && pacman_conf_arch='multilib'
+[[ "${arch}" == 'x86_64' ]] && pacman_conf_arch='multilib'
 
 mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
 
@@ -184,10 +172,8 @@ eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
 import ${LIBDIR}/util-iso.sh
 
-${is_buildset} && buildlist=$(read_set ${sets_dir_iso}/${buildset_iso}.set)
-
-check_requirements
+check_requirements "${buildset_iso}"
 
 ${pretend} && display_settings && exit 1
 
-build_iso
+run make_profile "${buildset_iso}"

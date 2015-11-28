@@ -22,9 +22,15 @@ import_util_iso_fs(){
 	fi
 }
 
+find_profile(){
+	local result=$(find . -maxdepth 1 -name "$1")
+	[[ -z $result ]] && die "${buildset_iso} is not a valid profile or buildset!"
+}
+
 # $1: path
 # $2: exit code
 check_profile(){
+	find_profile "$1"
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
 	local has_keyfiles=false has_keydirs=false
@@ -50,14 +56,12 @@ check_profile(){
 }
 
 check_requirements(){
-	if ${is_buildset};then
-		for p in ${buildlist[@]};do
-			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_iso} is not a valid buildset!"
-			check_profile "$p"
-		done
-	else
-		[[ -z $(find . -type d -name "${buildset_iso}") ]] && die "${buildset_iso} is not a valid profile directory!"
-		check_profile "${buildset_iso}"
+	run check_profile "${buildset_iso}"
+	if ! $(is_valid_arch_iso ${arch});then
+		die "${arch} is not a valid arch!"
+	fi
+	if ! $(is_valid_branch ${branch});then
+		die "${branch} is not a valid branch!"
 	fi
 }
 
@@ -682,12 +686,3 @@ make_profile(){
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
 
-build_iso(){
-	if ${is_buildset};then
-		for prof in ${buildlist[@]}; do
-			make_profile "$prof"
-		done
-	else
-		make_profile "${buildset_iso}"
-	fi
-}

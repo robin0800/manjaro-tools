@@ -10,19 +10,17 @@
 # GNU General Public License for more details.
 
 check_build(){
+	find_pkg $1
 	[[ ! -f $1/PKGBUILD ]] && die "Directory must contain a PKGBUILD!"
 }
 
+find_pkg(){
+	local result=$(find . -type d -name "$1")
+	[[ -z $result ]] && die "$1 is not a valid package or buildset!"
+}
+
 check_requirements(){
-	if ${is_buildset};then
-		for p in ${buildlist[@]};do
-			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_pkg} is not a valid buildset!"
-			check_build "$p"
-		done
-	else
-		[[ -z $(find . -type d -name "${buildset_pkg}") ]] && die "${buildset_pkg} is not a valid package!"
-		check_build "${buildset_pkg}"
-	fi
+	run check_build "${buildset_pkg}"
 }
 
 load_group(){
@@ -106,10 +104,10 @@ clean_up(){
 	fi
 }
 
-prepare_cachedir(){
-	prepare_dir "${cache_dir_pkg}"
-	chown -R "${OWNER}:users" "${cache_dir_pkg}"
-}
+# prepare_cachedir(){
+# 	prepare_dir "${cache_dir_pkg}"
+# 	chown -R "${OWNER}:users" "${cache_dir_pkg}"
+# }
 
 sign_pkg(){
 	su ${OWNER} -c "signpkg ${cache_dir_pkg}/$1"
@@ -152,27 +150,6 @@ run_post_build(){
 	arch=$_arch
 }
 
-make_pkg(){
-	msg "Start building [$1]"
-	cd $1
-		setarch "${arch}" \
-			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
-		run_post_build
-	cd ..
-	msg "Finished building [$1]"
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
-}
-
-chroot_build(){
-	if ${is_buildset};then
-		for pkg in ${buildlist[@]}; do
-			make_pkg "$pkg" "break"
-		done
-	else
-		make_pkg "${buildset_pkg}" "abort"
-	fi
-}
-
 chroot_init(){
 	local timer=$(get_timer)
 	if ${clean_first}; then
@@ -185,6 +162,29 @@ chroot_init(){
 	fi
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
+
+make_pkg(){
+	chroot_init
+	msg "Start building [$1]"
+	cd $1
+		setarch "${arch}" \
+			mkchrootpkg ${mkchrootpkg_args[*]} -- ${makepkg_args[*]} || eval "$2"
+		run_post_build
+	cd ..
+	msg "Finished building [$1]"
+	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
+}
+
+# chroot_build(){
+# 	if ${is_buildset};then
+# 		for pkg in ${buildlist[@]}; do
+# 			make_pkg "$pkg" "break"
+# 		done
+# 	else
+# 		make_pkg "${buildset_pkg}" "abort"
+# 	fi
+# }
+
 
 pkgver_equal() {
 	local left right

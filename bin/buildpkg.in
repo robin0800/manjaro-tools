@@ -22,29 +22,13 @@ SYSCONFDIR='@sysconfdir@'
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-pkg.sh
 
-show_build_queue(){
-	if ${is_buildset};then
-		for item in ${buildlist[@]}; do
-			msg3 "Package: [$item]"
+show_pkg(){
+	cd $1
+		source PKGBUILD
+		for n in ${pkgname[@]}; do
+			msg2 "$n"
 		done
-	else
-		for arg in "${makepkg_args[@]}"; do
-			case ${arg} in
-				--pkg) continue ;;
-				-*) continue ;;
-				*) local split_arg=${arg} ;;
-			esac
-		done
-		if [[ -n ${split_arg} ]]; then
-			local IFS=','
-			for item in ${split_arg}; do
-				msg3 "Package: [$item]"
-			done
-			unset IFS
-		else
-			msg3 "Package: [${buildset_pkg}]"
-		fi
-	fi
+	cd ..
 }
 
 display_settings(){
@@ -82,7 +66,7 @@ display_settings(){
 	fi
 
 	msg "BUILD QUEUE:"
-	show_build_queue
+	run show_pkg "${buildset_pkg}"
 }
 
 load_user_info
@@ -104,7 +88,7 @@ sign=false
 udev_root=false
 
 usage() {
-	echo "Usage: ${0##*/} [options] [--] [makepkg args]"
+	echo "Usage: ${0##*/} [options]"
 	echo "    -p <pkg>           Buildset or pkg [default: ${buildset_pkg}]"
 	echo "    -a <arch>          Arch [default: ${arch}]"
 	echo "    -b <branch>        Branch [default: ${branch}]"
@@ -166,17 +150,13 @@ mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${bu
 
 mkchrootpkg_args+=(-r ${work_dir})
 
-makepkg_args+=("${@:$OPTIND}")
-
 check_root "$0" "${orig_argv[@]}"
 
 timer_start=$(get_timer)
 
-prepare_cachedir
+prepare_dir "${cache_dir_pkg}"
 
 eval_buildset "${buildset_pkg}" "${sets_dir_pkg}"
-
-${is_buildset} && buildlist=$(read_set ${sets_dir_pkg}/${buildset_pkg}.set)
 
 check_requirements
 
@@ -188,6 +168,4 @@ ${wipe_clean} && clean_up
 
 [[ -d ${work_dir}/root ]] && check_chroot_version "${work_dir}/root"
 
-chroot_init
-
-chroot_build
+run make_pkg "${buildset_pkg}"
