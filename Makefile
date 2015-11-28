@@ -194,6 +194,7 @@ install_iso:
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/man/man1
 	gzip -c man/buildiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
+	gzip -c man/deployiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/deployiso.1.gz
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/man/man5
 	gzip -c man/manjaro-tools.conf.5 > $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
@@ -230,6 +231,7 @@ uninstall_iso:
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
 	for f in ${SCRIPTS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/deployiso.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/profile.conf.5.gz
 
