@@ -53,7 +53,6 @@ display_settings(){
 	msg2 "sign: ${sign}"
 	msg2 "udev_root: ${udev_root}"
 	msg2 "mkchroot_args: ${mkchroot_args[*]}"
-        msg2 "makepkg_args: ${makepkg_args[*]}"
 
 	msg "PATHS:"
 	msg2 "work_dir: ${work_dir}"
