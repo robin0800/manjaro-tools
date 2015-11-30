@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 create_subtree_ssh(){
-	local tree=${remote_target}/${remote_project}/${remote_tree}
+	local tree=${remote_target}/${remote_project}/${remote_dir}
         ssh !${remote_user}@${shell_url} [[ ! -d $tree ]] && mkdir -pv $tree
 }
 
@@ -24,8 +24,8 @@ create_subtree(){
 }
 
 prepare_transfer(){
-	remote_tree="${edition_type}/$1/${dist_release}/${arch}"
-	src_tree="${cache_dir_iso}/${remote_tree}"
+	remote_dir="${edition_type}/$1/${dist_release}/${arch}"
+	src_dir="${cache_dir_iso}/${remote_dir}"
 }
 
 sync_dir(){
@@ -34,7 +34,7 @@ sync_dir(){
 		prepare_transfer "$1"
 		${remote_create} && create_subtree "$1"
 		msg "Start upload [$1] ..."
-		rsync ${rsync_args[*]} ${src_tree}/ ${sf_url}/${remote_tree}/
+		rsync ${rsync_args[*]} ${src_dir}/ ${sf_url}/${remote_dir}/
 		msg "Done upload [$1]"
 		msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 	cd ../..

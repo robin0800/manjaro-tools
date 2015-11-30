@@ -172,7 +172,7 @@ run_xorriso(){
 			-no-emul-boot -boot-load-size 4 -boot-info-table \
 			-isohybrid-mbr "${work_dir}/iso/isolinux/isohdpfx.bin" \
 			${efi_boot_args[@]} \
-			-output "${dir_iso}/${iso_file}" \
+			-output "${iso_dir}/${iso_file}" \
 			"${work_dir}/iso/"
 }
 
@@ -192,9 +192,9 @@ make_iso() {
 	msg "Making bootable image"
 	# Sanity checks
 	[[ ! -d "${work_dir}/iso" ]] && die "[${work_dir}/iso] doesn't exist. What did you do?!"
-	if [[ -f "${dir_iso}/${iso_file}" ]]; then
+	if [[ -f "${iso_dir}/${iso_file}" ]]; then
 		msg2 "Removing existing bootable image..."
-		rm -rf "${dir_iso}/${iso_file}"
+		rm -rf "${iso_dir}/${iso_file}"
 	fi
 
 	run_xorriso
@@ -204,7 +204,7 @@ make_iso() {
 
 # $1: file
 make_checksum(){
-	cd ${dir_iso}
+	cd ${iso_dir}
 		msg "Creating [${iso_checksum}sum] ..."
 		local cs=$(${iso_checksum}sum $1)
 		msg2 "${iso_checksum}sum: ${cs}"
@@ -254,7 +254,7 @@ make_image_custom() {
 		else
 			local pkgs_file="${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt"
 		fi
-		cp "${path}/${custom}-image-pkgs.txt" ${dir_iso}/${pkgs_file}
+		cp "${path}/${custom}-image-pkgs.txt" ${iso_dir}/${pkgs_file}
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
@@ -615,16 +615,16 @@ load_profile(){
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 
-	dir_iso="${cache_dir_iso}/${edition_type}/$1/${dist_release}/${arch}"
+	iso_dir="${cache_dir_iso}/${edition_type}/$1/${dist_release}/${arch}"
 
-	prepare_dir "${dir_iso}"
+	prepare_dir "${iso_dir}"
 }
 
 compress_images(){
 	local timer=$(get_timer)
 	make_iso
 	make_checksum "${iso_file}"
-	chown -R "${OWNER}:users" "${dir_iso}"
+	chown -R "${OWNER}:users" "${iso_dir}"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
