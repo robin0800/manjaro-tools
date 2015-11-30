@@ -38,6 +38,13 @@ eval_buildset(){
 	${is_buildset} && read_set $2/$1.set
 }
 
+eval_edition(){
+	local result=$(find . -maxdepth 2 -name "$1") et
+	[[ -z $result ]] && die "$1 is not a valid profile or buildset!"
+	et=${result#./*}
+	edition_type=${et%%/*}
+}
+
 get_timer(){
 	echo $(date +%s)
 }
@@ -149,6 +156,8 @@ init_buildpkg(){
 	prepare_dir "${sets_dir_pkg}"
 
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
+
+	cache_dir_pkg=${cache_dir}/pkg
 }
 
 init_buildiso(){
@@ -159,6 +168,8 @@ init_buildiso(){
 	prepare_dir "${sets_dir_iso}"
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
+
+	cache_dir_iso="${cache_dir}/iso"
 
 	##### iso settings #####
 
@@ -423,13 +434,5 @@ run(){
 		done
 	else
 		$1 $2
-	fi
-}
-
-run_svc(){
-	if [[ -d /run/systemd ]];then
-		$@
-	else
-		$@
 	fi
 }

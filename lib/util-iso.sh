@@ -22,13 +22,6 @@ import_util_iso_fs(){
 	fi
 }
 
-eval_edition(){
-	local result=$(find . -maxdepth 2 -name "$1") et
-	[[ -z $result ]] && die "$1 is not a valid profile or buildset!"
-	et=${result#./*}
-	edition_type=${et%/*}
-}
-
 # $1: path
 # $2: exit code
 check_profile(){
@@ -530,7 +523,7 @@ load_pkgs(){
 	local list
 
 	if [[ $1 == "${packages_custom}" ]];then
-		sort -u ../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
+		sort -u ../../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
 		list=${work_dir}/${packages_custom}
 	else
 		list=$1
@@ -623,9 +616,8 @@ load_profile(){
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 
-	remote_tree="${edition_type}/$1/${dist_release}/${arch}"
+	cache_dir_iso="${cache_dir_iso}/${edition_type}/$1/${dist_release}/${arch}"
 
-	cache_dir_iso="${cache_dir}/iso/${remote_tree}"
 	prepare_dir "${cache_dir_iso}"
 }
 
@@ -666,7 +658,7 @@ build_images(){
 make_profile(){
 	eval_edition "$1"
 	msg "Start building [$1]"
-	cd $edition_type/$1
+	cd ${edition_type}/$1
 		load_profile "$1"
 		import_util_iso_fs
 		${clean_first} && chroot_clean "${work_dir}"

@@ -22,7 +22,7 @@ import ${LIBDIR}/util.sh
 
 show_profile(){
 	eval_edition "$1"
-	cd $edition_type/$1
+	cd ${edition_type}/$1
 		load_profile "$1"
 		if ${verbose};then
 			msg2 "edition_type: ${edition_type}"

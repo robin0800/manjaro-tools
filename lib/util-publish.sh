@@ -15,7 +15,7 @@ create_subtree_ssh(){
 }
 
 create_subtree(){
-	msg2 "Create (${edition_type}/$1) ..."
+	msg2 "Create (${edition_type}/$1/${dist_release}) ..."
 	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/
 	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/$1/
 	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition_type}/$1/${dist_release}/
@@ -25,12 +25,12 @@ create_subtree(){
 
 prepare_transfer(){
 	remote_tree="${edition_type}/$1/${dist_release}/${arch}"
-	cache_dir_iso="${cache_dir}/iso/${remote_tree}"
+	cache_dir_iso="${cache_dir_iso}/${remote_tree}"
 }
 
 sync_dir(){
 	eval_edition "$1"
-	cd cd $edition_type/$1
+	cd cd ${edition_type}/$1
 		prepare_transfer "$1"
 		${remote_create} && create_subtree "$1"
 		msg "Start upload [$1] ..."
