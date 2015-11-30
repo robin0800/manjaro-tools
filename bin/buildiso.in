@@ -21,7 +21,8 @@ SYSCONFDIR='@sysconfdir@'
 import ${LIBDIR}/util.sh
 
 show_profile(){
-	cd $1
+	eval_edition "$1"
+	cd $edition_type/$1
 		load_profile "$1"
 		if ${verbose};then
 			msg2 "edition_type: ${edition_type}"
@@ -60,7 +61,7 @@ show_profile(){
 				msg2 "disable_openrc: ${disable_openrc[*]}"
 			fi
 		fi
-	cd ..
+	cd ../..
 }
 
 display_settings(){
@@ -172,7 +173,7 @@ eval_buildset "${buildset_iso}" "${sets_dir_iso}"
 
 import ${LIBDIR}/util-iso.sh
 
-check_requirements "${buildset_iso}"
+check_requirements
 
 ${pretend} && display_settings && exit 1
 

@@ -22,15 +22,16 @@ import_util_iso_fs(){
 	fi
 }
 
-find_profile(){
-	local result=$(find . -maxdepth 1 -name "$1")
-	[[ -z $result ]] && die "${buildset_iso} is not a valid profile or buildset!"
+eval_edition(){
+	local result=$(find . -maxdepth 2 -name "$1") et
+	[[ -z $result ]] && die "$1 is not a valid profile or buildset!"
+	et=${result#./*}
+	edition_type=${et%/*}
 }
 
 # $1: path
 # $2: exit code
 check_profile(){
-	find_profile "$1"
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
 	local has_keyfiles=false has_keydirs=false
@@ -56,7 +57,6 @@ check_profile(){
 }
 
 check_requirements(){
-	run check_profile "${buildset_iso}"
 	if ! $(is_valid_arch_iso ${arch});then
 		die "${arch} is not a valid arch!"
 	fi
@@ -598,6 +598,7 @@ check_profile_conf(){
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1]"
+	check_profile "$1"
 	load_profile_config 'profile.conf'
 	check_profile_conf
 	local files=$(ls Packages*)
@@ -663,8 +664,9 @@ build_images(){
 }
 
 make_profile(){
+	eval_edition "$1"
 	msg "Start building [$1]"
-	cd $1
+	cd $edition_type/$1
 		load_profile "$1"
 		import_util_iso_fs
 		${clean_first} && chroot_clean "${work_dir}"
@@ -681,7 +683,7 @@ make_profile(){
 			build_images
 			compress_images
 		fi
-	cd ..
+	cd ../..
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }

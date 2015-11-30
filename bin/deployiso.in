@@ -17,15 +17,15 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 
 import ${LIBDIR}/util.sh
-import ${LIBDIR}/util-iso.sh
 import ${LIBDIR}/util-publish.sh
 
 show_profile(){
-	cd $1
-		load_profile "$1"
+	eval_edition "$1"
+	cd cd $edition_type/$1
+		prepare_transfer "$1"
 		msg2 "cache_dir_iso: ${cache_dir_iso}"
 		msg2 "remote_tree: ${remote_tree}"
-	cd ..
+	cd ../..
 }
 
 display_settings(){

@@ -23,13 +23,19 @@ create_subtree(){
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
 
+prepare_transfer(){
+	remote_tree="${edition_type}/$1/${dist_release}/${arch}"
+	cache_dir_iso="${cache_dir}/iso/${remote_tree}"
+}
+
 sync_dir(){
-	cd $1
-		load_profile "$1"
+	eval_edition "$1"
+	cd cd $edition_type/$1
+		prepare_transfer "$1"
 		${remote_create} && create_subtree "$1"
 		msg "Start upload [$1] ..."
 		rsync ${rsync_args[*]} ${cache_dir_iso}/ ${sf_url}/${remote_tree}/
 		msg "Done upload [$1]"
 		msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
-	cd ..
+	cd ../..
 }
