@@ -24,10 +24,10 @@ show_profile(){
 	eval_edition "$1"
 	cd ${edition_type}/$1
 		load_profile "$1"
+		msg2 "edition_type: ${edition_type}"
 		if ${verbose};then
-			msg2 "edition_type: ${edition_type}"
 			msg2 "work_dir: ${work_dir}"
-			msg2 "dir_iso: ${iso_dir}"
+			msg2 "iso_dir: ${iso_dir}"
 			msg2 "iso_file: ${iso_file}"
 			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 			msg2 "initsys: ${initsys}"
