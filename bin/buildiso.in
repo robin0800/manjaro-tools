@@ -27,7 +27,7 @@ show_profile(){
 		if ${verbose};then
 			msg2 "edition_type: ${edition_type}"
 			msg2 "work_dir: ${work_dir}"
-			msg2 "cache_dir_iso: ${cache_dir_iso}"
+			msg2 "dir_iso: ${dir_iso}"
 			msg2 "iso_file: ${iso_file}"
 			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 			msg2 "initsys: ${initsys}"

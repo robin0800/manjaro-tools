@@ -25,7 +25,7 @@ create_subtree(){
 
 prepare_transfer(){
 	remote_tree="${edition_type}/$1/${dist_release}/${arch}"
-	cache_dir_iso="${cache_dir_iso}/${remote_tree}"
+	src_tree="${cache_dir_iso}/${remote_tree}"
 }
 
 sync_dir(){
@@ -34,7 +34,7 @@ sync_dir(){
 		prepare_transfer "$1"
 		${remote_create} && create_subtree "$1"
 		msg "Start upload [$1] ..."
-		rsync ${rsync_args[*]} ${cache_dir_iso}/ ${sf_url}/${remote_tree}/
+		rsync ${rsync_args[*]} ${src_tree}/ ${sf_url}/${remote_tree}/
 		msg "Done upload [$1]"
 		msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 	cd ../..
