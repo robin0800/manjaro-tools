@@ -22,14 +22,13 @@ import_util_iso_fs(){
 	fi
 }
 
-# $1: path
-# $2: exit code
+# $1: profile
 check_profile(){
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
-		if [[ -f $1/$f ]];then
+		if [[ -f $f ]];then
 			has_keyfiles=true
 		else
 			has_keyfiles=false
@@ -37,7 +36,7 @@ check_profile(){
 		fi
 	done
 	for d in ${keydirs[@]}; do
-		if [[ -d $1/$d ]];then
+		if [[ -d $d ]];then
 			has_keydirs=true
 		else
 			has_keydirs=false

@@ -30,7 +30,7 @@ prepare_transfer(){
 
 sync_dir(){
 	eval_edition "$1"
-	cd cd ${edition_type}/$1
+	cd ${edition_type}/$1
 		prepare_transfer "$1"
 		${remote_create} && create_subtree "$1"
 		msg "Start upload [$1] ..."

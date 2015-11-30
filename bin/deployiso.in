@@ -21,7 +21,8 @@ import ${LIBDIR}/util-publish.sh
 
 show_profile(){
 	eval_edition "$1"
-	cd cd ${edition_type}/$1
+	cd ${edition_type}/$1
+		msg3 "Iso: [$1]"
 		prepare_transfer "$1"
 		msg2 "cache_dir_iso: ${cache_dir_iso}"
 		msg2 "remote_tree: ${remote_tree}"
