@@ -425,3 +425,11 @@ run(){
 		$1 $2
 	fi
 }
+
+run_svc(){
+	if [[ -d /run/systemd ]];then
+		$@
+	else
+		$@
+	fi
+}
