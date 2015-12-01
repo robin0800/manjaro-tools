@@ -177,7 +177,7 @@ init_buildiso(){
 	if [[ -z ${dist_release} ]];then
 # 		source /etc/lsb-release
 # 		dist_release=${DISTRIB_RELEASE}
-		version_gen2
+		version_gen
 	fi
 
 	if [[ -z ${dist_codename} ]];then
