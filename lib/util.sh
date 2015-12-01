@@ -314,8 +314,6 @@ load_profile_config(){
 		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init')
 	fi
 
-	[[ -z ${edition_type} ]] && edition_type="official"
-
 	return 0
 }
 
