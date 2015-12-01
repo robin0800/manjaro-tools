@@ -159,7 +159,6 @@ chroot_init(){
 }
 
 make_pkg(){
-	chroot_init
 	msg "Start building [$1]"
 	cd $1
 		setarch "${arch}" \
