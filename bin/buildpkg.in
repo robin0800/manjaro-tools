@@ -153,11 +153,11 @@ check_root "$0" "${orig_argv[@]}"
 
 timer_start=$(get_timer)
 
-prepare_dir "${pkg_dir}"
-
 eval_buildset "${sets_dir_pkg}" "${buildset_pkg}"
 
 check_requirements
+
+prepare_dir "${pkg_dir}"
 
 init_base_devel
 
