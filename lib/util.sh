@@ -13,7 +13,7 @@ read_set(){
 		_clean=':a;N;$!ba;s/\n/ /g' \
 		_com_rm="s|#.*||g"
 
-	stack=$(sed "$_com_rm" "$1" \
+	stack=$(sed "$_com_rm" "$1.set" \
 		| sed "$_space" \
 		| sed "$_clean")
 }
@@ -28,21 +28,22 @@ load_sets(){
 	echo $prof
 }
 
-# $1: buildset
-# $2: sets_dir
+
+# $1: sets_dir
+# $2: buildset
 eval_buildset(){
-	eval "case $1 in
-		$(load_sets $2)) is_buildset=true ;;
+	eval "case $2 in
+		$(load_sets $1)) is_buildset=true ;;
 		*) is_buildset=false ;;
 	esac"
-	${is_buildset} && read_set $2/$1.set
+	${is_buildset} && read_set $1/$2
 }
 
 eval_edition(){
-	local result=$(find . -maxdepth 2 -name "$1") et
+	local result=$(find . -maxdepth 2 -name "$1") path
 	[[ -z $result ]] && die "$1 is not a valid profile or buildset!"
-	et=${result#./*}
-	edition_type=${et%%/*}
+	path=${result#./*}
+	edition_type=${path%%/*}
 }
 
 get_timer(){
@@ -395,13 +396,6 @@ is_valid_bool(){
 is_valid_init(){
 	case $1 in
 		'openrc'|'systemd') return 0 ;;
-		*) return 1 ;;
-	esac
-}
-
-is_valid_edition(){
-	case $1 in
-		'official'|'community'|'community-minimal'|'sonar'|'netrunner') return 0 ;;
 		*) return 1 ;;
 	esac
 }

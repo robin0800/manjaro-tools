@@ -567,9 +567,6 @@ check_profile_conf(){
 	if ! is_valid_init "${initsys}";then
 		die "initsys only accepts openrc/systemd value!"
 	fi
-	if ! is_valid_edition "${edition_type}";then
-		die "edition_type only accepts official/community/community-minimal/sonar/netrunner value!"
-	fi
 	if ! is_valid_bool "${autologin}";then
 		die "autologin only accepts true/false value!"
 	fi
@@ -657,7 +654,7 @@ build_images(){
 make_profile(){
 	eval_edition "$1"
 	msg "Start building [$1]"
-	cd ${edition_type}/$1
+	cd ${run_dir}/${edition_type}/$1
 		load_profile "$1"
 		import_util_iso_fs
 		${clean_first} && chroot_clean "${work_dir}"
@@ -674,7 +671,7 @@ make_profile(){
 			build_images
 			compress_images
 		fi
-	cd ../..
+	cd ${run_dir}
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }

@@ -109,7 +109,7 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-eval_buildset "${buildset_iso}" "${sets_dir_iso}"
+eval_buildset "${sets_dir_iso}" "${buildset_iso}"
 
 rsync_args+=(--bwlimit=${limit})
 
