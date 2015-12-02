@@ -105,22 +105,12 @@ version_gen(){
 }
 
 version_gen2(){
-    local y=$(date +%Y) m=$(date +%m)
-    local release_versions=($y.03 $y.06 $y.09 $y.12)
-
-    for ver in ${release_versions[@]};do
-        case $m in
-            01) dist_release=${y:2}.12.1 ;;
-            02) dist_release=${y:2}.12.2 ;;
-            03|06|09|12) dist_release=${y:2}.${ver#.*} ;;
-            04) dist_release=${y:2}.03.1 ;;
-            05) dist_release=${y:2}.03.2 ;;
-            07) dist_release=${y:2}.06.1 ;;
-            08) dist_release=${y:2}.06.2 ;;
-            10) dist_release=${y:2}.09.1 ;;
-            11) dist_release=${y:2}.09.2 ;;
-        esac
-    done
+	local y=$(date +%Y) m=$(date +%m)
+	case $month in
+		01|04|07|10) dist_release=${y:2}.$m.1 ;;
+		02|05|08|11) dist_release=${y:2}.$m.2 ;;
+		*) dist_release=${y:2}.$m ;;
+	esac
 }
 
 init_common(){
