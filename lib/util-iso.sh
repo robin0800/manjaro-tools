@@ -49,6 +49,7 @@ check_profile(){
 }
 
 check_requirements(){
+	[[ -f ${run_dir}/.manjaro-tools ]] || die "${run_dir} is not a valid iso profiles directory!"
 	if ! $(is_valid_arch_iso ${arch});then
 		die "${arch} is not a valid arch!"
 	fi
