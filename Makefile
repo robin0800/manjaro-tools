@@ -97,7 +97,6 @@ SCRIPTS = \
 	scripts/kbd-model-map
 
 MAN_XML = \
-	buildset.xml \
 	buildpkg.xml \
 	buildtree.xml \
 	buildiso.xml \
