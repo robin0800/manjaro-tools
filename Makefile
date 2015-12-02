@@ -8,7 +8,6 @@ BIN = \
 	bin/basestrap \
 	bin/manjaro-chroot \
 	bin/fstabgen \
-	bin/buildset \
 	bin/chroot-run
 
 BIN_PKG = \
@@ -75,7 +74,6 @@ LIBS_ISO = \
 	lib/util-livecd.sh \
 	lib/util-iso-boot.sh \
 	lib/util-publish.sh \
-	lib/util-sets.sh \
 	lib/util-iso-log.sh
 
 CPIOHOOKS = \
