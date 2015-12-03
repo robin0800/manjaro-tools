@@ -21,12 +21,12 @@ import ${LIBDIR}/util-publish.sh
 
 show_profile(){
 	eval_edition "$1"
-	cd ${edition_type}/$1
+	cd ${cache_dir_iso}/${edition_type}/$1
 		msg3 "Iso: [$1]"
 		prepare_transfer "$1"
 		msg2 "src_dir: ${src_dir}"
 		msg2 "remote_dir: ${remote_dir}"
-	cd ../..
+	cd ${cache_dir_iso}
 }
 
 display_settings(){
@@ -66,6 +66,8 @@ load_user_info
 
 load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
+
+run_dir=${cache_dir_iso}
 
 pretend=false
 remote_create=false

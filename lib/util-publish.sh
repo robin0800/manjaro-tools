@@ -30,12 +30,12 @@ prepare_transfer(){
 
 sync_dir(){
 	eval_edition "$1"
-	cd ${edition_type}/$1
+	cd ${cache_dir_iso}/${edition_type}/$1
 		prepare_transfer "$1"
 		${remote_create} && create_subtree "$1"
-		msg "Start upload [$1] ..."
+		msg "Start upload [$1] (${arch}) ..."
 		rsync ${rsync_args[*]} ${src_dir}/ ${sf_url}/${remote_dir}/
 		msg "Done upload [$1]"
 		msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
-	cd ../..
+	cd ${cache_dir_iso}
 }
