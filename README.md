@@ -17,7 +17,7 @@ By default, the config is installed in
 A user manjaro-tools.conf can be placed in
 
 ~~~
-$HOME/.config/manjaro-tools.conf
+$HOME/.config/manjaro-tools/manjaro-tools.conf
 ~~~
 
 If the userconfig is present, manjaro-tools will load the userconfig values, however, if variables have been set in the systemwide
@@ -36,13 +36,13 @@ Specifying args will override manjaro-tools.conf settings.
 User sets can be placed in
 
 ~~~
-$HOME/.config/manjaro-tools/sets/{pkg.d,iso.d}
+$HOME/.config/manjaro-tools/{pkg,iso}.d
 ~~~
 
 overriding
 
 ~~~
-/etc/manjaro-tools/sets/{pkg.d,iso.d}
+/etc/manjaro-tools/{pkg,iso}.d
 ~~~
 
 
@@ -90,10 +90,10 @@ overriding
 # dist_name="Manjaro"
 
 # unset defaults to given value
-# dist_release=15.09
+# dist_release=15.12
 
 # unset defaults to value sourced from /etc/lsb-release
-# dist_codename="Bellatrix"
+# dist_codename="Capella"
 
 # unset defaults to given value
 # dist_branding="MJRO"
@@ -285,12 +285,15 @@ If there is only 1 system installed besides the host system, no list will pop up
 
 ~~~
 $ manjaro-chroot -h
-usage: ${0##*/} chroot-dir [command]
+usage: manjaro-chroot -a [or] manjaro-chroot chroot-dir [command]
     -a             Automount detected linux system
     -q             Query settings and pretend
     -h             Print this help message
 
     If 'command' is unspecified, manjaro-chroot will launch /bin/sh.
+
+    If 'automount' is true, manjaro-chroot will launch /bin/bash
+    and /build/manjaro-tools/manjaro-chroot.
 ~~~
 
 ######* automount
@@ -318,10 +321,12 @@ Ideally, you have a running ssh agent on the host, and your key added, and your 
 $ deployiso -h
 Usage: deployiso [options]
     -p                 Source folder to upload [default:default]
+    -a                 Arch to upload [default:x86_64]
+    -l                 Limit bandwidth in kB/s [default:80]
     -c                 Create new remote edition_type with subtree
     -u                 Update remote iso
-    -l                 Limit bandwidth in kB/s
     -q                 Query settings and pretend upload
+    -v                 Verbose output
     -h                 This help
 ~~~
 
