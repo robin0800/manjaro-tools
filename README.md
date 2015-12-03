@@ -23,7 +23,7 @@ $HOME/.config/manjaro-tools.conf
 If the userconfig is present, manjaro-tools will load the userconfig values, however, if variables have been set in the systemwide
 
 ~~~
-/etc/manjaro-tools/manjaro-tools.conf
+/etc/manjaro-tools/manjaro-tools/manjaro-tools.conf
 ~~~
 
 these values take precedence over the userconfig.
@@ -137,7 +137,7 @@ It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
 
 ~~~
 $ buildpkg -h
-Usage: buildpkg [options] [--] [makepkg args]
+Usage: buildpkg [options]
     -p <pkg>           Buildset or pkg [default: default]
     -a <arch>          Arch [default: auto]
     -b <branch>        Branch [default: stable]

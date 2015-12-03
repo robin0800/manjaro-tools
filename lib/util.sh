@@ -323,7 +323,8 @@ load_user_info(){
 		USER_HOME=$HOME
 	fi
 
-	USER_CONFIG="$USER_HOME/.config"
+	USER_CONFIG="$USER_HOME/.config/manjaro-tools"
+	prepare_dir "$USER_CONFIG"
 }
 
 show_version(){
