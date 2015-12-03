@@ -27,32 +27,32 @@ BIN_ISO = \
 	bin/deployiso
 
 SYSCONF = \
-	conf/manjaro-tools.conf
+	data/manjaro-tools.conf
 
 SETS_PKG = \
-	conf/pkg.d/default.set
+	data/pkg.d/default.set
 
 SETS_ISO = \
-	conf/iso.d/default.set \
-	conf/iso.d/official.set \
-	conf/iso.d/community.set \
-	conf/iso.d/community-minimal.set
+	data/iso.d/default.set \
+	data/iso.d/official.set \
+	data/iso.d/community.set \
+	data/iso.d/community-minimal.set
 
 SHARED = \
-	conf/pacman-default.conf \
-	conf/pacman-multilib.conf \
-	conf/pacman-mirrors-stable.conf \
-	conf/pacman-mirrors-testing.conf \
-	conf/pacman-mirrors-unstable.conf
+	data/pacman-default.conf \
+	data/pacman-multilib.conf \
+	data/pacman-mirrors-stable.conf \
+	data/pacman-mirrors-testing.conf \
+	data/pacman-mirrors-unstable.conf
 
 SHARED_PKG = \
-	conf/makepkg-i686.conf \
-	conf/base-devel-udev \
-	conf/makepkg-x86_64.conf
+	data/makepkg-i686.conf \
+	data/base-devel-udev \
+	data/makepkg-x86_64.conf
 
 SHARED_ISO = \
-	conf/pacman-gfx.conf \
-	conf/profile.conf.example
+	data/pacman-gfx.conf \
+	data/profile.conf.example
 
 LIBS = \
 	lib/util.sh \
@@ -107,7 +107,6 @@ MAN_XML = \
 all: $(BIN) $(BIN_PKG) $(BIN_ISO) doc #bin/bash_completion bin/zsh_completion
 
 edit = sed -e "s|@pkgdatadir[@]|$(DESTDIR)$(PREFIX)/share/manjaro-tools|g" \
-	-e "s|@bindir[@]|$(DESTDIR)$(PREFIX)/bin|g" \
 	-e "s|@sysconfdir[@]|$(DESTDIR)$(SYSCONFDIR)/manjaro-tools|g" \
 	-e "s|@libdir[@]|$(DESTDIR)$(PREFIX)/lib/manjaro-tools|g" \
 	-e "s|@version@|${Version}|"
@@ -139,9 +138,6 @@ install_base:
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -m0644 ${SHARED} $(DESTDIR)$(PREFIX)/share/manjaro-tools
-
-	install -dm0755 $(DESTDIR)$(PREFIX)/share/man/man1
-	gzip -c man/buildset.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildset.1.gz
 
 # 	install -Dm0644 bin/bash_completion $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 # 	install -Dm0644 bin/zsh_completion $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
@@ -203,7 +199,6 @@ uninstall_base:
 	for f in ${BIN}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${SHARED}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
 	for f in ${LIBS}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
-	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildset.1.gz
 
 # 	rm $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/manjaro_tools
 # 	rm $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_manjaro_tools
