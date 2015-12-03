@@ -33,6 +33,19 @@ By default it is commented and shows just initialization values done in code.
 Tools configuration is done in manjaro-tools.conf or by args.
 Specifying args will override manjaro-tools.conf settings.
 
+User sets can be placed in
+
+~~~
+$HOME/.config/manjaro-tools/sets/{pkg.d,iso.d}
+~~~
+
+overriding
+
+~~~
+/etc/manjaro-tools/sets/{pkg.d,iso.d}
+~~~
+
+
 ~~~
 ######################################################
 ################ manjaro-tools.conf ##################
@@ -49,9 +62,6 @@ Specifying args will override manjaro-tools.conf settings.
 
 # build dir where buildpkg or buildiso chroots are created
 # chroots_dir=/var/lib/manjaro-tools
-
-# default path to sets
-# sets_dir=/etc/manjaro-tools/sets
 
 # custom build mirror server
 # build_mirror=http://mirror.netzspielplatz.de/manjaro/packages

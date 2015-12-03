@@ -122,8 +122,6 @@ init_common(){
 
 	[[ -z ${chroots_dir} ]] && chroots_dir='/var/lib/manjaro-tools'
 
-	[[ -z ${sets_dir} ]] && sets_dir="${SYSCONFDIR}/sets"
-
 	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
 }
 
@@ -142,9 +140,11 @@ init_buildtree(){
 init_buildpkg(){
 	chroots_pkg="${chroots_dir}/buildpkg"
 
-	sets_dir_pkg="${sets_dir}/pkg.d"
+	sets_dir_pkg="${SYSCONFDIR}/sets/pkg.d"
 
 	prepare_dir "${sets_dir_pkg}"
+
+	[[ -d $USER_CONFIG/sets/pkg.d ]] && sets_dir_pkg=$USER_CONFIG/sets/pkg.d
 
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
 
@@ -154,9 +154,11 @@ init_buildpkg(){
 init_buildiso(){
 	chroots_iso="${chroots_dir}/buildiso"
 
-	sets_dir_iso="${sets_dir}/iso.d"
+	sets_dir_iso="${SYSCONFDIR}/sets/iso.d"
 
 	prepare_dir "${sets_dir_iso}"
+
+	[[ -d $USER_CONFIG/sets/iso.d ]] && sets_dir_iso=$USER_CONFIG/sets/iso.d
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
 
