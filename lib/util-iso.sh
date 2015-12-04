@@ -12,21 +12,23 @@
 import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
+import ${LIBDIR}/util-pac-conf.sh
 
-if ${use_overlayfs};then
-	import ${LIBDIR}/util-iso-overlayfs.sh
-else
-	import ${LIBDIR}/util-iso-aufs.sh
-fi
+import_util_iso_fs(){
+	if ${use_overlayfs};then
+		import ${LIBDIR}/util-iso-overlayfs.sh
+	else
+		import ${LIBDIR}/util-iso-aufs.sh
+	fi
+}
 
-# $1: path
-# $2: exit code
+# $1: profile
 check_profile(){
 	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
 	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
-		if [[ -f $1/$f ]];then
+		if [[ -f $f ]];then
 			has_keyfiles=true
 		else
 			has_keyfiles=false
@@ -34,7 +36,7 @@ check_profile(){
 		fi
 	done
 	for d in ${keydirs[@]}; do
-		if [[ -d $1/$d ]];then
+		if [[ -d $d ]];then
 			has_keydirs=true
 		else
 			has_keydirs=false
@@ -47,14 +49,12 @@ check_profile(){
 }
 
 check_requirements(){
-	if ${is_buildset};then
-		for p in $(cat ${sets_dir_iso}/${buildset_iso}.set);do
-			[[ -z $(find . -type d -name "${p}") ]] && die "${buildset_iso} is not a valid buildset!"
-			check_profile "$p"
-		done
-	else
-		[[ -z $(find . -type d -name "${buildset_iso}") ]] && die "${buildset_iso} is not a valid profile directory!"
-		check_profile "${buildset_iso}"
+	[[ -f ${run_dir}/.manjaro-tools ]] || die "${run_dir} is not a valid iso profiles directory!"
+	if ! $(is_valid_arch_iso ${arch});then
+		die "${arch} is not a valid arch!"
+	fi
+	if ! $(is_valid_branch ${branch});then
+		die "${branch} is not a valid branch!"
 	fi
 }
 
@@ -173,7 +173,7 @@ run_xorriso(){
 			-no-emul-boot -boot-load-size 4 -boot-info-table \
 			-isohybrid-mbr "${work_dir}/iso/isolinux/isohdpfx.bin" \
 			${efi_boot_args[@]} \
-			-output "${cache_dir_iso}/${iso_file}" \
+			-output "${iso_dir}/${iso_file}" \
 			"${work_dir}/iso/"
 }
 
@@ -193,9 +193,9 @@ make_iso() {
 	msg "Making bootable image"
 	# Sanity checks
 	[[ ! -d "${work_dir}/iso" ]] && die "[${work_dir}/iso] doesn't exist. What did you do?!"
-	if [[ -f "${cache_dir_iso}/${iso_file}" ]]; then
+	if [[ -f "${iso_dir}/${iso_file}" ]]; then
 		msg2 "Removing existing bootable image..."
-		rm -rf "${cache_dir_iso}/${iso_file}"
+		rm -rf "${iso_dir}/${iso_file}"
 	fi
 
 	run_xorriso
@@ -205,7 +205,7 @@ make_iso() {
 
 # $1: file
 make_checksum(){
-	cd ${cache_dir_iso}
+	cd ${iso_dir}
 		msg "Creating [${iso_checksum}sum] ..."
 		local cs=$(${iso_checksum}sum $1)
 		msg2 "${iso_checksum}sum: ${cs}"
@@ -255,7 +255,7 @@ make_image_custom() {
 		else
 			local pkgs_file="${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt"
 		fi
-		cp "${path}/${custom}-image-pkgs.txt" ${cache_dir_iso}/${pkgs_file}
+		cp "${path}/${custom}-image-pkgs.txt" ${iso_dir}/${pkgs_file}
 		[[ -d ${custom}-overlay ]] && copy_overlay_custom
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
@@ -523,7 +523,7 @@ load_pkgs(){
 	local list
 
 	if [[ $1 == "${packages_custom}" ]];then
-		sort -u ../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
+		sort -u ../../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
 		list=${work_dir}/${packages_custom}
 	else
 		list=$1
@@ -588,6 +588,7 @@ check_profile_conf(){
 # $1: profile
 load_profile(){
 	msg3 "Profile: [$1]"
+	check_profile "$1"
 	load_profile_config 'profile.conf'
 	check_profile_conf
 	local files=$(ls Packages*)
@@ -611,13 +612,17 @@ load_profile(){
 	work_dir=${chroots_iso}/$1/${arch}
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
+
+	iso_dir="${cache_dir_iso}/${edition_type}/$1/${dist_release}/${arch}"
+
+	prepare_dir "${iso_dir}"
 }
 
 compress_images(){
 	local timer=$(get_timer)
 	make_iso
 	make_checksum "${iso_file}"
-	chown -R "${OWNER}:users" "${cache_dir_iso}"
+	chown -R "${OWNER}:users" "${iso_dir}"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
 }
 
@@ -648,9 +653,11 @@ build_images(){
 }
 
 make_profile(){
+	eval_edition "$1"
 	msg "Start building [$1]"
-	cd $1
+	cd ${run_dir}/${edition_type}/$1
 		load_profile "$1"
+		import_util_iso_fs
 		${clean_first} && chroot_clean "${work_dir}"
 		if ${iso_only}; then
 			[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p ${buildset_iso} -i"
@@ -665,17 +672,8 @@ make_profile(){
 			build_images
 			compress_images
 		fi
-	cd ..
+	cd ${run_dir}
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
 
-build_iso(){
-	if ${is_buildset};then
-		for prof in $(cat ${sets_dir_iso}/${buildset_iso}.set); do
-			make_profile "$prof"
-		done
-	else
-		make_profile "${buildset_iso}"
-	fi
-}

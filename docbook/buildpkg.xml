@@ -48,7 +48,7 @@
 	<refsynopsisdiv>
 		<cmdsynopsis>
 			<command>buildpkg</command>
-			<arg choice="opt" rep="repeat">OPTIONS [--] [makepkg_args]</arg>
+			<arg choice="opt" rep="repeat">OPTIONS</arg>
 		</cmdsynopsis>
 	</refsynopsisdiv>
 

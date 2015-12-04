@@ -21,10 +21,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<refentry id="buildset" xmlns:xi="http://www.w3.org/2001/XInclude">
+<refentry id="deployiso" xmlns:xi="http://www.w3.org/2001/XInclude">
+
 	<refentryinfo>
-		<title>buildset-+</title>
+		<title>deployiso-+</title>
 		<productname>manjaro-tools</productname>
+
 		<authorgroup>
 			<author>
 				<contrib></contrib>
@@ -36,18 +38,18 @@
 	</refentryinfo>
 
 	<refmeta>
-		<refentrytitle>buildset</refentrytitle>
+		<refentrytitle>deployiso</refentrytitle>
 		<manvolnum>1</manvolnum>
 	</refmeta>
 
 	<refnamediv>
-		<refname>buildset</refname>
-		<refpurpose>buildset is used to iso or package build sets. </refpurpose>
+		<refname>deployiso</refname>
+		<refpurpose>deployiso is used to upload a particular ISO or a set of ISOs. </refpurpose>
 	</refnamediv>
 
 	<refsynopsisdiv>
 		<cmdsynopsis>
-			<command>buildset</command>
+			<command>deployiso</command>
 			<arg choice="opt" rep="repeat">OPTIONS</arg>
 		</cmdsynopsis>
 	</refsynopsisdiv>
@@ -55,9 +57,10 @@
 	<refsect1>
 		<title>Description</title>
 
-		<para><command>buildset</command> is used to manage build sets. </para>
+		<para><command>deployiso</command> is used to upload a particular ISO or a set of ISOs. </para>
 
-		<para>With buildset you can manage iso and package build sets.</para>
+		<para>deployiso is a script to upload a specific iso or a buiildset to SF.
+		It needs to be run inside the iso-profiles directory.</para>
 
 	</refsect1>
 
@@ -67,35 +70,47 @@
 		<para>The following options are understood:</para>
 
 		<variablelist>
-
 			<varlistentry>
-				<term><option>-c [name]</option></term>
+				<term><option>-p PROFILE...</option></term>
 
-				<listitem><para>Create set.</para></listitem>
+				<listitem><para>Name of the buildset or name of the directory
+				you will upload.</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-r [name]</option></term>
+				<term><option>-a i686|x86_64</option></term>
 
-				<listitem><para>Remove set.</para></listitem>
+				<listitem><para>Architecture of the iso to upload. Can be i686 or x86_64.</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-s [name]</option></term>
+				<term><option>-c</option></term>
 
-				<listitem><para>Show set.</para></listitem>
+				<listitem><para>Create new remote edition_type with subtree.</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-i</option></term>
+				<term><option>-l</option></term>
 
-				<listitem><para>Iso mode.</para></listitem>
+				<listitem><para>Limit bandwidth in kB/s.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-u</option></term>
+
+				<listitem><para>Update remote iso.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-v</option></term>
+
+				<listitem><para>Verbose output.</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
 				<term><option>-q</option></term>
 
-				<listitem><para>Query sets.</para></listitem>
+				<listitem><para>Query settings and pretend upload.</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
@@ -107,11 +122,20 @@
 
 	</refsect1>
 
+	<!--<refsect1>
+		<title>Exit status</title>
+
+		<para>On success, 0 is returned, a non-zero failure code
+		otherwise.</para>
+	</refsect1>
+	-->
+
 	<refsect1>
 		<title>See Also</title>
 		<para>
 			<citerefentry project='manjaro-tools'><refentrytitle>manjaro-tools.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+			<citerefentry project='manjaro-tools'><refentrytitle>profiles.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
 		</para>
 	</refsect1>
-</refentry>
 
+</refentry>
