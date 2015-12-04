@@ -21,12 +21,10 @@ import ${LIBDIR}/util-publish.sh
 
 show_profile(){
 	eval_edition "$1"
-	cd ${run_dir}/${edition_type}/$1
-		msg3 "Iso: [$1]"
-		prepare_transfer "$1"
-		msg2 "src_dir: ${src_dir}"
-		msg2 "remote_dir: ${remote_dir}"
-	cd ${run_dir}
+	msg3 "Iso: [$1]"
+	prepare_transfer "$1"
+	msg2 "src_dir: ${src_dir}"
+	msg2 "remote_dir: ${remote_dir}"
 }
 
 display_settings(){
@@ -117,8 +115,6 @@ rsync_args+=(--bwlimit=${limit})
 
 sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
 shell_url=${remote_user},${remote_project}@shell.${remote_url}
-
-cd ${run_dir}
 
 ${pretend} && display_settings && exit 1
 
