@@ -34,11 +34,11 @@ set_mkinicpio_hooks(){
 
 copy_initcpio(){
 	msg2 "Copying initcpio ..."
-	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
-	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
-	cp ${profile_dir}/mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
-	set_mkinicpio_hooks "$1/etc/mkinitcpio-${iso_name}.conf"
-	sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
+	cp /usr/lib/initcpio/hooks/miso* $2/usr/lib/initcpio/hooks
+	cp /usr/lib/initcpio/install/miso* $2/usr/lib/initcpio/install
+	cp $1/mkinitcpio.conf $2/etc/mkinitcpio-${iso_name}.conf
+	set_mkinicpio_hooks "$2/etc/mkinitcpio-${iso_name}.conf"
+	sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $2/usr/lib/initcpio/init
 }
 
 # $1: work_dir
@@ -251,17 +251,17 @@ write_isolinux_msg(){
 }
 
 update_isolinux_cfg(){
-	local fn=${profile_dir}/isolinux.cfg
+	local fn=$1/isolinux.cfg
 	msg2 "Updating ${fn} ..."
 	sed -i "s|%ISO_LABEL%|${iso_label}|g;
 			s|%ISO_NAME%|${iso_name}|g;
-			s|%ARCH%|${arch}|g" $1/${fn}
+			s|%ARCH%|${arch}|g" $2/${fn}
 }
 
 update_isolinux_msg(){
-	local fn=${profile_dir}/isolinux.msg
+	local fn=$1/isolinux.msg
 	msg2 "Updating ${fn} ..."
-	sed -i "s|%DIST_NAME%|${dist_name}|g" $1/${fn}
+	sed -i "s|%DIST_NAME%|${dist_name}|g" $2/${fn}
 }
 
 write_isomounts(){

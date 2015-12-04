@@ -24,21 +24,21 @@ import_util_iso_fs(){
 
 copy_overlay_root(){
 	msg2 "Copying overlay ..."
-	cp -a --no-preserve=ownership ${profile_dir}/overlay/* $1
+	cp -a --no-preserve=ownership $1/overlay/* $2
 }
 
 copy_overlay_custom(){
 	msg2 "Copying ${custom}-overlay ..."
-	cp -a --no-preserve=ownership ${profile_dir}/${custom}-overlay/* ${work_dir}/${custom}-image
+	cp -a --no-preserve=ownership $1/${custom}-overlay/* ${work_dir}/${custom}-image
 }
 
 copy_overlay_livecd(){
 	msg2 "Copying overlay-livecd ..."
 	if [[ -L overlay-livecd ]];then
-		cp -a --no-preserve=ownership ${profile_dir}/overlay-livecd/* $1
+		cp -a --no-preserve=ownership $1/overlay-livecd/* $2
 	else
 		msg2 "Copying custom overlay-livecd ..."
-		cp -LR ${profile_dir}/overlay-livecd/* $1
+		cp -LR $1/overlay-livecd/* $2
 	fi
 }
 
@@ -193,7 +193,7 @@ make_image_root() {
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_root_image "${path}"
-		copy_overlay_root "${path}"
+		copy_overlay_root "${profile_dir}" "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
@@ -220,7 +220,7 @@ make_image_custom() {
 			local pkgs_file="${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt"
 		fi
 		cp "${path}/${custom}-image-pkgs.txt" ${iso_dir}/${pkgs_file}
-		[[ -d ${custom}-overlay ]] && copy_overlay_custom
+		[[ -d ${profile_dir}/${custom}-overlay ]] && copy_overlay_custom "${profile_dir}"
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
@@ -250,7 +250,7 @@ make_image_livecd() {
 		fi
 
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
-		copy_overlay_livecd "${path}"
+		copy_overlay_livecd "${profile_dir}" "${path}"
 		# copy over setup helpers and config loader
 		copy_livecd_helpers "${path}/opt/livecd"
 		copy_startup_scripts "${path}/usr/bin"
@@ -324,7 +324,7 @@ make_image_boot() {
 			mount_root_image "${path}"
 		fi
 
-		copy_initcpio "${path}" || die "Failed to copy initcpio."
+		copy_initcpio "${profile_dir}" "${path}" || die "Failed to copy initcpio."
 
 		if ! gen_boot_image "${path}"; then
 			umount_image "${path}"
@@ -403,8 +403,8 @@ make_isolinux() {
 		if [[ -e isolinux-overlay ]]; then
 			msg2 "isolinux overlay found. Overwriting files ..."
 			cp -a --no-preserve=ownership ${profile_dir}/isolinux-overlay/* ${path}
-			update_isolinux_cfg "${path}"
-			update_isolinux_msg "${path}"
+			update_isolinux_cfg "${profile_dir}" "${path}"
+			update_isolinux_msg "${profile_dir}" "${path}"
 		fi
 		copy_isolinux_bin "${work_dir}/root-image" "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
@@ -423,7 +423,7 @@ make_isomounts() {
 
 # $1: file name
 load_pkgs(){
-	msg3 "Loading Packages: [$1] ..."
+	msg3 "Loading Packages: [${1##*/}] ..."
 
 	local _init _init_rm _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64
 
