@@ -21,46 +21,43 @@ import ${LIBDIR}/util.sh
 
 show_profile(){
 	eval_edition "$1"
-	cd ${run_dir}/${edition_type}/$1
-		load_profile "$1"
-		msg2 "edition_type: ${edition_type}"
-		if ${verbose};then
-			msg2 "work_dir: ${work_dir}"
-			msg2 "iso_dir: ${iso_dir}"
-			msg2 "iso_file: ${iso_file}"
-			msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
-			msg2 "initsys: ${initsys}"
-			if ${use_overlayfs};then
-				msg2 "mount system: overlayfs"
-			else
-				msg2 "mount system: aufs"
-			fi
-			[[ ${arch} == 'x86_64' ]] && msg2 "multilib: ${multilib}"
-			msg2 "displaymanager: ${displaymanager}"
-			msg2 "autologin: ${autologin}"
-			msg2 "nonfree_xorg: ${nonfree_xorg}"
-			msg2 "kernel: ${kernel}"
-			msg2 "efi_boot_loader: ${efi_boot_loader}"
-			msg2 "efi_part_size: ${efi_part_size}"
-			msg2 "pxe_boot: ${pxe_boot}"
-			msg2 "plymouth_boot: ${plymouth_boot}"
-			${plymouth_boot} && msg2 "plymouth_theme: ${plymouth_theme}"
-			msg2 "hostname: ${hostname}"
-			msg2 "username: ${username}"
-			msg2 "password: ${password}"
-			msg2 "addgroups: ${addgroups}"
-
-			if [[ ${initsys} == 'systemd' ]];then
-				msg2 "start_systemd: ${start_systemd[*]}"
-				msg2 "start_systemd_live: ${start_systemd_live[*]}"
-				msg2 "disable_systemd: ${disable_systemd[*]}"
-			else
-				msg2 "start_openrc: ${start_openrc[*]}"
-				msg2 "start_openrc_live: ${start_openrc_live[*]}"
-				msg2 "disable_openrc: ${disable_openrc[*]}"
-			fi
+	load_profile "${edition_dir}/$1"
+	if ${verbose};then
+		msg2 "work_dir: ${work_dir}"
+		msg2 "iso_dir: ${iso_dir}"
+		msg2 "iso_file: ${iso_file}"
+		msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
+		msg2 "initsys: ${initsys}"
+		if ${use_overlayfs};then
+			msg2 "mount system: overlayfs"
+		else
+			msg2 "mount system: aufs"
 		fi
-	cd ${run_dir}
+		[[ ${arch} == 'x86_64' ]] && msg2 "multilib: ${multilib}"
+		msg2 "displaymanager: ${displaymanager}"
+		msg2 "autologin: ${autologin}"
+		msg2 "nonfree_xorg: ${nonfree_xorg}"
+		msg2 "kernel: ${kernel}"
+		msg2 "efi_boot_loader: ${efi_boot_loader}"
+		msg2 "efi_part_size: ${efi_part_size}"
+		msg2 "pxe_boot: ${pxe_boot}"
+		msg2 "plymouth_boot: ${plymouth_boot}"
+		${plymouth_boot} && msg2 "plymouth_theme: ${plymouth_theme}"
+		msg2 "hostname: ${hostname}"
+		msg2 "username: ${username}"
+		msg2 "password: ${password}"
+		msg2 "addgroups: ${addgroups}"
+
+		if [[ ${initsys} == 'systemd' ]];then
+			msg2 "start_systemd: ${start_systemd[*]}"
+			msg2 "start_systemd_live: ${start_systemd_live[*]}"
+			msg2 "disable_systemd: ${disable_systemd[*]}"
+		else
+			msg2 "start_openrc: ${start_openrc[*]}"
+			msg2 "start_openrc_live: ${start_openrc_live[*]}"
+			msg2 "disable_openrc: ${disable_openrc[*]}"
+		fi
+	fi
 }
 
 display_settings(){
@@ -106,7 +103,7 @@ load_user_info
 load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
-run_dir=$(pwd)
+run_dir=/home/devtux/Projekte/iso-profiles #$(pwd)
 
 clean_first=true
 pretend=false

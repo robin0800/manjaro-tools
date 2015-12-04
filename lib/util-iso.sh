@@ -22,59 +22,23 @@ import_util_iso_fs(){
 	fi
 }
 
-# $1: profile
-check_profile(){
-	local keyfiles=('profile.conf' 'mkinitcpio.conf' 'Packages' 'Packages-Livecd')
-	local keydirs=('overlay' 'overlay-livecd' 'isolinux')
-	local has_keyfiles=false has_keydirs=false
-	for f in ${keyfiles[@]}; do
-		if [[ -f $f ]];then
-			has_keyfiles=true
-		else
-			has_keyfiles=false
-			break
-		fi
-	done
-	for d in ${keydirs[@]}; do
-		if [[ -d $d ]];then
-			has_keydirs=true
-		else
-			has_keydirs=false
-			break
-		fi
-	done
-	if ! ${has_keyfiles} && ! ${has_keydirs};then
-		die "Profile [$1] sanity check failed!"
-	fi
-}
-
-check_requirements(){
-	[[ -f ${run_dir}/.manjaro-tools ]] || die "${run_dir} is not a valid iso profiles directory!"
-	if ! $(is_valid_arch_iso ${arch});then
-		die "${arch} is not a valid arch!"
-	fi
-	if ! $(is_valid_branch ${branch});then
-		die "${branch} is not a valid branch!"
-	fi
-}
-
 copy_overlay_root(){
 	msg2 "Copying overlay ..."
-	cp -a --no-preserve=ownership overlay/* $1
+	cp -a --no-preserve=ownership ${profile_dir}/overlay/* $1
 }
 
 copy_overlay_custom(){
 	msg2 "Copying ${custom}-overlay ..."
-	cp -a --no-preserve=ownership ${custom}-overlay/* ${work_dir}/${custom}-image
+	cp -a --no-preserve=ownership ${profile_dir}/${custom}-overlay/* ${work_dir}/${custom}-image
 }
 
 copy_overlay_livecd(){
 	msg2 "Copying overlay-livecd ..."
 	if [[ -L overlay-livecd ]];then
-		cp -a --no-preserve=ownership overlay-livecd/* $1
+		cp -a --no-preserve=ownership ${profile_dir}/overlay-livecd/* $1
 	else
 		msg2 "Copying custom overlay-livecd ..."
-		cp -LR overlay-livecd/* $1
+		cp -LR ${profile_dir}/overlay-livecd/* $1
 	fi
 }
 
@@ -523,8 +487,8 @@ load_pkgs(){
 	local list
 
 	if [[ $1 == "${packages_custom}" ]];then
-		sort -u ../../shared/Packages-Desktop ${packages_custom} > ${work_dir}/${packages_custom}
-		list=${work_dir}/${packages_custom}
+		sort -u ${run_dir}/shared/Packages-Desktop ${packages_custom} > ${work_dir}/p_custom
+		list=${work_dir}/p_custom
 	else
 		list=$1
 	fi
@@ -564,7 +528,43 @@ check_custom_pacman_conf(){
 	fi
 }
 
-check_profile_conf(){
+# $1: profile
+check_profile_sanity(){
+	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages" "$1/Packages-Livecd")
+	local keydirs=("$1/overlay" "$1/overlay-livecd" "$1/isolinux")
+	local has_keyfiles=false has_keydirs=false
+	for f in ${keyfiles[@]}; do
+		if [[ -f $f ]];then
+			has_keyfiles=true
+		else
+			has_keyfiles=false
+			break
+		fi
+	done
+	for d in ${keydirs[@]}; do
+		if [[ -d $d ]];then
+			has_keydirs=true
+		else
+			has_keydirs=false
+			break
+		fi
+	done
+	if ! ${has_keyfiles} && ! ${has_keydirs};then
+		die "Profile [$1] sanity check failed!"
+	fi
+}
+
+check_requirements(){
+	[[ -f ${run_dir}/.manjaro-tools ]] || die "${run_dir} is not a valid iso profiles directory!"
+	if ! $(is_valid_arch_iso ${arch});then
+		die "${arch} is not a valid arch!"
+	fi
+	if ! $(is_valid_branch ${branch});then
+		die "${branch} is not a valid branch!"
+	fi
+}
+
+check_profile_vars(){
 	if ! is_valid_init "${initsys}";then
 		die "initsys only accepts openrc/systemd value!"
 	fi
@@ -587,18 +587,21 @@ check_profile_conf(){
 
 # $1: profile
 load_profile(){
-	msg3 "Profile: [$1]"
-	check_profile "$1"
-	load_profile_config 'profile.conf'
-	check_profile_conf
-	local files=$(ls Packages*)
+	profile_dir=$1
+	local prof=${1##*/}
+	msg3 "Profile: [$prof]"
+	check_profile_sanity "$1"
+	load_profile_config "$1/profile.conf" || die "$1 is not a valid profile!"
+	check_profile_vars
+	local files=$(ls $1/Packages*)
 	for f in ${files[@]};do
 		case $f in
-			Packages|Packages-Livecd|Packages-Mhwd) continue ;;
+			$1/Packages|$1/Packages-Livecd|$1/Packages-Mhwd) continue ;;
 			*) packages_custom="$f" ;;
 		esac
 	done
-	custom=${packages_custom#*-}
+	custom=${packages_custom##*/}
+	custom=${custom#*-}
 	custom=${custom,,}
 	if [[ ${initsys} == 'openrc' ]];then
 		iso_file="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}.iso"
@@ -609,11 +612,11 @@ load_profile(){
 	check_custom_pacman_conf
 
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
-	work_dir=${chroots_iso}/$1/${arch}
+	work_dir=${chroots_iso}/$prof/${arch}
 
 	[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 
-	iso_dir="${cache_dir_iso}/${edition_type}/$1/${dist_release}/${arch}"
+	iso_dir="${cache_dir_iso}/$prof/${dist_release}/${arch}"
 
 	prepare_dir "${iso_dir}"
 }
@@ -628,18 +631,19 @@ compress_images(){
 
 build_images(){
 	local timer=$(get_timer)
-	load_pkgs "Packages"
+	load_pkgs "${profile_dir}/Packages"
 	make_image_root
+	msg "${packages_custom}"
 	if [[ -f "${packages_custom}" ]] ; then
 		load_pkgs "${packages_custom}"
 		make_image_custom
 	fi
-	if [[ -f Packages-Livecd ]]; then
-		load_pkgs "Packages-Livecd"
+	if [[ -f ${profile_dir}/Packages-Livecd ]]; then
+		load_pkgs "${profile_dir}/Packages-Livecd"
 		make_image_livecd
 	fi
-	if [[ -f Packages-Mhwd ]] ; then
-		load_pkgs 'Packages-Mhwd'
+	if [[ -f ${profile_dir}/Packages-Mhwd ]] ; then
+		load_pkgs "${profile_dir}/Packages-Mhwd"
 		make_image_mhwd
 	fi
 	make_image_boot
@@ -655,25 +659,22 @@ build_images(){
 make_profile(){
 	eval_edition "$1"
 	msg "Start building [$1]"
-	cd ${run_dir}/${edition_type}/$1
-		load_profile "$1"
-		import_util_iso_fs
-		${clean_first} && chroot_clean "${work_dir}"
-		if ${iso_only}; then
-			[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p ${buildset_iso} -i"
-			compress_images
-			exit 1
-		fi
-		if ${images_only}; then
-			build_images
-			warning "Continue compress: buildiso -p ${buildset_iso} -sc ..."
-			exit 1
-		else
-			build_images
-			compress_images
-		fi
-	cd ${run_dir}
+	load_profile "${edition_dir}/$1"
+	import_util_iso_fs
+	${clean_first} && chroot_clean "${work_dir}"
+	if ${iso_only}; then
+		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p $1 -i"
+		compress_images
+		exit 1
+	fi
+	if ${images_only}; then
+		build_images
+		warning "Continue compress: buildiso -p $1 -sc ..."
+		exit 1
+	else
+		build_images
+		compress_images
+	fi
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
-

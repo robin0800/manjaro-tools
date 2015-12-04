@@ -36,7 +36,7 @@ copy_initcpio(){
 	msg2 "Copying initcpio ..."
 	cp /usr/lib/initcpio/hooks/miso* $1/usr/lib/initcpio/hooks
 	cp /usr/lib/initcpio/install/miso* $1/usr/lib/initcpio/install
-	cp mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
+	cp ${profile_dir}/mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
 	set_mkinicpio_hooks "$1/etc/mkinitcpio-${iso_name}.conf"
 	sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
 }
