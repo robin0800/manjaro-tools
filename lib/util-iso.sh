@@ -519,8 +519,8 @@ load_pkgs(){
 }
 
 check_custom_pacman_conf(){
-	if [[ -f pacman-${pacman_conf_arch}.conf ]]; then
-		pacman_conf="pacman-${pacman_conf_arch}.conf"
+	if [[ -f $1/pacman-${pacman_conf_arch}.conf ]]; then
+		pacman_conf="$1/pacman-${pacman_conf_arch}.conf"
 		is_custom_pac_conf=true
 	else
 		pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
@@ -609,7 +609,7 @@ load_profile(){
 		iso_file="${iso_name}-${custom}-${dist_release}-${arch}.iso"
 	fi
 
-	check_custom_pacman_conf
+	check_custom_pacman_conf "$1"
 
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
 	work_dir=${chroots_iso}/$prof/${arch}
