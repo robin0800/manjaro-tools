@@ -397,12 +397,12 @@ make_isolinux() {
 		msg "Prepare [${iso_name}/iso/isolinux]"
 		local path=${work_dir}/iso/isolinux
 		mkdir -p ${path}
-		cp -a --no-preserve=ownership isolinux/* ${path}
+		cp -a --no-preserve=ownership ${profile_dir}/isolinux/* ${path}
 		write_isolinux_cfg "${path}"
 		write_isolinux_msg "${path}"
 		if [[ -e isolinux-overlay ]]; then
 			msg2 "isolinux overlay found. Overwriting files ..."
-			cp -a --no-preserve=ownership isolinux-overlay/* ${path}
+			cp -a --no-preserve=ownership ${profile_dir}/isolinux-overlay/* ${path}
 			update_isolinux_cfg "${path}"
 			update_isolinux_msg "${path}"
 		fi
