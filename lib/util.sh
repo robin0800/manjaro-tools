@@ -317,6 +317,17 @@ clean_dir(){
 	fi
 }
 
+write_repo_conf(){
+	local repos=$(find $USER_HOME -type f -name ".manjaro-tools")
+	local path name
+
+	for r in ${repos[@]}; do
+		path=${r%/.*}
+		name=${path##*/}
+		echo run_dir=$path > $USER_CONFIG/$name.conf
+	done
+}
+
 load_user_info(){
 	OWNER=${SUDO_USER:-$USER}
 
@@ -328,6 +339,13 @@ load_user_info(){
 
 	USER_CONFIG="$USER_HOME/.config/manjaro-tools"
 	prepare_dir "$USER_CONFIG"
+}
+
+load_run_dir(){
+	write_repo_conf
+	[[ -f $USER_CONFIG/$1.conf ]] || return 1
+	[[ -r $USER_CONFIG/$1.conf ]] && source $USER_CONFIG/$1.conf
+	return 0
 }
 
 show_version(){

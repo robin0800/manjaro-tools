@@ -103,7 +103,7 @@ load_user_info
 load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
-run_dir=/home/devtux/Projekte/iso-profiles #$(pwd)
+load_run_dir "${profile_repo}"
 
 clean_first=true
 pretend=false
