@@ -69,6 +69,7 @@ display_settings(){
 	msg2 "buildsets: $(load_sets ${sets_dir_iso})"
 	msg2 "buildset_iso: ${buildset_iso}"
 	msg2 "is_buildset: ${is_buildset}"
+	msg2 "profile_repo: ${profile_repo}"
 
 	msg "OPTIONS:"
 	msg2 "arch: ${arch}"
@@ -102,6 +103,9 @@ load_user_info
 
 load_config "${USER_CONFIG}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
+
+# to force old way to have buildiso run in iso-profiles dir
+# run_dir=$(pwd)
 
 load_run_dir "${profile_repo}"
 

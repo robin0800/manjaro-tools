@@ -201,6 +201,8 @@ init_buildiso(){
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
 	used_kernel=$(uname -r | cut -d . -f1)
 	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
+
+	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
 }
 
 init_deployiso(){
