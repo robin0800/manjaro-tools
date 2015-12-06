@@ -342,7 +342,7 @@ load_user_info(){
 }
 
 load_run_dir(){
-	[[ -f $USER_CONFIG/$1.conf ]] || write_repo_conf && return 1
+	[[ -f $USER_CONFIG/$1.conf ]] || write_repo_conf
 	[[ -r $USER_CONFIG/$1.conf ]] && source $USER_CONFIG/$1.conf
 	return 0
 }
