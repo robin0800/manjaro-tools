@@ -21,7 +21,8 @@ import ${LIBDIR}/util.sh
 
 show_profile(){
 	eval_edition "$1"
-	load_profile "${edition_dir}/$1"
+	load_profile "${run_dir}/${edition}/$1"
+	msg2 "edition: ${edition}"
 	if ${verbose};then
 		msg2 "work_dir: ${work_dir}"
 		msg2 "iso_dir: ${iso_dir}"

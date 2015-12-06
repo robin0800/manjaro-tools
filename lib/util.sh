@@ -44,7 +44,6 @@ eval_edition(){
 	[[ -z $result ]] && die "$1 is not a valid profile or buildset!"
 	edition=${result%/*}
 	edition=${edition##*/}
-	edition_dir=${run_dir}/${edition}
 }
 
 get_timer(){

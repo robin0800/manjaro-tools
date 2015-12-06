@@ -9,6 +9,67 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+copy_overlay_root(){
+	msg2 "Copying overlay ..."
+	cp -a --no-preserve=ownership $1/overlay/* $2
+}
+
+copy_overlay_custom(){
+	msg2 "Copying ${custom}-overlay ..."
+	cp -a --no-preserve=ownership $1/${custom}-overlay/* $2
+}
+
+copy_overlay_livecd(){
+	msg2 "Copying overlay-livecd ..."
+	if [[ -L overlay-livecd ]];then
+		cp -a --no-preserve=ownership $1/overlay-livecd/* $2
+	else
+		msg2 "Copying custom overlay-livecd ..."
+		cp -LR $1/overlay-livecd/* $2
+	fi
+}
+
+copy_overlay_isolinux(){
+	msg2 "isolinux overlay found. Overwriting files ..."
+	cp -a --no-preserve=ownership $1/isolinux-overlay/* $2
+}
+
+copy_startup_scripts(){
+	msg2 "Copying startup scripts ..."
+	cp ${PKGDATADIR}/scripts/livecd $1
+	cp ${PKGDATADIR}/scripts/mhwd-live $1
+	chmod +x $1/livecd
+	chmod +x $1/mhwd-live
+}
+
+write_profile_conf_entries(){
+	local conf=$1/profile.conf
+	echo '' >> ${conf}
+	echo '# custom image name' >> ${conf}
+	echo "custom=${custom}" >> ${conf}
+	echo '' >> ${conf}
+	echo '# iso_name' >> ${conf}
+	echo "iso_name=${iso_name}" >> ${conf}
+}
+
+copy_livecd_helpers(){
+	msg2 "Copying livecd helpers ..."
+	[[ ! -d $1 ]] && mkdir -p $1
+	cp ${LIBDIR}/util-livecd.sh $1
+	cp ${LIBDIR}/util-msg.sh $1
+	cp ${LIBDIR}/util.sh $1
+	cp ${PKGDATADIR}/scripts/kbd-model-map $1
+
+	cp ${profile_conf} $1
+
+	write_profile_conf_entries $1
+}
+
+copy_cache_mhwd(){
+	msg2 "Copying mhwd package cache ..."
+	rsync -v --files-from="$1/cache-packages.txt" /var/cache/pacman/pkg "$1/opt/livecd/pkgs"
+}
+
 gen_pw(){
 	echo $(perl -e 'print crypt($ARGV[0], "password")' ${password})
 }

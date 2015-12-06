@@ -22,62 +22,6 @@ import_util_iso_fs(){
 	fi
 }
 
-copy_overlay_root(){
-	msg2 "Copying overlay ..."
-	cp -a --no-preserve=ownership $1/overlay/* $2
-}
-
-copy_overlay_custom(){
-	msg2 "Copying ${custom}-overlay ..."
-	cp -a --no-preserve=ownership $1/${custom}-overlay/* ${work_dir}/${custom}-image
-}
-
-copy_overlay_livecd(){
-	msg2 "Copying overlay-livecd ..."
-	if [[ -L overlay-livecd ]];then
-		cp -a --no-preserve=ownership $1/overlay-livecd/* $2
-	else
-		msg2 "Copying custom overlay-livecd ..."
-		cp -LR $1/overlay-livecd/* $2
-	fi
-}
-
-copy_startup_scripts(){
-	msg2 "Copying startup scripts ..."
-	cp ${PKGDATADIR}/scripts/livecd $1
-	cp ${PKGDATADIR}/scripts/mhwd-live $1
-	chmod +x $1/livecd
-	chmod +x $1/mhwd-live
-}
-
-write_profile_conf_entries(){
-	local conf=$1/profile.conf
-	echo '' >> ${conf}
-	echo '# custom image name' >> ${conf}
-	echo "custom=${custom}" >> ${conf}
-	echo '' >> ${conf}
-	echo '# iso_name' >> ${conf}
-	echo "iso_name=${iso_name}" >> ${conf}
-}
-
-copy_livecd_helpers(){
-	msg2 "Copying livecd helpers ..."
-	[[ ! -d $1 ]] && mkdir -p $1
-	cp ${LIBDIR}/util-livecd.sh $1
-	cp ${LIBDIR}/util-msg.sh $1
-	cp ${LIBDIR}/util.sh $1
-	cp ${PKGDATADIR}/scripts/kbd-model-map $1
-
-	cp ${profile_conf} $1
-
-	write_profile_conf_entries $1
-}
-
-copy_cache_mhwd(){
-	msg2 "Copying mhwd package cache ..."
-	rsync -v --files-from="${work_dir}/mhwd-image/cache-packages.txt" /var/cache/pacman/pkg "${work_dir}/mhwd-image/opt/livecd/pkgs"
-}
-
 # $1: image path
 squash_image_dir() {
 	if [[ ! -d "$1" ]]; then
@@ -118,27 +62,27 @@ run_xorriso(){
 	if [[ -f "${work_dir}/iso/EFI/miso/${iso_name}.img" ]]; then
 		msg2 "Setting efi args. El Torito detected."
 		efi_boot_args=("-eltorito-alt-boot"
-						"-e EFI/miso/${iso_name}.img"
-						"-isohybrid-gpt-basdat"
-						"-no-emul-boot")
+				"-e EFI/miso/${iso_name}.img"
+				"-isohybrid-gpt-basdat"
+				"-no-emul-boot")
 	fi
 
 	xorriso -as mkisofs \
-			-iso-level 3 -rock -joliet \
-			-max-iso9660-filenames -omit-period \
-			-omit-version-number \
-			-relaxed-filenames -allow-lowercase \
-			-volid "${iso_label}" \
-			-appid "${iso_app_id}" \
-			-publisher "${iso_publisher}" \
-			-preparer "Prepared by manjaro-tools/${0##*/}" \
-			-eltorito-boot isolinux/isolinux.bin \
-			-eltorito-catalog isolinux/boot.cat \
-			-no-emul-boot -boot-load-size 4 -boot-info-table \
-			-isohybrid-mbr "${work_dir}/iso/isolinux/isohdpfx.bin" \
-			${efi_boot_args[@]} \
-			-output "${iso_dir}/${iso_file}" \
-			"${work_dir}/iso/"
+		-iso-level 3 -rock -joliet \
+		-max-iso9660-filenames -omit-period \
+		-omit-version-number \
+		-relaxed-filenames -allow-lowercase \
+		-volid "${iso_label}" \
+		-appid "${iso_app_id}" \
+		-publisher "${iso_publisher}" \
+		-preparer "Prepared by manjaro-tools/${0##*/}" \
+		-eltorito-boot isolinux/isolinux.bin \
+		-eltorito-catalog isolinux/boot.cat \
+		-no-emul-boot -boot-load-size 4 -boot-info-table \
+		-isohybrid-mbr "${work_dir}/iso/isolinux/isohdpfx.bin" \
+		${efi_boot_args[@]} \
+		-output "${iso_dir}/${iso_file}" \
+		"${work_dir}/iso/"
 }
 
 # Build ISO
@@ -161,9 +105,7 @@ make_iso() {
 		msg2 "Removing existing bootable image..."
 		rm -rf "${iso_dir}/${iso_file}"
 	fi
-
 	run_xorriso
-
 	msg "Done [Build ISO]"
 }
 
@@ -200,6 +142,14 @@ make_image_root() {
 	fi
 }
 
+gen_iso_fn(){
+	if [[ ${initsys} == 'openrc' ]];then
+		echo "${iso_name}-${custom}-${initsys}-${dist_release}-${arch}"
+	else
+		echo "${iso_name}-${custom}-${dist_release}-${arch}"
+	fi
+}
+
 make_image_custom() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [${custom} installation] (${custom}-image)"
@@ -214,13 +164,8 @@ make_image_custom() {
 		fi
 
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
-		if [[ ${initsys} == 'openrc' ]];then
-			local pkgs_file="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}-pkgs.txt"
-		else
-			local pkgs_file="${iso_name}-${custom}-${dist_release}-${arch}-pkgs.txt"
-		fi
-		cp "${path}/${custom}-image-pkgs.txt" ${iso_dir}/${pkgs_file}
-		[[ -d ${profile_dir}/${custom}-overlay ]] && copy_overlay_custom "${profile_dir}"
+		cp "${path}/${custom}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
+		[[ -d ${profile_dir}/${custom}-overlay ]] && copy_overlay_custom "${profile_dir}" "${path}"
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
@@ -269,7 +214,7 @@ make_image_livecd() {
 
 make_image_mhwd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [mhwd-image]"
+		msg "Prepare [drivers repository] (mhwd-image)"
 		local path="${work_dir}/mhwd-image"
 		mkdir -p ${path}/opt/livecd/pkgs
 
@@ -286,7 +231,7 @@ make_image_mhwd() {
 			die "Exit ${FUNCNAME}"
 		fi
 
-		copy_cache_mhwd
+		copy_cache_mhwd "${work_dir}/mhwd-image"
 
 		if [[ -n "${packages_cleanup}" ]]; then
 			for mhwd_clean in ${packages_cleanup}; do
@@ -304,7 +249,7 @@ make_image_mhwd() {
 		rm -f "${path}/cache-packages.txt"
 
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [mhwd-image]"
+		msg "Done [drivers repository] (mhwd-image)"
 	fi
 }
 
@@ -401,8 +346,7 @@ make_isolinux() {
 		write_isolinux_cfg "${path}"
 		write_isolinux_msg "${path}"
 		if [[ -e isolinux-overlay ]]; then
-			msg2 "isolinux overlay found. Overwriting files ..."
-			cp -a --no-preserve=ownership ${profile_dir}/isolinux-overlay/* ${path}
+			copy_overlay_isolinux "${profile_dir}" "${path}"
 			update_isolinux_cfg "${profile_dir}" "${path}"
 			update_isolinux_msg "${profile_dir}" "${path}"
 		fi
@@ -585,14 +529,7 @@ check_profile_vars(){
 	fi
 }
 
-# $1: profile
-load_profile(){
-	profile_dir=$1
-	local prof=${1##*/}
-	msg3 "Profile: [$prof]"
-	check_profile_sanity "$1"
-	load_profile_config "$1/profile.conf" || die "$1 is not a valid profile!"
-	check_profile_vars
+eval_custom(){
 	local files=$(ls $1/Packages*)
 	for f in ${files[@]};do
 		case $f in
@@ -603,13 +540,21 @@ load_profile(){
 	custom=${packages_custom##*/}
 	custom=${custom#*-}
 	custom=${custom,,}
-	if [[ ${initsys} == 'openrc' ]];then
-		iso_file="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}.iso"
-	else
-		iso_file="${iso_name}-${custom}-${dist_release}-${arch}.iso"
-	fi
+}
 
-	check_custom_pacman_conf "$1"
+# $1: profile
+load_profile(){
+	profile_dir=$1
+	local prof=${1##*/}
+	msg3 "Profile: [$prof]"
+	check_profile_sanity "${profile_dir}"
+	load_profile_config "${profile_dir}/profile.conf" || die "${profile_dir} is not a valid profile!"
+	check_profile_vars
+	eval_custom "${profile_dir}"
+
+	iso_file=$(gen_iso_fn).iso
+
+	check_custom_pacman_conf "${profile_dir}"
 
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
 	work_dir=${chroots_iso}/$prof/${arch}
@@ -659,7 +604,7 @@ build_images(){
 make_profile(){
 	eval_edition "$1"
 	msg "Start building [$1]"
-	load_profile "${edition_dir}/$1"
+	load_profile "${run_dir}/${edition}/$1"
 	import_util_iso_fs
 	${clean_first} && chroot_clean "${work_dir}"
 	if ${iso_only}; then
