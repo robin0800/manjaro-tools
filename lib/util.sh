@@ -40,10 +40,10 @@ eval_buildset(){
 }
 
 eval_edition(){
-	local result=$(find ${run_dir} -maxdepth 2 -name "$1")
+	local result=$(find ${run_dir} -maxdepth 2 -name "$1") path
 	[[ -z $result ]] && die "$1 is not a valid profile or buildset!"
-	edition=${result%/*}
-	edition=${edition##*/}
+	path=${result%/*}
+	edition=${path##*/}
 }
 
 get_timer(){

@@ -530,16 +530,16 @@ check_profile_vars(){
 }
 
 eval_custom(){
-	local files=$(ls $1/Packages*)
+	local files=$(ls $1/Packages*) name
 	for f in ${files[@]};do
 		case $f in
 			$1/Packages|$1/Packages-Livecd|$1/Packages-Mhwd) continue ;;
 			*) packages_custom="$f" ;;
 		esac
 	done
-	custom=${packages_custom##*/}
-	custom=${custom#*-}
-	custom=${custom,,}
+	name=${packages_custom##*/}
+	name=${name#*-}
+	custom=${name,,}
 }
 
 # $1: profile
