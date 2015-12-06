@@ -342,7 +342,7 @@ make_isolinux() {
 		msg "Prepare [${iso_name}/iso/isolinux]"
 		local path=${work_dir}/iso/isolinux
 		mkdir -p ${path}
-		cp -a --no-preserve=ownership ${profile_dir}/isolinux/* ${path}
+		copy_overlay "${profile_dir}/isolinux" "${path}"
 		write_isolinux_cfg "${path}"
 		write_isolinux_msg "${path}"
 		if [[ -e ${profile_dir}/isolinux-overlay ]]; then
@@ -359,7 +359,7 @@ make_isolinux() {
 make_isomounts() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Creating [isomounts]"
-		write_isomounts "${profile_dir}" "${work_dir}/iso/${iso_name}/isomounts"
+		write_isomounts "${profile_dir}" "${work_dir}/iso/${iso_name}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done creating [isomounts]"
 	fi
