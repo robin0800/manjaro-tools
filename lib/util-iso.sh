@@ -239,7 +239,7 @@ make_image_mhwd() {
 			done
 		fi
 		cp ${PKGDATADIR}/pacman-gfx.conf ${path}/opt/livecd
-		make_repo "${path}/opt/livecd/pkgs/gfx-pkgs" "${path}/opt/livecd/pkgs"
+		make_repo "${path}"
 		configure_mhwd_drivers "${path}"
 
 		umount_image "${path}"

@@ -473,7 +473,7 @@ configure_livecd_image(){
 }
 
 make_repo(){
-	repo-add ${work_dir}/mhwd-image/opt/livecd/pkgs/gfx-pkgs.db.tar.gz ${work_dir}/mhwd-image/opt/livecd/pkgs/*pkg*z
+	repo-add $1/opt/livecd/pkgs/gfx-pkgs.db.tar.gz $1/opt/livecd/pkgs/*pkg*z
 }
 
 # $1: work dir
