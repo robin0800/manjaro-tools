@@ -135,7 +135,7 @@ make_image_root() {
 		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		configure_root_image "${path}"
-		copy_overlay_root "${profile_dir}" "${path}"
+		copy_overlay "${profile_dir}/overlay" "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
@@ -165,7 +165,7 @@ make_image_custom() {
 
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
-		[[ -d ${profile_dir}/${custom}-overlay ]] && copy_overlay_custom "${profile_dir}" "${path}"
+		[[ -e ${profile_dir}/${custom}-overlay ]] && copy_overlay "${profile_dir}/${custom}-overlay" "${path}"
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
@@ -195,7 +195,7 @@ make_image_livecd() {
 		fi
 
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
-		copy_overlay_livecd "${profile_dir}" "${path}"
+		copy_overlay "${profile_dir}/overlay-livecd" "${path}"
 		# copy over setup helpers and config loader
 		copy_livecd_helpers "${path}/opt/livecd"
 		copy_startup_scripts "${path}/usr/bin"
@@ -345,8 +345,8 @@ make_isolinux() {
 		cp -a --no-preserve=ownership ${profile_dir}/isolinux/* ${path}
 		write_isolinux_cfg "${path}"
 		write_isolinux_msg "${path}"
-		if [[ -e isolinux-overlay ]]; then
-			copy_overlay_isolinux "${profile_dir}" "${path}"
+		if [[ -e ${profile_dir}/isolinux-overlay ]]; then
+			copy_overlay "${profile_dir}/isolinux-overlay" "${path}"
 			update_isolinux_cfg "${profile_dir}" "${path}"
 			update_isolinux_msg "${profile_dir}" "${path}"
 		fi
@@ -431,8 +431,8 @@ load_pkgs(){
 	local list
 
 	if [[ $1 == "${packages_custom}" ]];then
-		sort -u ${run_dir}/shared/Packages-Desktop ${packages_custom} > ${work_dir}/p_custom
-		list=${work_dir}/p_custom
+		sort -u ${run_dir}/shared/Packages-Desktop ${packages_custom} > ${work_dir}/pkgs_merged
+		list=${work_dir}/pkgs_merged
 	else
 		list=$1
 	fi
@@ -578,7 +578,6 @@ build_images(){
 	local timer=$(get_timer)
 	load_pkgs "${profile_dir}/Packages"
 	make_image_root
-	msg "${packages_custom}"
 	if [[ -f "${packages_custom}" ]] ; then
 		load_pkgs "${packages_custom}"
 		make_image_custom

@@ -9,29 +9,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-copy_overlay_root(){
-	msg2 "Copying overlay ..."
-	cp -a --no-preserve=ownership $1/overlay/* $2
-}
-
-copy_overlay_custom(){
-	msg2 "Copying ${custom}-overlay ..."
-	cp -a --no-preserve=ownership $1/${custom}-overlay/* $2
-}
-
-copy_overlay_livecd(){
-	msg2 "Copying overlay-livecd ..."
-	if [[ -L overlay-livecd ]];then
-		cp -a --no-preserve=ownership $1/overlay-livecd/* $2
+copy_overlay(){
+	msg2 "Copying ${1##*/} ..."
+	if [[ -L $1 ]];then
+		cp -a --no-preserve=ownership $1/* $2
 	else
-		msg2 "Copying custom overlay-livecd ..."
-		cp -LR $1/overlay-livecd/* $2
+		cp -LR $1/* $2
 	fi
-}
-
-copy_overlay_isolinux(){
-	msg2 "isolinux overlay found. Overwriting files ..."
-	cp -a --no-preserve=ownership $1/isolinux-overlay/* $2
 }
 
 copy_startup_scripts(){
