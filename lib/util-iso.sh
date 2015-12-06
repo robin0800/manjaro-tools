@@ -359,7 +359,7 @@ make_isolinux() {
 make_isomounts() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Creating [isomounts]"
-		write_isomounts "${work_dir}/iso/${iso_name}/isomounts"
+		write_isomounts "${profile_dir}" "${work_dir}/iso/${iso_name}/isomounts"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done creating [isomounts]"
 	fi
@@ -453,7 +453,7 @@ load_pkgs(){
 			| sed "$_kernel" \
 			| sed "$_clean")
 
-	if [[ $1 == 'Packages-Mhwd' ]]; then
+	if [[ ${1##*/} == 'Packages-Mhwd' ]]; then
 		packages_cleanup=$(sed "$_com_rm" "$1" \
 			| grep cleanup \
 			| sed "$_purge_rm" \
