@@ -134,7 +134,7 @@ configure_lsb(){
 configure_services(){
 	case ${initsys} in
 		'openrc')
-			msg3 "Congiguring [${initsys}] ...."
+			msg3 "Configuring [${initsys}] ...."
 			for svc in ${start_openrc[@]}; do
 				msg2 "Setting $svc ..."
 				chroot $1 rc-update add $svc default &> /dev/null
@@ -142,7 +142,7 @@ configure_services(){
 			msg3 "Done configuring [${initsys}]"
 		;;
 		'systemd')
-			msg3 "Congiguring [${initsys}] ...."
+			msg3 "Configuring [${initsys}] ...."
 			for svc in ${start_systemd[@]}; do
 				msg2 "Setting $svc ..."
 				chroot $1 systemctl enable $svc &> /dev/null
