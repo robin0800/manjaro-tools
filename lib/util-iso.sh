@@ -132,11 +132,11 @@ make_image_root() {
 			die "Exit ${FUNCNAME}"
 		fi
 
-		clean_up_image "${path}"
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
-		configure_root_image "${path}"
 		copy_overlay "${profile_dir}/overlay" "${path}"
+		configure_root_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
 	fi
