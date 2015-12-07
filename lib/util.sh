@@ -319,7 +319,7 @@ clean_dir(){
 }
 
 write_repo_conf(){
-	local repos=$(find $USER_HOME -type f -name ".manjaro-tools")
+	local repos=$(find $USER_HOME -type f -name ".buildiso")
 	local path name
 
 	for r in ${repos[@]}; do
