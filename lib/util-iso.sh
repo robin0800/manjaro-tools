@@ -238,7 +238,7 @@ make_image_mhwd() {
 				rm ${path}/opt/livecd/pkgs/${mhwd_clean}
 			done
 		fi
-		cp ${PKGDATADIR}/pacman-gfx.conf ${path}/opt/livecd
+		cp ${DATADIR}/pacman-gfx.conf ${path}/opt/livecd
 		make_repo "${path}"
 		configure_mhwd_drivers "${path}"
 
@@ -467,7 +467,7 @@ check_custom_pacman_conf(){
 		pacman_conf="$1/pacman-${pacman_conf_arch}.conf"
 		is_custom_pac_conf=true
 	else
-		pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
+		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
 		is_custom_pac_conf=false
 	fi
 }

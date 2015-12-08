@@ -20,8 +20,8 @@ copy_overlay(){
 
 copy_startup_scripts(){
 	msg2 "Copying startup scripts ..."
-	cp ${PKGDATADIR}/scripts/livecd $1
-	cp ${PKGDATADIR}/scripts/mhwd-live $1
+	cp ${DATADIR}/scripts/livecd $1
+	cp ${DATADIR}/scripts/mhwd-live $1
 	chmod +x $1/livecd
 	chmod +x $1/mhwd-live
 }
@@ -42,7 +42,7 @@ copy_livecd_helpers(){
 	cp ${LIBDIR}/util-livecd.sh $1
 	cp ${LIBDIR}/util-msg.sh $1
 	cp ${LIBDIR}/util.sh $1
-	cp ${PKGDATADIR}/scripts/kbd-model-map $1
+	cp ${DATADIR}/scripts/kbd-model-map $1
 
 	cp ${profile_conf} $1
 

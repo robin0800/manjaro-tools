@@ -10,13 +10,13 @@
 # GNU General Public License for more details.
 
 copy_efi_shells(){
-	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v1.efi ]];then
+	if [[ -f ${DATADIR}/efi_shell/shellx64_v1.efi ]];then
 		msg2 "Copying shellx64_v1.efi ..."
-		cp ${PKGDATADIR}/efi_shell/shellx64_v1.efi $1/
+		cp ${DATADIR}/efi_shell/shellx64_v1.efi $1/
 	fi
-	if [[ -f ${PKGDATADIR}/efi_shell/shellx64_v2.efi ]];then
+	if [[ -f ${DATADIR}/efi_shell/shellx64_v2.efi ]];then
 		msg2 "Copying shellx64_v2.efi ..."
-		cp ${PKGDATADIR}/efi_shell/shellx64_v2.efi $1/
+		cp ${DATADIR}/efi_shell/shellx64_v2.efi $1/
 	fi
 }
 

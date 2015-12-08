@@ -19,7 +19,7 @@ read_set(){
 }
 
 # $1: sets_dir
-load_sets(){
+list_sets(){
 	local prof temp
 	for item in $(ls $1/*.set); do
 		temp=${item##*/}
@@ -33,7 +33,7 @@ load_sets(){
 # $2: buildset
 eval_buildset(){
 	eval "case $2 in
-		$(load_sets $1)) is_buildset=true ;;
+		$(list_sets $1)) is_buildset=true ;;
 		*) is_buildset=false ;;
 	esac"
 	${is_buildset} && read_set $1/$2
@@ -144,7 +144,7 @@ init_buildpkg(){
 
 	prepare_dir "${sets_dir_pkg}"
 
-	[[ -d $USER_CONFIG/pkg.d ]] && sets_dir_pkg=$USER_CONFIG/pkg.d
+	[[ -d ${USERCONFDIR}/pkg.d ]] && sets_dir_pkg=${USERCONFDIR}/pkg.d
 
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
 
@@ -158,7 +158,7 @@ init_buildiso(){
 
 	prepare_dir "${sets_dir_iso}"
 
-	[[ -d $USER_CONFIG/iso.d ]] && sets_dir_iso=$USER_CONFIG/iso.d
+	[[ -d ${USERCONFDIR}/iso.d ]] && sets_dir_iso=${USERCONFDIR}/iso.d
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
 
@@ -325,7 +325,7 @@ write_repo_conf(){
 	for r in ${repos[@]}; do
 		path=${r%/.*}
 		name=${path##*/}
-		echo run_dir=$path > $USER_CONFIG/$name.conf
+		echo run_dir=$path > ${USERCONFDIR}/$name.conf
 	done
 }
 
@@ -338,13 +338,13 @@ load_user_info(){
 		USER_HOME=$HOME
 	fi
 
-	USER_CONFIG="$USER_HOME/.config/manjaro-tools"
-	prepare_dir "$USER_CONFIG"
+	USERCONFDIR="$USER_HOME/.config/manjaro-tools"
+	prepare_dir "${USERCONFDIR}"
 }
 
 load_run_dir(){
-	[[ -f $USER_CONFIG/$1.conf ]] || write_repo_conf
-	[[ -r $USER_CONFIG/$1.conf ]] && source $USER_CONFIG/$1.conf
+	[[ -f ${USERCONFDIR}/$1.conf ]] || write_repo_conf
+	[[ -r ${USERCONFDIR}/$1.conf ]] && source ${USERCONFDIR}/$1.conf
 	return 0
 }
 
@@ -354,8 +354,8 @@ show_version(){
 }
 
 show_config(){
-	if [[ -f ${USER_CONFIG}/manjaro-tools.conf ]]; then
-		msg2 "user_config: ${USER_CONFIG}/manjaro-tools.conf"
+	if [[ -f ${USERCONFDIR}/manjaro-tools.conf ]]; then
+		msg2 "user_config: ${USERCONFDIR}/manjaro-tools.conf"
 	else
 		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
 	fi

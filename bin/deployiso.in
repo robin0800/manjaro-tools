@@ -33,7 +33,7 @@ display_settings(){
 
 	msg "PROFILE:"
 	msg2 "sets_dir_iso: ${sets_dir_iso}"
-	msg2 "buildsets: $(load_sets ${sets_dir_iso})"
+	msg2 "buildsets: $(list_sets ${sets_dir_iso})"
 	msg2 "buildset_iso: ${buildset_iso}"
 	msg2 "is_buildset: ${is_buildset}"
 
@@ -62,7 +62,7 @@ display_settings(){
 
 load_user_info
 
-load_config "${USER_CONFIG}/manjaro-tools.conf"
+load_config "${USERCONFDIR}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 run_dir=${cache_dir_iso}

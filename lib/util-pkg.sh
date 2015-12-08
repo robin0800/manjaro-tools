@@ -29,7 +29,7 @@ load_group(){
 		_clean=':a;N;$!ba;s/\n/ /g' \
 		_com_rm="s|#.*||g" \
 		devel_packages='' \
-		file=${PKGDATADIR}/base-devel-udev
+		file=${DATADIR}/base-devel-udev
 
         msg3 "Loading Group [$file] ..."
 

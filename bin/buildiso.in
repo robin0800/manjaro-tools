@@ -12,7 +12,7 @@
 version=@version@
 
 LIBDIR='@libdir@'
-PKGDATADIR='@pkgdatadir@'
+DATADIR='@datadir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
@@ -67,7 +67,7 @@ display_settings(){
 
 	msg "PROFILE:"
 	msg2 "sets_dir_iso: ${sets_dir_iso}"
-	msg2 "buildsets: $(load_sets ${sets_dir_iso})"
+	msg2 "buildsets: $(list_sets ${sets_dir_iso})"
 	msg2 "buildset_iso: ${buildset_iso}"
 	msg2 "is_buildset: ${is_buildset}"
 	msg2 "profile_repo: ${profile_repo}"
@@ -102,7 +102,7 @@ display_settings(){
 
 load_user_info
 
-load_config "${USER_CONFIG}/manjaro-tools.conf"
+load_config "${USERCONFDIR}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 # to force old way to have buildiso run in iso-profiles dir
@@ -167,7 +167,7 @@ timer_start=$(get_timer)
 
 [[ "${arch}" == 'x86_64' ]] && pacman_conf_arch='multilib'
 
-mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
+mirrors_conf="${DATADIR}/pacman-mirrors-${branch}.conf"
 
 check_root "$0" "${orig_argv[@]}"
 

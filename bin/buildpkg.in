@@ -14,7 +14,7 @@ version=@version@
 shopt -s nullglob
 
 LIBDIR='@libdir@'
-PKGDATADIR='@pkgdatadir@'
+DATADIR='@datadir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
@@ -37,7 +37,7 @@ display_settings(){
 
 	msg "PROFILE:"
 	msg2 "sets_dir_pkg: ${sets_dir_pkg}"
-	msg2 "buildsets: $(load_sets ${sets_dir_pkg})"
+	msg2 "buildsets: $(list_sets ${sets_dir_pkg})"
 	msg2 "buildset_pkg: ${buildset_pkg}"
 	msg2 "is_buildset: ${is_buildset}"
 
@@ -70,7 +70,7 @@ display_settings(){
 
 load_user_info
 
-load_config "${USER_CONFIG}/manjaro-tools.conf"
+load_config "${USERCONFDIR}/manjaro-tools.conf"
 load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
 load_vars "$USER_HOME/.makepkg.conf"
@@ -141,9 +141,9 @@ else
         is_multilib=false
 fi
 
-pacman_conf="${PKGDATADIR}/pacman-${pacman_conf_arch}.conf"
-makepkg_conf="${PKGDATADIR}/makepkg-${arch}.conf"
-mirrors_conf="${PKGDATADIR}/pacman-mirrors-${branch}.conf"
+pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
+makepkg_conf="${DATADIR}/makepkg-${arch}.conf"
+mirrors_conf="${DATADIR}/pacman-mirrors-${branch}.conf"
 
 mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}")
 
