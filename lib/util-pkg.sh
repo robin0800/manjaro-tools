@@ -162,7 +162,7 @@ make_pkg(){
 	msg "Start building [$1]"
 	cd $1
 		setarch "${arch}" \
-			mkchrootpkg ${mkchrootpkg_args[*]} || eval "$2"
+			mkchrootpkg ${mkchrootpkg_args[*]} || abort
 		run_post_build
 	cd ..
 	msg "Finished building [$1]"
