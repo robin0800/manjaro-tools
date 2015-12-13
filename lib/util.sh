@@ -391,11 +391,6 @@ create_min_fs(){
 	mkdir -m 0555 -p $1/{sys,proc}
 }
 
-check_chroot_version(){
-	[[ -f $1/.manjaro-tools ]] && local chroot_version=$(cat $1/.manjaro-tools)
-	[[ ${version} != $chroot_version ]] && clean_first=true
-}
-
 is_valid_bool(){
 	case $1 in
 		'true'|'false') return 0 ;;

@@ -559,8 +559,6 @@ load_profile(){
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
 	work_dir=${chroots_iso}/$prof/${arch}
 
-	#[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
-
 	iso_dir="${cache_dir_iso}/${edition}/$prof/${dist_release}/${arch}"
 
 	prepare_dir "${iso_dir}"
