@@ -242,7 +242,7 @@ load_profile_config(){
 
 	[[ -f $1 ]] || return 1
 
-	profile_conf="$1"
+	profile_conf="$1/profile.conf"
 
 	[[ -r ${profile_conf} ]] && source ${profile_conf}
 

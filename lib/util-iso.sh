@@ -359,7 +359,7 @@ make_isolinux() {
 make_isomounts() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Creating [isomounts]"
-		write_isomounts "${profile_dir}" "${work_dir}/iso/${iso_name}"
+		write_isomounts "${work_dir}/iso/${iso_name}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done creating [isomounts]"
 	fi
@@ -472,6 +472,12 @@ check_custom_pacman_conf(){
 	fi
 }
 
+eval_custom(){
+	local name=${1##*/}
+	name=${name#*-}
+	custom=${name,,}
+}
+
 # $1: profile
 check_profile_sanity(){
 	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages-Root" "$1/Packages-Livecd")
@@ -496,6 +502,18 @@ check_profile_sanity(){
 	if ! ${has_keyfiles} && ! ${has_keydirs};then
 		die "Profile [$1] sanity check failed!"
 	fi
+
+	local files=$(ls $1/Packages*)
+	for f in ${files[@]};do
+		case $f in
+			$1/Packages-Root|$1/Packages-Livecd|$1/Packages-Mhwd) continue ;;
+			*) packages_custom="$f" ;;
+		esac
+	done
+
+	eval_custom "${packages_custom}"
+
+	[[ -f "$1/Packages-Mhwd" ]] && packages_mhwd=$1/Packages-Mhwd
 }
 
 check_requirements(){
@@ -529,28 +547,14 @@ check_profile_vars(){
 	fi
 }
 
-eval_custom(){
-	local files=$(ls $1/Packages*) name
-	for f in ${files[@]};do
-		case $f in
-			$1/Packages-Root|$1/Packages-Livecd|$1/Packages-Mhwd) continue ;;
-			*) packages_custom="$f" ;;
-		esac
-	done
-	name=${packages_custom##*/}
-	name=${name#*-}
-	custom=${name,,}
-}
-
 # $1: profile
 load_profile(){
 	profile_dir=$1
 	local prof=${1##*/}
 	msg3 "Profile: [$prof]"
 	check_profile_sanity "${profile_dir}"
-	load_profile_config "${profile_dir}/profile.conf" || die "${profile_dir} is not a valid profile!"
+	load_profile_config "${profile_dir}" || die "${profile_dir} is not a valid profile!"
 	check_profile_vars
-	eval_custom "${profile_dir}"
 
 	iso_file=$(gen_iso_fn).iso
 
