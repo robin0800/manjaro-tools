@@ -83,9 +83,6 @@ overriding
 
 ################ buildiso ################
 
-# the iso-profiles directory name/git repo name
-# profile_repo='manjaro-tools-iso-profiles'
-
 # default iso buildset; name without .set extension
 # buildset_iso=default
 

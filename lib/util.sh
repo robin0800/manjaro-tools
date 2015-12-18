@@ -201,7 +201,7 @@ init_buildiso(){
 	used_kernel=$(uname -r | cut -d . -f1)
 	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
 
-	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
+# 	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
 }
 
 init_deployiso(){
@@ -321,11 +321,11 @@ clean_dir(){
 write_repo_conf(){
 	local repos=$(find $USER_HOME -type f -name ".buildiso")
 	local path name
-
+	[[ -z ${repos[@]} ]] && repos=${DATADIR}/iso-profiles
 	for r in ${repos[@]}; do
 		path=${r%/.*}
 		name=${path##*/}
-		echo run_dir=$path > ${USERCONFDIR}/$name.conf
+		echo "run_dir=$path" > ${USERCONFDIR}/$name.conf
 	done
 }
 
