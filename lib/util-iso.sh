@@ -474,7 +474,7 @@ check_custom_pacman_conf(){
 
 # $1: profile
 check_profile_sanity(){
-	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages" "$1/Packages-Livecd")
+	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages-Root" "$1/Packages-Livecd")
 	local keydirs=("$1/root-overlay" "$1/live-overlay" "$1/isolinux")
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
@@ -533,7 +533,7 @@ eval_custom(){
 	local files=$(ls $1/Packages*) name
 	for f in ${files[@]};do
 		case $f in
-			$1/Packages|$1/Packages-Livecd|$1/Packages-Mhwd) continue ;;
+			$1/Packages-Root|$1/Packages-Livecd|$1/Packages-Mhwd) continue ;;
 			*) packages_custom="$f" ;;
 		esac
 	done
@@ -574,7 +574,7 @@ compress_images(){
 
 build_images(){
 	local timer=$(get_timer)
-	load_pkgs "${profile_dir}/Packages"
+	load_pkgs "${profile_dir}/Packages-Root"
 	make_image_root
 	if [[ -f "${packages_custom}" ]] ; then
 		load_pkgs "${packages_custom}"
