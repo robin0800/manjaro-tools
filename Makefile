@@ -54,7 +54,9 @@ SETS_ISO = \
 	data/iso.d/default.set \
 	data/iso.d/official.set \
 	data/iso.d/community.set \
-	data/iso.d/community-minimal.set
+	data/iso.d/community-minimal.set \
+	data/iso.d/sonar.set \
+	data/iso.d/netrunner.set
 
 BIN_ISO = \
 	bin/buildiso \
