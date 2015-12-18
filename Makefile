@@ -1,4 +1,4 @@
-Version=0.9.16
+Version=0.10.0
 
 PREFIX = /usr/local
 SYSCONFDIR = /etc

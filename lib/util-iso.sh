@@ -133,7 +133,7 @@ make_image_root() {
 		fi
 
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
-		copy_overlay "${profile_dir}/overlay" "${path}"
+		copy_overlay "${profile_dir}/root-overlay" "${path}"
 		configure_root_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		clean_up_image "${path}"
@@ -195,7 +195,7 @@ make_image_livecd() {
 		fi
 
 		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
-		copy_overlay "${profile_dir}/overlay-livecd" "${path}"
+		copy_overlay "${profile_dir}/live-overlay" "${path}"
 		# copy over setup helpers and config loader
 		copy_livecd_helpers "${path}/opt/livecd"
 		copy_startup_scripts "${path}/usr/bin"
@@ -475,7 +475,7 @@ check_custom_pacman_conf(){
 # $1: profile
 check_profile_sanity(){
 	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages" "$1/Packages-Livecd")
-	local keydirs=("$1/overlay" "$1/overlay-livecd" "$1/isolinux")
+	local keydirs=("$1/root-overlay" "$1/live-overlay" "$1/isolinux")
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
 		if [[ -f $f ]];then
