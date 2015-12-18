@@ -553,7 +553,7 @@ load_profile(){
 	local prof=${1##*/}
 	msg3 "Profile: [$prof]"
 	check_profile_sanity "${profile_dir}"
-	load_profile_config "${profile_dir}" || die "${profile_dir} is not a valid profile!"
+	load_profile_config "${profile_dir}/profile.conf" || die "${profile_dir} is not a valid profile!"
 	check_profile_vars
 
 	iso_file=$(gen_iso_fn).iso
