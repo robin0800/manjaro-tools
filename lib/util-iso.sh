@@ -177,10 +177,10 @@ make_image_custom() {
 	fi
 }
 
-make_image_livecd() {
+make_image_live() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [livecd installation] (livecd-image)"
-		local path="${work_dir}/livecd-image"
+		msg "Prepare [live installation] (live-image)"
+		local path="${work_dir}/live-image"
 		mkdir -p ${path}
 
 		if [[ -n "${custom}" ]] ; then
@@ -194,12 +194,12 @@ make_image_livecd() {
 			die "Exit ${FUNCNAME}"
 		fi
 
-		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
+		pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
 		copy_overlay "${profile_dir}/live-overlay" "${path}"
 		# copy over setup helpers and config loader
 		copy_livecd_helpers "${path}/opt/livecd"
 		copy_startup_scripts "${path}/usr/bin"
-		configure_livecd_image "${path}"
+		configure_live_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		umount_image "${path}"
@@ -208,7 +208,7 @@ make_image_livecd() {
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [livecd-image]"
+		msg "Done [live-image]"
 	fi
 }
 
@@ -480,7 +480,7 @@ eval_custom(){
 
 # $1: profile
 check_profile_sanity(){
-	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages-Root" "$1/Packages-Livecd")
+	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages-Root" "$1/Packages-Live")
 	local keydirs=("$1/root-overlay" "$1/live-overlay" "$1/isolinux")
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
@@ -506,7 +506,7 @@ check_profile_sanity(){
 	local files=$(ls $1/Packages*)
 	for f in ${files[@]};do
 		case $f in
-			$1/Packages-Root|$1/Packages-Livecd|$1/Packages-Mhwd) continue ;;
+			$1/Packages-Root|$1/Packages-Live|$1/Packages-Mhwd) continue ;;
 			*) packages_custom="$f" ;;
 		esac
 	done
@@ -584,9 +584,9 @@ build_images(){
 		load_pkgs "${packages_custom}"
 		make_image_custom
 	fi
-	if [[ -f ${profile_dir}/Packages-Livecd ]]; then
-		load_pkgs "${profile_dir}/Packages-Livecd"
-		make_image_livecd
+	if [[ -f ${profile_dir}/Packages-Live ]]; then
+		load_pkgs "${profile_dir}/Packages-Live"
+		make_image_live
 	fi
 	if [[ -f ${profile_dir}/Packages-Mhwd ]] ; then
 		load_pkgs "${profile_dir}/Packages-Mhwd"

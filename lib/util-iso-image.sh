@@ -442,8 +442,8 @@ configure_custom_image(){
 	msg "Done configuring [${custom}-image]"
 }
 
-configure_livecd_image(){
-	msg "Configuring [livecd-image]"
+configure_live_image(){
+	msg "Configuring [live-image]"
 	configure_hostname "$1"
 	configure_hosts "$1"
 	configure_accountsservice "$1" "${username}"
@@ -453,7 +453,7 @@ configure_livecd_image(){
 	configure_calamares "$1"
 	configure_thus "$1"
 	configure_pamac_live "$1"
-	msg "Done configuring [livecd-image]"
+	msg "Done configuring [live-image]"
 }
 
 make_repo(){
