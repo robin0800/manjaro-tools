@@ -342,7 +342,7 @@ make_isolinux() {
 		msg "Prepare [${iso_name}/iso/isolinux]"
 		local path=${work_dir}/iso/isolinux
 		mkdir -p ${path}
-		copy_overlay "${profile_dir}/isolinux" "${path}"
+		copy_overlay "${DATADIR}/isolinux" "${path}"
 		write_isolinux_cfg "${path}"
 		write_isolinux_msg "${path}"
 		if [[ -e ${profile_dir}/isolinux-overlay ]]; then
