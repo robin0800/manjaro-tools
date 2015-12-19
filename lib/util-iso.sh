@@ -365,6 +365,15 @@ make_isomounts() {
 	fi
 }
 
+get_shared_list(){
+	local path
+	case ${edition} in
+		sonar|netrunner) path=${run_dir}/shared/${edition}/Packages-Desktop ;;
+		*) path=${run_dir}/shared/manjaro/Packages-Desktop ;;
+	esac
+	echo $path
+}
+
 # $1: file name
 load_pkgs(){
 	msg3 "Loading Packages: [${1##*/}] ..."
@@ -431,7 +440,7 @@ load_pkgs(){
 	local list
 
 	if [[ $1 == "${packages_custom}" ]];then
-		sort -u ${run_dir}/shared/Packages-Desktop ${packages_custom} > ${work_dir}/pkgs_merged
+		sort -u $(get_shared_list) ${packages_custom} > ${work_dir}/pkgs_merged
 		list=${work_dir}/pkgs_merged
 	else
 		list=$1

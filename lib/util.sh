@@ -181,7 +181,8 @@ init_buildiso(){
 
 	[[ -z ${dist_name} ]] && dist_name="Manjaro"
 
-	[[ -z ${iso_name} ]] && iso_name="manjaro"
+# 	[[ -z ${iso_name} ]] && iso_name="manjaro"
+	iso_name=${dist_name,,}
 
 	iso_label="${dist_branding}${dist_release//.}"
 	iso_label="${iso_label//_}"	# relace all _
