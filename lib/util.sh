@@ -322,7 +322,7 @@ clean_dir(){
 write_repo_conf(){
 	local repos=$(find $USER_HOME -type f -name ".buildiso")
 	local path name
-	[[ -z ${repos[@]} ]] && repos=${DATADIR}/iso-profiles
+	[[ -z ${repos[@]} ]] && repos=(${DATADIR}/iso-profiles)
 	for r in ${repos[@]}; do
 		path=${r%/.*}
 		name=${path##*/}
