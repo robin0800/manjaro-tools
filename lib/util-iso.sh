@@ -492,7 +492,7 @@ eval_custom(){
 # $1: profile
 check_profile_sanity(){
 	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages-Root" "$1/Packages-Live")
-	local keydirs=("$1/root-overlay" "$1/live-overlay" "$1/isolinux")
+	local keydirs=("$1/root-overlay" "$1/live-overlay")
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
 		if [[ -f $f ]];then

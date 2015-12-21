@@ -1,3 +1,0 @@
-{
-      "name": "manjaro-tools", "files": [ { "directory": "", "filters": ["*", "-*.xz", "*.*"], "recursive": 1 } ]
-}
