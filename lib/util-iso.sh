@@ -143,11 +143,21 @@ make_image_root() {
 }
 
 gen_iso_fn(){
+	local fn
 	if [[ ${initsys} == 'openrc' ]];then
-		echo "${iso_name}-${custom}-${initsys}-${dist_release}-${arch}"
+		if [[ -z ${custom} ]]; then
+			fn="${iso_name}-${initsys}-${dist_release}-${arch}"
+		else
+			fn="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}"
+		fi
 	else
-		echo "${iso_name}-${custom}-${dist_release}-${arch}"
+		if [[ -z ${custom} ]]; then
+			fn="${iso_name}-${dist_release}-${arch}"
+		else
+			fn="${iso_name}-${custom}-${dist_release}-${arch}"
+		fi
 	fi
+	echo $fn
 }
 
 make_image_custom() {

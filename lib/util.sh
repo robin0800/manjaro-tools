@@ -263,6 +263,8 @@ unset_profile(){
 	unset start_systemd_live
 	unset start_openrc_live
 	unset use_overlayfs
+	unset packages_custom
+	unset packages_mhwd
 }
 
 load_profile_config(){
