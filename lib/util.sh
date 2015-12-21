@@ -238,6 +238,33 @@ load_config(){
 	return 0
 }
 
+unset_profile(){
+	unset initsys
+	unset displaymanager
+	unset autologin
+	unset multilib
+	unset pxe_boot
+	unset plymouth_boot
+	unset nonfree_xorg
+	unset default_desktop_executable
+	unset default_desktop_file
+	unset kernel
+	unset efi_boot_loader
+	unset efi_part_size
+	unset hostname
+	unset username
+	unset plymouth_theme
+	unset password
+	unset addgroups
+	unset start_systemd
+	unset disable_systemd
+	unset start_openrc
+	unset disable_openrc
+	unset start_systemd_live
+	unset start_openrc_live
+	unset use_overlayfs
+}
+
 load_profile_config(){
 
 	[[ -f $1 ]] || return 1

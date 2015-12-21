@@ -59,6 +59,7 @@ show_profile(){
 			msg2 "disable_openrc: ${disable_openrc[*]}"
 		fi
 	fi
+	unset_profile
 }
 
 display_settings(){

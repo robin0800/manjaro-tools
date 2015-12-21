@@ -619,6 +619,7 @@ make_profile(){
 		build_images
 		compress_images
 	fi
+	unset_profile
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }
