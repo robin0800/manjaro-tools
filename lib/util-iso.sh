@@ -14,14 +14,6 @@ import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
 import ${LIBDIR}/util-pac-conf.sh
 
-import_util_iso_fs(){
-	if ${use_overlayfs};then
-		import ${LIBDIR}/util-iso-overlayfs.sh
-	else
-		import ${LIBDIR}/util-iso-aufs.sh
-	fi
-}
-
 # $1: image path
 squash_image_dir() {
 	if [[ ! -d "$1" ]]; then
@@ -613,9 +605,10 @@ build_images(){
 
 make_profile(){
 	eval_edition "$1"
-	msg "Start building [$1]"
 	load_profile "${run_dir}/${edition}/$1"
-	import_util_iso_fs
+
+	msg "Start building [$1]"
+	import ${LIBDIR}/util-iso-${iso_fs}.sh
 	${clean_first} && chroot_clean "${work_dir}"
 	if ${iso_only}; then
 		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p $1 -i"
@@ -630,6 +623,7 @@ make_profile(){
 		build_images
 		compress_images
 	fi
+	unset_profile
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }

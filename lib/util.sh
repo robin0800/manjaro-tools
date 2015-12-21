@@ -199,10 +199,11 @@ init_buildiso(){
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
 
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
-	used_kernel=$(uname -r | cut -d . -f1)
-	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
 
-# 	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
+	local used_kernel=$(uname -r)
+	[[ ${used_kernel%%*.} < "4" ]] && use_overlayfs='false'
+
+	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
 }
 
 init_deployiso(){
@@ -239,6 +240,33 @@ load_config(){
 	return 0
 }
 
+unset_profile(){
+	unset initsys
+	unset displaymanager
+	unset autologin
+	unset multilib
+	unset pxe_boot
+	unset plymouth_boot
+	unset nonfree_xorg
+	unset default_desktop_executable
+	unset default_desktop_file
+	unset kernel
+	unset efi_boot_loader
+	unset efi_part_size
+	unset hostname
+	unset username
+	unset plymouth_theme
+	unset password
+	unset addgroups
+	unset start_systemd
+	unset disable_systemd
+	unset start_openrc
+	unset disable_openrc
+	unset start_systemd_live
+	unset start_openrc_live
+	unset use_overlayfs
+}
+
 load_profile_config(){
 
 	[[ -f $1 ]] || return 1
@@ -266,8 +294,15 @@ load_profile_config(){
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
 
 	[[ -z ${kernel} ]] && kernel="linux41"
-	used_kernel=$(echo ${kernel} | cut -c 6)
-	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
+
+	local used_kernel=${kernel:5:1}
+	[[ ${used_kernel} < "4" ]] && use_overlayfs='false'
+
+	if ${use_overlayfs};then
+		iso_fs="overlayfs"
+	else
+		iso_fs="aufs"
+	fi
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
@@ -322,7 +357,7 @@ clean_dir(){
 write_repo_conf(){
 	local repos=$(find $USER_HOME -type f -name ".buildiso")
 	local path name
-	[[ -z ${repos[@]} ]] && repos=(${DATADIR}/iso-profiles)
+	[[ -z ${repos[@]} ]] && run_dir=${DATADIR}/iso-profiles && return 1
 	for r in ${repos[@]}; do
 		path=${r%/.*}
 		name=${path##*/}
