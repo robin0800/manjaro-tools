@@ -135,21 +135,19 @@ make_image_root() {
 }
 
 gen_iso_fn(){
-	local fn
-	if [[ ${initsys} == 'openrc' ]];then
-		if [[ -z ${custom} ]]; then
-			fn="${iso_name}-${initsys}-${dist_release}-${arch}"
-		else
-			fn="${iso_name}-${custom}-${initsys}-${dist_release}-${arch}"
-		fi
-	else
-		if [[ -z ${custom} ]]; then
-			fn="${iso_name}-${dist_release}-${arch}"
-		else
-			fn="${iso_name}-${custom}-${dist_release}-${arch}"
-		fi
+	local vars=() name
+	vars+=("${iso_name}")
+	[[ -n ${custom} ]] && vars+=("${custom}")
+	if [[ "${edition}" != 'netrunner' ]] && [[ "${edition}" != 'sonar' ]];then
+		vars+=("${edition}")
 	fi
-	echo $fn
+	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
+	vars+=("${dist_release}")
+	vars+=("${arch}")
+	for n in ${vars[@]};do
+		name=${name:-}${name:+-}${n}
+	done
+	echo $name
 }
 
 make_image_custom() {
