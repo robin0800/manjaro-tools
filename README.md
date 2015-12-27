@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.9.15
+Manjaro-tools-0.10.0
 
 User manual
 
@@ -83,6 +83,8 @@ overriding
 
 ################ buildiso ################
 
+# profile_repo='manjaro-tools-iso-profiles'
+
 # default iso buildset; name without .set extension
 # buildset_iso=default
 
@@ -97,9 +99,6 @@ overriding
 
 # unset defaults to given value
 # dist_branding="MJRO"
-
-# unset defaults to given value
-# iso_name=manjaro
 
 # iso publisher
 # iso_publisher="Manjaro Linux <http://www.manjaro.org>"
