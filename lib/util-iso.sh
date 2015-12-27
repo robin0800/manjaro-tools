@@ -138,9 +138,9 @@ gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
 	[[ -n ${custom} ]] && vars+=("${custom}")
-	if [[ "${edition}" != 'netrunner' ]] && [[ "${edition}" != 'sonar' ]];then
-		vars+=("${edition}")
-	fi
+	case ${edition} in
+		community|minimal) vars+=("${edition}") ;;
+	esac
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
 	vars+=("${arch}")
