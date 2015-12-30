@@ -166,6 +166,25 @@ configure_environment(){
 	esac
 }
 
+declare -A desktop_list=(
+	[plasma]=startkde
+	[kde-plasma]=startkde
+	[gnome]=gnome-session
+	[xfce]=startxfce4
+	[cinnamon]=cinnamon-session-cinnamon
+	[mate]=mate-session
+	[enlightenment]=enlightenment_start
+	[LXDE]=lxsession
+	[lxqt]=lxqt-session
+	[pekwm]=pekwm
+	[pantheon]=pantheon-session
+	[budgie-desktop]=budgie-desktop
+	[i3]=i3
+	[openbox]=openbox-session
+	[fluxbox]=startfluxbox
+	[deepin]=startdde
+)
+
 # $1: chroot
 # $2: user
 configure_accountsservice(){
@@ -179,82 +198,16 @@ configure_accountsservice(){
 }
 
 detect_desktop_env(){
-	if [[ "${default_desktop_executable}" == "none" ]] || [[ ${default_desktop_file} == "none" ]]; then
-		msg2 "No default desktop environment set, trying to detect it."
-		if [ -e "$1/usr/bin/startkde" ] && [ -e "$1/usr/share/xsessions/plasma.desktop" ]; then
-			default_desktop_executable="startkde"
-			default_desktop_file="plasma"
-			msg2 "Detected Plasma 5 desktop environment"
-		elif [ -e "$1/usr/bin/startkde" ] && [ -e "$1/usr/share/xsessions/kde-plasma.desktop" ]; then
-			default_desktop_executable="startkde"
-			default_desktop_file="kde-plasma"
-			msg2 "Detected KDE Plasma 4 desktop environment"
-		elif [ -e "$1/usr/bin/gnome-session" ] && [ -e "$1/usr/share/xsessions/gnome.desktop" ]; then
-			default_desktop_executable="gnome-session"
-			default_desktop_file="gnome"
-			msg2 "Detected Gnome desktop environment"
-		elif [ -e "$1/usr/bin/startxfce4" ] && [ -e "$1/usr/share/xsessions/xfce.desktop" ]; then
-			default_desktop_executable="startxfce4"
-			default_desktop_file="xfce"
-			msg2 "Detected Xfce desktop environment"
-		elif [ -e "$1/usr/bin/cinnamon-session-cinnamon" ] && [ -e "$1/usr/share/xsessions/cinnamon.desktop" ]; then
-			default_desktop_executable="cinnamon-session-cinnamon"
-			default_desktop_file="cinnamon"
-			msg2 "Detected Cinnamon desktop environment"
-		elif [ -e "$1/usr/bin/mate-session" ] && [ -e "$1/usr/share/xsessions/mate.desktop" ]; then
-			default_desktop_executable="mate-session"
-			default_desktop_file="mate"
-			msg2 "Detected Mate desktop environment"
-		elif [ -e "$1/usr/bin/enlightenment_start" ] && [ -e "$1/usr/share/xsessions/enlightenment.desktop" ]; then
-			default_desktop_executable="enlightenment_start"
-			default_desktop_file="enlightenment"
-			msg2 "Detected Enlightenment desktop environment"
-		elif [ -e "$1/usr/bin/lxsession" ] && [ -e "$1/usr/share/xsessions/LXDE.desktop" ]; then
-			default_desktop_executable="lxsession"
-			default_desktop_file="LXDE"
-			msg2 "Detected LXDE desktop environment"
-		elif [ -e "$1/usr/bin/startlxde" ] && [ -e "$1/usr/share/xsessions/LXDE.desktop" ]; then
-			default_desktop_executable="startlxde"
-			default_desktop_file="LXDE"
-			msg2 "Detected LXDE desktop environment"
-		elif [ -e "$1/usr/bin/lxqt-session" ] && [ -e "$1/usr/share/xsessions/lxqt.desktop" ]; then
-			default_desktop_executable="lxqt-session"
-			default_desktop_file="lxqt"
-			msg2 "Detected LXQt desktop environment"
-		elif [ -e "$1/usr/bin/pekwm" ] && [ -e "$1/usr/share/xsessions/pekwm.desktop" ]; then
-			default_desktop_executable="pekwm"
-			default_desktop_file="pekwm"
-			msg2 "Detected PekWM desktop environment"
-		elif [ -e "$1/usr/bin/pantheon-session" ] && [ -e "$1/usr/share/xsessions/pantheon.desktop" ]; then
-			default_desktop_executable="pantheon-session"
-			default_desktop_file="pantheon"
-			msg2 "Detected Pantheon desktop environment"
-		elif [ -e "$1/usr/bin/budgie-session" ] && [ -e "$1/usr/share/xsessions/budgie-desktop.desktop" ]; then
-			default_desktop_executable="budgie-session"
-			default_desktop_file="budgie-desktop"
-			msg2 "Detected Budgie desktop environment"
-		elif [ -e "$1/usr/bin/i3" ] && [ -e "$1/usr/share/xsessions/i3.desktop" ]; then
-			default_desktop_executable="i3"
-			default_desktop_file="i3"
-			msg2 "Detected i3 desktop environment"
-		elif [ -e "$1/usr/bin/openbox-session" ] && [ -e "$1/usr/share/xsessions/openbox.desktop" ]; then
-			default_desktop_executable="openbox-session"
-			default_desktop_file="openbox"
-			msg2 "Detected Openbox desktop environment"
-		elif [ -e "$1/usr/bin/fluxbox" ] && [ -e "$1/usr/share/xsessions/fluxbox.desktop" ]; then
-			default_desktop_executable="startfluxbox"
-			default_desktop_file="fluxbox"
-			msg2 "Detected Fluxbox desktop environment"
-		elif [ -e "$1/usr/bin/dde-desktop" ] && [ -e "$1/usr/share/xsessions/deepin.desktop" ]; then
-			default_desktop_executable="startdde"
-			default_desktop_file="deepin"
-			msg2 "Detected Deepin desktop environment"
-		else
-			default_desktop_executable="none"
-			default_desktop_file="none"
-			msg2 "No desktop environment detected"
+	local xs=$1/usr/share/xsessions ex=$1/usr/bin
+	msg2 "Trying to detect desktop environment ..."
+	for item in ${!desktop_list[@]};do
+		if [[ -f $ex/${desktop_list[$item]} ]] && \
+		[[ -f $xs/$item.desktop ]];then
+			default_desktop_executable="${desktop_list[$item]}"
+			default_desktop_file="${item}"
 		fi
-	fi
+	done
+	msg2 "Detected: ${default_desktop_file}"
 }
 
 configure_mhwd(){
@@ -283,18 +236,6 @@ configure_displaymanager(){
 				sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' ${conf}
 				sed -i -e 's/pam_systemd.so/pam_ck_connector.so nox11/' $1/etc/pam.d/lightdm-greeter
 			fi
-			local greeters=$(ls $1/etc/lightdm/*greeter.conf)
-			for g in ${greeters[@]};do
-				case ${g##*/} in
-					'lxqt-lightdm-greeter.conf')
-						sed -i -e "s/^.*greeter-session=.*/greeter-session=lxqt-lightdm-greeter/" ${conf}
-					;;
-					'lightdm-kde-greeter.conf')
-						sed -i -e "s/^.*greeter-session=.*/greeter-session=lightdm-kde-greeter/" ${conf}
-					;;
-					*) break ;;
-				esac
-			done
 		;;
 		'gdm')
 			configure_accountsservice $1 "gdm"
