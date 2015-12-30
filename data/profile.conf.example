@@ -24,11 +24,11 @@
 # pxe_boot="true"
 
 # desktop session executable
-ä default: auto detect
+# default: auto detect
 # default_desktop_executable="none"
 
 # desktop file to launch session
-ä default: auto detect
+# default: auto detect
 # default_desktop_file="none"
 
 ################ install ################
