@@ -166,25 +166,6 @@ configure_environment(){
 	esac
 }
 
-declare -A desktop_list=(
-	[plasma]=startkde
-	[kde-plasma]=startkde
-	[gnome]=gnome-session
-	[xfce]=startxfce4
-	[cinnamon]=cinnamon-session-cinnamon
-	[mate]=mate-session
-	[enlightenment]=enlightenment_start
-	[LXDE]=lxsession
-	[lxqt]=lxqt-session
-	[pekwm]=pekwm
-	[pantheon]=pantheon-session
-	[budgie-desktop]=budgie-desktop
-	[i3]=i3
-	[openbox]=openbox-session
-	[fluxbox]=startfluxbox
-	[deepin]=startdde
-)
-
 # $1: chroot
 # $2: user
 configure_accountsservice(){
@@ -197,16 +178,30 @@ configure_accountsservice(){
 	fi
 }
 
+load_desktop_map(){
+	local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g" \
+		file=${DATADIR}/desktop.map
+        msg3 "Loading [$file] ..."
+	local desktop_map=$(sed "$_com_rm" "$file" \
+			| sed "$_space" \
+			| sed "$_clean")
+        echo ${desktop_map}
+}
+
 detect_desktop_env(){
-	local xs=$1/usr/share/xsessions ex=$1/usr/bin
-	msg2 "Trying to detect desktop environment ..."
-	for item in ${!desktop_list[@]};do
-		if [[ -f $ex/${desktop_list[$item]} ]] && \
-		[[ -f $xs/$item.desktop ]];then
-			default_desktop_executable="${desktop_list[$item]}"
-			default_desktop_file="${item}"
-		fi
-	done
+	local xs=$1/usr/share/xsessions ex=$1/usr/bin key val map=( $(load_desktop_map) )
+	if [[ "${default_desktop_executable}" == "none" ]] || \
+		[[ ${default_desktop_file} == "none" ]]; then
+		msg2 "Trying to detect desktop environment ..."
+		for item in "${map[@]}";do
+			key=${item%:*}
+			val=${item#*:}
+			if [[ -f $xs/$key.desktop ]] && [[ -f $ex/$val ]];then
+				default_desktop_file="$key"
+				default_desktop_executable="$val"
+			fi
+		done
+	fi
 	msg2 "Detected: ${default_desktop_file}"
 }
 
