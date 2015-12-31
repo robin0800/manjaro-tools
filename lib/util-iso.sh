@@ -138,9 +138,7 @@ gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
 	[[ -n ${custom} ]] && vars+=("${custom}")
-	case ${edition} in
-		community|minimal) vars+=("${edition}") ;;
-	esac
+	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
 	vars+=("${arch}")
