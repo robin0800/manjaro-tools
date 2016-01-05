@@ -14,7 +14,7 @@ write_calamares_machineid_conf(){
 		local conf="$1/etc/calamares/modules/machineid.conf"
 		echo "systemd: false" > $conf
 		echo "dbus: true" >> $conf
-		echo "symlink: false" >> $conf
+		echo "symlink: true" >> $conf
 	fi
 }
 
