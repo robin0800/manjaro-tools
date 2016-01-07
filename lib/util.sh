@@ -100,17 +100,9 @@ prepare_dir(){
 }
 
 version_gen(){
-	local y=$(date +%Y) m=$(date +%m)
-	dist_release=${y:2}.$m
-}
-
-version_gen2(){
-	local y=$(date +%Y) m=$(date +%m)
-	case $month in
-		01|04|07|10) dist_release=${y:2}.$m.1 ;;
-		02|05|08|11) dist_release=${y:2}.$m.2 ;;
-		*) dist_release=${y:2}.$m ;;
-	esac
+	local y=$(date +%Y) m=$(date +%m) ver
+	ver=${y:2}.$m
+	echo $ver
 }
 
 init_common(){
@@ -142,8 +134,6 @@ init_buildpkg(){
 
 	sets_dir_pkg="${SYSCONFDIR}/pkg.d"
 
-	prepare_dir "${sets_dir_pkg}"
-
 	[[ -d ${USERCONFDIR}/pkg.d ]] && sets_dir_pkg=${USERCONFDIR}/pkg.d
 
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
@@ -156,8 +146,6 @@ init_buildiso(){
 
 	sets_dir_iso="${SYSCONFDIR}/iso.d"
 
-	prepare_dir "${sets_dir_iso}"
-
 	[[ -d ${USERCONFDIR}/iso.d ]] && sets_dir_iso=${USERCONFDIR}/iso.d
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
@@ -166,11 +154,7 @@ init_buildiso(){
 
 	##### iso settings #####
 
-	if [[ -z ${dist_release} ]];then
-# 		source /etc/lsb-release
-# 		dist_release=${DISTRIB_RELEASE}
-		version_gen
-	fi
+	[[ -z ${dist_release} ]] && dist_release=$(version_gen)
 
 	if [[ -z ${dist_codename} ]];then
 		source /etc/lsb-release
@@ -181,7 +165,6 @@ init_buildiso(){
 
 	[[ -z ${dist_name} ]] && dist_name="Manjaro"
 
-# 	[[ -z ${iso_name} ]] && iso_name="manjaro"
 	iso_name=${dist_name,,}
 
 	iso_label="${dist_branding}${dist_release//.}"

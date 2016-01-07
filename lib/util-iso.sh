@@ -21,7 +21,7 @@ squash_image_dir() {
 		return 1
 	fi
 	local timer=$(get_timer) path=${work_dir}/iso/${iso_name}/${arch}
-	local sq_img="${path}/$(basename ${1}).sqfs"
+	local sq_img="${path}/${1##*/}.sqfs"
 	mkdir -p ${path}
 	msg "Generating SquashFS image for '${1}'"
 	if [[ -f "${sq_img}" ]]; then
@@ -40,7 +40,7 @@ squash_image_dir() {
 	[[ "${iso_compression}" != "xz" ]] && highcomp=""
 	msg2 "Creating SquashFS image. This may take some time..."
 	local used_kernel=$(echo ${kernel} | cut -c 6)
-	if [[ "$(basename "$1")" == "mhwd-image" && ${used_kernel} -ge "4" ]]; then
+	if [[ "${1##*/}" == "mhwd-image" && ${used_kernel} -ge "4" ]]; then
 		mksquashfs "${1}" "${sq_img}" -noappend -comp lz4 || die "Exit ..."
 	else
 		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp} || die "Exit ..."
@@ -83,8 +83,8 @@ make_iso() {
 	touch "${work_dir}/iso/.miso"
 	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
 		if [[ "$d" != "${work_dir}/iso" ]] && \
-			[[ "$(basename "$d")" != "iso" ]] && \
-			[[ "$(basename "$d")" != "efiboot" ]] && \
+			[[ "${d##*/}" != "iso" ]] && \
+			[[ "${d##*/}" != "efiboot" ]] && \
 			[[ "$d" != "${work_dir}" ]]; then
 			squash_image_dir "$d"
 		fi

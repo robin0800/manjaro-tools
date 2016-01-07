@@ -97,28 +97,28 @@ copy_hostconf () {
 }
 
 chroot_extra_umount() {
-    chroot_mount "/etc/resolv.conf" "$1/etc/resolv.conf" -B
-    chroot_mount "${cache_dirs[0]}" "$1${cache_dirs[0]}" -B
+	chroot_mount "/etc/resolv.conf" "$1/etc/resolv.conf" -B
+	chroot_mount "${cache_dirs[0]}" "$1${cache_dirs[0]}" -B
 
-    for cache_dir in ${cache_dirs[@]:1}; do
+	for cache_dir in ${cache_dirs[@]:1}; do
 		chroot_mount "$cache_dir" "$1${cache_dir}" -Br
-    done
+	done
 
-    if [[ -n ${mountargs_ro[@]} ]];then
+	if [[ -n ${mountargs_ro[@]} ]];then
 		local IFS=','
 		for m in ${mountargs_ro[@]}; do
 			chroot_mount "${m%%:*}" "$1${m##*:}" -Br
 		done
 		unset IFS
-    fi
+	fi
 
-    if [[ -n ${mountargs_rw[@]} ]];then
+	if [[ -n ${mountargs_rw[@]} ]];then
 		local IFS=','
 		for m in ${mountargs_rw[@]}; do
 			chroot_mount "${m%%:*}" "$1${m##*:}" -B
 		done
 		unset IFS
-    fi
+	fi
 }
 
 umask 0022
