@@ -79,13 +79,11 @@ if ${automount};then
 
 	${pretend} && display_settings && exit 1
 
-	if [[ -d /run/systemd ]]; then
-		systemctl start lvm2-lvmetad
-	else
-		rc-service lvm start
-	fi
-
-	os_list=$(detect)
+# 	if [[ -d /run/systemd ]]; then
+# 		systemctl start lvm2-lvmetad
+# 	else
+# 		rc-service lvm start
+# 	fi
 	select_os
 else
 	chrootdir=$1
