@@ -46,7 +46,7 @@ chroot_part_mount() {
 
 select_os(){
         local os_list=( $(detect) ) count=${#os_list[@]}
-	if [[ ${count} > 0 ]];then
+	if [[ ${count} > 1 ]];then
                 msg "Detected systems:"
                 local i=0
                 for os in ${os_list[@]};do
