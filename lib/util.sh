@@ -100,17 +100,9 @@ prepare_dir(){
 }
 
 version_gen(){
-	local y=$(date +%Y) m=$(date +%m)
-	dist_release=${y:2}.$m
-}
-
-version_gen2(){
-	local y=$(date +%Y) m=$(date +%m)
-	case $month in
-		01|04|07|10) dist_release=${y:2}.$m.1 ;;
-		02|05|08|11) dist_release=${y:2}.$m.2 ;;
-		*) dist_release=${y:2}.$m ;;
-	esac
+	local y=$(date +%Y) m=$(date +%m) ver
+	ver=${y:2}.$m
+	echo $ver
 }
 
 init_common(){
@@ -142,8 +134,6 @@ init_buildpkg(){
 
 	sets_dir_pkg="${SYSCONFDIR}/pkg.d"
 
-	prepare_dir "${sets_dir_pkg}"
-
 	[[ -d ${USERCONFDIR}/pkg.d ]] && sets_dir_pkg=${USERCONFDIR}/pkg.d
 
 	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
@@ -156,8 +146,6 @@ init_buildiso(){
 
 	sets_dir_iso="${SYSCONFDIR}/iso.d"
 
-	prepare_dir "${sets_dir_iso}"
-
 	[[ -d ${USERCONFDIR}/iso.d ]] && sets_dir_iso=${USERCONFDIR}/iso.d
 
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
@@ -166,11 +154,7 @@ init_buildiso(){
 
 	##### iso settings #####
 
-	if [[ -z ${dist_release} ]];then
-# 		source /etc/lsb-release
-# 		dist_release=${DISTRIB_RELEASE}
-		version_gen
-	fi
+	[[ -z ${dist_release} ]] && dist_release=$(version_gen)
 
 	if [[ -z ${dist_codename} ]];then
 		source /etc/lsb-release
@@ -181,7 +165,7 @@ init_buildiso(){
 
 	[[ -z ${dist_name} ]] && dist_name="Manjaro"
 
-	[[ -z ${iso_name} ]] && iso_name="manjaro"
+	iso_name=${dist_name,,}
 
 	iso_label="${dist_branding}${dist_release//.}"
 	iso_label="${iso_label//_}"	# relace all _
@@ -198,8 +182,9 @@ init_buildiso(){
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
 
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
-	used_kernel=$(uname -r | cut -d . -f1)
-	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
+
+	local used_kernel=$(uname -r)
+	[[ ${used_kernel%%*.} < "4" ]] && use_overlayfs='false'
 
 	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
 }
@@ -238,6 +223,35 @@ load_config(){
 	return 0
 }
 
+unset_profile(){
+	unset initsys
+	unset displaymanager
+	unset autologin
+	unset multilib
+	unset pxe_boot
+	unset plymouth_boot
+	unset nonfree_xorg
+	unset default_desktop_executable
+	unset default_desktop_file
+	unset kernel
+	unset efi_boot_loader
+	unset efi_part_size
+	unset hostname
+	unset username
+	unset plymouth_theme
+	unset password
+	unset addgroups
+	unset start_systemd
+	unset disable_systemd
+	unset start_openrc
+	unset disable_openrc
+	unset start_systemd_live
+	unset start_openrc_live
+	unset use_overlayfs
+	unset packages_custom
+	unset packages_mhwd
+}
+
 load_profile_config(){
 
 	[[ -f $1 ]] || return 1
@@ -265,8 +279,15 @@ load_profile_config(){
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
 
 	[[ -z ${kernel} ]] && kernel="linux41"
-	used_kernel=$(echo ${kernel} | cut -c 6)
-	[[ ${used_kernel} -lt "4" ]] && use_overlayfs='false'
+
+	local used_kernel=${kernel:5:1}
+	[[ ${used_kernel} < "4" ]] && use_overlayfs='false'
+
+	if ${use_overlayfs};then
+		iso_fs="overlayfs"
+	else
+		iso_fs="aufs"
+	fi
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
@@ -321,11 +342,11 @@ clean_dir(){
 write_repo_conf(){
 	local repos=$(find $USER_HOME -type f -name ".buildiso")
 	local path name
-
+	[[ -z ${repos[@]} ]] && run_dir=${DATADIR}/iso-profiles && return 1
 	for r in ${repos[@]}; do
 		path=${r%/.*}
 		name=${path##*/}
-		echo run_dir=$path > ${USERCONFDIR}/$name.conf
+		echo "run_dir=$path" > ${USERCONFDIR}/$name.conf
 	done
 }
 
@@ -389,11 +410,6 @@ create_min_fs(){
 	mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
 	mkdir -m 1777 -p $1/tmp
 	mkdir -m 0555 -p $1/{sys,proc}
-}
-
-check_chroot_version(){
-	[[ -f $1/.manjaro-tools ]] && local chroot_version=$(cat $1/.manjaro-tools)
-	[[ ${version} != $chroot_version ]] && clean_first=true
 }
 
 is_valid_bool(){

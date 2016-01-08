@@ -14,14 +14,6 @@ import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
 import ${LIBDIR}/util-pac-conf.sh
 
-import_util_iso_fs(){
-	if ${use_overlayfs};then
-		import ${LIBDIR}/util-iso-overlayfs.sh
-	else
-		import ${LIBDIR}/util-iso-aufs.sh
-	fi
-}
-
 # $1: image path
 squash_image_dir() {
 	if [[ ! -d "$1" ]]; then
@@ -29,7 +21,7 @@ squash_image_dir() {
 		return 1
 	fi
 	local timer=$(get_timer) path=${work_dir}/iso/${iso_name}/${arch}
-	local sq_img="${path}/$(basename ${1}).sqfs"
+	local sq_img="${path}/${1##*/}.sqfs"
 	mkdir -p ${path}
 	msg "Generating SquashFS image for '${1}'"
 	if [[ -f "${sq_img}" ]]; then
@@ -48,7 +40,7 @@ squash_image_dir() {
 	[[ "${iso_compression}" != "xz" ]] && highcomp=""
 	msg2 "Creating SquashFS image. This may take some time..."
 	local used_kernel=$(echo ${kernel} | cut -c 6)
-	if [[ "$(basename "$1")" == "mhwd-image" && ${used_kernel} -ge "4" ]]; then
+	if [[ "${1##*/}" == "mhwd-image" && ${used_kernel} -ge "4" ]]; then
 		mksquashfs "${1}" "${sq_img}" -noappend -comp lz4 || die "Exit ..."
 	else
 		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp} || die "Exit ..."
@@ -91,8 +83,8 @@ make_iso() {
 	touch "${work_dir}/iso/.miso"
 	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
 		if [[ "$d" != "${work_dir}/iso" ]] && \
-			[[ "$(basename "$d")" != "iso" ]] && \
-			[[ "$(basename "$d")" != "efiboot" ]] && \
+			[[ "${d##*/}" != "iso" ]] && \
+			[[ "${d##*/}" != "efiboot" ]] && \
 			[[ "$d" != "${work_dir}" ]]; then
 			squash_image_dir "$d"
 		fi
@@ -133,7 +125,7 @@ make_image_root() {
 		fi
 
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
-		copy_overlay "${profile_dir}/overlay" "${path}"
+		copy_overlay "${profile_dir}/root-overlay" "${path}"
 		configure_root_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		clean_up_image "${path}"
@@ -143,11 +135,17 @@ make_image_root() {
 }
 
 gen_iso_fn(){
-	if [[ ${initsys} == 'openrc' ]];then
-		echo "${iso_name}-${custom}-${initsys}-${dist_release}-${arch}"
-	else
-		echo "${iso_name}-${custom}-${dist_release}-${arch}"
-	fi
+	local vars=() name
+	vars+=("${iso_name}")
+	[[ -n ${custom} ]] && vars+=("${custom}")
+	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
+	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
+	vars+=("${dist_release}")
+	vars+=("${arch}")
+	for n in ${vars[@]};do
+		name=${name:-}${name:+-}${n}
+	done
+	echo $name
 }
 
 make_image_custom() {
@@ -177,10 +175,10 @@ make_image_custom() {
 	fi
 }
 
-make_image_livecd() {
+make_image_live() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [livecd installation] (livecd-image)"
-		local path="${work_dir}/livecd-image"
+		msg "Prepare [live installation] (live-image)"
+		local path="${work_dir}/live-image"
 		mkdir -p ${path}
 
 		if [[ -n "${custom}" ]] ; then
@@ -194,12 +192,12 @@ make_image_livecd() {
 			die "Exit ${FUNCNAME}"
 		fi
 
-		pacman -Qr "${path}" > "${path}/livecd-image-pkgs.txt"
-		copy_overlay "${profile_dir}/overlay-livecd" "${path}"
+		pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
+		copy_overlay "${profile_dir}/live-overlay" "${path}"
 		# copy over setup helpers and config loader
 		copy_livecd_helpers "${path}/opt/livecd"
 		copy_startup_scripts "${path}/usr/bin"
-		configure_livecd_image "${path}"
+		configure_live_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		umount_image "${path}"
@@ -208,7 +206,7 @@ make_image_livecd() {
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [livecd-image]"
+		msg "Done [live-image]"
 	fi
 }
 
@@ -342,7 +340,7 @@ make_isolinux() {
 		msg "Prepare [${iso_name}/iso/isolinux]"
 		local path=${work_dir}/iso/isolinux
 		mkdir -p ${path}
-		copy_overlay "${profile_dir}/isolinux" "${path}"
+		copy_overlay "${DATADIR}/isolinux" "${path}"
 		write_isolinux_cfg "${path}"
 		write_isolinux_msg "${path}"
 		if [[ -e ${profile_dir}/isolinux-overlay ]]; then
@@ -359,10 +357,19 @@ make_isolinux() {
 make_isomounts() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Creating [isomounts]"
-		write_isomounts "${profile_dir}" "${work_dir}/iso/${iso_name}"
+		write_isomounts "${work_dir}/iso/${iso_name}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done creating [isomounts]"
 	fi
+}
+
+get_shared_list(){
+	local path
+	case ${edition} in
+		sonar|netrunner) path=${run_dir}/shared/${edition}/Packages-Desktop ;;
+		*) path=${run_dir}/shared/manjaro/Packages-Desktop ;;
+	esac
+	echo $path
 }
 
 # $1: file name
@@ -431,7 +438,7 @@ load_pkgs(){
 	local list
 
 	if [[ $1 == "${packages_custom}" ]];then
-		sort -u ${run_dir}/shared/Packages-Desktop ${packages_custom} > ${work_dir}/pkgs_merged
+		sort -u $(get_shared_list) ${packages_custom} > ${work_dir}/pkgs_merged
 		list=${work_dir}/pkgs_merged
 	else
 		list=$1
@@ -472,10 +479,16 @@ check_custom_pacman_conf(){
 	fi
 }
 
+eval_custom(){
+	local name=${1##*/}
+	name=${name#*-}
+	custom=${name,,}
+}
+
 # $1: profile
 check_profile_sanity(){
-	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages" "$1/Packages-Livecd")
-	local keydirs=("$1/overlay" "$1/overlay-livecd" "$1/isolinux")
+	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages-Root" "$1/Packages-Live")
+	local keydirs=("$1/root-overlay" "$1/live-overlay")
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
 		if [[ -f $f ]];then
@@ -496,6 +509,18 @@ check_profile_sanity(){
 	if ! ${has_keyfiles} && ! ${has_keydirs};then
 		die "Profile [$1] sanity check failed!"
 	fi
+
+	local files=$(ls $1/Packages*)
+	for f in ${files[@]};do
+		case $f in
+			$1/Packages-Root|$1/Packages-Live|$1/Packages-Mhwd) continue ;;
+			*) packages_custom="$f" ;;
+		esac
+	done
+
+	eval_custom "${packages_custom}"
+
+	[[ -f "$1/Packages-Mhwd" ]] && packages_mhwd=$1/Packages-Mhwd
 }
 
 check_requirements(){
@@ -529,19 +554,6 @@ check_profile_vars(){
 	fi
 }
 
-eval_custom(){
-	local files=$(ls $1/Packages*) name
-	for f in ${files[@]};do
-		case $f in
-			$1/Packages|$1/Packages-Livecd|$1/Packages-Mhwd) continue ;;
-			*) packages_custom="$f" ;;
-		esac
-	done
-	name=${packages_custom##*/}
-	name=${name#*-}
-	custom=${name,,}
-}
-
 # $1: profile
 load_profile(){
 	profile_dir=$1
@@ -550,7 +562,6 @@ load_profile(){
 	check_profile_sanity "${profile_dir}"
 	load_profile_config "${profile_dir}/profile.conf" || die "${profile_dir} is not a valid profile!"
 	check_profile_vars
-	eval_custom "${profile_dir}"
 
 	iso_file=$(gen_iso_fn).iso
 
@@ -558,8 +569,6 @@ load_profile(){
 
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
 	work_dir=${chroots_iso}/$prof/${arch}
-
-	#[[ -d ${work_dir}/root-image ]] && check_chroot_version "${work_dir}/root-image"
 
 	iso_dir="${cache_dir_iso}/${edition}/$prof/${dist_release}/${arch}"
 
@@ -576,15 +585,15 @@ compress_images(){
 
 build_images(){
 	local timer=$(get_timer)
-	load_pkgs "${profile_dir}/Packages"
+	load_pkgs "${profile_dir}/Packages-Root"
 	make_image_root
 	if [[ -f "${packages_custom}" ]] ; then
 		load_pkgs "${packages_custom}"
 		make_image_custom
 	fi
-	if [[ -f ${profile_dir}/Packages-Livecd ]]; then
-		load_pkgs "${profile_dir}/Packages-Livecd"
-		make_image_livecd
+	if [[ -f ${profile_dir}/Packages-Live ]]; then
+		load_pkgs "${profile_dir}/Packages-Live"
+		make_image_live
 	fi
 	if [[ -f ${profile_dir}/Packages-Mhwd ]] ; then
 		load_pkgs "${profile_dir}/Packages-Mhwd"
@@ -602,9 +611,10 @@ build_images(){
 
 make_profile(){
 	eval_edition "$1"
-	msg "Start building [$1]"
 	load_profile "${run_dir}/${edition}/$1"
-	import_util_iso_fs
+
+	msg "Start building [$1]"
+	import ${LIBDIR}/util-iso-${iso_fs}.sh
 	${clean_first} && chroot_clean "${work_dir}"
 	if ${iso_only}; then
 		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p $1 -i"
@@ -619,6 +629,7 @@ make_profile(){
 		build_images
 		compress_images
 	fi
+	unset_profile
 	msg "Finished building [$1]"
 	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
 }

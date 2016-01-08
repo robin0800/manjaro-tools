@@ -1,0 +1,15 @@
+openbox:openbox-session
+plasma:startkde
+gnome:gnome-session
+xfce:startxfce4
+cinnamon:cinnamon-session-cinnamon
+mate:mate-session
+enlightenment:enlightenment_start
+LXDE:lxsession
+lxqt:lxqt-session
+pekwm:pekwm
+pantheon:pantheon-session
+budgie-desktop:budgie-desktop
+i3:i3
+fluxbox:startfluxbox
+deepin:startdde

@@ -22,28 +22,26 @@ import ${LIBDIR}/util.sh
 show_profile(){
 	eval_edition "$1"
 	load_profile "${run_dir}/${edition}/$1"
-	msg2 "edition: ${edition}"
+	msg2 "initsys: ${initsys}"
+	msg2 "kernel: ${kernel}"
 	if ${verbose};then
 		msg2 "work_dir: ${work_dir}"
 		msg2 "iso_dir: ${iso_dir}"
 		msg2 "iso_file: ${iso_file}"
-		msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
-		msg2 "initsys: ${initsys}"
-		if ${use_overlayfs};then
-			msg2 "mount system: overlayfs"
-		else
-			msg2 "mount system: aufs"
-		fi
-		[[ ${arch} == 'x86_64' ]] && msg2 "multilib: ${multilib}"
+
+		msg2 "iso_fs: ${iso_fs}"
 		msg2 "displaymanager: ${displaymanager}"
 		msg2 "autologin: ${autologin}"
 		msg2 "nonfree_xorg: ${nonfree_xorg}"
-		msg2 "kernel: ${kernel}"
-		msg2 "efi_boot_loader: ${efi_boot_loader}"
-		msg2 "efi_part_size: ${efi_part_size}"
 		msg2 "pxe_boot: ${pxe_boot}"
 		msg2 "plymouth_boot: ${plymouth_boot}"
 		${plymouth_boot} && msg2 "plymouth_theme: ${plymouth_theme}"
+
+		[[ ${arch} == 'x86_64' ]] && msg2 "multilib: ${multilib}"
+
+		msg2 "efi_boot_loader: ${efi_boot_loader}"
+		msg2 "efi_part_size: ${efi_part_size}"
+
 		msg2 "hostname: ${hostname}"
 		msg2 "username: ${username}"
 		msg2 "password: ${password}"
@@ -58,7 +56,9 @@ show_profile(){
 			msg2 "start_openrc_live: ${start_openrc_live[*]}"
 			msg2 "disable_openrc: ${disable_openrc[*]}"
 		fi
+		msg2 "is_custom_pac_conf: ${is_custom_pac_conf}"
 	fi
+	unset_profile
 }
 
 display_settings(){
@@ -70,7 +70,7 @@ display_settings(){
 	msg2 "buildsets: $(list_sets ${sets_dir_iso})"
 	msg2 "buildset_iso: ${buildset_iso}"
 	msg2 "is_buildset: ${is_buildset}"
-	msg2 "profile_repo: ${profile_repo}"
+	msg2 "run_dir: ${run_dir}"
 
 	msg "OPTIONS:"
 	msg2 "arch: ${arch}"

@@ -20,29 +20,8 @@ parse_fstab(){
 }
 
 detect(){
-	local detected=( "$(os-prober | tr ' ' '_' | paste -s -d ' ')" )
-	echo ${detected[@]}
-}
-
-set_os(){
-	local count=${#os_list[@]}
-	if [[ ${count} -gt 1 ]];then
-		msg "List of found systems"
-		for((i=0; i < ${count}; i++)); do
-			msg3 "$i) $(get_os_name ${os_list[$i]})"
-		done
-		msg "Please enter your choice [0-$((count-1))] : "
-		while read selection; do
-			if [[ -n ${os_list[$selection]} ]];then
-				echo ${selection}
-				break
-			else
-				msg "Please enter your choice [0-$((count-1))] : "
-			fi
-		done
-	else
-		echo 0
-	fi
+	local detected="$(os-prober | tr ' ' '_' | paste -s -d ' ')"
+	echo ${detected}
 }
 
 # $1: os-prober array
@@ -50,7 +29,7 @@ get_os_name(){
 	local str=$1
 	str="${str#*:}"
 	str="${str#*:}"
-	str="${str//:/}"
+	str="${str%:*}"
 	echo "$str"
 }
 
@@ -65,32 +44,45 @@ chroot_part_mount() {
 	msg2 "mounted: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 }
 
-# $1: os-prober string
-get_root(){
-	local os_string=$1
-	echo ${os_string%%:*}
-}
-
 select_os(){
-	for system in ${os_list[@]};do
-		if [[ "${system##*:}" == 'linux' ]];then
-			chroot_mount_partitions "${chrootdir}" "${system}"
-		fi
-	done
+        local os_list=( $(detect) ) count=${#os_list[@]}
+	if [[ ${count} > 0 ]];then
+                msg "Detected systems:"
+                local i=0
+                for os in ${os_list[@]};do
+			if [[ ${os##*:} == 'efi' ]];then
+				count=$((count-1))
+			else
+				msg3 "$i) $(get_os_name $os)"
+				i=$((i+1))
+                        fi
+                done
+                i=0
+		msg "Select system to mount [0-$((count-1))] : "
+                read selected
+        else
+		selected=0
+	fi
+	local os_str=${os_list[$selected]} type
+	type=$os_str
+	root=${os_str%%:*}
+	type=${type##*:}
+        if [[ "${type##*:}" == 'linux' ]];then
+		chroot_mount_partitions "$1" "$root"
+        else
+                die "You can't mount $selected!"
+        fi
 }
 
 chroot_mount_partitions(){
+
 	CHROOT_ACTIVE_PART_MOUNTS=()
 	CHROOT_ACTIVE_MOUNTS=()
 
 	[[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
 	trap 'trap_handler' EXIT
 
-	local index=$(set_os)
-	msg "Selected OS: $(get_os_name ${os_list[$index]})"
-	local root=$(get_root "${os_list[$index]}")
-
-	chroot_part_mount ${root} $1
+	chroot_part_mount $2 $1
 
 	local mounts=$(parse_fstab "$1")
 

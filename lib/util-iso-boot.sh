@@ -265,13 +265,13 @@ update_isolinux_msg(){
 }
 
 write_isomounts(){
-	local file=$2/isomounts
+	local file=$1/isomounts
 	echo '# syntax: <img> <arch> <mount point> <type> <kernel argument>' > ${file}
 	echo '# Sample kernel argument in syslinux: overlay=extra,extra2' >> ${file}
 	echo '' >> ${file}
-	msg2 "Writing livecd entry ..."
-	echo "${arch}/livecd-image.sqfs ${arch} / squashfs" >> ${file}
-	if [[ -f $1/Packages-Mhwd ]] ; then
+	msg2 "Writing live entry ..."
+	echo "${arch}/live-image.sqfs ${arch} / squashfs" >> ${file}
+	if [[ -f ${packages_mhwd} ]] ; then
 		msg2 "Writing mhwd entry ..."
 		echo "${arch}/mhwd-image.sqfs ${arch} / squashfs" >> ${file}
 	fi

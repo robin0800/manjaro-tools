@@ -1,4 +1,4 @@
-Version=0.9.15
+Version=0.10.0
 
 PREFIX = /usr/local
 SYSCONFDIR = /etc
@@ -54,7 +54,9 @@ SETS_ISO = \
 	data/iso.d/default.set \
 	data/iso.d/official.set \
 	data/iso.d/community.set \
-	data/iso.d/community-minimal.set
+	data/iso.d/minimal.set \
+	data/iso.d/sonar.set \
+	data/iso.d/netrunner.set
 
 BIN_ISO = \
 	bin/buildiso \
@@ -74,6 +76,7 @@ LIBS_ISO = \
 
 SHARED_ISO = \
 	data/pacman-gfx.conf \
+	data/desktop.map \
 	data/profile.conf.example
 
 CPIOHOOKS = \
