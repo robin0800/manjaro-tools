@@ -29,7 +29,7 @@ get_os_name(){
 	local str=$1
 	str="${str#*:}"
 	str="${str#*:}"
-	str="${str//:/}"
+	str="${str%:*}"
 	echo "$str"
 }
 
@@ -45,29 +45,32 @@ chroot_part_mount() {
 }
 
 select_os(){
-        os_list=( $(detect) )
-	local count=${#os_list[@]}
+        local os_list=( $(detect) ) count=${#os_list[@]}
 	if [[ ${count} > 0 ]];then
-                msg "List of found systems:"
+                msg "Detected systems:"
                 local i=0
                 for os in ${os_list[@]};do
-                        msg3 "$i) $(get_os_name ${os})"
-                        i=$((i+1))
+			if [[ ${os##*:} == 'efi' ]];then
+				count=$((count-1))
+			else
+				msg3 "$i) $(get_os_name $os)"
+				i=$((i+1))
+                        fi
                 done
                 i=0
-		msg "Please enter your choice [0-$count] : "
-                read selection
+		msg "Select system to mount [0-$((count-1))] : "
+                read selected
         else
-		selection=0
+		selected=0
 	fi
-	local root=${os_list[$selection]}
-	root=${root%%:*}
-	local type=${os_list[$selection]}
+	local os_str=${os_list[$selected]} type
+	type=$os_str
+	root=${os_str%%:*}
 	type=${type##*:}
         if [[ "${type##*:}" == 'linux' ]];then
-		chroot_mount_partitions "${chrootdir}" "$root"
+		chroot_mount_partitions "$1" "$root"
         else
-                die "You can't mount $type!"
+                die "You can't mount $selected!"
         fi
 }
 
