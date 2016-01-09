@@ -50,27 +50,27 @@ select_os(){
                 msg "Detected systems:"
                 local i=0
                 for os in ${os_list[@]};do
-			if [[ ${os##*:} == 'efi' ]];then
-				count=$((count-1))
-			else
-				msg3 "$i) $(get_os_name $os)"
-				i=$((i+1))
-                        fi
+			local last=${os##*:}
+			case $last in
+				'efi') count=$((count-1)) ;;
+				*) msg3 "$i) $(get_os_name $os)"; i=$((i+1)) ;;
+			esac
                 done
                 i=0
 		msg "Select system to mount [0-$((count-1))] : "
-                read selected
+                read select
         else
-		selected=0
+		select=0
 	fi
-	local os_str=${os_list[$selected]} type
+	local os_str=${os_list[$select]} type
 	type=$os_str
 	root=${os_str%%:*}
 	type=${type##*:}
         if [[ "${type##*:}" == 'linux' ]];then
+		msg "Mounting ($(get_os_name $os_str)) [$root]"
 		chroot_mount_partitions "$1" "$root"
         else
-                die "You can't mount $selected!"
+                die "You can't mount $select!"
         fi
 }
 
@@ -88,8 +88,7 @@ chroot_mount_partitions(){
 
 	for entry in ${mounts[@]}; do
 		entry=${entry//UUID=}
-		local dev=${entry%:*}
-		local mp=${entry#*:}
+		local dev=${entry%:*} mp=${entry#*:}
 		case "${entry#*:}" in
 			'/'|'swap'|'none') continue ;;
 			*) chroot_part_mount "/dev/disk/by-uuid/${dev}" "$1${mp}" ;;
