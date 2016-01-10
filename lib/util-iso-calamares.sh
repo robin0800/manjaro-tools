@@ -10,30 +10,28 @@
 # GNU General Public License for more details.
 
 write_calamares_branding_desc(){
-	local conf="$1/etc/calamares/branding/branding.desc"
-	if [[ "${edition}" == 'sonar' ]];then
-		echo '---' > "$conf"
-		echo "componentName:  sonar-${custom}" >> $conf
-		echo '' >> $conf
-		echo 'strings:' >> $conf
-		echo "    productName:         ${dist_name} GNU Linux" >> $conf
-		echo "    shortProductName:    ${dist_name}" >> $conf
-		echo "    version:             ${dist_release}" >> $conf
-		echo "    shortVersion:        ${dist_release}" >> $conf
-		echo "    versionedName:       ${dist_name} GNU Linux  ${dist_release}" "${custom} Edition" >> $conf
-		echo "    shortVersionedName:  ${dist_name} Linux ${dist_release}" >> $conf
-		echo "    bootloaderEntryName: ${dist_name}" >> $conf
-		echo '' >> $conf
-		echo 'images:'
-		echo '    productLogo:         "squid.png"' >> $conf
-		echo '    productIcon:         "logo.png"' >> $conf
-		echo '' >> $conf
-		echo 'slideshow:               "show.qml"' >> $conf
-		echo 'style:' >> $conf
-		echo '   sidebarBackground:    "#292F34"' >> $conf
-		echo '   sidebarText:          "#FFFFFF"' >> $conf
-		echo '   sidebarTextSelect:    "#292F34"' >> $conf
-	fi
+	local conf="$1/usr/share/calamares/branding/sonar-${custom}/branding.desc"
+	echo '---' > "$conf"
+	echo "componentName:  sonar-${custom}" >> $conf
+	echo '' >> $conf
+	echo 'strings:' >> $conf
+	echo "    productName:         ${dist_name} GNU Linux" >> $conf
+	echo "    shortProductName:    ${dist_name}" >> $conf
+	echo "    version:             ${dist_release}" >> $conf
+	echo "    shortVersion:        ${dist_release}" >> $conf
+	echo "    versionedName:       ${dist_name} GNU Linux  ${dist_release}" "${custom} Edition" >> $conf
+	echo "    shortVersionedName:  ${dist_name} Linux ${dist_release}" >> $conf
+	echo "    bootloaderEntryName: ${dist_name}" >> $conf
+	echo '' >> $conf
+	echo 'images:'
+	echo '    productLogo:         "squid.png"' >> $conf
+	echo '    productIcon:         "logo.png"' >> $conf
+	echo '' >> $conf
+	echo 'slideshow:               "show.qml"' >> $conf
+	echo 'style:' >> $conf
+	echo '   sidebarBackground:    "#292F34"' >> $conf
+	echo '   sidebarText:          "#FFFFFF"' >> $conf
+	echo '   sidebarTextSelect:    "#292F34"' >> $conf
 }
 
 write_calamares_machineid_conf(){
@@ -187,7 +185,7 @@ configure_calamares(){
 	if [[ -f $1/usr/share/applications/calamares.desktop && -f $1/usr/bin/kdesu ]];then
 		sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
 	fi
-	write_calamares_branding_desc $1
+	[[ "${edition}" == 'sonar' ]] && write_calamares_branding_desc $1
 }
 
 configure_thus(){
