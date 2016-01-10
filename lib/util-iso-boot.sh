@@ -251,7 +251,7 @@ write_isolinux_msg(){
 }
 
 update_isolinux_cfg(){
-	local fn=$1/isolinux.cfg
+	local fn=isolinux.cfg
 	msg2 "Updating ${fn} ..."
 	sed -i "s|%ISO_LABEL%|${iso_label}|g;
 			s|%ISO_NAME%|${iso_name}|g;
@@ -259,7 +259,7 @@ update_isolinux_cfg(){
 }
 
 update_isolinux_msg(){
-	local fn=$1/isolinux.msg
+	local fn=isolinux.msg
 	msg2 "Updating ${fn} ..."
 	sed -i "s|%DIST_NAME%|${dist_name}|g" $2/${fn}
 }
