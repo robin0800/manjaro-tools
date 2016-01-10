@@ -345,8 +345,8 @@ make_isolinux() {
 		write_isolinux_msg "${path}"
 		if [[ -e ${profile_dir}/isolinux-overlay ]]; then
 			copy_overlay "${profile_dir}/isolinux-overlay" "${path}"
-			update_isolinux_cfg "${profile_dir}" "${path}"
-			update_isolinux_msg "${profile_dir}" "${path}"
+			update_isolinux_cfg "${profile_dir}/isolinux-overlay" "${path}"
+			update_isolinux_msg "${profile_dir}/isolinux-overlay" "${path}"
 		fi
 		copy_isolinux_bin "${work_dir}/root-image" "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
