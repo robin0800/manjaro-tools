@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 write_calamares_branding_desc(){
-	local conf="$1/usr/share/calamares/branding/sonar-${custom}/branding.desc"
+	local conf="$1/usr/share/calamares/branding/sonar/branding.desc"
 	echo '---' > "$conf"
 	echo "componentName:  sonar-${custom}" >> $conf
 	echo '' >> $conf
