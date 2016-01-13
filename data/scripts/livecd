@@ -48,7 +48,6 @@ echo "Configured displaymanager autologin: $(elapsed_time_ms ${livetimer})ms" >>
 
 livetimer=$(get_timer_ms)
 configure_user_root /
-cp -a /etc/skel/. /root/
 echo "Configured root user: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
 livetimer=$(get_timer_ms)

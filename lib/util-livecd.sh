@@ -382,6 +382,7 @@ configure_env(){
 configure_user_root(){
 	# set up root password
 	echo "root:${password}" | chroot $1 chpasswd
+	#cp -a /etc/skel/. /root/
 }
 
 configure_displaymanager_autologin(){
