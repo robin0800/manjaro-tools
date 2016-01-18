@@ -12,14 +12,14 @@
 write_calamares_branding_desc(){
 	local conf="$1/usr/share/calamares/branding/sonar/branding.desc"
 	echo '---' > "$conf"
-	echo "componentName:  sonar-${custom}" >> $conf
+	echo "componentName:  sonar" >> $conf
 	echo '' >> $conf
 	echo 'strings:' >> $conf
 	echo "    productName:         ${dist_name} GNU Linux" >> $conf
 	echo "    shortProductName:    ${dist_name}" >> $conf
 	echo "    version:             ${dist_release}" >> $conf
 	echo "    shortVersion:        ${dist_release}" >> $conf
-	echo "    versionedName:       ${dist_name} GNU Linux  ${dist_release}" "${custom} Edition" >> $conf
+	echo "    versionedName:       ${dist_name} GNU Linux  ${dist_release}" >> $conf
 	echo "    shortVersionedName:  ${dist_name} Linux ${dist_release}" >> $conf
 	echo "    bootloaderEntryName: ${dist_name}" >> $conf
 	echo '' >> $conf
