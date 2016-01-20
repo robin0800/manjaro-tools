@@ -62,7 +62,11 @@ gen_pw(){
 configure_user(){
 	# set up user and password
 	msg2 "Creating user: ${username} password: ${password} ..."
-	chroot $1 useradd -m -g users -G ${addgroups} -p $(gen_pw) ${username}
+	if [[ -n ${password} ]];then
+		chroot $1 useradd -m -g users -G ${addgroups} -p $(gen_pw) ${username}
+	else
+		chroot $1 useradd -m -g users -G ${addgroups} ${username}
+	fi
 }
 
 # $1: chroot
@@ -123,14 +127,6 @@ configure_lsb(){
 	fi
 }
 
-# configure_dbus(){
-# 	msg2 "Configuring dbus ...."
-# 	# set unique machine-id
-# # 	dbus-uuidgen --ensure=/etc/machine-id
-# # 	ln -sf /etc/machine-id /var/lib/dbus/machine-id
-# 	chroot $1 dbus-uuidgen --ensure=/var/lib/dbus/machine-id
-# }
-
 configure_services(){
 	case ${initsys} in
 		'openrc')
@@ -160,7 +156,7 @@ configure_services(){
 # $1: chroot
 configure_environment(){
 	case ${custom} in
-		cinnamon|enlightenment|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce|xfce-minimal|xfce-openrc)
+		cinnamon|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce|xfce-minimal)
 			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 		;;
 	esac
