@@ -63,9 +63,9 @@ configure_user(){
 	# set up user and password
 	msg2 "Creating user: ${username} password: ${password} ..."
 	if [[ -n ${password} ]];then
-		chroot $1 useradd -m -g ${username} -G ${addgroups} -p $(gen_pw) ${username}
+		chroot $1 useradd -m -G ${addgroups} -p $(gen_pw) ${username}
 	else
-		chroot $1 useradd -m -g ${username} -G ${addgroups} ${username}
+		chroot $1 useradd -m -G ${addgroups} ${username}
 	fi
 }
 
