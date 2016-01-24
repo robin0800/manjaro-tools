@@ -9,7 +9,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# this util-livecd.sh gets copied to overlay-image/opt/livecd
+# this util-live.sh gets copied to overlay-image/opt/livecd
 
 kernel_cmdline(){
 	for param in $(/bin/cat /proc/cmdline); do
@@ -382,7 +382,7 @@ configure_env(){
 configure_user_root(){
 	# set up root password
 	echo "root:${password}" | chroot $1 chpasswd
-	#cp -a /etc/skel/. /root/
+	cp /etc/skel/.{bash_profile,bashrc,bash_logout} /root/
 }
 
 configure_displaymanager_autologin(){
