@@ -5,7 +5,7 @@ livetimer=$(date +%s%3N)
 
 load_profile_config "/opt/livecd/profile.conf"
 
-[[ -r /opt/livecd/util-livecd.sh ]] && source /opt/livecd/util-livecd.sh
+[[ -r /opt/livecd/util-live.sh ]] && source /opt/livecd/util-live.sh
 echo "Loaded scripts: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
 livetimer=$(get_timer_ms)

@@ -39,7 +39,7 @@ write_profile_conf_entries(){
 copy_livecd_helpers(){
 	msg2 "Copying livecd helpers ..."
 	[[ ! -d $1 ]] && mkdir -p $1
-	cp ${LIBDIR}/util-livecd.sh $1
+	cp ${LIBDIR}/util-live.sh $1
 	cp ${LIBDIR}/util-msg.sh $1
 	cp ${LIBDIR}/util.sh $1
 	cp ${DATADIR}/scripts/kbd-model-map $1
