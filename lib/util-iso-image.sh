@@ -227,7 +227,7 @@ configure_displaymanager(){
 				sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' ${conf}
 				sed -i -e 's/pam_systemd.so/pam_ck_connector.so nox11/' $1/etc/pam.d/lightdm-greeter
 			fi
-			local greeters=$(ls $1/etc/lightdm/*greeter.conf) name
+			local greeters=$(ls $1/etc/lightdm/lightdm*.conf) name
 			for g in ${greeters[@]};do
 				name=${g##*/}
 				name=${name%%.*}
