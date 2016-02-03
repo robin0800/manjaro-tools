@@ -252,6 +252,13 @@ configure_displaymanager(){
 			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
 				sed -i -e "s|^Session=.*|Session=$default_desktop_file.desktop|" ${conf}
 			fi
+			if [[ ${initsys} == 'openrc' ]];then
+				local halt='/usr/bin/shutdown -h -P now' \
+					reboot='/usr/bin/shutdown -r now'
+				sed -e "s|^.*HaltCommand=.*|HaltCommand=${halt}|" \
+					-e "s|^.*RebootCommand=.*|RebootCommand=${reboot}|" \
+					-i ${conf}
+			fi
 		;;
 		'lxdm')
 			local conf=$1/etc/lxdm/lxdm.conf
