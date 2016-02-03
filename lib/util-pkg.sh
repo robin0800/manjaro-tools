@@ -139,7 +139,7 @@ run_post_build(){
 	fi
 	chown -R "${OWNER}:users" "${pkg_dir}"
 	if [[ -z $LOGDEST ]];then
-		tar -cjf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
+		tar -cJf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
 		find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
 	fi
 	arch=$_arch
