@@ -240,14 +240,6 @@
 
 		<varlistentry>
 			<!-- TODO: We should tell where exactly this is used -->
-			<term><varname>iso_name=</varname></term>
-
-			<listitem><para>Name of the iso.
-			</para></listitem>
-		</varlistentry>
-
-		<varlistentry>
-			<!-- TODO: We should tell where exactly this is used -->
 			<term><varname>iso_publisher=</varname></term>
 
 			<listitem><para>Publisher of the iso.
