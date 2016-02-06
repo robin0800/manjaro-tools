@@ -34,7 +34,7 @@
 ################ install ################
 
 # unset defaults to given value
-# kernel="linux319"
+# kernel="linux44"
 
 # possible values: grub;systemd-boot
 # efi_boot_loader="grub"

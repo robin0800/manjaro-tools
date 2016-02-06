@@ -278,7 +278,7 @@ load_profile_config(){
 
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
 
-	[[ -z ${kernel} ]] && kernel="linux41"
+	[[ -z ${kernel} ]] && kernel="linux44"
 
 	local used_kernel=${kernel:5:1}
 	[[ ${used_kernel} < "4" ]] && use_overlayfs='false'
