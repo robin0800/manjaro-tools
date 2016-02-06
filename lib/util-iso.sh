@@ -429,6 +429,7 @@ load_pkgs(){
 	fi
 	local _blacklist="s|>blacklist.*||g" \
 		_kernel="s|KERNEL|$kernel|g" \
+		_used_kernel=${kernel:5:2} \
 		_space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \
 		_com_rm="s|#.*||g" \
@@ -466,6 +467,7 @@ load_pkgs(){
 			| sed "$_purge_rm" \
 			| sed "$_kernel" \
 			| sed "$_clean")
+		[[ ${_used_kernel} <= "42" ]] && packages_cleanup="$packages_cleanup xf86-video-amdgpu"
 	fi
 }
 
