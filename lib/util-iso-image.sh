@@ -289,13 +289,11 @@ configure_displaymanager(){
 
 # $1: chroot
 configure_mhwd_drivers(){
-	# Disable Catalyst if not present
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Catalyst driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/MHWDCONFIG
 	fi
-	# Disable Nvidia if not present
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Nvidia driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/
@@ -315,6 +313,11 @@ configure_mhwd_drivers(){
 		msg2 "Disabling Nvidia 340xx driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/MHWDCONFIG
+	fi
+	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep xf86-video-amdgpu 2> /dev/null)" ]; then
+		msg2 "Disabling AMD gpu driver"
+		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/video-amdgpu/
+		touch $1/var/lib/mhwd/db/pci/graphic_drivers/video-amdgpu/MHWDCONFIG
 	fi
 }
 
