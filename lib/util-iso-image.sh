@@ -316,8 +316,8 @@ configure_mhwd_drivers(){
 	fi
 	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep xf86-video-amdgpu 2> /dev/null)" ]; then
 		msg2 "Disabling AMD gpu driver"
-		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/video-amdgpu/
-		touch $1/var/lib/mhwd/db/pci/graphic_drivers/video-amdgpu/MHWDCONFIG
+		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/xf86-video-amdgpu/
+		touch $1/var/lib/mhwd/db/pci/graphic_drivers/xf86-video-amdgpu/MHWDCONFIG
 	fi
 }
 
