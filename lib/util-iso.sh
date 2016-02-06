@@ -467,7 +467,7 @@ load_pkgs(){
 			| sed "$_purge_rm" \
 			| sed "$_kernel" \
 			| sed "$_clean")
-		[[ ${_used_kernel} <= "42" ]] && packages_cleanup="$packages_cleanup xf86-video-amdgpu"
+		[[ ${_used_kernel} < "42" ]] && packages_cleanup="$packages_cleanup xf86-video-amdgpu"
 	fi
 }
 
