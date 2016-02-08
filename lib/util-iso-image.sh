@@ -257,6 +257,7 @@ configure_displaymanager(){
 					reboot='/usr/bin/shutdown -r now'
 				sed -e "s|^.*HaltCommand=.*|HaltCommand=${halt}|" \
 					-e "s|^.*RebootCommand=.*|RebootCommand=${reboot}|" \
+					-e "s|^.*MinimumVT=.*|MinimumVT=7|" \
 					-i ${conf}
 			fi
 		;;
