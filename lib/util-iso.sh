@@ -23,16 +23,16 @@ squash_image_dir() {
 	local timer=$(get_timer) path=${work_dir}/iso/${iso_name}/${arch}
 	local sq_img="${path}/${1##*/}.sqfs"
 	mkdir -p ${path}
-	msg "Generating SquashFS image for '${1}'"
+	msg "Generating SquashFS image for %s" "${1}"
 	if [[ -f "${sq_img}" ]]; then
 		local has_changed_dir=$(find ${1} -newer ${sq_img})
-		msg2 "Possible changes for ${1}..." >> /tmp/buildiso.debug
-		msg2 "${has_changed_dir}" >> /tmp/buildiso.debug
+		msg2 "Possible changes for %s ..." "${1}"  >> /tmp/buildiso.debug
+		msg2 "%s" "${has_changed_dir}" >> /tmp/buildiso.debug
 		if [[ -n "${has_changed_dir}" ]]; then
-			msg2 "SquashFS image '${sq_img}' is not up to date, rebuilding..."
+			msg2 "SquashFS image %s is not up to date, rebuilding..." "${sq_img}"
 			rm "${sq_img}"
 		else
-			msg2 "SquashFS image '${sq_img}' is up to date, skipping."
+			msg2 "SquashFS image %s is up to date, skipping." "${sq_img}"
 			return
 		fi
 	fi
@@ -45,7 +45,7 @@ squash_image_dir() {
 	else
 		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp} || die "Exit ..."
 	fi
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
+	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
 }
 
 run_xorriso(){
@@ -92,7 +92,7 @@ make_iso() {
 
 	msg "Making bootable image"
 	# Sanity checks
-	[[ ! -d "${work_dir}/iso" ]] && die "[${work_dir}/iso] doesn't exist. What did you do?!"
+	[[ ! -d "${work_dir}/iso" ]] && die "[%s/iso] doesn't exist. What did you do?!" "${work_dir}"
 	if [[ -f "${iso_dir}/${iso_file}" ]]; then
 		msg2 "Removing existing bootable image..."
 		rm -rf "${iso_dir}/${iso_file}"
@@ -104,11 +104,11 @@ make_iso() {
 # $1: file
 make_checksum(){
 	cd ${iso_dir}
-		msg "Creating [${iso_checksum}sum] ..."
+		msg "Creating [%s] sum ..." "${iso_checksum}"
 		local cs=$(${iso_checksum}sum $1)
-		msg2 "${iso_checksum}sum: ${cs}"
+		msg2 "%s sum: %s" "${iso_checksum}" "${cs}"
 		echo "${cs}" > $1.${iso_checksum}
-		msg "Done [${iso_checksum}sum]"
+		msg "Done [%s] sum" "${iso_checksum}"
 	cd ..
 }
 
@@ -121,7 +121,7 @@ make_image_root() {
 
 		if ! chroot_create "${path}" "${packages}"; then
 			umount_image "${path}"
-			die "Exit ${FUNCNAME}"
+			die "Exit %s" "${FUNCNAME}"
 		fi
 
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
@@ -150,7 +150,7 @@ gen_iso_fn(){
 
 make_image_custom() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${custom} installation] (${custom}-image)"
+		msg "Prepare [%s installation] (%s-image)" "${custom}" "${custom}"
 		local path="${work_dir}/${custom}-image"
 		mkdir -p ${path}
 
@@ -158,7 +158,7 @@ make_image_custom() {
 
 		if ! chroot_create "${path}" "${packages}"; then
 			umount_image "${path}"
-			die "Exit ${FUNCNAME}"
+			die "Exit %s" "${FUNCNAME}"
 		fi
 
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
@@ -171,7 +171,7 @@ make_image_custom() {
 
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${custom} installation] (${custom}-image)"
+		msg "Done [%s installation] (%s-image)" "${custom}" "${custom}"
 	fi
 }
 
@@ -189,7 +189,7 @@ make_image_live() {
 
 		if ! chroot_create "${path}" "${packages}"; then
 			umount_image "${path}"
-			die "Exit ${FUNCNAME}"
+			die "Exit %s" "${FUNCNAME}"
 		fi
 
 		pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
@@ -226,7 +226,7 @@ make_image_mhwd() {
 
 		if ! download_to_cache "${path}" "${packages}"; then
 			umount_image "${path}"
-			die "Exit ${FUNCNAME}"
+			die "Exit %s" "${FUNCNAME}"
 		fi
 
 		copy_cache_mhwd "${work_dir}/mhwd-image"
@@ -253,7 +253,7 @@ make_image_mhwd() {
 
 make_image_boot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${iso_name}/boot]"
+		msg "Prepare [%s/boot]" "${iso_name}"
 		local path_iso="${work_dir}/iso/${iso_name}/boot"
 		mkdir -p ${path_iso}/${arch}
 		cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${arch}/memtest
@@ -271,7 +271,7 @@ make_image_boot() {
 
 		if ! gen_boot_image "${path}"; then
 			umount_image "${path}"
-			die "Exit ${FUNCNAME}"
+			die "Exit %s" "${FUNCNAME}"
 		fi
 
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
@@ -281,14 +281,14 @@ make_image_boot() {
 
 		rm -R ${path}
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${iso_name}/boot]"
+		msg "Done [%s/boot]" "${iso_name}"
 	fi
 }
 
 # Prepare /EFI
 make_efi() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${iso_name}/boot/EFI]"
+		msg "Prepare [%s/boot/EFI]" "${iso_name}"
 		local path_iso="${work_dir}/iso"
 		local path_efi="${path_iso}/EFI"
 		mkdir -p ${path_efi}/boot
@@ -301,14 +301,14 @@ make_efi() {
 		write_usb_nonfree_conf "${path_iso}/loader/entries"
 		copy_efi_shells "${path_efi}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${iso_name}/boot/EFI]"
+		msg "Done [%s/boot/EFI]" "${iso_name}"
 	fi
 }
 
 # Prepare kernel.img::/EFI for "El Torito" EFI boot mode
 make_efiboot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${iso_name}/iso/EFI]"
+		msg "Prepare [%s/iso/EFI]" "${iso_name}"
 		local path_iso="${work_dir}/iso"
 		mkdir -p ${path_iso}/EFI/miso
 		truncate -s ${efi_part_size} ${path_iso}/EFI/miso/${iso_name}.img
@@ -330,14 +330,14 @@ make_efiboot() {
 		copy_efi_shells "${path_efi}"
 		umount ${work_dir}/efiboot
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${iso_name}/iso/EFI]"
+		msg "Done [%s/iso/EFI]" "${iso_name}"
 	fi
 }
 
 # Prepare /isolinux
 make_isolinux() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [${iso_name}/iso/isolinux]"
+		msg "Prepare [%s/iso/isolinux]" "${iso_name}"
 		local path=${work_dir}/iso/isolinux
 		mkdir -p ${path}
 		copy_overlay "${DATADIR}/isolinux" "${path}"
@@ -350,7 +350,7 @@ make_isolinux() {
 		fi
 		copy_isolinux_bin "${work_dir}/root-image" "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [${iso_name}/iso/isolinux]"
+		msg "Done [%s/iso/isolinux]" "${iso_name}"
 	fi
 }
 
@@ -509,7 +509,7 @@ check_profile_sanity(){
 		fi
 	done
 	if ! ${has_keyfiles} && ! ${has_keydirs};then
-		die "Profile [$1] sanity check failed!"
+		die "Profile [%s] sanity check failed!" "$1"
 	fi
 
 	local files=$(ls $1/Packages*)
@@ -526,12 +526,12 @@ check_profile_sanity(){
 }
 
 check_requirements(){
-	[[ -f ${run_dir}/.buildiso ]] || die "${run_dir} is not a valid iso profiles directory!"
+	[[ -f ${run_dir}/.buildiso ]] || die "%s is not a valid iso profiles directory!" "${run_dir}"
 	if ! $(is_valid_arch_iso ${arch});then
-		die "${arch} is not a valid arch!"
+		die "%s is not a valid arch!" "${arch}"
 	fi
 	if ! $(is_valid_branch ${branch});then
-		die "${branch} is not a valid branch!"
+		die "%s is not a valid branch!" "${branch}"
 	fi
 }
 
@@ -560,9 +560,9 @@ check_profile_vars(){
 load_profile(){
 	profile_dir=$1
 	local prof=${1##*/}
-	msg3 "Profile: [$prof]"
+	msg3 "Profile: [%s]" "$prof"
 	check_profile_sanity "${profile_dir}"
-	load_profile_config "${profile_dir}/profile.conf" || die "${profile_dir} is not a valid profile!"
+	load_profile_config "${profile_dir}/profile.conf" || die "%s is not a valid profile!" "${profile_dir}"
 	check_profile_vars
 
 	iso_file=$(gen_iso_fn).iso
@@ -582,7 +582,7 @@ compress_images(){
 	make_iso
 	make_checksum "${iso_file}"
 	chown -R "${OWNER}:users" "${iso_dir}"
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
+	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
 }
 
 build_images(){
@@ -608,18 +608,18 @@ build_images(){
 	fi
 	make_isolinux
 	make_isomounts
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
+	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
 }
 
 make_profile(){
 	eval_edition "$1"
 	load_profile "${run_dir}/${edition}/$1"
 
-	msg "Start building [$1]"
+	msg "Start building [%s]" "$1"
 	import ${LIBDIR}/util-iso-${iso_fs}.sh
 	${clean_first} && chroot_clean "${work_dir}"
 	if ${iso_only}; then
-		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p $1 -i"
+		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -i" "$1"
 		compress_images
 		exit 1
 	fi
@@ -632,6 +632,6 @@ make_profile(){
 		compress_images
 	fi
 	unset_profile
-	msg "Finished building [$1]"
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
+	msg "Finished building [%s]" "$1"
+	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
 }

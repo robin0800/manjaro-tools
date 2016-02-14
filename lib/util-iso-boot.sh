@@ -76,7 +76,7 @@ copy_ucode(){
 write_loader_conf(){
 	local fn=loader.conf
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo 'timeout 3' > ${conf}
 	echo "default ${iso_name}-${arch}" >> ${conf}
 }
@@ -84,7 +84,7 @@ write_loader_conf(){
 write_efi_shellv1_conf(){
 	local fn=uefi-shell-v1-${arch}.conf
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo "title  UEFI Shell ${arch} v1" > ${conf}
 	echo "efi    /EFI/shellx64_v1.efi" >> ${conf}
 }
@@ -92,7 +92,7 @@ write_efi_shellv1_conf(){
 write_efi_shellv2_conf(){
 	local fn=uefi-shell-v2-${arch}.conf
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo "title  UEFI Shell ${arch} v2" > ${conf}
 	echo "efi    /EFI/shellx64_v2.efi" >> ${conf}
 }
@@ -100,7 +100,7 @@ write_efi_shellv2_conf(){
 write_dvd_conf(){
 	local fn=${iso_name}-${arch}.conf
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo "title   ${dist_name} Linux ${arch} UEFI DVD (default)" > ${conf}
 	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
 	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
@@ -114,7 +114,7 @@ write_dvd_conf(){
 write_dvd_nonfree_conf(){
 	local fn=${iso_name}-${arch}-nonfree.conf
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo "title   ${dist_name} Linux ${arch} UEFI DVD (nonfree)" > ${conf}
 	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
 	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
@@ -128,7 +128,7 @@ write_dvd_nonfree_conf(){
 write_usb_conf(){
 	local fn=${iso_name}-${arch}.conf
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo "title   ${dist_name} Linux ${arch} UEFI USB (default)" > ${conf}
 	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
 	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
@@ -142,7 +142,7 @@ write_usb_conf(){
 write_usb_nonfree_conf(){
 	local fn=${iso_name}-${arch}-nonfree.conf
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo "title   ${dist_name} Linux ${arch} UEFI USB (nonfree)" > ${conf}
 	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
 	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
@@ -183,7 +183,7 @@ copy_isolinux_bin(){
 write_isolinux_cfg(){
 	local fn=isolinux.cfg
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo "default start" > ${conf}
 	echo "implicit 1" >> ${conf}
 	echo "display isolinux.msg" >> ${conf}
@@ -235,7 +235,7 @@ write_isolinux_cfg(){
 write_isolinux_msg(){
 	local fn=isolinux.msg
 	local conf=$1/${fn}
-	msg2 "Writing ${fn} ..."
+	msg2 "Writing %s ..." "${fn}"
 	echo "Welcome to ${dist_name} Linux!" > ${conf}
 	echo '' >> ${conf}
 	echo "To start the system enter 'start' and press <return>" >> ${conf}
@@ -253,7 +253,7 @@ write_isolinux_msg(){
 
 update_isolinux_cfg(){
 	local fn=isolinux.cfg
-	msg2 "Updating ${fn} ..."
+	msg2 "Updating %s ..." "${fn}"
 	sed -i "s|%ISO_LABEL%|${iso_label}|g;
 			s|%ISO_NAME%|${iso_name}|g;
 			s|%ARCH%|${arch}|g" $2/${fn}
@@ -261,7 +261,7 @@ update_isolinux_cfg(){
 
 update_isolinux_msg(){
 	local fn=isolinux.msg
-	msg2 "Updating ${fn} ..."
+	msg2 "Updating %s ..." "${fn}"
 	sed -i "s|%DIST_NAME%|${dist_name}|g" $2/${fn}
 }
 
@@ -277,7 +277,7 @@ write_isomounts(){
 		echo "${arch}/mhwd-image.sqfs ${arch} / squashfs" >> ${file}
 	fi
 	if [[ -f "${packages_custom}" ]] ; then
-		msg2 "Writing ${custom} entry ..."
+		msg2 "Writing %s entry ..." "${custom}"
 		echo "${arch}/${custom}-image.sqfs ${arch} / squashfs" >> ${file}
 	fi
 	msg2 "Writing root entry ..."

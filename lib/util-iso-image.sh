@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 copy_overlay(){
-	msg2 "Copying ${1##*/} ..."
+	msg2 "Copying %s ..." "${1##*/}"
 	if [[ -L $1 ]];then
 		cp -a --no-preserve=ownership $1/* $2
 	else
@@ -61,7 +61,7 @@ gen_pw(){
 # $1: chroot
 configure_user(){
 	# set up user and password
-	msg2 "Creating user: ${username} password: ${password} ..."
+	msg2 "Creating user: %s password: %s ..." "${username}" "${password}"
 	if [[ -n ${password} ]];then
 		chroot $1 useradd -m -G ${addgroups} -p $(gen_pw) ${username}
 	else
@@ -71,7 +71,7 @@ configure_user(){
 
 # $1: chroot
 configure_hostname(){
-	msg2 "Setting hostname: ${hostname} ..."
+	msg2 "Setting hostname: %s ..." "${hostname}"
 	if [[ ${initsys} == 'openrc' ]];then
 		local _hostname='hostname="'${hostname}'"'
 		sed -i -e "s|^.*hostname=.*|${_hostname}|" $1/etc/conf.d/hostname
@@ -88,31 +88,31 @@ configure_hosts(){
 # $1: chroot
 configure_plymouth(){
 	if ${plymouth_boot};then
-		msg2 "Setting plymouth $plymouth_theme ...."
-		sed -i -e "s/^.*Theme=.*/Theme=$plymouth_theme/" $1/etc/plymouth/plymouthd.conf
+		msg2 "Setting plymouth %s ...." "${plymouth_theme}"
+		sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" $1/etc/plymouth/plymouthd.conf
 	fi
 }
 
 configure_services_live(){
 	case ${initsys} in
 		'openrc')
-			msg3 "Configuring [${initsys}] ...."
+			msg3 "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_openrc_live[@]}; do
-				msg2 "Setting $svc ..."
+				msg2 "Setting %s ..." "$svc"
 				chroot $1 rc-update add $svc default &> /dev/null
 			done
-			msg3 "Done configuring [${initsys}]"
+			msg3 "Done configuring [%s]" "${initsys}"
 		;;
 		'systemd')
-			msg3 "Configuring [${initsys}] ...."
+			msg3 "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd_live[@]}; do
-				msg2 "Setting $svc ..."
+				msg2 "Setting %s ..." "$svc"
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
-			msg3 "Done configuring [${initsys}]"
+			msg3 "Done configuring [%s]" "${initsys}"
 		;;
 		*)
-			msg3 "Unsupported: [${initsys}]!"
+			msg3 "Unsupported: [%s]!" "${initsys}"
 		;;
 	esac
 }
@@ -130,25 +130,25 @@ configure_lsb(){
 configure_services(){
 	case ${initsys} in
 		'openrc')
-			msg3 "Configuring [${initsys}] ...."
+			msg3 "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_openrc[@]}; do
 				msg2 "Setting $svc ..."
 				chroot $1 rc-update add $svc default &> /dev/null
 			done
-			msg3 "Done configuring [${initsys}]"
+			msg3 "Done configuring [%s]" "${initsys}"
 		;;
 		'systemd')
-			msg3 "Configuring [${initsys}] ...."
+			msg3 "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd[@]}; do
 				msg2 "Setting $svc ..."
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
 			sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
 			sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
-			msg3 "Done configuring [${initsys}]"
+			msg3 "Done configuring [%s]" "${initsys}"
 		;;
 		*)
-			msg3 "Unsupported: [${initsys}]!"
+			msg3 "Unsupported: [%s]!" "${initsys}"
 		;;
 	esac
 }
@@ -177,7 +177,7 @@ configure_accountsservice(){
 load_desktop_map(){
 	local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g" \
 		file=${DATADIR}/desktop.map
-        msg3 "Loading [$file] ..."
+        msg3 "Loading [%s] ..." "$file"
 	local desktop_map=$(sed "$_com_rm" "$file" \
 			| sed "$_space" \
 			| sed "$_clean")
@@ -198,7 +198,7 @@ detect_desktop_env(){
 			fi
 		done
 	fi
-	msg2 "Detected: ${default_desktop_file}"
+	msg2 "Detected: %s" "${default_desktop_file}"
 }
 
 configure_mhwd(){
@@ -268,7 +268,7 @@ configure_displaymanager(){
 			fi
 		;;
 		*)
-			msg3 "Unsupported: [${displaymanager}]!"
+			msg3 "Unsupported: [%s]!" "${displaymanager}"
 		;;
 	esac
 	if [[ ${displaymanager} != "none" ]];then
@@ -327,7 +327,7 @@ chroot_clean(){
 	for image in "$1"/*-image; do
 		[[ -d ${image} ]] || continue
 		if [[ $(basename "${image}") != "mhwd-image" ]];then
-			msg2 "Deleting chroot '$(basename "${image}")'..."
+			msg2 "Deleting chroot %s ..." "$(basename "${image}")"
 			lock 9 "${image}.lock" "Locking chroot '${image}'"
 			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
 				{ type -P btrfs && btrfs subvolume delete "${image}"; } &> /dev/null
@@ -387,12 +387,12 @@ configure_root_image(){
 }
 
 configure_custom_image(){
-	msg "Configuring [${custom}-image]"
+	msg "Configuring [%s-image]" "${custom}"
 	configure_plymouth "$1"
 	configure_displaymanager "$1"
 	configure_services "$1"
 	configure_environment "$1"
-	msg "Done configuring [${custom}-image]"
+	msg "Done configuring [%s-image]" "${custom}"
 }
 
 configure_live_image(){
@@ -442,7 +442,7 @@ chroot_create(){
 
 # $1: image path
 clean_up_image(){
-	msg2 "Cleaning up [${1##*/}]"
+	msg2 "Cleaning up [%s]" "${1##*/}"
 	[[ -d "$1/boot/" ]] && find "$1/boot" -name 'initramfs*.img' -delete &> /dev/null
 	[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
 	[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"

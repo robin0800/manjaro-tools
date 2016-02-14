@@ -91,7 +91,7 @@ fi
 # Workaround when creating a chroot in a branch different of the host
 if [[ -n $pac_conf ]] && [[ -n $mirrors_conf ]] && [[ -n ${build_mirror} ]]; then
 	url=${build_mirror}'/$repo/$arch'
-	msg3 "mirror: $url"
+	msg3 "mirror: %s" "$url"
 	pac_base="$working_dir/pacman-basestrap.conf"
 	sed "s#Include = /etc/pacman.d/mirrorlist#Server = ${url}#g" $pac_conf > $pac_base
 

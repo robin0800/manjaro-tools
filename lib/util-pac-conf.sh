@@ -56,19 +56,19 @@ get_repos() {
 
 clean_pacman_conf(){
 	local repositories=$(get_repos) uri='file://'
-	msg "Cleaning [$1/etc/pacman.conf] ..."
+	msg "Cleaning [%s/etc/pacman.conf] ..." "$1"
 	for repo in ${repositories[@]}; do
 		case ${repo} in
 			'options'|'core'|'extra'|'community'|'multilib') continue ;;
 			*)
-				msg2 "parsing [${repo}] ..."
+				msg2 "parsing [%s] ..." "${repo}"
 				parse_section ${repo}
 				if [[ ${pc_value} == $uri* ]]; then
-					msg2 "Removing local repo [${repo}] ..."
+					msg2 "Removing local repo [%s] ..." "${repo}"
 					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
 				fi
 			;;
 		esac
 	done
-	msg "Done cleaning [$1/etc/pacman.conf]"
+	msg "Done cleaning [%s/etc/pacman.conf]" "$1"
 }

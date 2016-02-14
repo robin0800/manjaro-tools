@@ -41,7 +41,7 @@ eval_buildset(){
 
 eval_edition(){
 	local result=$(find ${run_dir} -maxdepth 2 -name "$1") path
-	[[ -z $result ]] && die "$1 is not a valid profile or buildset!"
+	[[ -z $result ]] && die "%s is not a valid profile or buildset!" "$1"
 	path=${result%/*}
 	edition=${path##*/}
 }
@@ -334,7 +334,7 @@ load_profile_config(){
 
 clean_dir(){
 	if [[ -d $1 ]]; then
-		msg "Cleaning [$1] ..."
+		msg "Cleaning [%s] ..." "$1"
 		rm -r $1/*
 	fi
 }
@@ -371,14 +371,14 @@ load_run_dir(){
 
 show_version(){
 	msg "manjaro-tools"
-	msg2 "version: ${version}"
+	msg2 "version: %s" "${version}"
 }
 
 show_config(){
 	if [[ -f ${USERCONFDIR}/manjaro-tools.conf ]]; then
-		msg2 "user_config: ${USERCONFDIR}/manjaro-tools.conf"
+		msg2 "user_config: %s" "${USERCONFDIR}/manjaro-tools.conf"
 	else
-		msg2 "manjaro_tools_conf: ${manjaro_tools_conf}"
+		msg2 "manjaro_tools_conf: %s" "${manjaro_tools_conf}"
 	fi
 }
 
@@ -406,7 +406,7 @@ kill_chroot_process(){
 }
 
 create_min_fs(){
-	msg "Creating install root at $1"
+	msg "Creating install root at %s" "$1"
 	mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
 	mkdir -m 1777 -p $1/tmp
 	mkdir -m 0555 -p $1/{sys,proc}

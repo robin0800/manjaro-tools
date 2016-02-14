@@ -41,7 +41,7 @@ get_chroot_arch(){
 
 chroot_part_mount() {
 	mount "$@" && CHROOT_ACTIVE_PART_MOUNTS=("$2" "${CHROOT_ACTIVE_PART_MOUNTS[@]}")
-	msg2 "mounted: ${CHROOT_ACTIVE_PART_MOUNTS[@]}"
+	msg2 "mounted: %s" "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 }
 
 select_os(){
@@ -57,7 +57,7 @@ select_os(){
 			esac
                 done
                 i=0
-		msg "Select system to mount [0-$((count-1))] : "
+		msg "Select system to mount [0-%s] : " "$((count-1))"
                 read select
         else
 		select=0
@@ -67,10 +67,10 @@ select_os(){
 	root=${os_str%%:*}
 	type=${type##*:}
         if [[ "${type##*:}" == 'linux' ]];then
-		msg "Mounting ($(get_os_name $os_str)) [$root]"
+		msg "Mounting (%s) [%s]" "$(get_os_name $os_str)" "$root"
 		chroot_mount_partitions "$1" "$root"
         else
-                die "You can't mount $select!"
+                die "You can't mount %s!" "$select"
         fi
 }
 
@@ -100,7 +100,7 @@ chroot_mount_partitions(){
 	case ${arch} in
 		i686)
 			if [[ ${chroot_arch} == x86_64 ]];then
-				die "You can't chroot from ${arch} host into ${chroot_arch}!"
+				die "You can't chroot from %s host into %s!" "${arch}" "${chroot_arch}"
 			fi
 		;;
 	esac
@@ -120,7 +120,7 @@ chroot_mount_partitions(){
 
 chroot_mount() {
 	mount "$@" && CHROOT_ACTIVE_MOUNTS=("$2" "${CHROOT_ACTIVE_MOUNTS[@]}")
-	#msg2 "mounted: ${CHROOT_ACTIVE_MOUNTS[@]}"
+	#msg2 "mounted: %s" "${CHROOT_ACTIVE_MOUNTS[@]}"
 }
 
 chroot_mount_conditional() {
