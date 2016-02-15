@@ -374,7 +374,7 @@ get_shared_list(){
 
 # $1: file name
 load_pkgs(){
-	msg3 "Loading Packages: [%s] ..." "${1##*/}"
+	info "Loading Packages: [%s] ..." "${1##*/}"
 
 	local _init _init_rm _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64
 
@@ -560,7 +560,7 @@ check_profile_vars(){
 load_profile(){
 	profile_dir=$1
 	local prof=${1##*/}
-	msg3 "Profile: [%s]" "$prof"
+	info "Profile: [%s]" "$prof"
 	check_profile_sanity "${profile_dir}"
 	load_profile_config "${profile_dir}/profile.conf" || die "%s is not a valid profile!" "${profile_dir}"
 	check_profile_vars

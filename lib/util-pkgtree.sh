@@ -17,9 +17,9 @@ sync_tree(){
 	msg2 "local: %s" "${master}"
 	msg2 "remote: %s" "${master_remote}"
 	if [[ "${master}" == "${master_remote}" ]]; then
-		msg3 "nothing to do"
+		info "nothing to do"
 	else
-		msg3 "needs sync"
+		info "needs sync"
 		git pull origin master
 	fi
 	msg "Done [%s]" "$1"
@@ -29,7 +29,7 @@ sync_tree(){
 clone_tree(){
 	local timer=$(get_timer)
 	msg "Preparing [%s] ..." "$1"
-	msg3 "clone"
+	info "clone"
 	git clone $2.git
 	msg "Done [%s]" "$1"
 	show_elapsed_time "${FUNCNAME}" "${timer}"

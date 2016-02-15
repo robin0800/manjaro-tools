@@ -31,7 +31,7 @@ load_group(){
 		devel_packages='' \
 		file=${DATADIR}/base-devel-udev
 
-        msg3 "Loading Group [%s] ..." "$file"
+        info "Loading Group [%s] ..." "$file"
 
 	if ${is_multilib}; then
 		_multi="s|>multilib||g"

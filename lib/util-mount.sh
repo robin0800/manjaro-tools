@@ -53,7 +53,7 @@ select_os(){
 			local last=${os##*:}
 			case $last in
 				'efi') count=$((count-1)) ;;
-				*) msg3 "$i) $(get_os_name $os)"; i=$((i+1)) ;;
+				*) info "$i) $(get_os_name $os)"; i=$((i+1)) ;;
 			esac
                 done
                 i=0

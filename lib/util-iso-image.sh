@@ -96,23 +96,23 @@ configure_plymouth(){
 configure_services_live(){
 	case ${initsys} in
 		'openrc')
-			msg3 "Configuring [%s] ...." "${initsys}"
+			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_openrc_live[@]}; do
 				msg2 "Setting %s ..." "$svc"
 				chroot $1 rc-update add $svc default &> /dev/null
 			done
-			msg3 "Done configuring [%s]" "${initsys}"
+			info "Done configuring [%s]" "${initsys}"
 		;;
 		'systemd')
-			msg3 "Configuring [%s] ...." "${initsys}"
+			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd_live[@]}; do
 				msg2 "Setting %s ..." "$svc"
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
-			msg3 "Done configuring [%s]" "${initsys}"
+			info "Done configuring [%s]" "${initsys}"
 		;;
 		*)
-			msg3 "Unsupported: [%s]!" "${initsys}"
+			info "Unsupported: [%s]!" "${initsys}"
 		;;
 	esac
 }
@@ -130,25 +130,25 @@ configure_lsb(){
 configure_services(){
 	case ${initsys} in
 		'openrc')
-			msg3 "Configuring [%s] ...." "${initsys}"
+			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_openrc[@]}; do
 				msg2 "Setting %s ..." "$svc"
 				chroot $1 rc-update add $svc default &> /dev/null
 			done
-			msg3 "Done configuring [%s]" "${initsys}"
+			info "Done configuring [%s]" "${initsys}"
 		;;
 		'systemd')
-			msg3 "Configuring [%s] ...." "${initsys}"
+			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd[@]}; do
 				msg2 "Setting %s ..." "$svc"
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
 			sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
 			sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
-			msg3 "Done configuring [%s]" "${initsys}"
+			info "Done configuring [%s]" "${initsys}"
 		;;
 		*)
-			msg3 "Unsupported: [%s]!" "${initsys}"
+			info "Unsupported: [%s]!" "${initsys}"
 		;;
 	esac
 }
@@ -177,7 +177,7 @@ configure_accountsservice(){
 load_desktop_map(){
 	local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g" \
 		file=${DATADIR}/desktop.map
-        msg3 "Loading [%s] ..." "$file"
+        info "Loading [%s] ..." "$file"
 	local desktop_map=$(sed "$_com_rm" "$file" \
 			| sed "$_space" \
 			| sed "$_clean")
@@ -268,7 +268,7 @@ configure_displaymanager(){
 			fi
 		;;
 		*)
-			msg3 "Unsupported: [%s]!" "${displaymanager}"
+			info "Unsupported: [%s]!" "${displaymanager}"
 		;;
 	esac
 	if [[ ${displaymanager} != "none" ]];then
