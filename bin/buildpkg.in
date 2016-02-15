@@ -52,7 +52,7 @@ display_settings(){
 	msg2 "namcap: %s" "${namcap}"
 	msg2 "sign: %s" "${sign}"
 	msg2 "udev_root: %s" "${udev_root}"
-	msg2 "mkchroot_args: %s" "${mkchroot_args[*]}"
+# 	msg2 "mkchroot_args: %s" "${mkchroot_args[*]}"
 
 	msg "PATHS:"
 	msg2 "work_dir: %s" "${work_dir}"
