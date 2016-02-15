@@ -155,7 +155,7 @@ chroot_init(){
 	else
 		chroot_update
 	fi
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer})"
+	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
 make_pkg(){
@@ -166,7 +166,7 @@ make_pkg(){
 		run_post_build
 	cd ..
 	msg "Finished building [%s]" "$1"
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer})"
+	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
 pkgver_equal() {

@@ -45,7 +45,7 @@ squash_image_dir() {
 	else
 		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp} || die "Exit ..."
 	fi
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
+	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
 run_xorriso(){
@@ -582,7 +582,7 @@ compress_images(){
 	make_iso
 	make_checksum "${iso_file}"
 	chown -R "${OWNER}:users" "${iso_dir}"
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
+	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
 build_images(){
@@ -608,7 +608,7 @@ build_images(){
 	fi
 	make_isolinux
 	make_isomounts
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
+	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
 make_profile(){
@@ -633,5 +633,5 @@ make_profile(){
 	fi
 	unset_profile
 	msg "Finished building [%s]" "$1"
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
+	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }

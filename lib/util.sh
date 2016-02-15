@@ -64,6 +64,10 @@ elapsed_time_ms(){
 	echo $(echo $1 $(get_timer_ms) | awk '{ printf "%0.3f",($2-$1)/1000 }')
 }
 
+show_elapsed_time(){
+	msg3 "Time %s: %s minutes" "$1" "$(elapsed_time $2)"
+}
+
 check_root() {
 	(( EUID == 0 )) && return
 	if type -P sudo >/dev/null; then
@@ -398,7 +402,7 @@ kill_chroot_process(){
 				# this process is in the chroot...
 				pid=$(basename $(dirname "$root_dir"))
 				name=$(ps -p $pid -o comm=)
-				msg3 "Killing chroot process: $name ($pid)"
+				msg3 "Killing chroot process: %s (%s)" "$name" "$pid"
 				kill -9 "$pid"
 			fi
 		fi

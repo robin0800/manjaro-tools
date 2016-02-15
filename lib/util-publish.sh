@@ -20,7 +20,7 @@ create_subtree(){
 	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition}/$1/
 	rsync ${rsync_args[*]} /dev/null ${sf_url}/${edition}/$1/${dist_release}/
 	msg2 "Done"
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
+	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
 prepare_transfer(){
@@ -35,5 +35,5 @@ sync_dir(){
 	msg "Start upload [%s] (%s) ..." "$1" "${arch}"
 	rsync ${rsync_args[*]} ${src_dir}/ ${sf_url}/${remote_dir}/
 	msg "Done upload [%s]" "$1"
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer_start})"
+	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }

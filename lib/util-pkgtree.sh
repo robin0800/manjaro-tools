@@ -23,7 +23,7 @@ sync_tree(){
 		git pull origin master
 	fi
 	msg "Done [%s]" "$1"
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer})"
+	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
 clone_tree(){
@@ -32,7 +32,7 @@ clone_tree(){
 	msg3 "clone"
 	git clone $2.git
 	msg "Done [%s]" "$1"
-	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer})"
+	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
 sync_tree_manjaro(){
