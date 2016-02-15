@@ -21,6 +21,19 @@ error_function() {
 	exit 2
 }
 
+# $1: function
+run_log(){
+	local logfile=${iso_dir}/$(gen_iso_fn).log shellopts=$(shopt -p)
+	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
+	mkfifo "$logpipe"
+	tee "$logfile" < "$logpipe" &
+	local teepid=$!
+	$1 &> "$logpipe"
+	wait $teepid
+	rm "$logpipe"
+	eval "$shellopts"
+}
+
 run_safe() {
 	local restoretrap
 	set -e
@@ -31,16 +44,4 @@ run_safe() {
 	eval $restoretrap
 	set +E
 	set +e
-}
-
-# $1: function
-run_log(){
-	local logfile=${work_dir}/${imgname}.log
-	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
-	mkfifo "$logpipe"
-	tee "$logfile" < "$logpipe" &
-	local teepid=$!
-	$1 &> "$logpipe"
-	wait $teepid
-	rm "$logpipe"
 }
