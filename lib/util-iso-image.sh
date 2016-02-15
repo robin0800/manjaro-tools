@@ -132,7 +132,7 @@ configure_services(){
 		'openrc')
 			msg3 "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_openrc[@]}; do
-				msg2 "Setting $svc ..."
+				msg2 "Setting %s ..." "$svc"
 				chroot $1 rc-update add $svc default &> /dev/null
 			done
 			msg3 "Done configuring [%s]" "${initsys}"
@@ -140,7 +140,7 @@ configure_services(){
 		'systemd')
 			msg3 "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd[@]}; do
-				msg2 "Setting $svc ..."
+				msg2 "Setting %s ..." "$svc"
 				chroot $1 systemctl enable $svc &> /dev/null
 			done
 			sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf

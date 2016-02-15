@@ -26,7 +26,7 @@ show_pkg(){
 	cd $1
 		source PKGBUILD
 		for n in ${pkgname[@]}; do
-			msg2 "$n"
+			msg2 "%s" "$n"
 		done
 	cd ..
 }
@@ -36,32 +36,32 @@ display_settings(){
 	show_config
 
 	msg "PROFILE:"
-	msg2 "sets_dir_pkg: ${sets_dir_pkg}"
-	msg2 "buildsets: $(list_sets ${sets_dir_pkg})"
-	msg2 "buildset_pkg: ${buildset_pkg}"
-	msg2 "is_buildset: ${is_buildset}"
+	msg2 "sets_dir_pkg: %s" "${sets_dir_pkg}"
+	msg2 "buildsets: %s" "$(list_sets ${sets_dir_pkg})"
+	msg2 "buildset_pkg: %s" "${buildset_pkg}"
+	msg2 "is_buildset: %s" "${is_buildset}"
 
 	msg "OPTIONS:"
-	msg2 "arch: ${arch}"
-	msg2 "branch: ${branch}"
-	msg2 "chroots_pkg: ${chroots_pkg}"
+	msg2 "arch: %s" "${arch}"
+	msg2 "branch: %s" "${branch}"
+	msg2 "chroots_pkg: %s" "${chroots_pkg}"
 
 	msg "ARGS:"
-	msg2 "clean_first: ${clean_first}"
-	msg2 "wipe_clean: ${wipe_clean}"
-	msg2 "namcap: ${namcap}"
-	msg2 "sign: ${sign}"
-	msg2 "udev_root: ${udev_root}"
-	msg2 "mkchroot_args: ${mkchroot_args[*]}"
+	msg2 "clean_first: %s" "${clean_first}"
+	msg2 "wipe_clean: %s" "${wipe_clean}"
+	msg2 "namcap: %s" "${namcap}"
+	msg2 "sign: %s" "${sign}"
+	msg2 "udev_root: %s" "${udev_root}"
+	msg2 "mkchroot_args: %s" "${mkchroot_args[*]}"
 
 	msg "PATHS:"
-	msg2 "work_dir: ${work_dir}"
-	msg2 "pkg_dir: ${pkg_dir}"
-	msg2 "build_mirror: ${build_mirror}/${branch}"
+	msg2 "work_dir: %s" "${work_dir}"
+	msg2 "pkg_dir: %s" "${pkg_dir}"
+	msg2 "build_mirror: %s" "${build_mirror}/${branch}"
 
 	if ${clean_first};then
 		msg "PKG:"
-		msg2 "base_packages: ${base_packages[*]}"
+		msg2 "base_packages: %s" "${base_packages[*]}"
 	fi
 
 	msg "BUILD QUEUE:"

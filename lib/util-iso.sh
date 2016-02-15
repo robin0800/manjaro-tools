@@ -374,7 +374,7 @@ get_shared_list(){
 
 # $1: file name
 load_pkgs(){
-	msg3 "Loading Packages: [${1##*/}] ..."
+	msg3 "Loading Packages: [%s] ..." "${1##*/}"
 
 	local _init _init_rm _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64
 

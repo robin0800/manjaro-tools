@@ -23,15 +23,15 @@ display_settings(){
 	show_config
 
 	msg "ARGS:"
-	msg2 "sync: ${sync}"
-	msg2 "abs: ${abs}"
-	msg2 "clean: ${clean}"
+	msg2 "sync: %s" "${sync}"
+	msg2 "abs: %s" "${abs}"
+	msg2 "clean: %s" "${clean}"
 
 	msg "PATHS:"
-	msg2 "tree_dir: ${tree_dir}"
-	msg2 "repo_tree: ${repo_tree[*]}"
-	msg2 "host_tree: ${host_tree}"
-	msg2 "host_tree_abs: ${host_tree_abs}"
+	msg2 "tree_dir: %s" "${tree_dir}"
+	msg2 "repo_tree: %s" "${repo_tree[*]}"
+	msg2 "host_tree: %s" "${host_tree}"
+	msg2 "host_tree_abs: %s" "${host_tree_abs}"
 }
 
 load_user_info

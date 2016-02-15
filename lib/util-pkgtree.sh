@@ -13,26 +13,26 @@ sync_tree(){
 	local master=$(git log --pretty=%H ...refs/heads/master^ | head -n 1) \
 		master_remote=$(git ls-remote origin -h refs/heads/master | cut -f1) \
 		timer=$(get_timer)
-	msg "Checking [$1] ..."
-	msg2 "local:  ${master}"
-	msg2 "remote: ${master_remote}"
+	msg "Checking [%s] ..." "$1"
+	msg2 "local: %s" "${master}"
+	msg2 "remote: %s" "${master_remote}"
 	if [[ "${master}" == "${master_remote}" ]]; then
 		msg3 "nothing to do"
 	else
 		msg3 "needs sync"
 		git pull origin master
 	fi
-	msg "Done [$1]"
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
+	msg "Done [%s]" "$1"
+	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer})"
 }
 
 clone_tree(){
 	local timer=$(get_timer)
-	msg "Preparing [$1] ..."
+	msg "Preparing [%s] ..." "$1"
 	msg3 "clone"
 	git clone $2.git
-	msg "Done [$1]"
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
+	msg "Done [%s]" "$1"
+	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer})"
 }
 
 sync_tree_manjaro(){

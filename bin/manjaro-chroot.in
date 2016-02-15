@@ -26,11 +26,11 @@ display_settings(){
 	show_config
 
 	msg "ARGS:"
-	msg2 "automount: ${automount}"
-	msg2 "run_args: ${run_args}"
+	msg2 "automount: %s" "${automount}"
+	msg2 "run_args: %s" "${run_args}"
 
 	msg "PATHS:"
-	msg2 "chrootdir: ${chrootdir}"
+	msg2 "chrootdir: %s" "${chrootdir}"
 }
 
 load_user_info

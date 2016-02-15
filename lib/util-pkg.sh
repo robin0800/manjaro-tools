@@ -16,7 +16,7 @@ check_build(){
 
 find_pkg(){
 	local result=$(find . -type d -name "$1")
-	[[ -z $result ]] && die "$1 is not a valid package or buildset!"
+	[[ -z $result ]] && die "%s is not a valid package or buildset!" "$1"
 }
 
 check_requirements(){
@@ -31,7 +31,7 @@ load_group(){
 		devel_packages='' \
 		file=${DATADIR}/base-devel-udev
 
-        msg3 "Loading Group [$file] ..."
+        msg3 "Loading Group [%s] ..." "$file"
 
 	if ${is_multilib}; then
 		_multi="s|>multilib||g"
@@ -60,7 +60,7 @@ init_base_devel(){
 }
 
 chroot_create(){
-	msg "Creating chroot for [${branch}] (${arch})..."
+	msg "Creating chroot for [%s] (%s)..." "${branch}" "${arch}"
 	mkdir -p "${work_dir}"
 	setarch "${arch}" \
 		mkchroot ${mkchroot_args[*]} \
@@ -69,10 +69,10 @@ chroot_create(){
 }
 
 chroot_clean(){
-	msg "Creating chroot for [${branch}] (${arch})..."
+	msg "Cleaning chroot for [%s] (%s)..." "${branch}" "${arch}"
 	for copy in "${work_dir}"/*; do
 		[[ -d ${copy} ]] || continue
-		msg2 "Deleting chroot copy '$(basename "${copy}")'..."
+		msg2 "Deleting chroot copy %s ..." "$(basename "${copy}")"
 
 		lock 9 "${copy}.lock" "Locking chroot copy '${copy}'"
 
@@ -87,7 +87,7 @@ chroot_clean(){
 }
 
 chroot_update(){
-	msg "Updating chroot for [${branch}] (${arch})..."
+	msg "Updating chroot for [%s] (%s)..." "${branch}" "${arch}"
 	chroot-run ${mkchroot_args[*]} \
 			"${work_dir}/${OWNER}" \
 			pacman -Syu --noconfirm || abort
@@ -96,7 +96,7 @@ chroot_update(){
 
 clean_up(){
 	msg "Cleaning up ..."
-	msg2 "Cleaning [${pkg_dir}]"
+	msg2 "Cleaning [%s]" "${pkg_dir}"
 	find ${pkg_dir} -maxdepth 1 -name "*.*" -delete #&> /dev/null
 	if [[ -z $SRCDEST ]];then
 		msg2 "Cleaning [source files]"
@@ -155,18 +155,18 @@ chroot_init(){
 	else
 		chroot_update
 	fi
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer}) minutes"
+	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer})"
 }
 
 make_pkg(){
-	msg "Start building [$1]"
+	msg "Start building [%s]" "$1"
 	cd $1
 		setarch "${arch}" \
 			mkchrootpkg ${mkchrootpkg_args[*]} || abort
 		run_post_build
 	cd ..
-	msg "Finished building [$1]"
-	msg3 "Time ${FUNCNAME}: $(elapsed_time ${timer_start}) minutes"
+	msg "Finished building [%s]" "$1"
+	msg3 "Time %s: %s minutes" "${FUNCNAME}" "$(elapsed_time ${timer})"
 }
 
 pkgver_equal() {

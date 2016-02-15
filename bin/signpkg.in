@@ -25,5 +25,5 @@ if [ ! -e "$1" ]; then
 	exit 1
 fi
 
-msg "Signing package '$1' with key ${GPGKEY}..."
+msg "Signing package %s with key %s" "$1" "${GPGKEY}..."
 gpg --detach-sign --use-agent -u "${GPGKEY}" "$1"
