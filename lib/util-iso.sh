@@ -625,7 +625,7 @@ make_profile(){
 	fi
 	if ${images_only}; then
 		build_images
-		warning "Continue compress: buildiso -p $1 -sc ..."
+		warning "Continue compress: buildiso -p %s -sc ..." "$1"
 		exit 1
 	else
 		build_images
