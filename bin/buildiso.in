@@ -73,6 +73,8 @@ display_settings(){
 	msg2 "arch: %s" "${arch}"
 	msg2 "branch: %s" "${branch}"
 	msg2 "chroots_iso: %s" "${chroots_iso}"
+	msg2 "initsys: %s" "${initsys}"
+	msg2 "kernel:  %s" "${kernel}"
 
 	msg "ARGS:"
 	msg2 "clean_first: %s" "${clean_first}"
@@ -91,8 +93,6 @@ display_settings(){
 	msg2 "iso_app_id: %s" "${iso_app_id}"
 	msg2 "iso_compression: %s" "${iso_compression}"
 	msg2 "iso_checksum: %s" "${iso_checksum}"
-	msg2 "initsys: %s" "${initsys}"
-	msg2 "kernel:  %s" "${kernel}"
 	msg2 "use_overlayfs: %s" "${use_overlayfs}"
 
 	msg "BUILD QUEUE:"
@@ -128,11 +128,11 @@ usage() {
 	echo "                       [default: ${cache_dir_iso}]"
 	echo '    -k <name>          Kernel to use'
 	echo "                       [default: ${kernel}]"
-	echo '    -z <name>          Init system to use'
+	echo '    -i <name>          Init system to use'
 	echo "                       [default: ${initsys}]"
 	echo '    -c                 Disable clean work dir'
-	echo '    -i                 Build images only'
-	echo '    -s                 Generate iso only'
+	echo '    -x                 Build images only'
+	echo '    -z                 Generate iso only'
 	echo '                       Requires pre built images (-i)'
 	echo '    -v                 Verbose output, show profies detail (-q)'
 	echo '    -q                 Query settings and pretend build'
@@ -144,7 +144,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:z:cisvqh'
+opts='p:a:b:r:t:k:i:czxvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -154,10 +154,10 @@ while getopts "${opts}" arg; do
 		r) chroots_iso="$OPTARG" ;;
 		t) cache_dir_iso="$OPTARG" ;;
 		k) kernel="$OPTARG" ;;
-		z) initsys="$OPTARG" ;;
+		i) initsys="$OPTARG" ;;
 		c) clean_first=false ;;
-		i) images_only=true ;;
-		s) iso_only=true ;;
+		x) images_only=true ;;
+		z) iso_only=true ;;
 		v) verbose=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;

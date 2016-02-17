@@ -619,13 +619,13 @@ make_profile(){
 	import ${LIBDIR}/util-iso-${iso_fs}.sh
 	${clean_first} && chroot_clean "${work_dir}"
 	if ${iso_only}; then
-		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -i" "$1"
+		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -x" "$1"
 		compress_images
 		exit 1
 	fi
 	if ${images_only}; then
 		build_images
-		warning "Continue compress: buildiso -p %s -sc ..." "$1"
+		warning "Continue compress: buildiso -p %s -zc ..." "$1"
 		exit 1
 	else
 		build_images

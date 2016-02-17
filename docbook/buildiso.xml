@@ -97,10 +97,22 @@
 				<listitem><para>Root working directory where the iso will be built.</para></listitem>
 			</varlistentry>
 
-				<varlistentry>
+			<varlistentry>
 				<term><option>-t DIR</option></term>
 
 				<listitem><para>Iso target directory where the final iso will be stored.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-i systend|openrc</option></term>
+
+				<listitem><para>The init system on the iso</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-k linuxXXX<option></term>
+
+				<listitem><para>The kernel on the iso</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
@@ -110,15 +122,15 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-i</option></term>
+				<term><option>-x</option></term>
 
 				<listitem><para>Only build images, without creating an ISO file.</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-s</option></term>
+				<term><option>-z</option></term>
 
-				<listitem><para>Generate iso from already created images, for example created with the -i option.</para></listitem>
+				<listitem><para>Generate iso from already created images, for example created with the -x option.</para></listitem>
 			</varlistentry>
 
 				<varlistentry>

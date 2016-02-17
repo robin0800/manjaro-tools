@@ -67,17 +67,6 @@
 		<para>The following options are understood:</para>
 
 		<variablelist>
-			<varlistentry>
-				<term><varname>initsys=</varname></term>
-
-				<listitem><para>Takes <option>systemd</option> (the default)
-				or <option>openrc</option>. Selecting and option will change
-				how the hostname, the displaymanager and services will be configured.
-				For services also controls if buildiso will use start_systemd and
-				start_systemd_live or start_openrc and start_openrc_live to determine
-				the default services that will be enabled automatically.
-				</para></listitem>
-			</varlistentry>
 
 			<varlistentry>
 				<term><varname>displaymanager=</varname></term>
@@ -140,14 +129,6 @@
 				Xfce            startxfce4              xfce
 				</screen>
 				</listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><varname>kernel=</varname></term>
-
-				<listitem><para>Takes a string corresponding to a
-				manjaro kernel package (ex: linux318 for linux 3.18).
-				</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
