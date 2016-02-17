@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.10.0
+Manjaro-tools-0.11.0
 
 User manual
 
@@ -226,9 +226,13 @@ Usage: buildiso [options]
                        [default: /var/lib/manjaro-tools/buildiso]
     -t <dir>           Target directory
                        [default: /var/cache/manjaro-tools/iso]
+    -k <name>          Kernel to use
+                       [default: linux44]
+    -z <name>          Init system to use
+                       [default: systemd]
     -c                 Disable clean work dir
-    -i                 Build images only
-    -s                 Generate iso only
+    -x                 Build images only
+    -z                 Generate iso only
                        Requires pre built images (-i)
     -v                 Verbose output, show profies detail (-q)
     -q                 Query settings and pretend build
