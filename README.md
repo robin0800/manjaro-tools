@@ -228,7 +228,7 @@ Usage: buildiso [options]
                        [default: /var/cache/manjaro-tools/iso]
     -k <name>          Kernel to use
                        [default: linux44]
-    -z <name>          Init system to use
+    -i <name>          Init system to use
                        [default: systemd]
     -c                 Disable clean work dir
     -x                 Build images only
