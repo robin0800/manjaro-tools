@@ -533,6 +533,18 @@ check_requirements(){
 	if ! $(is_valid_branch ${branch});then
 		die "%s is not a valid branch!" "${branch}"
 	fi
+
+	local iso_kernel=${kernel:5:1} host_kernel=$(uname -r)
+
+	if [[ ${iso_kernel} < "4" ]] || [[ ${host_kernel%%*.} < "4" ]];then
+		use_overlayfs='false'
+	fi
+
+	if ${use_overlayfs};then
+		iso_fs="overlayfs"
+	else
+		iso_fs="aufs"
+	fi
 }
 
 check_profile_vars(){

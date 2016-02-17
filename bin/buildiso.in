@@ -74,7 +74,7 @@ display_settings(){
 	msg2 "branch: %s" "${branch}"
 	msg2 "chroots_iso: %s" "${chroots_iso}"
 	msg2 "initsys: %s" "${initsys}"
-	msg2 "kernel:  %s" "${kernel}"
+	msg2 "kernel: %s" "${kernel}"
 
 	msg "ARGS:"
 	msg2 "clean_first: %s" "${clean_first}"
