@@ -2,9 +2,6 @@
 ###### use this file in the profile ######
 ##########################################
 
-# possible values: openrc,systemd
-# initsys="systemd"
-
 # use multilib packages; x86_64 only
 # multilib="true"
 
@@ -32,9 +29,6 @@
 # default_desktop_file="none"
 
 ################ install ################
-
-# unset defaults to given value
-# kernel="linux44"
 
 # possible values: grub;systemd-boot
 # efi_boot_loader="grub"

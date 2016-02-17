@@ -22,13 +22,10 @@ import ${LIBDIR}/util.sh
 show_profile(){
 	eval_edition "$1"
 	load_profile "${run_dir}/${edition}/$1"
-	msg2 "initsys: %s" "${initsys}"
-	msg2 "kernel:  %s" "${kernel}"
 	if ${verbose};then
 		msg2 "work_dir: %s" "${work_dir}"
 		msg2 "iso_dir: %s" "${iso_dir}"
 		msg2 "iso_file: %s" "${iso_file}"
-
 		msg2 "iso_fs: %s" "${iso_fs}"
 		msg2 "displaymanager: %s" "${displaymanager}"
 		msg2 "autologin: %s" "${autologin}"
@@ -94,6 +91,8 @@ display_settings(){
 	msg2 "iso_app_id: %s" "${iso_app_id}"
 	msg2 "iso_compression: %s" "${iso_compression}"
 	msg2 "iso_checksum: %s" "${iso_checksum}"
+	msg2 "initsys: %s" "${initsys}"
+	msg2 "kernel:  %s" "${kernel}"
 	msg2 "use_overlayfs: %s" "${use_overlayfs}"
 
 	msg "BUILD QUEUE:"
@@ -127,6 +126,10 @@ usage() {
 	echo "                       [default: ${chroots_iso}]"
 	echo '    -t <dir>           Target directory'
 	echo "                       [default: ${cache_dir_iso}]"
+	echo '    -k <name>          Kernel to use'
+	echo "                       [default: ${kernel}]"
+	echo '    -z <name>          Init system to use'
+	echo "                       [default: ${initsys}]"
 	echo '    -c                 Disable clean work dir'
 	echo '    -i                 Build images only'
 	echo '    -s                 Generate iso only'
@@ -141,7 +144,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:cisvqh'
+opts='p:a:b:r:t:k:z:cisvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -150,7 +153,8 @@ while getopts "${opts}" arg; do
 		b) branch="$OPTARG" ;;
 		r) chroots_iso="$OPTARG" ;;
 		t) cache_dir_iso="$OPTARG" ;;
-		k) keep_repo="$OPTARG" ;;
+		k) kernel="$OPTARG" ;;
+		z) initsys="$OPTARG" ;;
 		c) clean_first=false ;;
 		i) images_only=true ;;
 		s) iso_only=true ;;

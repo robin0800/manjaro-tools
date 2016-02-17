@@ -185,10 +185,23 @@ init_buildiso(){
 
 	[[ -z ${iso_checksum} ]] && iso_checksum='md5'
 
+	[[ -z ${initsys} ]] && initsys="systemd"
+
+	[[ -z ${kernel} ]] && kernel="linux44"
+
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
 
-	local used_kernel=$(uname -r)
-	[[ ${used_kernel%%*.} < "4" ]] && use_overlayfs='false'
+	local iso_kernel=${kernel:5:1}
+	[[ ${iso_kernel} < "4" ]] && use_overlayfs='false'
+
+	if ${use_overlayfs};then
+		iso_fs="overlayfs"
+	else
+		iso_fs="aufs"
+	fi
+
+	local host_kernel=$(uname -r)
+	[[ ${host_kernel%%*.} < "4" ]] && use_overlayfs='false'
 
 	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
 }
@@ -228,7 +241,7 @@ load_config(){
 }
 
 unset_profile(){
-	unset initsys
+	#unset initsys
 	unset displaymanager
 	unset autologin
 	unset multilib
@@ -237,7 +250,7 @@ unset_profile(){
 	unset nonfree_xorg
 	unset default_desktop_executable
 	unset default_desktop_file
-	unset kernel
+	#unset kernel
 	unset efi_boot_loader
 	unset efi_part_size
 	unset hostname
@@ -264,8 +277,6 @@ load_profile_config(){
 
 	[[ -r ${profile_conf} ]] && source ${profile_conf}
 
-	[[ -z ${initsys} ]] && initsys="systemd"
-
 	[[ -z ${displaymanager} ]] && displaymanager="none"
 
 	[[ -z ${autologin} ]] && autologin="true"
@@ -282,16 +293,16 @@ load_profile_config(){
 
 	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
 
-	[[ -z ${kernel} ]] && kernel="linux44"
-
-	local used_kernel=${kernel:5:1}
-	[[ ${used_kernel} < "4" ]] && use_overlayfs='false'
-
-	if ${use_overlayfs};then
-		iso_fs="overlayfs"
-	else
-		iso_fs="aufs"
-	fi
+# 	[[ -z ${kernel} ]] && kernel="linux44"
+#
+# 	local used_kernel=${kernel:5:1}
+# 	[[ ${used_kernel} < "4" ]] && use_overlayfs='false'
+#
+# 	if ${use_overlayfs};then
+# 		iso_fs="overlayfs"
+# 	else
+# 		iso_fs="aufs"
+# 	fi
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
