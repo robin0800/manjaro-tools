@@ -88,6 +88,11 @@
 
 				<listitem><para>Create new remote edition_type with subtree.</para></listitem>
 			</varlistentry>
+			<varlistentry>
+				<term><option>-t</option></term>
+
+				<listitem><para>Create a torrent from the source directory.</para></listitem>
+			</varlistentry>
 
 			<varlistentry>
 				<term><option>-l</option></term>

@@ -168,26 +168,6 @@
 				</para></listitem>
 			</varlistentry>
 
-
-			<varlistentry>
-				<term><varname>blacklist_trigger=</varname></term>
-
-				<listitem><para>Only useful when compiling packages against
-				eudev. List of packages that will trigger a package blacklist
-				defined with "blacklist=" when creating a chroot. By default
-				they are "('eudev' 'upower-pm-utils' 'eudev-systemdcompat')"
-				</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><varname>blacklist=</varname></term>
-
-				<listitem><para>List of packages that will be blacklisted when
-				creating a chroot. This list is only triggered when compiling
-				a packages in the "blacklist_trigger=" option. By default
-				"('libsystemd')" is blacklisted.
-				</para></listitem>
-			</varlistentry>
 		</variablelist>
 	</refsect1>
 
@@ -296,12 +276,73 @@
 		</variablelist>
 	</refsect1>
 
+		<refsect1>
+		<title>Options for deployiso</title>
+
+		<para>The following options are understood:</para>
+
+		<variablelist>
+			<varlistentry>
+				<term><varname>buildset_iso=</varname></term>
+
+				<listitem><para>Default set for deployiso without the .set
+				extension.
+				</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><varname>remote_url=</varname></term>
+
+				<listitem><para>Default url to be used for upload.
+				</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><varname>remote_project=</varname></term>
+
+				<listitem><para>Default orject to be used for upload.
+				</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><varname>remote_target=</varname></term>
+
+				<listitem><para>Default server path to be used for upload.
+				</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>remote_user=</varname></term>
+
+				<listitem><para>Default user to be used for upload.
+				</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>limit=</varname></term>
+
+				<listitem><para>Default upload bandwidth limit.
+				</para></listitem>
+			</varlistentry><varlistentry>
+				<term><varname>tracker_url=</varname></term>
+
+				<listitem><para>Default tracker announce for the torrent.
+				</para></listitem>
+			</varlistentry>
+			</varlistentry><varlistentry>
+				<term><varname>piece_size=</varname></term>
+
+				<listitem><para>Default priece size for the torrent in 2^n.
+				</para></listitem>
+			</varlistentry>
+		</variablelist>
+	</refsect1>
 
 	<refsect1>
 		<title>See Also</title>
 		<para>
 			<citerefentry project='manjaro-tools'><refentrytitle>profiles.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
 			<citerefentry project='manjaro-tools'><refentrytitle>buildiso</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+			<citerefentry project='manjaro-tools'><refentrytitle>deployiso</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+			<citerefentry project='manjaro-tools'><refentrytitle>buildtree</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
 			<citerefentry project='manjaro-tools'><refentrytitle>buildpkg</refentrytitle><manvolnum>1</manvolnum></citerefentry>
 		</para>
 	</refsect1>
