@@ -28,9 +28,14 @@ prepare_transfer(){
 	src_dir="${run_dir}/${remote_dir}"
 }
 
+create_torrent(){
+	mktorrent -v -p -l ${piece_size} -a ${tracker_url} -o ${USER_HOME}/$1.torrent ${src_dir}
+}
+
 sync_dir(){
 	eval_edition "$1"
 	prepare_transfer "$1"
+	${torrent_create} && create_torrent "$1"
 	${remote_create} && create_subtree "$1"
 	msg "Start upload [%s] (%s) ..." "$1" "${arch}"
 	rsync ${rsync_args[*]} ${src_dir}/ ${sf_url}/${remote_dir}/

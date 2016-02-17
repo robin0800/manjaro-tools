@@ -71,6 +71,7 @@ pretend=false
 remote_create=false
 update=false
 verbose=false
+torrent_create=false
 
 rsync_args=(-aP --progress -e ssh)
 
@@ -80,6 +81,7 @@ usage() {
 	echo "    -a                 Arch to upload [default:${arch}]"
 	echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
 	echo '    -c                 Create new remote edition_type with subtree'
+	echo '    -t                 Create a torrent from source folder'
 	echo '    -u                 Update remote iso'
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -v                 Verbose output'
@@ -89,7 +91,7 @@ usage() {
 	exit $1
 }
 
-opts='p:a:l:cuvqh'
+opts='p:a:l:ctuvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -97,6 +99,7 @@ while getopts "${opts}" arg; do
                 a) arch="$OPTARG" ;;
                 l) limit="$OPTARG" ;;
                 c) remote_create=true ;;
+                t) torrent_create=true ;;
                 u) update=true; rsync_args+=(-u) ;;
                 v) verbose=true; rsync_args+=(-v --stats) ;;
 		q) pretend=true; rsync_args+=(-n) ;;

@@ -336,6 +336,7 @@ Usage: deployiso [options]
     -a                 Arch to upload [default:x86_64]
     -l                 Limit bandwidth in kB/s [default:80]
     -c                 Create new remote edition_type with subtree
+    -t                 Create torrent from source folder
     -u                 Update remote iso
     -q                 Query settings and pretend upload
     -v                 Verbose output

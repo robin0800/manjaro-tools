@@ -205,6 +205,10 @@ init_deployiso(){
 	[[ -z ${remote_url} ]] && remote_url="sourceforge.net"
 
 	[[ -z ${limit} ]] && limit=100
+
+	[[ -z ${tracker_url} ]] && tracker_url=""
+
+	[[ -z ${piece_size} ]] && piece_size=21
 }
 
 load_config(){
