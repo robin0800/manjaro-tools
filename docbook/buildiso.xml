@@ -110,7 +110,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-k linuxXXX<option></term>
+				<term><option>-k linuxXXX</option></term>
 
 				<listitem><para>The kernel on the iso</para></listitem>
 			</varlistentry>
