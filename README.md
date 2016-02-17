@@ -100,6 +100,9 @@ overriding
 # unset defaults to given value
 # dist_branding="MJRO"
 
+# unset defaults to given value
+# iso_kernel="linux44"
+
 # iso publisher
 # iso_publisher="Manjaro Linux <http://www.manjaro.org>"
 
@@ -112,6 +115,12 @@ overriding
 
 # valid: md5, sha1, sha256, sha384, sha512
 # iso_checksum=md5
+
+# possible values: openrc,systemd
+# initsys="systemd"
+
+# unset defaults to given value
+# kernel="linux44"
 
 # experimental; use overlayfs instead of aufs
 # requires minimum 4.0 kernel on the build host and on iso in profile.conf
