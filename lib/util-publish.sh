@@ -30,11 +30,12 @@ prepare_transfer(){
 
 create_torrent(){
 	msg "Create %s.torrent" "$1"
+	local name=$(gen_iso_fn)
 	if [[ "${edition}" == 'official' ]];then
-		local webseed_url="${sf_url}/${remote_dir}/$(gen_iso_fn).iso"
+		local webseed_url="${sf_url}/${remote_dir}/${name}.iso"
 		mktorrent_args+=(-w ${webseed_url})
 	fi
-	mktorrent ${mktorrent_args[*]} -o ${src_dir}/$1-${dist_release}-${arch}.torrent ${src_dir}
+	mktorrent ${mktorrent_args[*]} -o ${src_dir}/${name}.torrent ${src_dir}
 	msg "Done %s.torrent" "$1"
 }
 
