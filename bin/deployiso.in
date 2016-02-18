@@ -47,6 +47,7 @@ display_settings(){
 	msg2 "torrent_create: %s" "${torrent_create}"
 	msg2 "verbose: %s" "${verbose}"
 	msg2 "rsync_args: %s" "${rsync_args[*]}"
+	${torrent_create} && msg2 "mktorrent_args: %s" "${mktorrent_args[*]}"
 
 	msg "HOST:"
 	msg2 "dist_release: %s" "${dist_release}"
@@ -56,9 +57,10 @@ display_settings(){
 	msg2 "remote_project: %s" "${remote_project}"
 	msg2 "remote_target: %s" "${remote_target}"
 	msg2 "remote_user: %s" "${remote_user}"
-	msg2 "tracker_url: %s" "${tracker_url}"
-	msg2 "piece_size: %s" "${piece_size}"
-
+	if ${torrent_create};then
+		msg2 "tracker_url: %s" "${tracker_url}"
+		msg2 "piece_size: %s" "${piece_size}"
+	fi
 	msg "UPLOAD QUEUE:"
 	run show_profile "${buildset_iso}"
 }
@@ -77,6 +79,7 @@ verbose=false
 torrent_create=false
 
 rsync_args=(-aP --progress -e ssh)
+mktorrent_args=(-v -p)
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
@@ -118,6 +121,7 @@ timer_start=$(get_timer)
 eval_buildset "${sets_dir_iso}" "${buildset_iso}"
 
 rsync_args+=(--bwlimit=${limit})
+mktorrent_args+=(-l ${piece_size} -a ${tracker_url})
 
 sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
 shell_url=${remote_user},${remote_project}@shell.${remote_url}

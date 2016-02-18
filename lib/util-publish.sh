@@ -26,11 +26,16 @@ create_subtree(){
 prepare_transfer(){
 	remote_dir="${edition}/$1/${dist_release}/${arch}"
 	src_dir="${run_dir}/${remote_dir}"
+	iso_name=${}
 }
 
 create_torrent(){
 	msg "Create %s.torrent" "$1"
-	mktorrent -v -p -l ${piece_size} -a ${tracker_url} -o ${USER_HOME}/$1.torrent ${src_dir}
+	if [[ "${edition}" == 'official' ]];then
+		local webseed_url="${sf_url}/${remote_dir}/$(gen_iso_fn).iso"
+		mktorrent_args+=(-w ${webseed_url})
+	fi
+	mktorrent ${mktorrent_args[*]} -o ${src_dir}/$1-${dist_release}-${arch}.torrent ${src_dir}
 	msg "Done %s.torrent" "$1"
 }
 
