@@ -44,6 +44,7 @@ display_settings(){
 	msg "ARGS:"
 	msg2 "update: %s" "${update}"
 	msg2 "remote_create: %s" "${remote_create}"
+	msg2 "torrent_create: %s" "${torrent_create}"
 	msg2 "verbose: %s" "${verbose}"
 	msg2 "rsync_args: %s" "${rsync_args[*]}"
 
@@ -55,6 +56,8 @@ display_settings(){
 	msg2 "remote_project: %s" "${remote_project}"
 	msg2 "remote_target: %s" "${remote_target}"
 	msg2 "remote_user: %s" "${remote_user}"
+	msg2 "tracker_url: %s" "${tracker_url}"
+	msg2 "piece_size: %s" "${piece_size}"
 
 	msg "UPLOAD QUEUE:"
 	run show_profile "${buildset_iso}"

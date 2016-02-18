@@ -29,7 +29,9 @@ prepare_transfer(){
 }
 
 create_torrent(){
+	msg "Create %s.torrent" "$1"
 	mktorrent -v -p -l ${piece_size} -a ${tracker_url} -o ${USER_HOME}/$1.torrent ${src_dir}
+	msg "Done %s.torrent" "$1"
 }
 
 sync_dir(){

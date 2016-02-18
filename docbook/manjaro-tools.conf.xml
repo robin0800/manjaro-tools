@@ -105,10 +105,10 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>sets_dir=</varname></term>
+				<term><varname>build_mirror=</varname></term>
 
-				<listitem><para>Directory where buildpkg and buildiso will
-				search for sets. Default is "/etc/manjaro-tools/sets".
+				<listitem><para>Default mirror to be used when building
+				packages.
 				</para></listitem>
 			</varlistentry>
 		</variablelist>
@@ -157,14 +157,6 @@
 
 				<listitem><para>Default set for buildpkg without the .set
 				extension.
-				</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><varname>build_mirror=</varname></term>
-
-				<listitem><para>Default mirror to be used when building
-				packages.
 				</para></listitem>
 			</varlistentry>
 
@@ -282,13 +274,6 @@
 		<para>The following options are understood:</para>
 
 		<variablelist>
-			<varlistentry>
-				<term><varname>buildset_iso=</varname></term>
-
-				<listitem><para>Default set for deployiso without the .set
-				extension.
-				</para></listitem>
-			</varlistentry>
 
 			<varlistentry>
 				<term><varname>remote_url=</varname></term>
