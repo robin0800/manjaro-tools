@@ -39,6 +39,7 @@ display_settings(){
 
 	msg "OPTIONS:"
 	msg2 "arch: %s" "${arch}"
+	msg2 "initsys: %s" "${initsys}"
 	msg2 "limit: %s kB/s" "${limit}"
 
 	msg "ARGS:"
@@ -85,6 +86,7 @@ usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p                 Source folder to upload [default:${buildset_iso}]"
 	echo "    -a                 Arch to upload [default:${arch}]"
+	echo "    -i                 The iso's init system [default:${initsys}]"
 	echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
 	echo '    -c                 Create new remote edition_type with subtree'
 	echo '    -t                 Create a torrent from source folder'
@@ -97,12 +99,13 @@ usage() {
 	exit $1
 }
 
-opts='p:a:l:ctuvqh'
+opts='p:a:l:i:ctuvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
                 p) buildset_iso="$OPTARG" ;;
                 a) arch="$OPTARG" ;;
+                i) initsys="$OPTARG" ;;
                 l) limit="$OPTARG" ;;
                 c) remote_create=true ;;
                 t) torrent_create=true ;;
