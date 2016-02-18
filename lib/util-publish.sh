@@ -26,7 +26,6 @@ create_subtree(){
 prepare_transfer(){
 	remote_dir="${edition}/$1/${dist_release}/${arch}"
 	src_dir="${run_dir}/${remote_dir}"
-	iso_name=${}
 }
 
 create_torrent(){
