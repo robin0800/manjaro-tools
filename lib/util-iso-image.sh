@@ -186,8 +186,6 @@ load_desktop_map(){
 
 detect_desktop_env(){
 	local xs=$1/usr/share/xsessions ex=$1/usr/bin key val map=( $(load_desktop_map) )
-	if [[ "${default_desktop_executable}" == "none" ]] || \
-		[[ ${default_desktop_file} == "none" ]]; then
 		msg2 "Trying to detect desktop environment ..."
 		for item in "${map[@]}";do
 			key=${item%:*}
@@ -195,9 +193,11 @@ detect_desktop_env(){
 			if [[ -f $xs/$key.desktop ]] && [[ -f $ex/$val ]];then
 				default_desktop_file="$key"
 				default_desktop_executable="$val"
+			else
+				default_desktop_executable="none"
+				default_desktop_file="none"
 			fi
 		done
-	fi
 	msg2 "Detected: %s" "${default_desktop_file}"
 }
 

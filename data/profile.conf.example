@@ -2,14 +2,14 @@
 ###### use this file in the profile ######
 ##########################################
 
-# use multilib packages; x86_64 only
-# multilib="true"
-
 # default displaymanager
 # displaymanager="none"
 
 # Set to false to disable autologin in the livecd
 # autologin="true"
+
+# use multilib packages; x86_64 only
+# multilib="true"
 
 # nonfree xorg drivers
 # nonfree_xorg="true"
