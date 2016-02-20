@@ -534,6 +534,10 @@ check_requirements(){
 		die "%s is not a valid branch!" "${branch}"
 	fi
 
+	if ! is_valid_init "${initsys}";then
+		die "initsys only accepts openrc/systemd value!"
+	fi
+
 	local iso_kernel=${kernel:5:1} host_kernel=$(uname -r)
 
 	if [[ ${iso_kernel} < "4" ]] || [[ ${host_kernel%%*.} < "4" ]];then
@@ -548,9 +552,6 @@ check_requirements(){
 }
 
 check_profile_vars(){
-	if ! is_valid_init "${initsys}";then
-		die "initsys only accepts openrc/systemd value!"
-	fi
 	if ! is_valid_bool "${autologin}";then
 		die "autologin only accepts true/false value!"
 	fi
