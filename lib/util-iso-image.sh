@@ -195,9 +195,6 @@ detect_desktop_env(){
 		if [[ -f $xs/$key.desktop ]] && [[ -f $ex/$val ]];then
 			default_desktop_file="$key"
 			default_desktop_executable="$val"
-		else
-			default_desktop_file="none"
-			default_desktop_executable="none"
 		fi
 	done
 	msg2 "Detected: %s" "${default_desktop_file}"
