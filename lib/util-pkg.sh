@@ -166,7 +166,7 @@ make_pkg(){
 		run_post_build
 	cd ..
 	msg "Finished building [%s]" "$1"
-	show_elapsed_time "${FUNCNAME}" "${timer}"
+	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
 pkgver_equal() {

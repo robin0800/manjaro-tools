@@ -28,9 +28,28 @@ prepare_transfer(){
 	src_dir="${run_dir}/${remote_dir}"
 }
 
+gen_iso_fn(){
+	local vars=() name
+	vars+=("${iso_name}")
+	[[ -n ${1} ]] && vars+=("${1}")
+	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
+	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
+	vars+=("${dist_release}")
+	vars+=("${arch}")
+	for n in ${vars[@]};do
+		name=${name:-}${name:+-}${n}
+	done
+	echo $name
+}
+
 create_torrent(){
 	msg "Create %s.torrent" "$1"
-	mktorrent -v -p -l ${piece_size} -a ${tracker_url} -o ${USER_HOME}/$1.torrent ${src_dir}
+	local name=$(gen_iso_fn "$1")
+	if [[ "${edition}" == 'official' ]];then
+		local webseed_url="http://${remote_url}/projects/${remote_project}/${remote_dir}/${name}.iso"
+		mktorrent_args+=(-w ${webseed_url})
+	fi
+	mktorrent ${mktorrent_args[*]} -o ${src_dir}/${name}.torrent ${src_dir}
 	msg "Done %s.torrent" "$1"
 }
 

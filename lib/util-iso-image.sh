@@ -186,8 +186,8 @@ load_desktop_map(){
 
 detect_desktop_env(){
 	local xs=$1/usr/share/xsessions ex=$1/usr/bin key val map=( $(load_desktop_map) )
-	if [[ "${default_desktop_executable}" == "none" ]] || \
-		[[ ${default_desktop_file} == "none" ]]; then
+		default_desktop_executable="none"
+		default_desktop_file="none"
 		msg2 "Trying to detect desktop environment ..."
 		for item in "${map[@]}";do
 			key=${item%:*}
@@ -200,8 +200,7 @@ detect_desktop_env(){
 				default_desktop_executable="none"
 			fi
 		done
-	fi
-	msg2 "Detected: %s" "${default_desktop_file}"
+		msg2 "Detected: %s" "${default_desktop_file}"
 }
 
 configure_mhwd(){

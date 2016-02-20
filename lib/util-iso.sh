@@ -112,6 +112,20 @@ make_checksum(){
 	cd ..
 }
 
+gen_iso_fn(){
+	local vars=() name
+	vars+=("${iso_name}")
+	[[ -n ${custom} ]] && vars+=("${custom}")
+	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
+	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
+	vars+=("${dist_release}")
+	vars+=("${arch}")
+	for n in ${vars[@]};do
+		name=${name:-}${name:+-}${n}
+	done
+	echo $name
+}
+
 # Base installation (root-image)
 make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
@@ -132,20 +146,6 @@ make_image_root() {
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
 	fi
-}
-
-gen_iso_fn(){
-	local vars=() name
-	vars+=("${iso_name}")
-	[[ -n ${custom} ]] && vars+=("${custom}")
-	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
-	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
-	vars+=("${dist_release}")
-	vars+=("${arch}")
-	for n in ${vars[@]};do
-		name=${name:-}${name:+-}${n}
-	done
-	echo $name
 }
 
 make_image_custom() {

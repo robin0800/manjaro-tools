@@ -276,10 +276,6 @@ load_profile_config(){
 
 	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
 
-	[[ -z ${default_desktop_executable} ]] && default_desktop_executable="none"
-
-	[[ -z ${default_desktop_file} ]] && default_desktop_file="none"
-
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
 	[[ -z ${efi_part_size} ]] && efi_part_size="32M"
