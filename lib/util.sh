@@ -239,8 +239,6 @@ unset_profile(){
 	unset pxe_boot
 	unset plymouth_boot
 	unset nonfree_xorg
-	unset default_desktop_executable
-	unset default_desktop_file
 	unset efi_boot_loader
 	unset efi_part_size
 	unset hostname
@@ -254,7 +252,6 @@ unset_profile(){
 	unset disable_openrc
 	unset start_systemd_live
 	unset start_openrc_live
-	unset use_overlayfs
 	unset packages_custom
 	unset packages_mhwd
 }

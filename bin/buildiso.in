@@ -133,7 +133,7 @@ usage() {
 	echo '    -c                 Disable clean work dir'
 	echo '    -x                 Build images only'
 	echo '    -z                 Generate iso only'
-	echo '                       Requires pre built images (-i)'
+	echo '                       Requires pre built images (-x)'
 	echo '    -v                 Verbose output, show profies detail (-q)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
