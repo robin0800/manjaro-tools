@@ -535,7 +535,7 @@ check_requirements(){
 	fi
 
 	if ! is_valid_init "${initsys}";then
-		die "initsys only accepts openrc/systemd value!"
+		die "%s is not a valid init system!" "${initsys}"
 	fi
 
 	local iso_kernel=${kernel:5:1} host_kernel=$(uname -r)
