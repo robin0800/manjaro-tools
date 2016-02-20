@@ -233,7 +233,7 @@ Usage: buildiso [options]
     -c                 Disable clean work dir
     -x                 Build images only
     -z                 Generate iso only
-                       Requires pre built images (-i)
+                       Requires pre built images (-x)
     -v                 Verbose output, show profies detail (-q)
     -q                 Query settings and pretend build
     -h                 This help
@@ -334,6 +334,7 @@ $ deployiso -h
 Usage: deployiso [options]
     -p                 Source folder to upload [default:default]
     -a                 Arch to upload [default:x86_64]
+    -i                 The iso's init system [default:systemd]
     -l                 Limit bandwidth in kB/s [default:80]
     -c                 Create new remote edition_type with subtree
     -t                 Create torrent from source folder
