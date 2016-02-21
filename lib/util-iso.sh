@@ -195,8 +195,7 @@ make_image_live() {
 		pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
 		copy_overlay "${profile_dir}/live-overlay" "${path}"
 		# copy over setup helpers and config loader
-		copy_livecd_helpers "${path}/opt/live"
-		copy_startup_scripts "${path}/usr/bin"
+		copy_profile_conf "${path}/opt/live"
 		configure_live_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 

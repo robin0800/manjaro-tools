@@ -18,14 +18,6 @@ copy_overlay(){
 	fi
 }
 
-copy_startup_scripts(){
-	msg2 "Copying startup scripts ..."
-	cp ${DATADIR}/scripts/livecd $1
-	cp ${DATADIR}/scripts/mhwd-live $1
-	chmod +x $1/livecd
-	chmod +x $1/mhwd-live
-}
-
 write_profile_conf_entries(){
 	local conf=$1/profile.conf
 	echo '' >> ${conf}
@@ -36,7 +28,7 @@ write_profile_conf_entries(){
 	echo "iso_name=${iso_name}" >> ${conf}
 }
 
-copy_livecd_helpers(){
+copy_profile_conf(){
 	msg2 "Copying livecd helpers ..."
 	[[ ! -d $1 ]] && mkdir -p $1
 
