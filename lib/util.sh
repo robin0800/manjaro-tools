@@ -309,11 +309,11 @@ load_profile_config(){
 	fi
 
 	if [[ -z ${start_systemd_live[@]} ]];then
-		start_systemd_live=('livecd' 'mhwd-live' 'pacman-init')
+		start_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
 	fi
 
 	if [[ -z ${start_openrc_live[@]} ]];then
-		start_openrc_live=('livecd' 'mhwd-live' 'pacman-init')
+		start_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
 	fi
 
 	return 0
