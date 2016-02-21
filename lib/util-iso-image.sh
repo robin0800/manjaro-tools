@@ -29,7 +29,7 @@ write_profile_conf_entries(){
 }
 
 copy_profile_conf(){
-	msg2 "Copying livecd helpers ..."
+	msg2 "Copying profile.conf ..."
 	[[ ! -d $1 ]] && mkdir -p $1
 
 	cp ${profile_conf} $1
