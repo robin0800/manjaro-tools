@@ -195,7 +195,7 @@ make_image_live() {
 		pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
 		copy_overlay "${profile_dir}/live-overlay" "${path}"
 		# copy over setup helpers and config loader
-		copy_livecd_helpers "${path}/opt/livecd"
+		copy_livecd_helpers "${path}/opt/live"
 		copy_startup_scripts "${path}/usr/bin"
 		configure_live_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
@@ -214,7 +214,7 @@ make_image_mhwd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [drivers repository] (mhwd-image)"
 		local path="${work_dir}/mhwd-image"
-		mkdir -p ${path}/opt/livecd/pkgs
+		mkdir -p ${path}/opt/live/pkgs
 
 		if [[ -n "${custom}" ]] ; then
 			mount_custom_image "${path}"
@@ -233,10 +233,10 @@ make_image_mhwd() {
 
 		if [[ -n "${packages_cleanup}" ]]; then
 			for mhwd_clean in ${packages_cleanup}; do
-				rm ${path}/opt/livecd/pkgs/${mhwd_clean}
+				rm ${path}/opt/live/pkgs/${mhwd_clean}
 			done
 		fi
-		cp ${DATADIR}/pacman-gfx.conf ${path}/opt/livecd
+		cp ${DATADIR}/pacman-gfx.conf ${path}/opt/live
 		make_repo "${path}"
 		configure_mhwd_drivers "${path}"
 

@@ -9,7 +9,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# this util-live.sh gets copied to overlay-image/opt/livecd
+# this util-live.sh gets copied to live-image
 
 kernel_cmdline(){
 	for param in $(/bin/cat /proc/cmdline); do
@@ -36,7 +36,7 @@ get_layout(){
 }
 
 find_legacy_keymap(){
-	file="/opt/livecd/kbd-model-map"
+	file="/opt/live/kbd-model-map"
 	while read -r line || [[ -n $line ]]; do
 		if [[ -z $line ]] || [[ $line == \#* ]]; then
 			continue

@@ -51,7 +51,7 @@ copy_livecd_helpers(){
 
 copy_cache_mhwd(){
 	msg2 "Copying mhwd package cache ..."
-	rsync -v --files-from="$1/cache-packages.txt" /var/cache/pacman/pkg "$1/opt/livecd/pkgs"
+	rsync -v --files-from="$1/cache-packages.txt" /var/cache/pacman/pkg "$1/opt/live/pkgs"
 }
 
 gen_pw(){
@@ -289,32 +289,32 @@ configure_displaymanager(){
 
 # $1: chroot
 configure_mhwd_drivers(){
-	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
+	if  [ -z "$(ls $1/opt/live/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Catalyst driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
+	if  [ -z "$(ls $1/opt/live/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Nvidia driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
+	if  [ -z "$(ls $1/opt/live/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Nvidia Bumblebee driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-304xx-utils 2> /dev/null)" ]; then
+	if  [ -z "$(ls $1/opt/live/pkgs/ | grep nvidia-304xx-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Nvidia 304xx driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep nvidia-340xx-utils 2> /dev/null)" ]; then
+	if  [ -z "$(ls $1/opt/live/pkgs/ | grep nvidia-340xx-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Nvidia 340xx driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/livecd/pkgs/ | grep xf86-video-amdgpu 2> /dev/null)" ]; then
+	if  [ -z "$(ls $1/opt/live/pkgs/ | grep xf86-video-amdgpu 2> /dev/null)" ]; then
 		msg2 "Disabling AMD gpu driver"
 		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/xf86-video-amdgpu/
 		touch $1/var/lib/mhwd/db/pci/graphic_drivers/xf86-video-amdgpu/MHWDCONFIG
@@ -409,7 +409,7 @@ configure_live_image(){
 }
 
 make_repo(){
-	repo-add $1/opt/livecd/pkgs/gfx-pkgs.db.tar.gz $1/opt/livecd/pkgs/*pkg*z
+	repo-add $1/opt/live/pkgs/gfx-pkgs.db.tar.gz $1/opt/live/pkgs/*pkg*z
 }
 
 # $1: work dir

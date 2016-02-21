@@ -1,11 +1,11 @@
 #!/bin/sh
 
 livetimer=$(date +%s%3N)
-[[ -r /opt/livecd/util.sh ]] && source /opt/livecd/util.sh
+[[ -r /opt/live/util.sh ]] && source /opt/live/util.sh
 
-load_profile_config "/opt/livecd/profile.conf"
+load_profile_config "/opt/live/profile.conf"
 
-[[ -r /opt/livecd/util-live.sh ]] && source /opt/livecd/util-live.sh
+[[ -r /opt/live/util-live.sh ]] && source /opt/live/util-live.sh
 echo "Loaded scripts: $(elapsed_time_ms ${livetimer})ms" >> /var/log/livecd.log
 
 livetimer=$(get_timer_ms)
