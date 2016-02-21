@@ -145,6 +145,20 @@ init_buildpkg(){
 	cache_dir_pkg=${cache_dir}/pkg
 }
 
+get_iso_label(){
+	local label="$1"
+	label="${label//_}"	# relace all _
+	label="${label//-}"	# relace all -
+	label="${label^^}"	# all uppercase
+	label="${label::8}"	# limit to 8 characters
+	echo ${label}
+}
+
+get_codename(){
+	source /etc/lsb-release
+	echo "${DISTRIB_CODENAME}"
+}
+
 init_buildiso(){
 	chroots_iso="${chroots_dir}/buildiso"
 
@@ -160,10 +174,7 @@ init_buildiso(){
 
 	[[ -z ${dist_release} ]] && dist_release=$(version_gen)
 
-	if [[ -z ${dist_codename} ]];then
-		source /etc/lsb-release
-		dist_codename="${DISTRIB_CODENAME}"
-	fi
+	[[ -z ${dist_codename} ]] && dist_codename=$(get_codename)
 
 	[[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
@@ -171,11 +182,7 @@ init_buildiso(){
 
 	iso_name=${dist_name,,}
 
-	iso_label="${dist_branding}${dist_release//.}"
-	iso_label="${iso_label//_}"	# relace all _
-	iso_label="${iso_label//-}"	# relace all -
-	iso_label="${iso_label^^}"	# all uppercase
-	iso_label="${iso_label::8}"	# limit to 8 characters
+	iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
 
 	[[ -z ${iso_publisher} ]] && iso_publisher='Manjaro Linux <http://www.manjaro.org>'
 
@@ -296,17 +303,13 @@ load_profile_config(){
 		start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 	fi
 
-	if [[ -z ${disable_systemd[@]} ]];then
-		disable_systemd=('pacman-init')
-	fi
+	[[ -z ${disable_systemd[@]} ]] && disable_systemd=('pacman-init')
 
 	if [[ -z ${start_openrc[@]} ]];then
 		start_openrc=('acpid' 'bluetooth' 'cgmanager' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 	fi
 
-	if [[ -z ${disable_openrc[@]} ]];then
-		disable_openrc=('pacman-init')
-	fi
+	[[ -z ${disable_openrc[@]} ]] && disable_openrc=('pacman-init')
 
 	if [[ -z ${start_systemd_live[@]} ]];then
 		start_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
