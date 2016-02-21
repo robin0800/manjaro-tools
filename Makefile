@@ -69,7 +69,6 @@ LIBS_ISO = \
 	lib/util-iso-overlayfs.sh \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
-	lib/util-live.sh \
 	lib/util-iso-boot.sh \
 	lib/util-publish.sh \
 	lib/util-iso-log.sh
@@ -93,11 +92,6 @@ CPIOINST = \
 	initcpio/inst/miso_pxe_common \
 	initcpio/inst/miso_pxe_http \
 	initcpio/inst/miso_kms
-
-SCRIPTS = \
-	data/scripts/mhwd-live \
-	data/scripts/livecd \
-	data/scripts/kbd-model-map
 
 MAN_XML = \
 	buildpkg.xml \
@@ -180,9 +174,6 @@ install_iso:
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -m0644 ${SHARED_ISO} $(DESTDIR)$(PREFIX)/share/manjaro-tools
 
-	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
-	install -m0644 ${SCRIPTS} $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts
-
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/man/man1
 	gzip -c man/buildiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
 	gzip -c man/deployiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/deployiso.1.gz
@@ -213,7 +204,6 @@ uninstall_iso:
 	for f in ${LIBS_ISO}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
 	for f in ${CPIOHOOKS}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/hooks/$$f; done
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
-	for f in ${SCRIPTS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/scripts/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/deployiso.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
