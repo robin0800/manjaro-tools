@@ -66,7 +66,7 @@ display_settings(){
 	msg2 "buildsets: %s" "$(list_sets ${sets_dir_iso})"
 	msg2 "buildset_iso: %s" "${buildset_iso}"
 	msg2 "is_buildset: %s" "${is_buildset}"
-	msg2 "run_dir: %s" "${run_dir}"
+	${verbose} && msg2 "run_dir: %s" "${run_dir}"
 
 	msg "OPTIONS:"
 	msg2 "arch: %s" "${arch}"
@@ -88,13 +88,12 @@ display_settings(){
 
 	msg "ISO SETTINGS:"
 	msg2 "iso_label: %s" "${iso_label}"
-	msg2 "iso_name: %s" "${iso_name}"
 	msg2 "iso_publisher: %s" "${iso_publisher}"
 	msg2 "iso_app_id: %s" "${iso_app_id}"
 	msg2 "iso_compression: %s" "${iso_compression}"
 	msg2 "iso_checksum: %s" "${iso_checksum}"
 	msg2 "use_overlayfs: %s" "${use_overlayfs}"
-	msg2 "iso_fs: %s" "${iso_fs}"
+	${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
 
 	msg "BUILD QUEUE:"
 	run show_profile "${buildset_iso}"
