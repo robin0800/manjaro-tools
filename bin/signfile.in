@@ -21,9 +21,9 @@ load_vars "$HOME/.makepkg.conf"
 load_vars /etc/makepkg.conf
 
 if [ ! -e "$1" ]; then
-	error "Iso %s does not exist!" "$1"
+	error "%s does not exist!" "$1"
 	exit 1
 fi
 
-msg "Signing iso %s with key %s" "$1" "${GPGKEY}..."
+msg "Signing %s with key %s" "$1" "${GPGKEY}..."
 gpg --detach-sign --use-agent -u "${GPGKEY}" "$1"

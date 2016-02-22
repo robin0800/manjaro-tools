@@ -105,7 +105,7 @@ clean_up(){
 }
 
 sign_pkg(){
-	su ${OWNER} -c "signpkg ${pkg_dir}/$1"
+	su ${OWNER} -c "signfile ${pkg_dir}/$1"
 }
 
 run_post_build(){

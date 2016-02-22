@@ -589,7 +589,7 @@ load_profile(){
 }
 
 sign_iso(){
-	su ${OWNER} -c "signiso ${iso_dir}/$1"
+	su ${OWNER} -c "signfile ${iso_dir}/$1"
 }
 
 compress_images(){

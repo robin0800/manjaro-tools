@@ -11,4 +11,4 @@
 
 version=@version@
 
-find $PWD -maxdepth 1 -name '*.pkg.tar.xz' -exec signpkg {} \;
+find $PWD -maxdepth 1 -name '*.pkg.tar.xz' -exec signfile {} \;

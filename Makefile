@@ -11,6 +11,7 @@ BIN_BASE = \
 	bin/basestrap \
 	bin/manjaro-chroot \
 	bin/fstabgen \
+	bin/signfile \
 	bin/chroot-run
 
 LIBS_BASE = \
@@ -35,7 +36,6 @@ BIN_PKG = \
 	bin/lddd \
 	bin/finddeps \
 	bin/find-libdeps \
-	bin/signpkg \
 	bin/signpkgs \
 	bin/mkchrootpkg \
 	bin/buildpkg \
@@ -61,8 +61,7 @@ SETS_ISO = \
 BIN_ISO = \
 	bin/buildiso \
 	bin/testiso \
-	bin/deployiso \
-	bin/signiso
+	bin/deployiso
 
 LIBS_ISO = \
 	lib/util-iso.sh \
