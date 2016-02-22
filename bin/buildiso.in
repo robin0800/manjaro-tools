@@ -114,6 +114,7 @@ pretend=false
 images_only=false
 iso_only=false
 verbose=false
+sign=false
 
 pacman_conf_arch='default'
 
@@ -130,6 +131,7 @@ usage() {
 	echo "                       [default: ${kernel}]"
 	echo '    -i <name>          Init system to use'
 	echo "                       [default: ${initsys}]"
+	echo '    -s                 Sign the iso'
 	echo '    -c                 Disable clean work dir'
 	echo '    -x                 Build images only'
 	echo '    -z                 Generate iso only'
@@ -144,7 +146,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:czxvqh'
+opts='p:a:b:r:t:k:i:czxsvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -155,6 +157,7 @@ while getopts "${opts}" arg; do
 		t) cache_dir_iso="$OPTARG" ;;
 		k) kernel="$OPTARG" ;;
 		i) initsys="$OPTARG" ;;
+		s) sign=true ;;
 		c) clean_first=false ;;
 		x) images_only=true ;;
 		z) iso_only=true ;;

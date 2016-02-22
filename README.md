@@ -230,6 +230,7 @@ Usage: buildiso [options]
                        [default: linux44]
     -i <name>          Init system to use
                        [default: systemd]
+    -s                 Sign the iso
     -c                 Disable clean work dir
     -x                 Build images only
     -z                 Generate iso only
