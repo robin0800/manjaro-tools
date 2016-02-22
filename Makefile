@@ -61,7 +61,8 @@ SETS_ISO = \
 BIN_ISO = \
 	bin/buildiso \
 	bin/testiso \
-	bin/deployiso
+	bin/deployiso \
+	bin/signiso
 
 LIBS_ISO = \
 	lib/util-iso.sh \
