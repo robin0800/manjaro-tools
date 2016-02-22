@@ -285,7 +285,7 @@ load_profile_config(){
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
-	[[ -z ${efi_part_size} ]] && efi_part_size="32M"
+	[[ -z ${efi_part_size} ]] && efi_part_size="31M"
 
 	[[ -z ${hostname} ]] && hostname="manjaro"
 
