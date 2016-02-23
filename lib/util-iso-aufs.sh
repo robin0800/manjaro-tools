@@ -11,19 +11,19 @@
 
 # $1: new branch
 mount_root_image(){
-	msg2 "aufs: mount [root-image] on [%s]" "${1##*/}"
+	msg2 "${iso_fs}: mount [root-image] on [%s]" "${1##*/}"
 	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
 }
 
 mount_custom_image(){
-	msg2 "aufs: mount [%s] on [%s-image]" "${1##*/}" "${custom}"
+	msg2 "${iso_fs}: mount [%s] on [%s-image]" "${1##*/}" "${custom}"
 	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro:${work_dir}/root-image=ro none "$1"
 }
 
 # $1: image path
 umount_image(){
 	if mountpoint -q "$1";then
-		msg2 "aufs: unmount %s" "${1##*/}"
+		msg2 "${iso_fs}: unmount %s" "${1##*/}"
 		umount $1
 	fi
 	find $1 -name '.wh.*' -delete &> /dev/null
