@@ -102,20 +102,7 @@ configure_services_live(){
 			done
 			info "Done configuring [%s]" "${initsys}"
 		;;
-		*)
-			info "Unsupported: [%s]!" "${initsys}"
-		;;
 	esac
-}
-
-# $1: chroot
-configure_lsb(){
-	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
-	if [ -e $1/etc/lsb-release ] ; then
-		msg2 "Configuring lsb-release"
-		sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${dist_release}/" $1/etc/lsb-release
-		sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${dist_codename}/" $1/etc/lsb-release
-	fi
 }
 
 configure_services(){
@@ -137,12 +124,7 @@ configure_services(){
 					chroot $1 systemctl enable $svc #&> /dev/null
 				fi
 			done
-			sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
-			sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
 			info "Done configuring [%s]" "${initsys}"
-		;;
-		*)
-			info "Unsupported: [%s]!" "${initsys}"
 		;;
 	esac
 }
@@ -192,15 +174,6 @@ detect_desktop_env(){
 		fi
 	done
 	msg2 "Detected: %s" "${default_desktop_file}"
-}
-
-configure_mhwd(){
-	if [[ ${arch} == "x86_64" ]];then
-		if ! ${multilib};then
-			msg2 "Disable mhwd lib32 support"
-			echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
-		fi
-	fi
 }
 
 # $1: chroot
@@ -332,6 +305,34 @@ chroot_clean(){
 	rm -rf --one-file-system "$1"
 }
 
+# $1: chroot
+configure_lsb(){
+	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
+	if [ -e $1/etc/lsb-release ] ; then
+		msg2 "Configuring lsb-release"
+		sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${dist_release}/" $1/etc/lsb-release
+		sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${dist_codename}/" $1/etc/lsb-release
+	fi
+}
+
+configure_logind(){
+	if [[ ${initsys} == 'systemd' ]];then
+		msg2 "Configuring logind"
+		local conf=$1/etc/systemd/logind.conf
+		sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
+		sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
+	fi
+}
+
+configure_mhwd(){
+	if [[ ${arch} == "x86_64" ]];then
+		if ! ${multilib};then
+			msg2 "Disable mhwd lib32 support"
+			echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
+		fi
+	fi
+}
+
 configure_sysctl(){
 	if [[ ${initsys} == 'openrc' ]];then
 		msg2 "Configuring sysctl for openrc"
@@ -353,7 +354,7 @@ configure_time(){
 # $1: chroot
 configure_systemd_live(){
 	if [[ ${initsys} == 'systemd' ]];then
-		msg2 "Configuring systemd for livecd"
+		msg2 "Configuring systemd for live session"
 		sed -i 's/#\(Storage=\)auto/\1volatile/' $1/etc/systemd/journald.conf
 		sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
 		sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' $1/etc/systemd/logind.conf
@@ -376,6 +377,7 @@ configure_root_image(){
 	configure_mhwd "$1"
 	configure_sysctl "$1"
 	configure_time "$1"
+	configure_logind "$1"
 	msg "Done configuring [root-image]"
 }
 
