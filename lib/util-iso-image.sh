@@ -46,15 +46,6 @@ gen_pw(){
 	echo $(perl -e 'print crypt($ARGV[0], "password")' ${password})
 }
 
-svc_exists(){
-	if [[ -f /etc/systemd/system/$1.service ]] || \
-	[[ -f /usr/lib/systemd/system/$1.service ]];then
-		return 0
-	else
-		return 1
-	fi
-}
-
 # $1: chroot
 configure_user(){
 	# set up user and password
@@ -103,7 +94,8 @@ configure_services_live(){
 		'systemd')
 			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd_live[@]}; do
-				if $(svc_exists $svc);then
+				if [[ -f $1/etc/systemd/system/$svc.service ]] || \
+                                [[ -f $1/usr/lib/systemd/system/$svc.service ]];then
 					msg2 "Setting %s ..." "$svc"
 					chroot $1 systemctl enable $svc #&> /dev/null
 				fi
@@ -139,7 +131,8 @@ configure_services(){
 		'systemd')
 			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd[@]}; do
-				if $(svc_exists $svc);then
+				if [[ -f $1/etc/systemd/system/$svc.service ]] || \
+                                [[ -f $1/usr/lib/systemd/system/$svc.service ]];then
 					msg2 "Setting %s ..." "$svc"
 					chroot $1 systemctl enable $svc #&> /dev/null
 				fi

@@ -16,7 +16,6 @@ error_function() {
 	# first exit all subshells, then print the error
 	if (( ! BASH_SUBSHELL )); then
 		error "A failure occurred in %s()." "$1"
-		umount_image "$1"
 		plain "Aborting..."
 	fi
 	exit 2
