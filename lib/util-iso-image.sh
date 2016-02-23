@@ -87,7 +87,7 @@ configure_services_live(){
 			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_openrc_live[@]}; do
 				msg2 "Setting %s ..." "$svc"
-				chroot $1 rc-update add $svc default &> /dev/null
+				chroot $1 rc-update add $svc default #&> /dev/null
 			done
 			info "Done configuring [%s]" "${initsys}"
 		;;
@@ -95,7 +95,7 @@ configure_services_live(){
 			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd_live[@]}; do
 				msg2 "Setting %s ..." "$svc"
-				chroot $1 systemctl enable $svc &> /dev/null
+				chroot $1 systemctl enable $svc #&> /dev/null
 			done
 			info "Done configuring [%s]" "${initsys}"
 		;;
@@ -121,7 +121,7 @@ configure_services(){
 			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_openrc[@]}; do
 				msg2 "Setting %s ..." "$svc"
-				chroot $1 rc-update add $svc default &> /dev/null
+				chroot $1 rc-update add $svc default #&> /dev/null
 			done
 			info "Done configuring [%s]" "${initsys}"
 		;;
@@ -129,7 +129,7 @@ configure_services(){
 			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd[@]}; do
 				msg2 "Setting %s ..." "$svc"
-				chroot $1 systemctl enable $svc &> /dev/null
+				chroot $1 systemctl enable $svc #&> /dev/null
 			done
 			sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
 			sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
@@ -262,14 +262,14 @@ configure_displaymanager(){
 		if [[ ${initsys} == 'openrc' ]];then
 			local conf='DISPLAYMANAGER="'${displaymanager}'"'
 			sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
-			chroot $1 rc-update add xdm default &> /dev/null
+			chroot $1 rc-update add xdm default #&> /dev/null
 		else
 			local service=${displaymanager}
 			if [[ -f $1/etc/plymouth/plymouthd.conf && \
 				-f $1/usr/lib/systemd/system/${displaymanager}-plymouth.service ]]; then
 				service=${displaymanager}-plymouth
 			fi
-			chroot $1 systemctl enable ${service} &> /dev/null
+			chroot $1 systemctl enable ${service} #&> /dev/null
 		fi
 	fi
 	msg2 "Configured: ${displaymanager}"
@@ -317,7 +317,7 @@ chroot_clean(){
 			msg2 "Deleting chroot %s ..." "$(basename "${image}")"
 			lock 9 "${image}.lock" "Locking chroot '${image}'"
 			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
-				{ type -P btrfs && btrfs subvolume delete "${image}"; } &> /dev/null
+				{ type -P btrfs && btrfs subvolume delete "${image}"; } #&> /dev/null
 			fi
 		rm -rf --one-file-system "${image}"
 		fi
@@ -430,14 +430,14 @@ chroot_create(){
 # $1: image path
 clean_up_image(){
 	msg2 "Cleaning up [%s]" "${1##*/}"
-	[[ -d "$1/boot/" ]] && find "$1/boot" -name 'initramfs*.img' -delete &> /dev/null
+	[[ -d "$1/boot/" ]] && find "$1/boot" -name 'initramfs*.img' -delete #&> /dev/null
 	[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
 	[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
 
-	find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &> /dev/null
-	find "$1/var/lib/pacman/sync" -type f -delete &> /dev/null
+	find "$1/var/lib/pacman" -maxdepth 1 -type f -delete #&> /dev/null
+	find "$1/var/lib/pacman/sync" -type f -delete #&> /dev/null
 	#find "$1/var/cache/pacman/pkg" -type f -delete &> /dev/null
-	find "$1/var/log" -type f -delete &> /dev/null
+	find "$1/var/log" -type f -delete #&> /dev/null
 	#find "$1/var/tmp" -mindepth 1 -delete &> /dev/null
 	#find "$1/tmp" -mindepth 1 -delete &> /dev/null
 

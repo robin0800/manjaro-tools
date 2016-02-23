@@ -16,6 +16,7 @@ error_function() {
 	# first exit all subshells, then print the error
 	if (( ! BASH_SUBSHELL )); then
 		error "A failure occurred in %s()." "$1"
+		umount_image "$1"
 		plain "Aborting..."
 	fi
 	exit 2
@@ -23,28 +24,29 @@ error_function() {
 
 # $1: function
 run_log(){
+	local func="$1"
 	if ${is_log};then
-		local logfile=${iso_dir}/$(gen_iso_fn).$1.log shellopts=$(shopt -p)
+		local logfile=${iso_dir}/$(gen_iso_fn).$func.log shellopts=$(shopt -p)
 		logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
 		mkfifo "$logpipe"
 		tee "$logfile" < "$logpipe" &
 		local teepid=$!
-		$1 &> "$logpipe"
+		$func &> "$logpipe"
 		wait $teepid
 		rm "$logpipe"
 		eval "$shellopts"
 	else
-		$1
+		"$func"
 	fi
 }
 
 run_safe() {
-	local restoretrap
+	local restoretrap func="$1"
 	set -e
 	set -E
 	restoretrap=$(trap -p ERR)
-	trap 'error_function $1' ERR
-	run_log "$1"
+	trap 'error_function $func' ERR
+	run_log "$func"
 	eval $restoretrap
 	set +E
 	set +e

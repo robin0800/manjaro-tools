@@ -607,26 +607,26 @@ compress_images(){
 build_images(){
 	local timer=$(get_timer)
 	load_pkgs "${profile_dir}/Packages-Root"
-	run_safe make_image_root
+	run_safe "make_image_root"
 	if [[ -f "${packages_custom}" ]] ; then
 		load_pkgs "${packages_custom}"
-		run_safe make_image_custom
+		run_safe "make_image_custom"
 	fi
 	if [[ -f ${profile_dir}/Packages-Live ]]; then
 		load_pkgs "${profile_dir}/Packages-Live"
-		run_safe make_image_live
+		run_safe "make_image_live"
 	fi
 	if [[ -f ${packages_mhwd} ]] ; then
-		load_pkgs "${profile_dir}/Packages-Mhwd"
-		run_safe make_image_mhwd
+		load_pkgs "${packages_mhwd}"
+		run_safe "make_image_mhwd"
 	fi
-	run_safe make_image_boot
+	run_safe "make_image_boot"
 	if [[ "${arch}" == "x86_64" ]]; then
-		run_safe make_efi
-		run_safe make_efiboot
+		run_safe "make_efi"
+		run_safe "make_efiboot"
 	fi
-	run_safe make_isolinux
-	run_safe make_isomounts
+	run_safe "make_isolinux"
+	run_safe "make_isomounts"
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
