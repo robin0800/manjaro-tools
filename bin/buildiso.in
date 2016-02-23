@@ -80,6 +80,7 @@ display_settings(){
 	msg2 "images_only: %s" "${images_only}"
 	msg2 "iso_only: %s" "${iso_only}"
 	msg2 "sign: %s" "${sign}"
+	msg2 "is_log: %s" "${is_log}"
 
 	msg "DIST SETTINGS:"
 	msg2 "dist_name: %s" "${dist_name}"
@@ -115,6 +116,7 @@ images_only=false
 iso_only=false
 verbose=false
 sign=false
+is_log=false
 
 pacman_conf_arch='default'
 
@@ -136,6 +138,7 @@ usage() {
 	echo '    -x                 Build images only'
 	echo '    -z                 Generate iso only'
 	echo '                       Requires pre built images (-x)'
+	echo '    -l                 Log the build process'
 	echo '    -v                 Verbose output, show profies detail (-q)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
@@ -146,7 +149,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:czxsvqh'
+opts='p:a:b:r:t:k:i:clzxsvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -161,6 +164,7 @@ while getopts "${opts}" arg; do
 		c) clean_first=false ;;
 		x) images_only=true ;;
 		z) iso_only=true ;;
+		l) is_log=true ;;
 		v) verbose=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;

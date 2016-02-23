@@ -23,15 +23,19 @@ error_function() {
 
 # $1: function
 run_log(){
-	local logfile=${iso_dir}/$(gen_iso_fn).log shellopts=$(shopt -p)
-	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
-	mkfifo "$logpipe"
-	tee "$logfile" < "$logpipe" &
-	local teepid=$!
-	$1 &> "$logpipe"
-	wait $teepid
-	rm "$logpipe"
-	eval "$shellopts"
+	if ${is_log};then
+		local logfile=${iso_dir}/$(gen_iso_fn).$1.log shellopts=$(shopt -p)
+		logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
+		mkfifo "$logpipe"
+		tee "$logfile" < "$logpipe" &
+		local teepid=$!
+		$1 &> "$logpipe"
+		wait $teepid
+		rm "$logpipe"
+		eval "$shellopts"
+	else
+		$1
+	fi
 }
 
 run_safe() {

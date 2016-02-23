@@ -13,6 +13,7 @@ import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
 import ${LIBDIR}/util-pac-conf.sh
+import ${LIBDIR}/util-iso-log.sh
 
 # $1: image path
 squash_image_dir() {
@@ -459,13 +460,15 @@ load_pkgs(){
 			| sed "$_kernel" \
 			| sed "$_clean")
 
-	if [[ ${1##*/} == 'Packages-Mhwd' ]]; then
+	if [[ $1 == "${packages_mhwd}" ]]; then
 		packages_cleanup=$(sed "$_com_rm" "$1" \
 			| grep cleanup \
 			| sed "$_purge_rm" \
 			| sed "$_kernel" \
 			| sed "$_clean")
-		[[ ${_used_kernel} < "42" ]] && packages_cleanup="$packages_cleanup xf86-video-amdgpu"
+		if [[ ${_used_kernel} < "42" ]]; then
+			packages_cleanup="$packages_cleanup xf86-video-amdgpu"
+		fi
 	fi
 }
 
@@ -604,26 +607,26 @@ compress_images(){
 build_images(){
 	local timer=$(get_timer)
 	load_pkgs "${profile_dir}/Packages-Root"
-	make_image_root
+	run_safe make_image_root
 	if [[ -f "${packages_custom}" ]] ; then
 		load_pkgs "${packages_custom}"
-		make_image_custom
+		run_safe make_image_custom
 	fi
 	if [[ -f ${profile_dir}/Packages-Live ]]; then
 		load_pkgs "${profile_dir}/Packages-Live"
-		make_image_live
+		run_safe make_image_live
 	fi
-	if [[ -f ${profile_dir}/Packages-Mhwd ]] ; then
+	if [[ -f ${packages_mhwd} ]] ; then
 		load_pkgs "${profile_dir}/Packages-Mhwd"
-		make_image_mhwd
+		run_safe make_image_mhwd
 	fi
-	make_image_boot
+	run_safe make_image_boot
 	if [[ "${arch}" == "x86_64" ]]; then
-		make_efi
-		make_efiboot
+		run_safe make_efi
+		run_safe make_efiboot
 	fi
-	make_isolinux
-	make_isomounts
+	run_safe make_isolinux
+	run_safe make_isomounts
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 

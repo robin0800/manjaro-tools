@@ -170,22 +170,24 @@ brand_calamares_settings_conf(){
 configure_calamares(){
 	msg2 "Configuring Calamares ..."
 	mkdir -p $1/etc/calamares/modules
-	write_calamares_bootloader_conf $1
-	write_calamares_unpack_conf $1
-	write_calamares_displaymanager_conf $1
-	write_calamares_initcpio_conf $1
-	brand_calamares_settings_conf $1
+	write_calamares_bootloader_conf "$1"
+	write_calamares_unpack_conf "$1"
+	write_calamares_displaymanager_conf "$1"
+	write_calamares_initcpio_conf "$1"
+	brand_calamares_settings_conf "$1"
 	if [[ ${initsys} == 'openrc' ]];then
-		write_calamares_machineid_conf $1
-		write_calamares_finished_conf $1
+		write_calamares_machineid_conf "$1"
+		write_calamares_finished_conf "$1"
 	fi
-	write_calamares_services_conf $1
-	write_calamares_users_conf $1
+	write_calamares_services_conf "$1"
+	write_calamares_users_conf "$1"
 
 	if [[ -f $1/usr/share/applications/calamares.desktop && -f $1/usr/bin/kdesu ]];then
 		sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
 	fi
-	[[ "${edition}" == 'sonar' ]] && write_calamares_branding_desc $1
+	if [[ "${edition}" == 'sonar' ]]; then
+		write_calamares_branding_desc "$1"
+	fi
 }
 
 configure_thus(){

@@ -436,10 +436,10 @@ clean_up_image(){
 
 	find "$1/var/lib/pacman" -maxdepth 1 -type f -delete &> /dev/null
 	find "$1/var/lib/pacman/sync" -type f -delete &> /dev/null
-	find "$1/var/cache/pacman/pkg" -type f -delete &> /dev/null
+	#find "$1/var/cache/pacman/pkg" -type f -delete &> /dev/null
 	find "$1/var/log" -type f -delete &> /dev/null
-	find "$1/var/tmp" -mindepth 1 -delete &> /dev/null
-	find "$1/tmp" -mindepth 1 -delete &> /dev/null
+	#find "$1/var/tmp" -mindepth 1 -delete &> /dev/null
+	#find "$1/tmp" -mindepth 1 -delete &> /dev/null
 
 # 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
 }
