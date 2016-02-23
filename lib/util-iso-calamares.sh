@@ -23,9 +23,10 @@ write_calamares_branding_desc(){
 	echo "    shortVersionedName:  ${dist_name} Linux ${dist_release}" >> $conf
 	echo "    bootloaderEntryName: ${dist_name}" >> $conf
 	echo '' >> $conf
-	echo 'images:'
+	echo 'images:' >> $conf
 	echo '    productLogo:         "squid.png"' >> $conf
 	echo '    productIcon:         "logo.png"' >> $conf
+	echo '    productWelcome:      "languages.png"' >> $conf
 	echo '' >> $conf
 	echo 'slideshow:               "show.qml"' >> $conf
 	echo 'style:' >> $conf
