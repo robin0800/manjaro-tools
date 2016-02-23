@@ -591,7 +591,7 @@ load_profile(){
 	prepare_dir "${iso_dir}"
 }
 
-sign_checksum(){
+sign_iso(){
 	su ${OWNER} -c "signfile ${iso_dir}/$1"
 }
 
@@ -599,7 +599,7 @@ compress_images(){
 	local timer=$(get_timer)
 	make_iso
 	make_checksum "${iso_file}"
-	${sign} && sign_checksum "${iso_file}.${iso_checksum}"
+	${sign} && sign_iso "${iso_file}"
 	chown -R "${OWNER}:users" "${iso_dir}"
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
