@@ -46,6 +46,15 @@ gen_pw(){
 	echo $(perl -e 'print crypt($ARGV[0], "password")' ${password})
 }
 
+svc_exists(){
+	if [[ -f /etc/systemd/system/$1.service ]] || \
+	[[ -f /usr/lib/systemd/system/$1.service ]];then
+		return 0
+	else
+		return 1
+	fi
+}
+
 # $1: chroot
 configure_user(){
 	# set up user and password
@@ -94,8 +103,10 @@ configure_services_live(){
 		'systemd')
 			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd_live[@]}; do
-				msg2 "Setting %s ..." "$svc"
-				chroot $1 systemctl enable $svc #&> /dev/null
+				if $(svc_exists $svc);then
+					msg2 "Setting %s ..." "$svc"
+					chroot $1 systemctl enable $svc #&> /dev/null
+				fi
 			done
 			info "Done configuring [%s]" "${initsys}"
 		;;
@@ -128,8 +139,10 @@ configure_services(){
 		'systemd')
 			info "Configuring [%s] ...." "${initsys}"
 			for svc in ${start_systemd[@]}; do
-				msg2 "Setting %s ..." "$svc"
-				chroot $1 systemctl enable $svc #&> /dev/null
+				if $(svc_exists $svc);then
+					msg2 "Setting %s ..." "$svc"
+					chroot $1 systemctl enable $svc #&> /dev/null
+				fi
 			done
 			sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
 			sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
