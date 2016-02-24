@@ -339,7 +339,8 @@ configure_services(){
 				if ${plymouth_boot}; then
 					#msg2 "Setting plymouth %s ...." "${plymouth_theme}"
 					sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" $1/etc/plymouth/plymouthd.conf
-					if [[ -f $1/usr/lib/systemd/system/${displaymanager}-plymouth.service ]];then
+					if [[ -f $1/etc/systemd/system/${displaymanager}-plymouth.service ]] || \
+					[[ -f $1/usr/lib/systemd/system/${displaymanager}-plymouth.service ]];then
 						service=${displaymanager}-plymouth
 					fi
 				fi
