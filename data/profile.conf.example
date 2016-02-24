@@ -2,7 +2,8 @@
 ###### use this file in the profile ######
 ##########################################
 
-# default displaymanager
+# default displaymanager: none
+# supported; lightdm, sddm, gdm, lxdm, mdm
 # displaymanager="none"
 
 # Set to false to disable autologin in the livecd
