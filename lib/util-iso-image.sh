@@ -58,77 +58,24 @@ configure_user(){
 }
 
 # $1: chroot
-configure_hostname(){
-	msg2 "Setting hostname: %s ..." "${hostname}"
-	if [[ ${initsys} == 'openrc' ]];then
-		local _hostname='hostname="'${hostname}'"'
-		sed -i -e "s|^.*hostname=.*|${_hostname}|" $1/etc/conf.d/hostname
-	else
-		echo ${hostname} > $1/etc/hostname
-	fi
-}
-
-# $1: chroot
 configure_hosts(){
 	sed -e "s|localhost.localdomain|localhost.localdomain ${hostname}|" -i $1/etc/hosts
 }
 
-# $1: chroot
-configure_plymouth(){
-	if ${plymouth_boot};then
-		msg2 "Setting plymouth %s ...." "${plymouth_theme}"
-		sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" $1/etc/plymouth/plymouthd.conf
+add_svc_rc(){
+	if [[ -f $1/etc/init.d/$2 ]];then
+		msg2 "Setting %s ..." "$2"
+		chroot $1 rc-update add $2 default #&> /dev/null
 	fi
 }
 
-configure_services_live(){
-	case ${initsys} in
-		'openrc')
-			info "Configuring [%s] ...." "${initsys}"
-			for svc in ${start_openrc_live[@]}; do
-				msg2 "Setting %s ..." "$svc"
-				chroot $1 rc-update add $svc default #&> /dev/null
-			done
-			info "Done configuring [%s]" "${initsys}"
-		;;
-		'systemd')
-			info "Configuring [%s] ...." "${initsys}"
-			for svc in ${start_systemd_live[@]}; do
-				if [[ -f $1/etc/systemd/system/$svc.service ]] || \
-                                [[ -f $1/usr/lib/systemd/system/$svc.service ]];then
-					msg2 "Setting %s ..." "$svc"
-					chroot $1 systemctl enable $svc #&> /dev/null
-				fi
-			done
-			info "Done configuring [%s]" "${initsys}"
-		;;
-	esac
+add_svc_sd(){
+	if [[ -f $1/etc/systemd/system/$2.service ]] || \
+	[[ -f $1/usr/lib/systemd/system/$2.service ]];then
+		msg2 "Setting %s ..." "$2"
+		chroot $1 systemctl enable $2 #&> /dev/null
+	fi
 }
-
-configure_services(){
-	case ${initsys} in
-		'openrc')
-			info "Configuring [%s] ...." "${initsys}"
-			for svc in ${start_openrc[@]}; do
-				msg2 "Setting %s ..." "$svc"
-				chroot $1 rc-update add $svc default #&> /dev/null
-			done
-			info "Done configuring [%s]" "${initsys}"
-		;;
-		'systemd')
-			info "Configuring [%s] ...." "${initsys}"
-			for svc in ${start_systemd[@]}; do
-				if [[ -f $1/etc/systemd/system/$svc.service ]] || \
-                                [[ -f $1/usr/lib/systemd/system/$svc.service ]];then
-					msg2 "Setting %s ..." "$svc"
-					chroot $1 systemctl enable $svc #&> /dev/null
-				fi
-			done
-			info "Done configuring [%s]" "${initsys}"
-		;;
-	esac
-}
-
 # $1: chroot
 configure_environment(){
 	case ${custom} in
@@ -174,6 +121,13 @@ detect_desktop_env(){
 		fi
 	done
 	msg2 "Detected: %s" "${default_desktop_file}"
+}
+
+set_xdm(){
+	if [[ -f $1/etc/conf.d/xdm ]];then
+		local conf='DISPLAYMANAGER="'${displaymanager}'"'
+		sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
+	fi
 }
 
 # $1: chroot
@@ -233,58 +187,41 @@ configure_displaymanager(){
 				sed -i -e "s|^.*session=.*|session=/usr/bin/$default_desktop_executable|" ${conf}
 			fi
 		;;
-		*)
-			info "Unsupported: [%s]!" "${displaymanager}"
-		;;
 	esac
-	if [[ ${displaymanager} != "none" ]];then
-		if [[ ${initsys} == 'openrc' ]];then
-			local conf='DISPLAYMANAGER="'${displaymanager}'"'
-			sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
-			chroot $1 rc-update add xdm default #&> /dev/null
-		else
-			local service=${displaymanager}
-			if [[ -f $1/etc/plymouth/plymouthd.conf && \
-				-f $1/usr/lib/systemd/system/${displaymanager}-plymouth.service ]]; then
-				service=${displaymanager}-plymouth
-			fi
-			chroot $1 systemctl enable ${service} #&> /dev/null
-		fi
-	fi
 	msg2 "Configured: ${displaymanager}"
 }
 
 # $1: chroot
 configure_mhwd_drivers(){
-	if  [ -z "$(ls $1/opt/live/pkgs/ | grep catalyst-utils 2> /dev/null)" ]; then
+	local path=$1/opt/live/pkgs/ \
+		drv_path=$1/var/lib/mhwd/db/pci/graphic_drivers
+	if  [ -z "$(ls $path | grep catalyst-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Catalyst driver"
-		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/
-		touch $1/var/lib/mhwd/db/pci/graphic_drivers/catalyst/MHWDCONFIG
+		mkdir -p $drv_path/catalyst/
+		touch $drv_path/catalyst/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/live/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
+	if  [ -z "$(ls $path | grep nvidia-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Nvidia driver"
-		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/
-		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia/MHWDCONFIG
-	fi
-	if  [ -z "$(ls $1/opt/live/pkgs/ | grep nvidia-utils 2> /dev/null)" ]; then
+		mkdir -p $drv_path/nvidia/
+		touch $drv_path/nvidia/MHWDCONFIG
 		msg2 "Disabling Nvidia Bumblebee driver"
-		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/
-		touch $1/var/lib/mhwd/db/pci/graphic_drivers/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
+		mkdir -p $drv_path/hybrid-intel-nvidia-bumblebee/
+		touch $drv_path/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/live/pkgs/ | grep nvidia-304xx-utils 2> /dev/null)" ]; then
+	if  [ -z "$(ls $path | grep nvidia-304xx-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Nvidia 304xx driver"
-		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/
-		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-304xx/MHWDCONFIG
+		mkdir -p $drv_path/nvidia-304xx/
+		touch $drv_path/nvidia-304xx/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/live/pkgs/ | grep nvidia-340xx-utils 2> /dev/null)" ]; then
+	if  [ -z "$(ls $path | grep nvidia-340xx-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Nvidia 340xx driver"
-		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/
-		touch $1/var/lib/mhwd/db/pci/graphic_drivers/nvidia-340xx/MHWDCONFIG
+		mkdir -p $drv_path/nvidia-340xx/
+		touch $drv_path/nvidia-340xx/MHWDCONFIG
 	fi
-	if  [ -z "$(ls $1/opt/live/pkgs/ | grep xf86-video-amdgpu 2> /dev/null)" ]; then
+	if  [ -z "$(ls $path | grep xf86-video-amdgpu 2> /dev/null)" ]; then
 		msg2 "Disabling AMD gpu driver"
-		mkdir -p $1/var/lib/mhwd/db/pci/graphic_drivers/xf86-video-amdgpu/
-		touch $1/var/lib/mhwd/db/pci/graphic_drivers/xf86-video-amdgpu/MHWDCONFIG
+		mkdir -p $drv_path/xf86-video-amdgpu/
+		touch $drv_path/xf86-video-amdgpu/MHWDCONFIG
 	fi
 }
 
@@ -305,6 +242,14 @@ chroot_clean(){
 	rm -rf --one-file-system "$1"
 }
 
+# Remove pamac auto-update when the network is up, it locks de pacman db when booting in the livecd
+# $1: chroot
+configure_pamac_live() {
+	if [[ -f $1/etc/NetworkManager/dispatcher.d/99_update_pamac_tray ]];then
+		rm -f $1/etc/NetworkManager/dispatcher.d/99_update_pamac_tray
+	fi
+}
+
 # $1: chroot
 configure_lsb(){
 	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
@@ -312,15 +257,6 @@ configure_lsb(){
 		msg2 "Configuring lsb-release"
 		sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${dist_release}/" $1/etc/lsb-release
 		sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${dist_codename}/" $1/etc/lsb-release
-	fi
-}
-
-configure_logind(){
-	if [[ ${initsys} == 'systemd' ]];then
-		msg2 "Configuring logind"
-		local conf=$1/etc/systemd/logind.conf
-		sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
-		sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
 	fi
 }
 
@@ -333,7 +269,33 @@ configure_mhwd(){
 	fi
 }
 
-configure_sysctl(){
+configure_systemd(){
+	if [[ ${initsys} == 'systemd' ]];then
+		msg2 "Configuring logind"
+		local conf=$1/etc/systemd/logind.conf
+		sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
+		sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
+	fi
+}
+
+# $1: chroot
+configure_systemd_live(){
+	if [[ ${initsys} == 'systemd' ]];then
+		msg2 "Configuring systemd for live session"
+		sed -i 's/#\(Storage=\)auto/\1volatile/' $1/etc/systemd/journald.conf
+		#sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
+		sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' $1/etc/systemd/logind.conf
+		#sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
+		# Prevent some services to be started in the livecd
+		echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
+		     | tee "${path}/etc/.updated" >"${path}/var/.updated"
+
+		msg2 "Setting hostname: %s ..." "${hostname}"
+		echo ${hostname} > $1/etc/hostname
+	fi
+}
+
+configure_openrc(){
 	if [[ ${initsys} == 'openrc' ]];then
 		msg2 "Configuring sysctl for openrc"
 		touch $1/etc/sysctl.conf
@@ -342,48 +304,78 @@ configure_sysctl(){
 		echo 'vm.swappiness = 30' >> ${conf}
 		echo '# Enable the SysRq key' >> ${conf}
 		echo 'kernel.sysrq = 1' >> ${conf}
+
+		rm $1/etc/runlevels/boot/hwclock
 	fi
 }
 
-configure_time(){
-    if [[ ${initsys} == 'openrc' ]];then
-        rm $1/etc/runlevels/boot/hwclock
-    fi
-}
-
 # $1: chroot
-configure_systemd_live(){
-	if [[ ${initsys} == 'systemd' ]];then
-		msg2 "Configuring systemd for live session"
-		sed -i 's/#\(Storage=\)auto/\1volatile/' $1/etc/systemd/journald.conf
-		sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
-		sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' $1/etc/systemd/logind.conf
-		sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
-		# Prevent some services to be started in the livecd
-		echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
-		     | tee "${path}/etc/.updated" >"${path}/var/.updated"
+configure_openrc_live(){
+	if [[ ${initsys} == 'openrc' ]];then
+		msg2 "Setting hostname: %s ..." "${hostname}"
+		local _hostname='hostname="'${hostname}'"'
+		sed -i -e "s|^.*hostname=.*|${_hostname}|" $1/etc/conf.d/hostname
 	fi
 }
 
-# Remove pamac auto-update when the network is up, it locks de pacman db when booting in the livecd
-# $1: chroot
-configure_pamac_live() {
-	rm -f $1/etc/NetworkManager/dispatcher.d/99_update_pamac_tray
+configure_services(){
+	info "Configuring [%s] ...." "${initsys}"
+	case ${initsys} in
+		'openrc')
+			for svc in ${start_openrc[@]}; do
+				add_svc_rc "$1" "$svc"
+			done
+			if [[ ${displaymanager} != "none" ]];then
+				set_xdm "$1"
+				add_svc_rc "$1" "xdm"
+			fi
+		;;
+		'systemd')
+			for svc in ${start_systemd[@]}; do
+				add_svc_sd "$1" "$svc"
+			done
+			if [[ ${displaymanager} != "none" ]];then
+				local service=${displaymanager}
+				if ${plymouth_boot}; then
+					#msg2 "Setting plymouth %s ...." "${plymouth_theme}"
+					sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" $1/etc/plymouth/plymouthd.conf
+					service=${displaymanager}-plymouth
+				fi
+				add_svc_sd "$1" "$service"
+			fi
+		;;
+	esac
+	info "Done configuring [%s]" "${initsys}"
+}
+
+configure_services_live(){
+	info "Configuring [%s] ...." "${initsys}"
+	case ${initsys} in
+		'openrc')
+			for svc in ${start_openrc_live[@]}; do
+				add_svc_rc "$1" "$svc"
+			done
+		;;
+		'systemd')
+			for svc in ${start_systemd_live[@]}; do
+				add_svc_sd "$1" "$svc"
+			done
+		;;
+	esac
+	info "Done configuring [%s]" "${initsys}"
 }
 
 configure_root_image(){
 	msg "Configuring [root-image]"
 	configure_lsb "$1"
 	configure_mhwd "$1"
-	configure_sysctl "$1"
-	configure_time "$1"
-	configure_logind "$1"
+	configure_openrc "$1"
+	configure_systemd "$1"
 	msg "Done configuring [root-image]"
 }
 
 configure_custom_image(){
 	msg "Configuring [%s-image]" "${custom}"
-	configure_plymouth "$1"
 	configure_displaymanager "$1"
 	configure_services "$1"
 	configure_environment "$1"
@@ -392,12 +384,12 @@ configure_custom_image(){
 
 configure_live_image(){
 	msg "Configuring [live-image]"
-	configure_hostname "$1"
 	configure_hosts "$1"
 	configure_accountsservice "$1" "${username}"
 	configure_user "$1"
 	configure_services_live "$1"
 	configure_systemd_live "$1"
+	configure_openrc_live "$1"
 	configure_calamares "$1"
 	configure_thus "$1"
 	configure_pamac_live "$1"
