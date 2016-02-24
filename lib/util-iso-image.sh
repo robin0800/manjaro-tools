@@ -65,7 +65,7 @@ configure_hosts(){
 add_svc_rc(){
 	if [[ -f $1/etc/init.d/$2 ]];then
 		msg2 "Setting %s ..." "$2"
-		chroot $1 rc-update add $2 default #&> /dev/null
+		chroot $1 rc-update add $2 default &>/dev/null
 	fi
 }
 
@@ -73,7 +73,7 @@ add_svc_sd(){
 	if [[ -f $1/etc/systemd/system/$2.service ]] || \
 	[[ -f $1/usr/lib/systemd/system/$2.service ]];then
 		msg2 "Setting %s ..." "$2"
-		chroot $1 systemctl enable $2 #&> /dev/null
+		chroot $1 systemctl enable $2 &>/dev/null
 	fi
 }
 # $1: chroot
