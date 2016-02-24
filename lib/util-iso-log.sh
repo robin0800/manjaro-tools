@@ -25,15 +25,16 @@ error_function() {
 run_log(){
 	local func="$1"
 	if ${is_log};then
-		local logfile=${iso_dir}/$(gen_iso_fn).$func.log shellopts=$(shopt -p)
+		local tmpfile=/tmp/$(gen_iso_fn).$func.log logfile=${iso_dir}/$func.log
 		logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
 		mkfifo "$logpipe"
-		tee "$logfile" < "$logpipe" &
+		tee "$tmpfile" < "$logpipe" &
 		local teepid=$!
 		$func &> "$logpipe"
 		wait $teepid
 		rm "$logpipe"
-		eval "$shellopts"
+		cat $tmpfile | perl -pe 's/\e\[?.*?[\@-~]//g' > $logfile
+		rm "$tmpfile"
 	else
 		"$func"
 	fi
