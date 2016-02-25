@@ -445,3 +445,10 @@ clean_up_image(){
 
 # 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
 }
+
+clean_up_mhwd_image(){
+	msg2 "Cleaning up [%s]" "${1##*/}"
+	rm -r $1/var
+	rm -rf "$1/etc"
+	rm -f "$1/cache-packages.txt"
+}

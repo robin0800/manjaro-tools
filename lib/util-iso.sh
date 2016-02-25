@@ -148,11 +148,11 @@ make_image_root() {
 
 make_image_custom() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [%s installation] (%s-image)" "${custom}" "${custom}"
+		msg "Prepare [Desktop installation] (%s-image)" "${custom}"
 		local path="${work_dir}/${custom}-image"
 		mkdir -p ${path}
 
-		mount_root_image "${path}"
+		mount_image "${path}"
 
 		chroot_create "${path}" "${packages}"
 
@@ -166,21 +166,25 @@ make_image_custom() {
 
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [%s installation] (%s-image)" "${custom}" "${custom}"
+		msg "Done [Desktop installation] (%s-image)" "${custom}"
+	fi
+}
+
+mount_image_select(){
+	if [[ -f "${packages_custom}" ]]; then
+		mount_image_custom "$1"
+	else
+		mount_image "$1"
 	fi
 }
 
 make_image_live() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [live installation] (live-image)"
+		msg "Prepare [Live installation] (live-image)"
 		local path="${work_dir}/live-image"
 		mkdir -p ${path}
 
-		if [[ -n "${custom}" ]] ; then
-			mount_custom_image "${path}"
-		else
-			mount_root_image "${path}"
-		fi
+		mount_image_select "${path}"
 
 		chroot_create "${path}" "${packages}"
 
@@ -196,7 +200,7 @@ make_image_live() {
 		rm -rf "${path}/etc/pacman.d/gnupg"
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [live-image]"
+		msg "Done [Live installation] (live-image)"
 	fi
 }
 
@@ -206,11 +210,7 @@ make_image_mhwd() {
 		local path="${work_dir}/mhwd-image"
 		mkdir -p ${path}/opt/live/pkgs
 
-		if [[ -n "${custom}" ]] ; then
-			mount_custom_image "${path}"
-		else
-			mount_root_image "${path}"
-		fi
+		mount_image_select "${path}"
 
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
@@ -229,9 +229,7 @@ make_image_mhwd() {
 
 		umount_image "${path}"
 
-		rm -r ${path}/var
-		rm -rf "${path}/etc"
-		rm -f "${path}/cache-packages.txt"
+		clean_up_mhwd_image "${path}"
 
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [drivers repository] (mhwd-image)"
@@ -248,11 +246,7 @@ make_image_boot() {
 		local path="${work_dir}/boot-image"
 		mkdir -p ${path}
 
-		if [[ -n "${custom}" ]] ; then
-			mount_custom_image "${path}"
-		else
-			mount_root_image "${path}"
-		fi
+		mount_image_select "${path}"
 
 		copy_initcpio "${profile_dir}" "${path}"
 
@@ -467,10 +461,10 @@ check_custom_pacman_conf(){
 	fi
 }
 
-eval_custom(){
+get_custom(){
 	local name=${1##*/}
 	name=${name#*-}
-	custom=${name,,}
+	echo ${name,,}
 }
 
 # $1: profile
@@ -506,7 +500,7 @@ check_profile_sanity(){
 		esac
 	done
 
-	eval_custom "${packages_custom}"
+	custom=$(get_custom "${packages_custom}")
 
 	[[ -f "$1/Packages-Mhwd" ]] && packages_mhwd=$1/Packages-Mhwd
 }

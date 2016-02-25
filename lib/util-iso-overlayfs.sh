@@ -10,21 +10,21 @@
 # GNU General Public License for more details.
 
 # $1: new branch
-mount_root_image(){
-	msg2 "${iso_fs}: mount [root-image] on [%s]" "${1##*/}"
+mount_image(){
+	msg2 "%s mount: %s" "${iso_fs}" "${1##*/}"
 	mkdir -p "${work_dir}/work"
 	mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
 }
 
-mount_custom_image(){
-	msg2 "${iso_fs}: mount [%s] on [%s-image]" "${1##*/}" "${custom}"
+mount_image_custom(){
+	msg2 "%s mount: %s" "${iso_fs}" "${1##*/}"
 	mkdir -p "${work_dir}/work"
 	mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
 }
 
 umount_image(){
 	if mountpoint -q "$1";then
-		msg2 "${iso_fs}: unmount %s" "${1##*/}"
+		msg2 "%s umount: %s" "${iso_fs}" "${1##*/}"
 		umount $1
 		rm -rf "${work_dir}/work"
 	fi
