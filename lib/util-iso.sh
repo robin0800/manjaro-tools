@@ -594,6 +594,8 @@ load_profile(){
 
 	load_profile_config "$conf"
 
+	check_custom_pacman_conf
+
 	iso_file=$(gen_iso_fn).iso
 
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
@@ -610,7 +612,6 @@ prepare_profile(){
 	profile_dir=${run_dir}/${edition}/${profile}
 	check_profile
 	load_profile
-	check_custom_pacman_conf
 }
 
 build(){
