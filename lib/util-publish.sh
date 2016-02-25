@@ -24,6 +24,7 @@ create_subtree(){
 }
 
 prepare_transfer(){
+	edition=$(get_edition $1)
 	remote_dir="${edition}/$1/${dist_release}/${arch}"
 	src_dir="${run_dir}/${remote_dir}"
 }
@@ -54,7 +55,6 @@ create_torrent(){
 }
 
 sync_dir(){
-	eval_edition "$1"
 	prepare_transfer "$1"
 	${torrent_create} && create_torrent "$1"
 	${remote_create} && create_subtree "$1"

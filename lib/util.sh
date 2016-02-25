@@ -28,7 +28,6 @@ list_sets(){
 	echo $prof
 }
 
-
 # $1: sets_dir
 # $2: buildset
 eval_buildset(){
@@ -39,11 +38,11 @@ eval_buildset(){
 	${is_buildset} && read_set $1/$2
 }
 
-eval_edition(){
+get_edition(){
 	local result=$(find ${run_dir} -maxdepth 2 -name "$1") path
 	[[ -z $result ]] && die "%s is not a valid profile or buildset!" "$1"
 	path=${result%/*}
-	edition=${path##*/}
+	echo ${path##*/}
 }
 
 get_timer(){

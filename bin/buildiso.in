@@ -20,8 +20,7 @@ SYSCONFDIR='@sysconfdir@'
 import ${LIBDIR}/util.sh
 
 show_profile(){
-	eval_edition "$1"
-	load_profile "${run_dir}/${edition}/$1"
+	prepare_profile "$1"
 	if ${verbose};then
 		msg2 "work_dir: %s" "${work_dir}"
 		msg2 "iso_dir: %s" "${iso_dir}"
@@ -190,4 +189,4 @@ check_requirements
 
 ${pretend} && display_settings && exit 1
 
-run make_profile "${buildset_iso}"
+run build "${buildset_iso}"

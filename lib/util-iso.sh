@@ -42,9 +42,9 @@ squash_image_dir() {
 	msg2 "Creating SquashFS image. This may take some time..."
 	local used_kernel=$(echo ${kernel} | cut -c 6)
 	if [[ "${1##*/}" == "mhwd-image" && ${used_kernel} -ge "4" ]]; then
-		mksquashfs "${1}" "${sq_img}" -noappend -comp lz4 || die "Exit ..."
+		mksquashfs "${1}" "${sq_img}" -noappend -comp lz4
 	else
-		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp} || die "Exit ..."
+		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp}
 	fi
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
@@ -93,7 +93,7 @@ make_iso() {
 
 	msg "Making bootable image"
 	# Sanity checks
-	[[ ! -d "${work_dir}/iso" ]] && die "[%s/iso] doesn't exist. What did you do?!" "${work_dir}"
+	[[ ! -d "${work_dir}/iso" ]] && return 1
 	if [[ -f "${iso_dir}/${iso_file}" ]]; then
 		msg2 "Removing existing bootable image..."
 		rm -rf "${iso_dir}/${iso_file}"
@@ -134,10 +134,7 @@ make_image_root() {
 		local path="${work_dir}/root-image"
 		mkdir -p ${path}
 
-		if ! chroot_create "${path}" "${packages}"; then
-			umount_image "${path}"
-			die "Exit %s" "${FUNCNAME}"
-		fi
+		chroot_create "${path}" "${packages}"
 
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		copy_overlay "${profile_dir}/root-overlay" "${path}"
@@ -157,10 +154,7 @@ make_image_custom() {
 
 		mount_root_image "${path}"
 
-		if ! chroot_create "${path}" "${packages}"; then
-			umount_image "${path}"
-			die "Exit %s" "${FUNCNAME}"
-		fi
+		chroot_create "${path}" "${packages}"
 
 		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
 		cp "${path}/${custom}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
@@ -188,10 +182,7 @@ make_image_live() {
 			mount_root_image "${path}"
 		fi
 
-		if ! chroot_create "${path}" "${packages}"; then
-			umount_image "${path}"
-			die "Exit %s" "${FUNCNAME}"
-		fi
+		chroot_create "${path}" "${packages}"
 
 		pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
 		copy_overlay "${profile_dir}/live-overlay" "${path}"
@@ -223,10 +214,7 @@ make_image_mhwd() {
 
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
-		if ! download_to_cache "${path}" "${packages}"; then
-			umount_image "${path}"
-			die "Exit %s" "${FUNCNAME}"
-		fi
+		download_to_cache "${path}" "${packages}"
 
 		copy_cache_mhwd "${work_dir}/mhwd-image"
 
@@ -266,12 +254,9 @@ make_image_boot() {
 			mount_root_image "${path}"
 		fi
 
-		copy_initcpio "${profile_dir}" "${path}" || die "Failed to copy initcpio."
+		copy_initcpio "${profile_dir}" "${path}"
 
-		if ! gen_boot_image "${path}"; then
-			umount_image "${path}"
-			die "Exit %s" "${FUNCNAME}"
-		fi
+		gen_boot_image "${path}"
 
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
@@ -570,41 +555,20 @@ check_profile_vars(){
 	fi
 }
 
-# $1: profile
-load_profile(){
-	profile_dir=$1
-	local prof=${1##*/}
-	info "Profile: [%s]" "$prof"
-	check_profile_sanity "${profile_dir}"
-	load_profile_config "${profile_dir}/profile.conf" || die "%s is not a valid profile!" "${profile_dir}"
-	check_profile_vars
-
-	iso_file=$(gen_iso_fn).iso
-
-	check_custom_pacman_conf "${profile_dir}"
-
-	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
-	work_dir=${chroots_iso}/$prof/${arch}
-
-	iso_dir="${cache_dir_iso}/${edition}/$prof/${dist_release}/${arch}"
-
-	prepare_dir "${iso_dir}"
-}
-
 sign_iso(){
 	su ${OWNER} -c "signfile ${iso_dir}/$1"
 }
 
 compress_images(){
 	local timer=$(get_timer)
-	make_iso
+	run_safe "make_iso"
 	make_checksum "${iso_file}"
 	${sign} && sign_iso "${iso_file}"
 	chown -R "${OWNER}:users" "${iso_dir}"
-	show_elapsed_time "${FUNCNAME}" "${timer_start}"
+	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
-build_images(){
+prepare_images(){
 	local timer=$(get_timer)
 	load_pkgs "${profile_dir}/Packages-Root"
 	run_safe "make_image_root"
@@ -627,13 +591,10 @@ build_images(){
 	fi
 	run_safe "make_isolinux"
 	run_safe "make_isomounts"
-	show_elapsed_time "${FUNCNAME}" "${timer_start}"
+	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
 make_profile(){
-	eval_edition "$1"
-	load_profile "${run_dir}/${edition}/$1"
-
 	msg "Start building [%s]" "$1"
 	import ${LIBDIR}/util-iso-${iso_fs}.sh
 	${clean_first} && chroot_clean "${work_dir}"
@@ -643,14 +604,45 @@ make_profile(){
 		exit 1
 	fi
 	if ${images_only}; then
-		build_images
+		prepare_images
 		warning "Continue compress: buildiso -p %s -zc ..." "$1"
 		exit 1
 	else
-		build_images
+		prepare_images
 		compress_images
 	fi
 	unset_profile
 	msg "Finished building [%s]" "$1"
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
+}
+
+# $1: profile
+load_profile(){
+	profile_dir=$1
+	local prof=${1##*/}
+	info "Profile: [%s]" "$prof"
+	check_profile_sanity "${profile_dir}"
+	load_profile_config "${profile_dir}/profile.conf" || die "%s is not a valid profile!" "${profile_dir}"
+	check_profile_vars
+
+	iso_file=$(gen_iso_fn).iso
+
+	check_custom_pacman_conf "${profile_dir}"
+
+	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
+	work_dir=${chroots_iso}/$prof/${arch}
+
+	iso_dir="${cache_dir_iso}/${edition}/$prof/${dist_release}/${arch}"
+
+	prepare_dir "${iso_dir}"
+}
+
+prepare_profile(){
+	edition=$(get_edition $1)
+	load_profile "${run_dir}/${edition}/$1"
+}
+
+build(){
+	prepare_profile "$1"
+	make_profile "$1"
 }

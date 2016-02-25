@@ -18,26 +18,25 @@ error_function() {
 		error "A failure occurred in %s()." "$1"
 		plain "Aborting..."
 	fi
+	for mp in ${work_dir}/{root,${custom},live,mhwd,boot}-image;do
+            umount_image "$mp"
+        done
 	exit 2
 }
 
 # $1: function
 run_log(){
 	local func="$1"
-	if ${is_log};then
-		local tmpfile=/tmp/$(gen_iso_fn).$func.log logfile=${iso_dir}/$func.log
-		logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
-		mkfifo "$logpipe"
-		tee "$tmpfile" < "$logpipe" &
-		local teepid=$!
-		$func &> "$logpipe"
-		wait $teepid
-		rm "$logpipe"
-		cat $tmpfile | perl -pe 's/\e\[?.*?[\@-~]//g' > $logfile
-		rm "$tmpfile"
-	else
-		"$func"
-	fi
+	local tmpfile=/tmp/$(gen_iso_fn).$func.log logfile=${iso_dir}/$func.log
+	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
+	mkfifo "$logpipe"
+	tee "$tmpfile" < "$logpipe" &
+	local teepid=$!
+	$func &> "$logpipe"
+	wait $teepid
+	rm "$logpipe"
+	cat $tmpfile | perl -pe 's/\e\[?.*?[\@-~]//g' > $logfile
+	rm "$tmpfile"
 }
 
 run_safe() {
@@ -46,7 +45,13 @@ run_safe() {
 	set -E
 	restoretrap=$(trap -p ERR)
 	trap 'error_function $func' ERR
-	run_log "$func"
+
+	if ${is_log};then
+		run_log "$func"
+	else
+		"$func"
+	fi
+
 	eval $restoretrap
 	set +E
 	set +e

@@ -235,6 +235,7 @@ Usage: buildiso [options]
     -x                 Build images only
     -z                 Generate iso only
                        Requires pre built images (-x)
+    -l                 Log the build process
     -v                 Verbose output, show profies detail (-q)
     -q                 Query settings and pretend build
     -h                 This help
