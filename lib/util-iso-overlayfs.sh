@@ -19,7 +19,7 @@ mount_image(){
 mount_image_custom(){
 	msg2 "%s mount: %s" "${iso_fs}" "${1##*/}"
 	mkdir -p "${work_dir}/work"
-	mount -t overlay overlay -olowerdir="${work_dir}/${custom}-image":"${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
+	mount -t overlay overlay -olowerdir="${work_dir}/${profile}-image":"${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
 }
 
 umount_image(){

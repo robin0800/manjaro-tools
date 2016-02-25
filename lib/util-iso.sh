@@ -116,8 +116,8 @@ make_checksum(){
 gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
-	[[ -n ${custom} ]] && vars+=("${custom}")
-	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
+# 	[[ -n ${profile} ]] && vars+=("${profile}")
+# 	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
 	vars+=("${arch}")
@@ -148,17 +148,17 @@ make_image_root() {
 
 make_image_custom() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Prepare [Desktop installation] (%s-image)" "${custom}"
-		local path="${work_dir}/${custom}-image"
+		msg "Prepare [Desktop installation] (%s-image)" "${profile}"
+		local path="${work_dir}/${profile}-image"
 		mkdir -p ${path}
 
 		mount_image "${path}"
 
 		chroot_create "${path}" "${packages}"
 
-		pacman -Qr "${path}" > "${path}/${custom}-image-pkgs.txt"
-		cp "${path}/${custom}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
-		[[ -e ${profile_dir}/${custom}-overlay ]] && copy_overlay "${profile_dir}/${custom}-overlay" "${path}"
+		pacman -Qr "${path}" > "${path}/${profile}-image-pkgs.txt"
+		cp "${path}/${profile}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
+		[[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
@@ -166,7 +166,7 @@ make_image_custom() {
 
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done [Desktop installation] (%s-image)" "${custom}"
+		msg "Done [Desktop installation] (%s-image)" "${profile}"
 	fi
 }
 
@@ -461,12 +461,6 @@ check_custom_pacman_conf(){
 	fi
 }
 
-get_custom(){
-	local name=${1##*/}
-	name=${name#*-}
-	echo ${name,,}
-}
-
 check_profile(){
 	local keyfiles=("${profile_dir}/mkinitcpio.conf"
 			"${profile_dir}/Packages-Root"
@@ -503,8 +497,6 @@ check_profile(){
 			*) packages_custom="$f" ;;
 		esac
 	done
-
-	custom=$(get_custom "${packages_custom}")
 
 	[[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
 }

@@ -17,7 +17,7 @@ mount_image(){
 
 mount_image_custom(){
 	msg2 "%s mount: %s" "${iso_fs}" "${1##*/}"
-	mount -t aufs -o br="$1":${work_dir}/${custom}-image=ro:${work_dir}/root-image=ro none "$1"
+	mount -t aufs -o br="$1":${work_dir}/${profile}-image=ro:${work_dir}/root-image=ro none "$1"
 }
 
 # $1: image path

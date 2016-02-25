@@ -277,8 +277,8 @@ write_isomounts(){
 		echo "${arch}/mhwd-image.sqfs ${arch} / squashfs" >> ${file}
 	fi
 	if [[ -f "${packages_custom}" ]] ; then
-		msg2 "Writing %s entry ..." "${custom}"
-		echo "${arch}/${custom}-image.sqfs ${arch} / squashfs" >> ${file}
+		msg2 "Writing %s entry ..." "${profile}"
+		echo "${arch}/${profile}-image.sqfs ${arch} / squashfs" >> ${file}
 	fi
 	msg2 "Writing root entry ..."
 	echo "${arch}/root-image.sqfs ${arch} / squashfs" >> ${file}

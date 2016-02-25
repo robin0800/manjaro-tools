@@ -21,8 +21,8 @@ copy_overlay(){
 write_profile_conf_entries(){
 	local conf=$1/profile.conf
 	echo '' >> ${conf}
-	echo '# custom image name' >> ${conf}
-	echo "custom=${custom}" >> ${conf}
+	echo '# profile image name' >> ${conf}
+	echo "profile=${profile}" >> ${conf}
 	echo '' >> ${conf}
 	echo '# iso_name' >> ${conf}
 	echo "iso_name=${iso_name}" >> ${conf}
@@ -78,7 +78,7 @@ add_svc_sd(){
 }
 # $1: chroot
 configure_environment(){
-	case ${custom} in
+	case ${profile} in
 		cinnamon|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce|xfce-minimal)
 			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 		;;
@@ -377,11 +377,11 @@ configure_root_image(){
 }
 
 configure_custom_image(){
-	msg "Configuring [%s-image]" "${custom}"
+	msg "Configuring [%s-image]" "${profile}"
 	configure_displaymanager "$1"
 	configure_services "$1"
 	configure_environment "$1"
-	msg "Done configuring [%s-image]" "${custom}"
+	msg "Done configuring [%s-image]" "${profile}"
 }
 
 configure_live_image(){

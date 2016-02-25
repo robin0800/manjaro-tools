@@ -18,7 +18,7 @@ error_function() {
 		error "A failure occurred in %s()." "$1"
 		plain "Aborting..."
 	fi
-	for mp in ${work_dir}/{root,${custom},live,mhwd,boot}-image;do
+	for mp in ${work_dir}/{root,${profile},live,mhwd,boot}-image;do
             umount_image "$mp"
         done
 	exit 2

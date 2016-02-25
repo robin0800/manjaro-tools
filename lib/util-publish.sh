@@ -33,7 +33,7 @@ gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
 	[[ -n ${1} ]] && vars+=("${1}")
-	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
+	#[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
 	vars+=("${arch}")

@@ -137,7 +137,7 @@ write_calamares_unpack_conf(){
 	echo "    -   source: \"/bootmnt/${iso_name}/${arch}/root-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
-	echo "    -   source: \"/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs\"" >> "$conf"
+	echo "    -   source: \"/bootmnt/${iso_name}/${arch}/${profile}-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
 }
@@ -160,8 +160,8 @@ write_calamares_users_conf(){
 brand_calamares_settings_conf(){
 	local conf="$1/usr/share/calamares/settings.conf"
 	if [[ -f $conf ]];then
-		if [[ -d $1/usr/share/calamares/branding/${iso_name}-${custom} ]];then
-			sed -i -e "s|^.*branding:.*|branding: ${iso_name}-${custom}|" "$conf"
+		if [[ -d $1/usr/share/calamares/branding/${iso_name}-${profile} ]];then
+			sed -i -e "s|^.*branding:.*|branding: ${iso_name}-${profile}|" "$conf"
 		elif [[ -d $1/usr/share/calamares/branding/${iso_name} ]];then
 			sed -i -e "s|^.*branding:.*|branding: ${iso_name}|" "$conf"
 		fi
@@ -201,7 +201,7 @@ configure_thus(){
 	echo "SHORT_NAME = \"${dist_name}\"" >> "$conf"
 	echo "[install]" >> "$conf"
 	echo "LIVE_MEDIA_SOURCE = \"/bootmnt/${iso_name}/${arch}/root-image.sqfs\"" >> "$conf"
-	echo "LIVE_MEDIA_DESKTOP = \"/bootmnt/${iso_name}/${arch}/${custom}-image.sqfs\"" >> "$conf"
+	echo "LIVE_MEDIA_DESKTOP = \"/bootmnt/${iso_name}/${arch}/${profile}-image.sqfs\"" >> "$conf"
 	echo "LIVE_MEDIA_TYPE = \"squashfs\"" >> "$conf"
 	echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
 	echo "KERNEL = \"${kernel}\"" >> "$conf"
