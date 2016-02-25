@@ -298,12 +298,14 @@ load_profile_config(){
 	[[ -z ${displaymanager} ]] && displaymanager="none"
 
 	[[ -z ${autologin} ]] && autologin="true"
+	[[ ${displaymanager} == 'none' ]] && autologin="false"
 
 	[[ -z ${multilib} ]] && multilib="true"
 
 	[[ -z ${pxe_boot} ]] && pxe_boot="true"
 
 	[[ -z ${plymouth_boot} ]] && plymouth_boot="true"
+	[[ ${initsys} == 'openrc' ]] && plymouth_boot="false"
 
 	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
 
