@@ -262,6 +262,31 @@ unset_profile(){
 	unset packages_mhwd
 }
 
+is_valid_bool(){
+	case $1 in
+		'true'|'false') return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+check_profile_vars(){
+	if ! is_valid_bool "${autologin}";then
+		die "autologin only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${multilib}";then
+		die "multilib only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${nonfree_xorg}";then
+		die "nonfree_xorg only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${plymouth_boot}";then
+		die "plymouth_boot only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${pxe_boot}";then
+		die "pxe_boot only accepts true/false value!"
+	fi
+}
+
 load_profile_config(){
 
 	[[ -f $1 ]] || return 1
@@ -317,6 +342,8 @@ load_profile_config(){
 	if [[ -z ${start_openrc_live[@]} ]];then
 		start_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
 	fi
+
+	check_profile_vars
 
 	return 0
 }
@@ -399,13 +426,6 @@ create_min_fs(){
 	mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
 	mkdir -m 1777 -p $1/tmp
 	mkdir -m 0555 -p $1/{sys,proc}
-}
-
-is_valid_bool(){
-	case $1 in
-		'true'|'false') return 0 ;;
-		*) return 1 ;;
-	esac
 }
 
 is_valid_init(){

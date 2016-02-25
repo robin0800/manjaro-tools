@@ -452,8 +452,8 @@ load_pkgs(){
 }
 
 check_custom_pacman_conf(){
-	if [[ -f $1/pacman-${pacman_conf_arch}.conf ]]; then
-		pacman_conf="$1/pacman-${pacman_conf_arch}.conf"
+	if [[ -f ${profile_dir}/pacman-${pacman_conf_arch}.conf ]]; then
+		pacman_conf="${profile_dir}/pacman-${pacman_conf_arch}.conf"
 		is_custom_pac_conf=true
 	else
 		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
@@ -467,10 +467,14 @@ get_custom(){
 	echo ${name,,}
 }
 
-# $1: profile
-check_profile_sanity(){
-	local keyfiles=("$1/profile.conf" "$1/mkinitcpio.conf" "$1/Packages-Root" "$1/Packages-Live")
-	local keydirs=("$1/root-overlay" "$1/live-overlay")
+check_profile(){
+	local keyfiles=("${profile_dir}/mkinitcpio.conf"
+			"${profile_dir}/Packages-Root"
+			"${profile_dir}/Packages-Live")
+
+	local keydirs=("${profile_dir}/root-overlay"
+			"${profile_dir}/live-overlay")
+
 	local has_keyfiles=false has_keydirs=false
 	for f in ${keyfiles[@]}; do
 		if [[ -f $f ]];then
@@ -489,20 +493,20 @@ check_profile_sanity(){
 		fi
 	done
 	if ! ${has_keyfiles} && ! ${has_keydirs};then
-		die "Profile [%s] sanity check failed!" "$1"
+		die "Profile [%s] sanity check failed!" "${profile_dir}"
 	fi
 
-	local files=$(ls $1/Packages*)
+	local files=$(ls ${profile_dir}/Packages*)
 	for f in ${files[@]};do
 		case $f in
-			$1/Packages-Root|$1/Packages-Live|$1/Packages-Mhwd) continue ;;
+			${profile_dir}/Packages-Root|${profile_dir}/Packages-Live|${profile_dir}/Packages-Mhwd) continue ;;
 			*) packages_custom="$f" ;;
 		esac
 	done
 
 	custom=$(get_custom "${packages_custom}")
 
-	[[ -f "$1/Packages-Mhwd" ]] && packages_mhwd=$1/Packages-Mhwd
+	[[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
 }
 
 check_requirements(){
@@ -528,24 +532,6 @@ check_requirements(){
 		iso_fs="overlayfs"
 	else
 		iso_fs="aufs"
-	fi
-}
-
-check_profile_vars(){
-	if ! is_valid_bool "${autologin}";then
-		die "autologin only accepts true/false value!"
-	fi
-	if ! is_valid_bool "${multilib}";then
-		die "multilib only accepts true/false value!"
-	fi
-	if ! is_valid_bool "${nonfree_xorg}";then
-		die "nonfree_xorg only accepts true/false value!"
-	fi
-	if ! is_valid_bool "${plymouth_boot}";then
-		die "plymouth_boot only accepts true/false value!"
-	fi
-	if ! is_valid_bool "${pxe_boot}";then
-		die "pxe_boot only accepts true/false value!"
 	fi
 }
 
@@ -589,54 +575,53 @@ prepare_images(){
 }
 
 make_profile(){
-	msg "Start building [%s]" "$1"
+	msg "Start building [%s]" "${profile}"
 	import ${LIBDIR}/util-iso-${iso_fs}.sh
 	${clean_first} && chroot_clean "${work_dir}"
 	if ${iso_only}; then
-		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -x" "$1"
+		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -x" "${profile}"
 		compress_images
 		exit 1
 	fi
 	if ${images_only}; then
 		prepare_images
-		warning "Continue compress: buildiso -p %s -zc ..." "$1"
+		warning "Continue compress: buildiso -p %s -zc ..." "${profile}"
 		exit 1
 	else
 		prepare_images
 		compress_images
 	fi
 	unset_profile
-	msg "Finished building [%s]" "$1"
+	msg "Finished building [%s]" "${profile}"
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
-# $1: profile
 load_profile(){
-	profile_dir=$1
-	local prof=${1##*/}
-	info "Profile: [%s]" "$prof"
-	check_profile_sanity "${profile_dir}"
-	load_profile_config "${profile_dir}/profile.conf" || die "%s is not a valid profile!" "${profile_dir}"
-	check_profile_vars
+	conf="${profile_dir}/profile.conf"
+	info "Profile: [%s]" "${profile}"
+
+	load_profile_config "$conf"
 
 	iso_file=$(gen_iso_fn).iso
 
-	check_custom_pacman_conf "${profile_dir}"
-
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
-	work_dir=${chroots_iso}/$prof/${arch}
+	work_dir=${chroots_iso}/${profile}/${arch}
 
-	iso_dir="${cache_dir_iso}/${edition}/$prof/${dist_release}/${arch}"
+	iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}/${arch}"
 
 	prepare_dir "${iso_dir}"
 }
 
 prepare_profile(){
-	edition=$(get_edition $1)
-	load_profile "${run_dir}/${edition}/$1"
+	profile=$1
+	edition=$(get_edition ${profile})
+	profile_dir=${run_dir}/${edition}/${profile}
+	check_profile
+	load_profile
+	check_custom_pacman_conf
 }
 
 build(){
 	prepare_profile "$1"
-	make_profile "$1"
+	make_profile
 }
