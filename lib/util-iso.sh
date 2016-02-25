@@ -116,8 +116,8 @@ make_checksum(){
 gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
-# 	[[ -n ${profile} ]] && vars+=("${profile}")
-# 	[[ ${edition} == 'minimal' ]] && vars+=("${edition}")
+	[[ -n ${profile} ]] && vars+=("${profile}")
+	[[ ${edition} == 'community' ]] && vars+=("${edition}")
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
 	vars+=("${arch}")
