@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 copy_overlay(){
-	msg2 "Copying %s ..." "${1##*/}"
+	msg2 "Copying [%s] ..." "${1##*/}"
 	if [[ -L $1 ]];then
 		cp -a --no-preserve=ownership $1/* $2
 	else
@@ -49,7 +49,7 @@ gen_pw(){
 # $1: chroot
 configure_user(){
 	# set up user and password
-	msg2 "Creating user: %s password: %s ..." "${username}" "${password}"
+	msg2 "Creating user: [%s] password: [%s] ..." "${username}" "${password}"
 	if [[ -n ${password} ]];then
 		chroot $1 useradd -m -G ${addgroups} -p $(gen_pw) ${username}
 	else
@@ -88,7 +88,7 @@ configure_environment(){
 # $1: chroot
 # $2: user
 configure_accountsservice(){
-	msg2 "Configuring AccountsService ..."
+	msg2 "Configuring Accountsservice ..."
 	local path=$1/var/lib/AccountsService/users
 	if [ -d "${path}" ] ; then
 		echo "[User]" > ${path}/$2
@@ -230,7 +230,7 @@ chroot_clean(){
 		[[ -d ${image} ]] || continue
 		local name=${image##*/}
 		if [[ $name != "mhwd-image" ]];then
-			msg2 "Deleting chroot %s ..." "$name"
+			msg2 "Deleting chroot [%s] ..." "$name"
 			lock 9 "${image}.lock" "Locking chroot '${image}'"
 			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
 				{ type -P btrfs && btrfs subvolume delete "${image}"; } #&> /dev/null
@@ -388,8 +388,8 @@ configure_custom_image(){
 configure_live_image(){
 	msg "Configuring [live-image]"
 	configure_hosts "$1"
-	configure_accountsservice "$1" "${username}"
 	configure_user "$1"
+	configure_accountsservice "$1" "${username}"
 	configure_services_live "$1"
 	configure_systemd_live "$1"
 	configure_openrc_live "$1"
