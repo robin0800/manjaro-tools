@@ -63,6 +63,9 @@ overriding
 # build dir where buildpkg or buildiso chroots are created
 # chroots_dir=/var/lib/manjaro-tools
 
+# log dir where log files are created
+# log_dir='/var/log/manjaro-tools'
+
 # custom build mirror server
 # build_mirror=http://mirror.netzspielplatz.de/manjaro/packages
 
@@ -124,7 +127,7 @@ overriding
 
 # experimental; use overlayfs instead of aufs
 # requires minimum 4.0 kernel on the build host and on iso in profile.conf
-# use_overlayfs="false"
+# use_overlayfs="true"
 
 ################ deployiso ################
 
@@ -142,6 +145,12 @@ overriding
 
 # set upload bandwidth limit in kB/s
 # limit=100
+
+# the torrent tracker url
+# tracker_url=""
+
+# Piece size, 2^n
+# piece_size=21
 ~~~
 
 ###2. buildpkg
@@ -339,6 +348,7 @@ Usage: deployiso [options]
     -i                 The iso's init system [default:systemd]
     -l                 Limit bandwidth in kB/s [default:80]
     -c                 Create new remote edition_type with subtree
+    -t                 Create a torrent from source folder
     -t                 Create torrent from source folder
     -u                 Update remote iso
     -q                 Query settings and pretend upload
