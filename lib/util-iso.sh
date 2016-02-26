@@ -440,14 +440,16 @@ load_pkgs(){
 			| sed "$_clean")
 
 	if [[ $1 == "${packages_mhwd}" ]]; then
+
+		local  _used_kernel=${kernel:5:2}
+                [[ ${_used_kernel} < "42" ]] && local _amd="s|xf86-video-amdgpu||g"
+
 		packages_cleanup=$(sed "$_com_rm" "$1" \
 			| grep cleanup \
 			| sed "$_purge_rm" \
 			| sed "$_kernel" \
-			| sed "$_clean")
-		if [[ ${_used_kernel} < "42" ]]; then
-			packages_cleanup="$packages_cleanup xf86-video-amdgpu"
-		fi
+			| sed "$_clean" \
+			| sed "$_amd")
 	fi
 }
 
