@@ -53,7 +53,7 @@ show_profile(){
 		fi
 		msg2 "is_custom_pac_conf: %s" "${is_custom_pac_conf}"
 	fi
-	unset_profile
+	reset_profile
 }
 
 display_settings(){

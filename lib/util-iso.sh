@@ -599,7 +599,7 @@ make_profile(){
 		prepare_images
 		compress_images
 	fi
-	unset_profile
+	reset_profile
 	msg "Finished building [%s]" "${profile}"
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
@@ -618,7 +618,9 @@ load_profile(){
 	work_dir=${chroots_iso}/${profile}/${arch}
 
 	iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}/${arch}"
+	profile_log_dir="${log_dir_iso}/${profile}/${arch}"
 
+	prepare_dir "${iso_dir}"
 	prepare_dir "${iso_dir}"
 }
 

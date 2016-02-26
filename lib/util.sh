@@ -117,6 +117,8 @@ init_common(){
 
 	[[ -z ${chroots_dir} ]] && chroots_dir='/var/lib/manjaro-tools'
 
+	[[ -z ${log_dir} ]] && log_dir='/var/log/manjaro-tools'
+
 	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
 }
 
@@ -168,6 +170,8 @@ init_buildiso(){
 	[[ -z ${buildset_iso} ]] && buildset_iso='default'
 
 	cache_dir_iso="${cache_dir}/iso"
+
+	log_dir_iso="${log_dir}/buildiso"
 
 	##### iso settings #####
 
@@ -238,7 +242,7 @@ load_config(){
 	return 0
 }
 
-unset_profile(){
+reset_profile(){
 	unset displaymanager
 	unset autologin
 	unset multilib
