@@ -66,6 +66,7 @@ display_settings(){
 	msg2 "buildset_iso: %s" "${buildset_iso}"
 	msg2 "is_buildset: %s" "${is_buildset}"
 	${verbose} && msg2 "run_dir: %s" "${run_dir}"
+	${is_log} && msg2 "log_dir: %s" "${log_dir}"
 
 	msg "OPTIONS:"
 	msg2 "arch: %s" "${arch}"
