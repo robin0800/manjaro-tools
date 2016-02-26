@@ -26,9 +26,9 @@ error_function() {
 
 # $1: function
 run_log(){
-	local func="$1" name=$(gen_iso_fn)
-	local tmpfile=/tmp/$name.$func.log logfile=${log_dir}/$name.$func.log
-	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
+	local func="$1"
+	local tmpfile=/tmp/$func.ansi.log logfile=${log_dir}/$(gen_iso_fn).$func.log
+	logpipe=$(mktemp -u "/tmp/$func.pipe.XXXXXXXX")
 	mkfifo "$logpipe"
 	tee "$tmpfile" < "$logpipe" &
 	local teepid=$!
@@ -44,7 +44,7 @@ run_safe() {
 	set -e
 	set -E
 	restoretrap=$(trap -p ERR)
-	trap 'error_function $func' ERR
+	trap 'error_function $func' ERR SIGINT SIGTERM
 
 	if ${is_log};then
 		run_log "$func"
