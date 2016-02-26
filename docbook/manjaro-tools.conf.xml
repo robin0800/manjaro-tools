@@ -292,7 +292,7 @@
 			<varlistentry>
 				<term><varname>remote_project=</varname></term>
 
-				<listitem><para>Default orject to be used for upload.
+				<listitem><para>Default project to be used for upload.
 				</para></listitem>
 			</varlistentry>
 
@@ -313,14 +313,15 @@
 			<varlistentry>
 				<term><varname>limit=</varname></term>
 
-				<listitem><para>Default upload bandwidth limit.
+				<listitem><para>Default upload bandwidth limit in kb/s.
 				</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
 				<term><varname>tracker_url=</varname></term>
 
-				<listitem><para>Default tracker announce for the torrent. The tracker url can also contain comma separated urls.
+				<listitem><para>Default tracker announce for the torrent.
+				The tracker url can also contain comma separated urls.
 				</para></listitem>
 			</varlistentry>
 
