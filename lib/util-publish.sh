@@ -46,6 +46,7 @@ gen_iso_fn(){
 create_torrent(){
 	msg "Create %s.torrent" "$1"
 	local name=$(gen_iso_fn "$1")
+	[[ -f ${src_dir}/${name}.torrent ]] && rm ${src_dir}/${name}.torrent
 	if [[ "${edition}" == 'official' ]];then
 		local webseed_url="http://${remote_url}/projects/${remote_project}/${remote_dir}/${name}.iso"
 		mktorrent_args+=(-w ${webseed_url})
