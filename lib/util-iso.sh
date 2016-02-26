@@ -22,7 +22,8 @@ make_sqfs() {
 		return 1
 	fi
 	local timer=$(get_timer) path=${work_dir}/iso/${iso_name}/${arch}
-	local name=${1##*/} sq_img="${path}/$name.sqfs"
+	local name=${1##*/}
+	local sq_img="${path}/$name.sqfs"
 	mkdir -p ${path}
 	msg "Generating SquashFS image for %s" "${1}"
 	if [[ -f "${sq_img}" ]]; then
