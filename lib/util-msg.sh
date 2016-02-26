@@ -80,23 +80,12 @@ stat_done() {
 	printf "${BOLD}done${ALL_OFF}\n" >&2
 }
 
-setup_workdir() {
-	[[ -z $WORKDIR ]] && WORKDIR=$(mktemp -d --tmpdir "${0##*/}.XXXXXXXXXX")
-}
-
-cleanup() {
-	[[ -n $WORKDIR ]] && rm -rf "$WORKDIR"
-	exit ${1:-0}
-}
-
 abort() {
 	error 'Aborting...'
-	cleanup 255
 }
 
 die() {
 	(( $# )) && error "$@"
-	cleanup 255
 }
 
 lock() {

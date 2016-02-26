@@ -44,7 +44,7 @@ fi
 if [[ -d $1 ]]; then
 	pushd $1 >/dev/null
 else
-	setup_workdir
+	WORKDIR=$(mktemp -d --tmpdir "${0##*/}.XXXXXXXXXX")
 
 	case ${script_mode} in
 		deps) bsdtar -C "$WORKDIR" -xf "$1";;
