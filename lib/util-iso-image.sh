@@ -79,7 +79,7 @@ add_svc_sd(){
 # $1: chroot
 configure_environment(){
 	case ${profile} in
-		cinnamon|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce|xfce-minimal)
+		cinnamon*|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce*)
 			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 		;;
 	esac
@@ -228,8 +228,9 @@ chroot_clean(){
 	msg "Cleaning up ..."
 	for image in "$1"/*-image; do
 		[[ -d ${image} ]] || continue
-		if [[ $(basename "${image}") != "mhwd-image" ]];then
-			msg2 "Deleting chroot %s ..." "$(basename "${image}")"
+		local name=${image##*/}
+		if [[ $name != "mhwd-image" ]];then
+			msg2 "Deleting chroot %s ..." "$name"
 			lock 9 "${image}.lock" "Locking chroot '${image}'"
 			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
 				{ type -P btrfs && btrfs subvolume delete "${image}"; } #&> /dev/null
@@ -318,7 +319,7 @@ configure_openrc_live(){
 }
 
 configure_services(){
-	info "Configuring [%s] ...." "${initsys}"
+	info "Configuring [%s]" "${initsys}"
 	case ${initsys} in
 		'openrc')
 			for svc in ${start_openrc[@]}; do
@@ -351,7 +352,7 @@ configure_services(){
 }
 
 configure_services_live(){
-	info "Configuring [%s] ...." "${initsys}"
+	info "Configuring [%s]" "${initsys}"
 	case ${initsys} in
 		'openrc')
 			for svc in ${start_openrc_live[@]}; do
