@@ -67,6 +67,24 @@ show_elapsed_time(){
 	info "Time %s: %s minutes" "$1" "$(elapsed_time $2)"
 }
 
+lock() {
+	eval "exec $1>"'"$2"'
+	if ! flock -n $1; then
+		stat_busy "$3"
+		flock $1
+		stat_done
+	fi
+}
+
+slock() {
+	eval "exec $1>"'"$2"'
+	if ! flock -sn $1; then
+		stat_busy "$3"
+		flock -s $1
+		stat_done
+	fi
+}
+
 check_root() {
 	(( EUID == 0 )) && return
 	if type -P sudo >/dev/null; then

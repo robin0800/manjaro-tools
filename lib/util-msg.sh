@@ -88,24 +88,6 @@ die() {
 	(( $# )) && error "$@"
 }
 
-lock() {
-	eval "exec $1>"'"$2"'
-	if ! flock -n $1; then
-		stat_busy "$3"
-		flock $1
-		stat_done
-	fi
-}
-
-slock() {
-	eval "exec $1>"'"$2"'
-	if ! flock -sn $1; then
-		stat_busy "$3"
-		flock -s $1
-		stat_done
-	fi
-}
-
 import(){
 	if [[ -r $1 ]];then
 		source $1
