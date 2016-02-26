@@ -16,13 +16,13 @@ import ${LIBDIR}/util-pac-conf.sh
 import ${LIBDIR}/util-iso-log.sh
 
 # $1: image path
-squash_image_dir() {
+make_sqfs() {
 	if [[ ! -d "$1" ]]; then
 		error "$1 is not a directory"
 		return 1
 	fi
 	local timer=$(get_timer) path=${work_dir}/iso/${iso_name}/${arch}
-	local sq_img="${path}/${1##*/}.sqfs"
+	local name=${1##*/} sq_img="${path}/$name.sqfs"
 	mkdir -p ${path}
 	msg "Generating SquashFS image for %s" "${1}"
 	if [[ -f "${sq_img}" ]]; then
@@ -37,19 +37,32 @@ squash_image_dir() {
 			return
 		fi
 	fi
+
+	msg2 "Creating SquashFS image. This may take some time..."
+	local used_kernel=${kernel:5:1} mksqfs_args=(${1} ${sq_img} -noappend)
 	local highcomp="-b 256K -Xbcj x86"
 	[[ "${iso_compression}" != "xz" ]] && highcomp=""
-	msg2 "Creating SquashFS image. This may take some time..."
-	local used_kernel=${kernel:5:1}
-	if [[ "${1##*/}" == "mhwd-image" && ${used_kernel} < "4" ]]; then
-		mksquashfs "${1}" "${sq_img}" -noappend -comp lz4
+
+	if [[ "$name" == "mhwd-image" && ${used_kernel} < "4" ]]; then
+		mksqfs_args+=(-comp lz4)
+		if ${is_log};then
+			mksquashfs "${mksqfs_args[@]}" >/dev/null
+		else
+			mksquashfs "${mksqfs_args[@]}"
+		fi
 	else
-		mksquashfs "${1}" "${sq_img}" -noappend -comp ${iso_compression} ${highcomp}
+		mksqfs_args+=(-comp ${iso_compression} ${highcomp})
+		if ${is_log};then
+			mksquashfs "${mksqfs_args[@]}" >/dev/null
+		else
+			mksquashfs "${mksqfs_args[@]}"
+		fi
 	fi
+
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
-run_xorriso(){
+assemble_iso(){
 	msg "Creating ISO image..."
 	local efi_boot_args=()
 	if [[ -f "${work_dir}/iso/EFI/miso/${iso_name}.img" ]]; then
@@ -87,7 +100,7 @@ make_iso() {
 			[[ "${d##*/}" != "iso" ]] && \
 			[[ "${d##*/}" != "efiboot" ]] && \
 			[[ "$d" != "${work_dir}" ]]; then
-			squash_image_dir "$d"
+			make_sqfs "$d"
 		fi
 	done
 
@@ -98,7 +111,7 @@ make_iso() {
 		msg2 "Removing existing bootable image..."
 		rm -rf "${iso_dir}/${iso_file}"
 	fi
-	run_xorriso
+	assemble_iso
 	msg "Done [Build ISO]"
 }
 
@@ -334,10 +347,10 @@ make_isolinux() {
 
 make_isomounts() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-		msg "Creating [isomounts]"
+		msg "Prepare [isomounts]"
 		write_isomounts "${work_dir}/iso/${iso_name}"
 		: > ${work_dir}/build.${FUNCNAME}
-		msg "Done creating [isomounts]"
+		msg "Done [isomounts]"
 	fi
 }
 
