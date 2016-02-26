@@ -105,6 +105,13 @@
 			</varlistentry>
 
 			<varlistentry>
+				<term><varname>log_dir=</varname></term>
+
+				<listitem><para>Log dir where buildiso log the build process. Default is  "/var/log/manjaro-tools".
+				</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
 				<term><varname>build_mirror=</varname></term>
 
 				<listitem><para>Default mirror to be used when building
@@ -313,7 +320,7 @@
 			<varlistentry>
 				<term><varname>tracker_url=</varname></term>
 
-				<listitem><para>Default tracker announce for the torrent.
+				<listitem><para>Default tracker announce for the torrent. The tracker url can also contain comma separated urls.
 				</para></listitem>
 			</varlistentry>
 

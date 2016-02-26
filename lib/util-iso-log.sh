@@ -26,8 +26,8 @@ error_function() {
 
 # $1: function
 run_log(){
-	local func="$1"
-	local tmpfile=/tmp/$(gen_iso_fn).$func.log logfile=${profile_log_dir}/$func.log
+	local func="$1" name=$(gen_iso_fn)
+	local tmpfile=/tmp/$name.$func.log logfile=${log_dir}/$name.$func.log
 	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
 	mkfifo "$logpipe"
 	tee "$tmpfile" < "$logpipe" &

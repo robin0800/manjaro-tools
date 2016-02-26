@@ -618,10 +618,9 @@ load_profile(){
 	work_dir=${chroots_iso}/${profile}/${arch}
 
 	iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}/${arch}"
-	profile_log_dir="${log_dir_iso}/${profile}/${arch}"
 
 	prepare_dir "${iso_dir}"
-	prepare_dir "${iso_dir}"
+	prepare_dir "${log_dir}"
 }
 
 prepare_profile(){

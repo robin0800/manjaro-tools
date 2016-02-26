@@ -122,6 +122,12 @@
 			</varlistentry>
 
 			<varlistentry>
+				<term><option>-l</option></term>
+
+				<listitem><para>Log the build process.</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
 				<term><option>-x</option></term>
 
 				<listitem><para>Only build images, without creating an ISO file.</para></listitem>

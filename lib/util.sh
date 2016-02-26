@@ -171,8 +171,6 @@ init_buildiso(){
 
 	cache_dir_iso="${cache_dir}/iso"
 
-	log_dir_iso="${log_dir}/buildiso"
-
 	##### iso settings #####
 
 	[[ -z ${dist_release} ]] && dist_release=$(version_gen)
