@@ -27,7 +27,8 @@ error_function() {
 # $1: function
 run_log(){
 	local func="$1" name=$(gen_iso_fn)
-	local tmpfile=/tmp/$name.$func.log logfile=${log_dir}/$name.$func.log
+	local tmpfile=/tmp/$name.$func.log logfile=${log_dir}/$name.log
+	[[ -f $logfile ]] && rm $logfile
 	logpipe=$(mktemp -u "/tmp/logpipe.XXXXXXXX")
 	mkfifo "$logpipe"
 	tee "$tmpfile" < "$logpipe" &
@@ -35,7 +36,7 @@ run_log(){
 	$func &> "$logpipe"
 	wait $teepid
 	rm "$logpipe"
-	cat $tmpfile | perl -pe 's/\e\[?.*?[\@-~]//g' > $logfile
+	cat $tmpfile | perl -pe 's/\e\[?.*?[\@-~]//g' >> $logfile
 	rm "$tmpfile"
 }
 
