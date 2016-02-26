@@ -8,6 +8,51 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+# $1: section
+parse_section() {
+	local is_section=0
+	while read line; do
+		[[ $line =~ ^\ {0,}# ]] && continue
+		[[ -z "$line" ]] && continue
+		if [ $is_section == 0 ]; then
+			if [[ $line =~ ^\[.*?\] ]]; then
+				line=${line:1:$((${#line}-2))}
+				section=${line// /}
+				if [[ $section == $1 ]]; then
+					is_section=1
+					continue
+				fi
+				continue
+			fi
+		elif [[ $line =~ ^\[.*?\] && $is_section == 1 ]]; then
+			break
+		else
+			pc_key=${line%%=*}
+			pc_key=${pc_key// /}
+			pc_value=${line##*=}
+			pc_value=${pc_value## }
+			eval "$pc_key='$pc_value'"
+		fi
+	done < "$2"
+}
+
+get_repos() {
+	local section repos=() filter='^\ {0,}#'
+	while read line; do
+		[[ $line =~ "${filter}" ]] && continue
+		[[ -z "$line" ]] && continue
+		if [[ $line =~ ^\[.*?\] ]]; then
+			line=${line:1:$((${#line}-2))}
+			section=${line// /}
+			case ${section} in
+				"options") continue ;;
+				*) repos+=("${section}") ;;
+			esac
+		fi
+	done < "$1"
+	echo ${repos[@]}
+}
+
 read_set(){
 	local _space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \
@@ -32,10 +77,9 @@ list_sets(){
 # $2: buildset
 eval_buildset(){
 	eval "case $2 in
-		$(list_sets $1)) is_buildset=true ;;
+		$(list_sets $1)) is_buildset=true; read_set $1/$2 ;;
 		*) is_buildset=false ;;
 	esac"
-	${is_buildset} && read_set $1/$2
 }
 
 get_edition(){

@@ -12,8 +12,73 @@
 import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
 import ${LIBDIR}/util-iso-calamares.sh
-import ${LIBDIR}/util-pac-conf.sh
-import ${LIBDIR}/util-iso-log.sh
+
+error_function() {
+	if [[ -p $logpipe ]]; then
+		rm "$logpipe"
+	fi
+	# first exit all subshells, then print the error
+	if (( ! BASH_SUBSHELL )); then
+		error "A failure occurred in %s()." "$1"
+		plain "Aborting..."
+	fi
+	for mp in ${work_dir}/{root,${profile},live,mhwd,boot}-image;do
+            umount_image "$mp"
+        done
+	exit 2
+}
+
+# $1: function
+run_log(){
+	local func="$1"
+	local tmpfile=/tmp/$func.ansi.log logfile=${log_dir}/$(gen_iso_fn).$func.log
+	logpipe=$(mktemp -u "/tmp/$func.pipe.XXXXXXXX")
+	mkfifo "$logpipe"
+	tee "$tmpfile" < "$logpipe" &
+	local teepid=$!
+	$func &> "$logpipe"
+	wait $teepid
+	rm "$logpipe"
+	cat $tmpfile | perl -pe 's/\e\[?.*?[\@-~]//g' > $logfile
+	rm "$tmpfile"
+}
+
+run_safe() {
+	local restoretrap func="$1"
+	set -e
+	set -E
+	restoretrap=$(trap -p ERR)
+	trap 'error_function $func' ERR SIGINT SIGTERM
+
+	if ${is_log};then
+		run_log "$func"
+	else
+		"$func"
+	fi
+
+	eval $restoretrap
+	set +E
+	set +e
+}
+
+clean_pacman_conf(){
+	local repositories=$(get_repos "${pacman_conf}") uri='file://'
+	msg "Cleaning [%s/etc/pacman.conf] ..." "$1"
+	for repo in ${repositories[@]}; do
+		case ${repo} in
+			'options'|'core'|'extra'|'community'|'multilib') continue ;;
+			*)
+				msg2 "parsing [%s] ..." "${repo}"
+				parse_section "${repo}" "${pacman_conf}"
+				if [[ ${pc_value} == $uri* ]]; then
+					msg2 "Removing local repo [%s] ..." "${repo}"
+					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
+				fi
+			;;
+		esac
+	done
+	msg "Done cleaning [%s/etc/pacman.conf]" "$1"
+}
 
 # $1: image path
 make_sqfs() {

@@ -18,7 +18,6 @@ LIBS_BASE = \
 	lib/util.sh \
 	lib/util-mount.sh \
 	lib/util-msg.sh \
-	lib/util-pac-conf.sh \
 	lib/util-fstab.sh
 
 SHARED_BASE = \
@@ -70,8 +69,7 @@ LIBS_ISO = \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
 	lib/util-iso-boot.sh \
-	lib/util-publish.sh \
-	lib/util-iso-log.sh
+	lib/util-publish.sh
 
 SHARED_ISO = \
 	data/pacman-gfx.conf \
