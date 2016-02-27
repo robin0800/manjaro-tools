@@ -9,23 +9,27 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+track_image() {
+        info "%s mount: [%s]" "${iso_fs}" "$5"
+        mount "$@" && IMAGE_ACTIVE_MOUNTS=("$5" "${IMAGE_ACTIVE_MOUNTS[@]}")
+}
+
 # $1: new branch
 mount_image(){
-	info "%s mount: [%s]" "${iso_fs}" "${1##*/}"
+        IMAGE_ACTIVE_MOUNTS=()
 	mkdir -p "${work_dir}/work"
-	mount -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
+	track_image -t overlay overlay -olowerdir="${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
 }
 
 mount_image_custom(){
-	info "%s mount: [%s]" "${iso_fs}" "${1##*/}"
+        IMAGE_ACTIVE_MOUNTS=()
 	mkdir -p "${work_dir}/work"
-	mount -t overlay overlay -olowerdir="${work_dir}/${profile}-image":"${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
+	track_image -t overlay overlay -olowerdir="${work_dir}/${profile}-image":"${work_dir}/root-image",upperdir="$1",workdir="${work_dir}/work" "$1"
 }
 
 umount_image(){
-	if mountpoint -q "$1";then
-		info "%s umount: [%s]" "${iso_fs}" "${1##*/}"
-		umount $1
-		rm -rf "${work_dir}/work"
-	fi
+        info "%s umount: [%s]" "${iso_fs}" "${IMAGE_ACTIVE_MOUNTS[@]}"
+        umount "${IMAGE_ACTIVE_MOUNTS[@]}"
+        unset IMAGE_ACTIVE_MOUNTS
+        rm -rf "${work_dir}/work"
 }

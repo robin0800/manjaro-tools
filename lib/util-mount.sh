@@ -40,6 +40,7 @@ get_chroot_arch(){
 }
 
 chroot_part_mount() {
+	info "mount: [%s]" "$2"
 	mount "$@" && CHROOT_ACTIVE_PART_MOUNTS=("$2" "${CHROOT_ACTIVE_PART_MOUNTS[@]}")
 	msg2 "mounted: %s" "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 }
@@ -119,8 +120,8 @@ chroot_mount_partitions(){
 }
 
 chroot_mount() {
+	info "mount: [%s]" "$2"
 	mount "$@" && CHROOT_ACTIVE_MOUNTS=("$2" "${CHROOT_ACTIVE_MOUNTS[@]}")
-	#msg2 "mounted: %s" "${CHROOT_ACTIVE_MOUNTS[@]}"
 }
 
 chroot_mount_conditional() {
@@ -148,11 +149,13 @@ chroot_api_mount() {
 }
 
 chroot_part_umount() {
+	info "umount: [%s]" "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 	umount "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 	unset CHROOT_ACTIVE_PART_MOUNTS
 }
 
 chroot_api_umount() {
+	info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
 	umount "${CHROOT_ACTIVE_MOUNTS[@]}"
 	unset CHROOT_ACTIVE_MOUNTS
 }

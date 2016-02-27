@@ -22,9 +22,7 @@ error_function() {
 		error "A failure occurred in %s()." "$1"
 		plain "Aborting..."
 	fi
-	for mp in ${work_dir}/{root,${profile},live,mhwd,boot}-image;do
-            umount_image "$mp"
-        done
+	umount_image
 	exit 2
 }
 
@@ -241,7 +239,7 @@ make_image_custom() {
 		configure_custom_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
-		umount_image "${path}"
+		umount_image
 
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
@@ -273,7 +271,7 @@ make_image_live() {
 		configure_live_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
-		umount_image "${path}"
+		umount_image
 
 		# Clean up GnuPG keys
 		rm -rf "${path}/etc/pacman.d/gnupg"
@@ -306,7 +304,7 @@ make_image_mhwd() {
 		make_repo "${path}"
 		configure_mhwd_drivers "${path}"
 
-		umount_image "${path}"
+		umount_image
 
 		clean_up_mhwd_image "${path}"
 
@@ -334,7 +332,7 @@ make_image_boot() {
 		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
 		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
 
-		umount_image "${path}"
+		umount_image
 
 		rm -R ${path}
 		: > ${work_dir}/build.${FUNCNAME}

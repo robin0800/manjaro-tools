@@ -9,22 +9,25 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+track_image() {
+        info "%s mount: [%s]" "${iso_fs}" "$6"
+	mount "$@" && IMAGE_ACTIVE_MOUNTS=("$6" "${IMAGE_ACTIVE_MOUNTS[@]}")
+}
+
 # $1: new branch
 mount_image(){
-	info "%s mount: [%s]" "${iso_fs}" "${1##*/}"
-	mount -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
+        IMAGE_ACTIVE_MOUNTS=()
+	track_image -t aufs -o br="$1":${work_dir}/root-image=ro none "$1"
 }
 
 mount_image_custom(){
-	info "%s mount: [%s]" "${iso_fs}" "${1##*/}"
-	mount -t aufs -o br="$1":${work_dir}/${profile}-image=ro:${work_dir}/root-image=ro none "$1"
+        IMAGE_ACTIVE_MOUNTS=()
+	track_image -t aufs -o br="$1":${work_dir}/${profile}-image=ro:${work_dir}/root-image=ro none "$1"
 }
 
 # $1: image path
 umount_image(){
-	if mountpoint -q "$1";then
-		info "%s umount: [%s]" "${iso_fs}" "${1##*/}"
-		umount $1
-	fi
+        umount "${IMAGE_ACTIVE_MOUNTS[@]}"
+        unset IMAGE_ACTIVE_MOUNTS
 	find $1 -name '.wh.*' -delete &> /dev/null
 }
