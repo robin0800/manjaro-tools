@@ -89,6 +89,15 @@ get_edition(){
 	echo ${path##*/}
 }
 
+in_array() {
+	local needle=$1; shift
+	local item
+	for item in "$@"; do
+		[[ $item = $needle ]] && return 0 # Found
+	done
+	return 1 # Not Found
+}
+
 get_timer(){
 	echo $(date +%s)
 }

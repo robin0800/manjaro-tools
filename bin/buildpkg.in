@@ -155,8 +155,6 @@ timer_start=$(get_timer)
 
 eval_buildset "${sets_dir_pkg}" "${buildset_pkg}"
 
-check_requirements
-
 prepare_dir "${pkg_dir}"
 
 init_base_devel

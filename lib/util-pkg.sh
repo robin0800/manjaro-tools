@@ -9,166 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-check_build(){
-	find_pkg $1
-	[[ ! -f $1/PKGBUILD ]] && die "Directory must contain a PKGBUILD!"
-}
-
-find_pkg(){
-	local result=$(find . -type d -name "$1")
-	[[ -z $result ]] && die "%s is not a valid package or buildset!" "$1"
-}
-
-check_requirements(){
-	run check_build "${buildset_pkg}"
-}
-
-load_group(){
-	local _multi \
-		_space="s| ||g" \
-		_clean=':a;N;$!ba;s/\n/ /g' \
-		_com_rm="s|#.*||g" \
-		devel_packages='' \
-		file=${DATADIR}/base-devel-udev
-
-        info "Loading Group [%s] ..." "$file"
-
-	if ${is_multilib}; then
-		_multi="s|>multilib||g"
-	else
-		_multi="s|>multilib.*||g"
-	fi
-
-	devel_packages=$(sed "$_com_rm" "$file" \
-			| sed "$_space" \
-			| sed "$_multi" \
-			| sed "$_clean")
-
-        echo ${devel_packages}
-}
-
-init_base_devel(){
-	if ${udev_root};then
-		base_packages=( "$(load_group)" )
-	else
-		if ${is_multilib};then
-			base_packages=('base-devel' 'multilib-devel')
-		else
-			base_packages=('base-devel')
-		fi
-	fi
-}
-
-chroot_create(){
-	msg "Creating chroot for [%s] (%s)..." "${branch}" "${arch}"
-	mkdir -p "${work_dir}"
-	setarch "${arch}" \
-		mkchroot ${mkchroot_args[*]} \
-		"${work_dir}/root" \
-		${base_packages[*]} || abort
-}
-
-chroot_clean(){
-	msg "Cleaning chroot for [%s] (%s)..." "${branch}" "${arch}"
-	for copy in "${work_dir}"/*; do
-		[[ -d ${copy} ]] || continue
-		msg2 "Deleting chroot copy %s ..." "$(basename "${copy}")"
-
-		lock 9 "${copy}.lock" "Locking chroot copy '${copy}'"
-
-		if [[ "$(stat -f -c %T "${copy}")" == btrfs ]]; then
-			{ type -P btrfs && btrfs subvolume delete "${copy}"; } &>/dev/null
-		fi
-		rm -rf --one-file-system "${copy}"
-	done
-	exec 9>&-
-
-	rm -rf --one-file-system "${work_dir}"
-}
-
-chroot_update(){
-	msg "Updating chroot for [%s] (%s)..." "${branch}" "${arch}"
-	chroot-run ${mkchroot_args[*]} \
-			"${work_dir}/${OWNER}" \
-			pacman -Syu --noconfirm || abort
-
-}
-
-clean_up(){
-	msg "Cleaning up ..."
-	msg2 "Cleaning [%s]" "${pkg_dir}"
-	find ${pkg_dir} -maxdepth 1 -name "*.*" -delete #&> /dev/null
-	if [[ -z $SRCDEST ]];then
-		msg2 "Cleaning [source files]"
-		find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
-	fi
-}
-
-sign_pkg(){
-	su ${OWNER} -c "signfile ${pkg_dir}/$1"
-}
-
-run_post_build(){
-	local _arch=${arch}
-	source PKGBUILD
-	local ext='pkg.tar.xz' pinfo loglist=() lname
-	if [[ ${arch} == "any" ]]; then
-		pinfo=${pkgver}-${pkgrel}-any
-	else
-		pinfo=${pkgver}-${pkgrel}-${_arch}
-	fi
-	if [[ -n $PKGDEST ]];then
-		if [[ -n ${pkgbase} ]];then
-			for p in ${pkgname[@]};do
-				mv $PKGDEST/${p}-${pinfo}.${ext} ${pkg_dir}/
-				${sign} && sign_pkg ${p}-${pinfo}.${ext}
-				loglist+=("*$p*.log")
-				lname=${pkgbase}
-			done
-		else
-			mv $PKGDEST/${pkgname}-${pinfo}.${ext} ${pkg_dir}/
-			${sign} && sign_pkg ${pkgname}-${pinfo}.${ext}
-			loglist+=("*${pkgname}*.log")
-			lname=${pkgname}
-		fi
-	else
-		mv *.${ext} ${pkg_dir}
-		${sign} && sign_pkg ${pkgname}-${pinfo}.${ext}
-		loglist+=("*${pkgname}*.log")
-		lname=${pkgname}
-	fi
-	chown -R "${OWNER}:users" "${pkg_dir}"
-	if [[ -z $LOGDEST ]];then
-		tar -cJf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
-		find $PWD -maxdepth 1 -name '*.log' -delete #&> /dev/null
-	fi
-	arch=$_arch
-}
-
-chroot_init(){
-	local timer=$(get_timer)
-	if ${clean_first}; then
-		chroot_clean
-		chroot_create
-	elif [[ ! -d "${work_dir}" ]]; then
-		chroot_create
-	else
-		chroot_update
-	fi
-	show_elapsed_time "${FUNCNAME}" "${timer}"
-}
-
-make_pkg(){
-	msg "Start building [%s]" "$1"
-	cd $1
-		setarch "${arch}" \
-			mkchrootpkg ${mkchrootpkg_args[*]} || abort
-		run_post_build
-	cd ..
-	msg "Finished building [%s]" "$1"
-	show_elapsed_time "${FUNCNAME}" "${timer_start}"
-}
-
 pkgver_equal() {
 	local left right
 
@@ -257,28 +97,163 @@ find_cached_package() {
 	esac
 }
 
-in_array() {
-	local needle=$1; shift
-	local item
-	for item in "$@"; do
-		[[ $item = $needle ]] && return 0 # Found
-	done
-	return 1 # Not Found
+check_build(){
+	find_pkg $1
+	[[ ! -f $1/PKGBUILD ]] && die "Directory must contain a PKGBUILD!"
 }
 
-# $1: sofile
-# $2: soarch
-process_sofile() {
-	# extract the library name: libfoo.so
-	local soname="${1%.so?(+(.+([0-9])))}".so
-	# extract the major version: 1
-	soversion="${1##*\.so\.}"
-	if [[ "$soversion" = "$1" ]] && (($IGNORE_INTERNAL)); then
-		continue
+find_pkg(){
+	local result=$(find . -type d -name "$1")
+	[[ -z $result ]] && die "%s is not a valid package or buildset!" "$1"
+}
+
+load_group(){
+	local _multi \
+		_space="s| ||g" \
+		_clean=':a;N;$!ba;s/\n/ /g' \
+		_com_rm="s|#.*||g" \
+		devel_group='' \
+		file=${DATADIR}/base-devel-udev
+
+        info "Loading Group [%s] ..." "$file"
+
+	if ${is_multilib}; then
+		_multi="s|>multilib||g"
+	else
+		_multi="s|>multilib.*||g"
 	fi
-	if ! in_array "${soname}=${soversion}-$2" ${soobjects[@]}; then
-	# libfoo.so=1-64
-		msg "${soname}=${soversion}-$2"
-		soobjects+=("${soname}=${soversion}-$2")
+
+	devel_group=$(sed "$_com_rm" "$file" \
+			| sed "$_space" \
+			| sed "$_multi" \
+			| sed "$_clean")
+
+        echo ${devel_group}
+}
+
+init_base_devel(){
+	if ${udev_root};then
+		base_packages=( "$(load_group)" )
+	else
+		if ${is_multilib};then
+			base_packages=('base-devel' 'multilib-devel')
+		else
+			base_packages=('base-devel')
+		fi
 	fi
+}
+
+chroot_create(){
+	msg "Creating chroot for [%s] (%s)..." "${branch}" "${arch}"
+	mkdir -p "${work_dir}"
+	setarch "${arch}" \
+		mkchroot ${mkchroot_args[*]} \
+		"${work_dir}/root" \
+		${base_packages[*]} || abort
+}
+
+chroot_clean(){
+	msg "Cleaning chroot for [%s] (%s)..." "${branch}" "${arch}"
+	for copy in "${work_dir}"/*; do
+		[[ -d ${copy} ]] || continue
+		msg2 "Deleting chroot copy %s ..." "$(basename "${copy}")"
+
+		lock 9 "${copy}.lock" "Locking chroot copy '${copy}'"
+
+		if [[ "$(stat -f -c %T "${copy}")" == btrfs ]]; then
+			{ type -P btrfs && btrfs subvolume delete "${copy}"; } &>/dev/null
+		fi
+		rm -rf --one-file-system "${copy}"
+	done
+	exec 9>&-
+
+	rm -rf --one-file-system "${work_dir}"
+}
+
+chroot_update(){
+	msg "Updating chroot for [%s] (%s)..." "${branch}" "${arch}"
+	chroot-run ${mkchroot_args[*]} \
+			"${work_dir}/${OWNER}" \
+			pacman -Syu --noconfirm || abort
+
+}
+
+clean_up(){
+	msg "Cleaning up ..."
+	msg2 "Cleaning [%s]" "${pkg_dir}"
+	find ${pkg_dir} -maxdepth 1 -name "*.*" -delete #&> /dev/null
+	if [[ -z $SRCDEST ]];then
+		msg2 "Cleaning [source files]"
+		find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
+	fi
+}
+
+sign_pkg(){
+	su ${OWNER} -c "signfile ${pkg_dir}/$1"
+}
+
+post_build(){
+	local _arch=${arch}
+	source PKGBUILD
+	local ext='pkg.tar.xz' pinfo loglist=() lname
+	if [[ ${arch} == "any" ]]; then
+		pinfo=${pkgver}-${pkgrel}-any
+	else
+		pinfo=${pkgver}-${pkgrel}-${_arch}
+	fi
+	if [[ -n $PKGDEST ]];then
+		if [[ -n ${pkgbase} ]];then
+			for p in ${pkgname[@]};do
+				mv $PKGDEST/${p}-${pinfo}.${ext} ${pkg_dir}/
+				${sign} && sign_pkg ${p}-${pinfo}.${ext}
+				loglist+=("*$p*.log")
+				lname=${pkgbase}
+			done
+		else
+			mv $PKGDEST/${pkgname}-${pinfo}.${ext} ${pkg_dir}/
+			${sign} && sign_pkg ${pkgname}-${pinfo}.${ext}
+			loglist+=("*${pkgname}*.log")
+			lname=${pkgname}
+		fi
+	else
+		mv *.${ext} ${pkg_dir}
+		${sign} && sign_pkg ${pkgname}-${pinfo}.${ext}
+		loglist+=("*${pkgname}*.log")
+		lname=${pkgname}
+	fi
+	chown -R "${OWNER}:users" "${pkg_dir}"
+	if [[ -z $LOGDEST ]];then
+		tar -cJf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
+		find . -maxdepth 1 -name '*.log' -delete #&> /dev/null
+	fi
+	arch=$_arch
+}
+
+chroot_init(){
+	local timer=$(get_timer)
+	if ${clean_first}; then
+		chroot_clean
+		chroot_create
+	elif [[ ! -d "${work_dir}" ]]; then
+		chroot_create
+	else
+		chroot_update
+	fi
+	show_elapsed_time "${FUNCNAME}" "${timer}"
+}
+
+build_pkg(){
+	setarch "${arch}" \
+		mkchrootpkg ${mkchrootpkg_args[*]}
+}
+
+make_pkg(){
+	check_build "$1"
+	msg "Start building [%s]" "$1"
+	cd $1
+		build_pkg || die
+		post_build
+	cd ..
+	msg "Finished building [%s]" "$1"
+	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
