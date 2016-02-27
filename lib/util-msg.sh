@@ -80,12 +80,18 @@ stat_done() {
 	printf "${BOLD}done${ALL_OFF}\n" >&2
 }
 
+cleanup() {
+	exit ${1:-0}
+}
+
 abort() {
 	error 'Aborting...'
+	cleanup 255
 }
 
 die() {
 	(( $# )) && error "$@"
+	cleanup 255
 }
 
 import(){
