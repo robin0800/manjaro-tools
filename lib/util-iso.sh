@@ -352,8 +352,8 @@ make_efi() {
 		write_loader_conf "${path_iso}/loader"
 		write_efi_shellv1_conf "${path_iso}/loader/entries"
 		write_efi_shellv2_conf "${path_iso}/loader/entries"
-		write_usb_conf "${path_iso}/loader/entries"
-		write_usb_nonfree_conf "${path_iso}/loader/entries"
+		write_usb_conf "${path_iso}/loader/entries" "${path_iso}"
+		write_usb_nonfree_conf "${path_iso}/loader/entries" "${path_iso}"
 		copy_efi_shells "${path_efi}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [%s/boot/EFI]" "${iso_name}"
@@ -380,8 +380,8 @@ make_efiboot() {
 		write_loader_conf "${efi_loader}"
 		write_efi_shellv1_conf "${efi_loader}/entries"
 		write_efi_shellv2_conf "${efi_loader}/entries"
-		write_dvd_conf "${efi_loader}/entries"
-		write_dvd_nonfree_conf "${efi_loader}/entries"
+		write_dvd_conf "${efi_loader}/entries" "${path_iso}"
+		write_dvd_nonfree_conf "${efi_loader}/entries" "${path_iso}"
 		copy_efi_shells "${path_efi}"
 		umount ${work_dir}/efiboot
 		: > ${work_dir}/build.${FUNCNAME}
@@ -396,7 +396,7 @@ make_isolinux() {
 		local path=${work_dir}/iso/isolinux
 		mkdir -p ${path}
 		copy_overlay "${DATADIR}/isolinux" "${path}"
-		write_isolinux_cfg "${path}"
+		write_isolinux_cfg "${path}" "${work_dir}/iso"
 		write_isolinux_msg "${path}"
 		if [[ -e ${profile_dir}/isolinux-overlay ]]; then
 			copy_overlay "${profile_dir}/isolinux-overlay" "${path}"

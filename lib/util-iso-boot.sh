@@ -99,11 +99,11 @@ write_efi_shellv2_conf(){
 
 write_dvd_conf(){
 	local fn=${iso_name}-${arch}.conf
-	local conf=$1/${fn}
+	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
 	echo "title   ${dist_name} Linux ${arch} UEFI DVD (default)" > ${conf}
 	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
-	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+	if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
 		echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
 	fi
@@ -113,11 +113,11 @@ write_dvd_conf(){
 
 write_dvd_nonfree_conf(){
 	local fn=${iso_name}-${arch}-nonfree.conf
-	local conf=$1/${fn}
+	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
 	echo "title   ${dist_name} Linux ${arch} UEFI DVD (nonfree)" > ${conf}
 	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
-	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+	if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
 		echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
 	fi
@@ -127,11 +127,11 @@ write_dvd_nonfree_conf(){
 
 write_usb_conf(){
 	local fn=${iso_name}-${arch}.conf
-	local conf=$1/${fn}
+	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
 	echo "title   ${dist_name} Linux ${arch} UEFI USB (default)" > ${conf}
 	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+	if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
 		echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
 	fi
@@ -141,11 +141,11 @@ write_usb_conf(){
 
 write_usb_nonfree_conf(){
 	local fn=${iso_name}-${arch}-nonfree.conf
-	local conf=$1/${fn}
+	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
 	echo "title   ${dist_name} Linux ${arch} UEFI USB (nonfree)" > ${conf}
 	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
+	if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
 		echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
 	fi
@@ -180,9 +180,26 @@ copy_isolinux_bin(){
 	fi
 }
 
+gen_boot_args(){
+	local args=(quiet)
+	if ${plymouth_boot};then
+		[[ ${initsys} == 'systemd' ]] && args+=(splash)
+	fi
+	echo ${args[@]}
+}
+
+gen_initrd_arg(){
+	local path="/${iso_name}/boot/${arch}/${iso_name}.img"
+	local arg="initrd=${path}"
+	if [[ -f $1/${iso_name}/boot/intel_ucode.img ]] ; then
+		arg="initrd=/${iso_name}/boot/intel_ucode.img,${path}"
+	fi
+	echo $arg
+}
+
 write_isolinux_cfg(){
 	local fn=isolinux.cfg
-	local conf=$1/${fn}
+	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
 	echo "default start" > ${conf}
 	echo "implicit 1" >> ${conf}
@@ -193,32 +210,17 @@ write_isolinux_cfg(){
 	echo '' >> ${conf}
 	echo "label start" >> ${conf}
 	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-	local plymouth_settings=" quiet splash"
-	# on openrc, you would want quite initramfs boot, except you want to debug hooks
-	# quite doesn't affect openrc verbosity, so only splash is useless on openrc
-	if ! ${plymouth_boot};then
-		if [[ ${initsys} == 'systemd' ]]; then
-			plymouth_settings=""
-		else
-			plymouth_settings=" quiet"
-		fi
-	fi
-	if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
-		msg2 "Using intel_ucode.img ..."
-		echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free${plymouth_settings} showopts" >> ${conf}
-	else
-		echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free${plymouth_settings} showopts" >> ${conf}
-	fi
+
+	local boot_args=($(gen_boot_args))
+	local initrd_arg=$(gen_initrd_arg $path)
+
+	echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free ${boot_args[@]} showopts" >> ${conf}
+
 	echo '' >> ${conf}
 	if ${nonfree_xorg};then
 		echo "label nonfree" >> ${conf}
 		echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
-		if [[ -f ${path_iso}/${iso_name}/boot/intel_ucode.img ]] ; then
-			msg2 "Using intel_ucode.img ..."
-			echo "  append initrd=/${iso_name}/boot/intel_ucode.img,/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree${plymouth_settings} showopts" >> ${conf}
-		else
-			echo "  append initrd=/${iso_name}/boot/${arch}/${iso_name}.img misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree${plymouth_settings} showopts" >> ${conf}
-		fi
+		echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree ${boot_args[@]} showopts" >> ${conf}
 		echo '' >> ${conf}
 	fi
 	echo "label harddisk" >> ${conf}

@@ -335,12 +335,12 @@ configure_services(){
 				add_svc_sd "$1" "$svc"
 			done
 			if [[ ${displaymanager} != "none" ]];then
+				local canf=$1/etc/plymouth/plymouthd.conf
+				sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" $conf
 				local service=${displaymanager}
 				if ${plymouth_boot}; then
-					#msg2 "Setting plymouth %s ...." "${plymouth_theme}"
-					sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" $1/etc/plymouth/plymouthd.conf
-					if [[ -f $1/etc/systemd/system/${displaymanager}-plymouth.service ]] || \
-					[[ -f $1/usr/lib/systemd/system/${displaymanager}-plymouth.service ]];then
+					local svc="/systemd/system/${displaymanager}-plymouth.service"
+					if [[ -f $1/etc$svc ]] || [[ -f $1/usr/lib$svc ]];then
 						service=${displaymanager}-plymouth
 					fi
 				fi
