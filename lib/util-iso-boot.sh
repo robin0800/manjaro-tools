@@ -22,10 +22,12 @@ copy_efi_shells(){
 
 set_mkinicpio_hooks(){
 	if ! ${pxe_boot};then
+		msg2 "Removing pxe hooks"
 		sed -e 's/miso_pxe_common miso_pxe_http //' \
 		-e 's/memdisk //' -i $1
 	fi
 	if ! ${plymouth_boot};then
+		msg2 "Removing plymouth hook"
 		sed -e 's/plymouth //' -i $1
 	fi
 	if ${use_overlayfs};then
@@ -39,7 +41,6 @@ copy_initcpio(){
 	cp /usr/lib/initcpio/install/miso* $2/usr/lib/initcpio/install
 	cp $1/mkinitcpio.conf $2/etc/mkinitcpio-${iso_name}.conf
 	set_mkinicpio_hooks "$2/etc/mkinitcpio-${iso_name}.conf"
-	sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $2/usr/lib/initcpio/init
 }
 
 # $1: work_dir

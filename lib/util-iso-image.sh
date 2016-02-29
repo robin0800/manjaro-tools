@@ -49,7 +49,7 @@ gen_pw(){
 # $1: chroot
 configure_user(){
 	# set up user and password
-	msg2 "Creating user: [%s] password: [%s] ..." "${username}" "${password}"
+	msg2 "Creating user ..."
 	if [[ -n ${password} ]];then
 		chroot $1 useradd -m -G ${addgroups} -p $(gen_pw) ${username}
 	else
@@ -60,6 +60,14 @@ configure_user(){
 # $1: chroot
 configure_hosts(){
 	sed -e "s|localhost.localdomain|localhost.localdomain ${hostname}|" -i $1/etc/hosts
+}
+
+configure_plymouth(){
+	if ${plymouth_boot};then
+		msg2 "Configuring plymouth: %s" "${plymouth_theme}"
+		local conf=$1/etc/plymouth/plymouthd.conf
+		sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" "${conf}"
+	fi
 }
 
 add_svc_rc(){
@@ -88,7 +96,7 @@ configure_environment(){
 # $1: chroot
 # $2: user
 configure_accountsservice(){
-	msg2 "Configuring Accountsservice ..."
+	msg2 "Configuring accountsservice ..."
 	local path=$1/var/lib/AccountsService/users
 	if [ -d "${path}" ] ; then
 		echo "[User]" > ${path}/$2
@@ -110,7 +118,6 @@ detect_desktop_env(){
 	local xs=$1/usr/share/xsessions ex=$1/usr/bin key val map=( $(load_desktop_map) )
 	default_desktop_file="none"
 	default_desktop_executable="none"
-	msg2 "Trying to detect desktop environment ..."
 	for item in "${map[@]}";do
 		key=${item%:*}
 		val=${item#*:}
@@ -119,7 +126,7 @@ detect_desktop_env(){
 			default_desktop_executable="$val"
 		fi
 	done
-	msg2 "Detected: %s" "${default_desktop_file}"
+	msg2 "Detected desktop environment: %s" "${default_desktop_file}"
 }
 
 set_xdm(){
@@ -128,6 +135,45 @@ set_xdm(){
 		sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
 	fi
 }
+
+is_valid_de(){
+	local func=$1
+	if [[ ${default_desktop_executable} != "none" ]] && \
+		[[ ${default_desktop_file} != "none" ]]; then
+			return 0
+	else
+		return 1
+	fi
+
+}
+
+set_sddm_ck(){
+        local halt='/usr/bin/shutdown -h -P now' \
+        reboot='/usr/bin/shutdown -r now'
+        sed -e "s|^.*HaltCommand=.*|HaltCommand=${halt}|" \
+            -e "s|^.*RebootCommand=.*|RebootCommand=${reboot}|" \
+            -e "s|^.*MinimumVT=.*|MinimumVT=7|" \
+            -i "$1/etc/sddm.conf"
+        chroot $1 gpasswd -a sddm video &> /dev/null
+}
+
+ set_lightdm_greeter(){
+	local greeters=$(ls $1/usr/share/xgreeters/*greeter.desktop) name
+	for g in ${greeters[@]};do
+		name=${g##*/}
+		name=${name%%.*}
+		case ${name} in
+			'lightdm-deepin-greeter'|'lightdm-kde-greeter')
+				sed -i -e "s/^.*greeter-session=.*/greeter-session=${name}/" $1/etc/lightdm/lightdm.conf
+			;;
+		esac
+	done
+ }
+
+ set_lightdm_ck(){
+	sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' $1/etc/lightdm/lightdm.conf
+	sed -i -e 's/pam_systemd.so/pam_ck_connector.so nox11/' $1/etc/pam.d/lightdm-greeter
+ }
 
 # $1: chroot
 configure_displaymanager(){
@@ -138,52 +184,27 @@ configure_displaymanager(){
 	case ${displaymanager} in
 		'lightdm')
 			chroot $1 groupadd -r autologin
-			local conf=$1/etc/lightdm/lightdm.conf
-			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
-				sed -i -e "s/^.*user-session=.*/user-session=$default_desktop_file/" ${conf}
+			[[ ${initsys} == 'openrc' ]] && set_lightdm_ck "$1"
+			set_lightdm_greeter "$1"
+			if $(is_valid_de); then
+				sed -i -e "s/^.*user-session=.*/user-session=$default_desktop_file/" $1/etc/lightdm/lightdm.conf
 			fi
-			if [[ ${initsys} == 'openrc' ]];then
-				sed -i -e 's/^.*minimum-vt=.*/minimum-vt=7/' ${conf}
-				sed -i -e 's/pam_systemd.so/pam_ck_connector.so nox11/' $1/etc/pam.d/lightdm-greeter
-			fi
-			local greeters=$(ls $1/usr/share/xgreeters/*greeter.desktop) name
-			for g in ${greeters[@]};do
-				name=${g##*/}
-				name=${name%%.*}
-				case ${name} in
-					'lightdm-deepin-greeter'|'lightdm-kde-greeter')
-						sed -i -e "s/^.*greeter-session=.*/greeter-session=${name}/" ${conf}
-					;;
-				esac
-			done
 		;;
-		'gdm')
-			configure_accountsservice $1 "gdm"
-		;;
+		'gdm') configure_accountsservice "$1" "gdm" ;;
 		'mdm')
-			local conf=$1/etc/mdm/custom.conf
-			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
-				sed -i "s|default.desktop|$default_desktop_file.desktop|g" ${conf}
+			if $(is_valid_de); then
+				sed -i "s|default.desktop|$default_desktop_file.desktop|g" $1/etc/mdm/custom.conf
 			fi
 		;;
 		'sddm')
-			local conf=$1/etc/sddm.conf
-			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
-				sed -i -e "s|^Session=.*|Session=$default_desktop_file.desktop|" ${conf}
-			fi
-			if [[ ${initsys} == 'openrc' ]];then
-				local halt='/usr/bin/shutdown -h -P now' \
-					reboot='/usr/bin/shutdown -r now'
-				sed -e "s|^.*HaltCommand=.*|HaltCommand=${halt}|" \
-					-e "s|^.*RebootCommand=.*|RebootCommand=${reboot}|" \
-					-e "s|^.*MinimumVT=.*|MinimumVT=7|" \
-					-i ${conf}
+			[[ ${initsys} == 'openrc' ]] && set_sddm_ck "$1"
+			if $(is_valid_de); then
+				sed -i -e "s|^Session=.*|Session=$default_desktop_file.desktop|" $1/etc/sddm.conf
 			fi
 		;;
 		'lxdm')
-			local conf=$1/etc/lxdm/lxdm.conf
-			if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
-				sed -i -e "s|^.*session=.*|session=/usr/bin/$default_desktop_executable|" ${conf}
+			if $(is_valid_de); then
+				sed -i -e "s|^.*session=.*|session=/usr/bin/$default_desktop_executable|" $1/etc/lxdm/lxdm.conf
 			fi
 		;;
 	esac
@@ -193,7 +214,8 @@ configure_displaymanager(){
 # $1: chroot
 configure_mhwd_drivers(){
 	local path=$1/opt/live/pkgs/ \
-		drv_path=$1/var/lib/mhwd/db/pci/graphic_drivers
+        drv_path=$1/var/lib/mhwd/db/pci/graphic_drivers
+	info "Configuring mwwd db ..."
 	if  [ -z "$(ls $path | grep catalyst-utils 2> /dev/null)" ]; then
 		msg2 "Disabling Catalyst driver"
 		mkdir -p $drv_path/catalyst/
@@ -269,53 +291,48 @@ configure_mhwd(){
 	fi
 }
 
-configure_systemd(){
-	if [[ ${initsys} == 'systemd' ]];then
-		msg2 "Configuring logind"
-		local conf=$1/etc/systemd/logind.conf
-		sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
-		sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
-	fi
+configure_logind(){
+	msg2 "Configuring logind ..."
+	local conf=$1/etc/systemd/logind.conf
+	sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
+	sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
 }
 
-# $1: chroot
-configure_systemd_live(){
-	if [[ ${initsys} == 'systemd' ]];then
-		msg2 "Configuring systemd for live session"
-		sed -i 's/#\(Storage=\)auto/\1volatile/' $1/etc/systemd/journald.conf
-		#sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
-		sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' $1/etc/systemd/logind.conf
-		#sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' $1/etc/systemd/logind.conf
-		# Prevent some services to be started in the livecd
-		echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
-		     | tee "${path}/etc/.updated" >"${path}/var/.updated"
-
-		msg2 "Setting hostname: %s ..." "${hostname}"
-		echo ${hostname} > $1/etc/hostname
-	fi
+configure_logind_live(){
+	msg2 "Configuring logind ..."
+	local conf=$1/etc/systemd/logind.conf
+	sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' "$conf"
 }
 
-configure_openrc(){
-	if [[ ${initsys} == 'openrc' ]];then
-		msg2 "Configuring sysctl for openrc"
-		touch $1/etc/sysctl.conf
-		local conf=$1/etc/sysctl.d/100-manjaro.conf
-		echo '# Virtual memory setting (swap file or partition)' > ${conf}
-		echo 'vm.swappiness = 30' >> ${conf}
-		echo '# Enable the SysRq key' >> ${conf}
-		echo 'kernel.sysrq = 1' >> ${conf}
-
-		rm $1/etc/runlevels/boot/hwclock
-	fi
+configure_journald(){
+	msg2 "Configuring journald ..."
+	local conf=$1/etc/systemd/journald.conf
+	sed -i 's/#\(Storage=\)auto/\1volatile/' "$conf"
 }
 
-# $1: chroot
-configure_openrc_live(){
-	if [[ ${initsys} == 'openrc' ]];then
-		msg2 "Setting hostname: %s ..." "${hostname}"
-		local _hostname='hostname="'${hostname}'"'
-		sed -i -e "s|^.*hostname=.*|${_hostname}|" $1/etc/conf.d/hostname
+configure_sysctl(){
+	msg2 "Configuring sysctl ..."
+	touch $1/etc/sysctl.conf
+	local conf=$1/etc/sysctl.d/100-manjaro.conf
+	echo '# Virtual memory setting (swap file or partition)' > ${conf}
+	echo 'vm.swappiness = 30' >> ${conf}
+	echo '# Enable the SysRq key' >> ${conf}
+	echo 'kernel.sysrq = 1' >> ${conf}
+}
+
+get_svc_dm(){
+	local service=${displaymanager}
+	if  [[ $service != "sddm" ]] || \
+		[[ $service != "lxdm" ]];then
+		if ${plymouth_boot}; then
+			local svc="systemd/system/$service-plymouth.service"
+			if [[ -f $1/etc/$svc ]] || \
+			[[ -f $1/usr/lib/$svc ]];then
+				service="$service-plymouth"
+			fi
+		fi
 	fi
+	echo $service
 }
 
 configure_services(){
@@ -335,16 +352,7 @@ configure_services(){
 				add_svc_sd "$1" "$svc"
 			done
 			if [[ ${displaymanager} != "none" ]];then
-				local conf=$1/etc/plymouth/plymouthd.conf
-				sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" $conf
-				local service=${displaymanager}
-				if ${plymouth_boot}; then
-					local svc="/systemd/system/${displaymanager}-plymouth.service"
-					if [[ -f $1/etc$svc ]] || [[ -f $1/usr/lib$svc ]];then
-						service=${displaymanager}-plymouth
-					fi
-				fi
-				add_svc_sd "$1" "$service"
+				add_svc_sd "$1" "$(get_svc_dm)"
 			fi
 		;;
 	esac
@@ -372,16 +380,24 @@ configure_root_image(){
 	msg "Configuring [root-image]"
 	configure_lsb "$1"
 	configure_mhwd "$1"
-	configure_openrc "$1"
-	configure_systemd "$1"
+
+	case ${initsys} in
+		'systemd')
+			configure_logind "$1"
+		;;
+		'openrc')
+			configure_sysctl "$1"
+			rm $1/etc/runlevels/boot/hwclock
+		;;
+	esac
 	msg "Done configuring [root-image]"
 }
 
 configure_custom_image(){
 	msg "Configuring [%s-image]" "${profile}"
+	configure_plymouth "$1"
 	configure_displaymanager "$1"
 	configure_services "$1"
-	configure_environment "$1"
 	msg "Done configuring [%s-image]" "${profile}"
 }
 
@@ -390,12 +406,29 @@ configure_live_image(){
 	configure_hosts "$1"
 	configure_user "$1"
 	configure_accountsservice "$1" "${username}"
+	configure_pamac_live "$1"
+	configure_environment "$1"
+	case ${initsys} in
+		'systemd')
+			configure_logind_live "$1"
+			configure_journald "$1"
+
+			# Prevent some services to be started in the livecd
+			echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
+			| tee "${path}/etc/.updated" >"${path}/var/.updated"
+
+			msg2 "Configuring hostname ..."
+			echo ${hostname} > $1/etc/hostname
+		;;
+		'openrc')
+			msg2 "Configuring hostname ..."
+			local _hostname='hostname="'${hostname}'"'
+			sed -i -e "s|^.*hostname=.*|${_hostname}|" $1/etc/conf.d/hostname
+		;;
+	esac
 	configure_services_live "$1"
-	configure_systemd_live "$1"
-	configure_openrc_live "$1"
 	configure_calamares "$1"
 	configure_thus "$1"
-	configure_pamac_live "$1"
 	msg "Done configuring [live-image]"
 }
 
