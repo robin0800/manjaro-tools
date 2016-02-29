@@ -139,12 +139,11 @@ set_xdm(){
 is_valid_de(){
 	local func=$1
 	if [[ ${default_desktop_executable} != "none" ]] && \
-		[[ ${default_desktop_file} != "none" ]]; then
-			return 0
+	[[ ${default_desktop_file} != "none" ]]; then
+		return 0
 	else
 		return 1
 	fi
-
 }
 
 set_sddm_ck(){
