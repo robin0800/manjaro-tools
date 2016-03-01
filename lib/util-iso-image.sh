@@ -351,7 +351,7 @@ configure_services(){
 				add_svc_sd "$1" "$svc"
 			done
 			if [[ ${displaymanager} != "none" ]];then
-				add_svc_sd "$1" "$(get_svc_dm)"
+				add_svc_sd "$1" "$(get_svc_dm $1)"
 			fi
 		;;
 	esac
