@@ -179,6 +179,17 @@ version_gen(){
 	echo $ver
 }
 
+# $1: chroot
+get_branch(){
+	echo $(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch = ' | sed 's/Branch = \s*//g')
+}
+
+# $1: chroot
+# $2: branch
+set_branch(){
+	sed -e "s|/stable|/$2|g" -i "$1/etc/pacman.d/mirrorlist"
+}
+
 init_common(){
 	[[ -z ${branch} ]] && branch='stable'
 
