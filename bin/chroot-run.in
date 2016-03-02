@@ -83,14 +83,12 @@ copy_hostconf () {
 	if [[ -n ${build_mirror} ]];then
 	    build_mirror=${build_mirror}'/$repo/$arch'
 	    if ${keep_mirrors}; then
-			Branch=$(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch = ' | sed 's/Branch = \s*//g')
-			sed -e "s|/stable|/${Branch}|g" -i "$1/etc/pacman.d/mirrorlist"
+			set_branch "$1" "$(get_branch $1)"
 		else
 			echo "Server = ${build_mirror}" > "$1/etc/pacman.d/mirrorlist"
 	    fi
 	else
-	    Branch=$(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch = ' | sed 's/Branch = \s*//g')
-	    sed -e "s|/stable|/${Branch}|g" -i "$1/etc/pacman.d/mirrorlist"
+	    set_branch "$1" "$(get_branch $1)"
 	fi
 
 	sed -r "s|^#?\\s*CacheDir.+|CacheDir = $(echo -n ${cache_dirs[@]})|g" -i "$1/etc/pacman.conf"
