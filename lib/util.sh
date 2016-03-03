@@ -187,6 +187,7 @@ get_branch(){
 # $1: chroot
 # $2: branch
 set_branch(){
+	info "Setting mirrorlist branch: %s" "$2"
 	sed -e "s|/stable|/$2|g" -i "$1/etc/pacman.d/mirrorlist"
 }
 
