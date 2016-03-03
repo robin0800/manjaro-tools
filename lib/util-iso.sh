@@ -161,9 +161,9 @@ make_iso() {
 	touch "${work_dir}/iso/.miso"
 	for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
 		if [[ "$d" != "${work_dir}/iso" ]] && \
-			[[ "${d##*/}" != "iso" ]] && \
-			[[ "${d##*/}" != "efiboot" ]] && \
-			[[ "$d" != "${work_dir}" ]]; then
+		[[ "${d##*/}" != "iso" ]] && \
+		[[ "${d##*/}" != "efiboot" ]] && \
+		[[ "$d" != "${work_dir}" ]]; then
 			make_sqfs "$d"
 		fi
 	done
@@ -240,7 +240,6 @@ make_image_custom() {
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		umount_image
-
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Desktop installation] (%s-image)" "${profile}"
@@ -304,9 +303,7 @@ make_image_mhwd() {
 		configure_mhwd_drivers "${path}"
 
 		umount_image
-
-		clean_up_mhwd_image "${path}"
-
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [drivers repository] (mhwd-image)"
 	fi

@@ -35,12 +35,17 @@ set_mkinicpio_hooks(){
 	fi
 }
 
+set_silent_switch_root(){
+        sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
+}
+
 copy_initcpio(){
 	msg2 "Copying initcpio ..."
 	cp /usr/lib/initcpio/hooks/miso* $2/usr/lib/initcpio/hooks
 	cp /usr/lib/initcpio/install/miso* $2/usr/lib/initcpio/install
 	cp $1/mkinitcpio.conf $2/etc/mkinitcpio-${iso_name}.conf
 	set_mkinicpio_hooks "$2/etc/mkinitcpio-${iso_name}.conf"
+	set_silent_switch_root "$2"
 }
 
 # $1: work_dir
