@@ -444,26 +444,50 @@ chroot_create(){
 		mkchroot ${mkchroot_args[*]} ${flag} $@
 }
 
-# $1: image path
 clean_up_image(){
-	msg2 "Cleaning up [%s]" "${1##*/}"
-	[[ -d "$1/boot/" ]] && find "$1/boot" -name 'initramfs*.img' -delete #&> /dev/null
-	[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
-	[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
+	msg2 "Cleaning [%s]" "${1##*/}"
 
-	find "$1/var/lib/pacman" -maxdepth 1 -type f -delete #&> /dev/null
-	find "$1/var/lib/pacman/sync" -type f -delete #&> /dev/null
-	#find "$1/var/cache/pacman/pkg" -type f -delete &> /dev/null
-	find "$1/var/log" -type f -delete #&> /dev/null
-	#find "$1/var/tmp" -mindepth 1 -delete &> /dev/null
-	#find "$1/tmp" -mindepth 1 -delete &> /dev/null
+	local path
+	if [[ ${1##*/} == 'mhwd-image' ]];then
+		path=$1/var
+		if [[ -d $path ]];then
+			find "$path" -mindepth 0 -delete &> /dev/null
+		fi
+		path=$1/etc
+		if [[ -d $path ]];then
+			find "$path" -mindepth 0 -delete &> /dev/null
+		fi
+		rm -f "$1/cache-packages.txt"
+        else
 
+		[[ -f "$1/etc/locale.gen.bak" ]] && \
+			mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
+		[[ -f "$1/etc/locale.conf.bak" ]] && \
+			mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
+		path=$1/boot
+		if [[ -d "$path" ]]; then
+			find "$path" -name 'initramfs*.img' -delete &> /dev/null
+		fi
+		path=$1/var/lib/pacman/sync
+		if [[ -d $path ]];then
+			find "$path" -type f -delete &> /dev/null
+		fi
+		path=$1/var/cache/pacman/pkg
+		if [[ -d $path ]]; then
+			find "$path" -type f -delete &> /dev/null
+		fi
+		path=$1/var/log
+		if [[ -d $path ]]; then
+			find "$path" -type f -delete &> /dev/null
+		fi
+		path=$1/var/tmp
+		if [[ -d $path ]];then
+			find "$path" -mindepth 1 -delete &> /dev/null
+		fi
+		path=$1/tmp
+		if [[ -d $path ]];then
+			find "$path" -mindepth 1 -delete &> /dev/null
+		fi
+	fi
 # 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-}
-
-clean_up_mhwd_image(){
-	msg2 "Cleaning up [%s]" "${1##*/}"
-	rm -r $1/var
-	rm -rf "$1/etc"
-	rm -f "$1/cache-packages.txt"
 }
