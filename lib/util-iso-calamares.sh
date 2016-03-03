@@ -191,6 +191,29 @@ configure_calamares(){
 	fi
 }
 
+write_cli_inst_conf(){
+	local conf=$1/profile.conf
+	echo '' >> ${conf}
+	echo '# profile image name' >> ${conf}
+	echo "profile=${profile}" >> ${conf}
+	echo '' >> ${conf}
+	echo '# iso_name' >> ${conf}
+	echo "iso_name=${iso_name}" >> ${conf}
+	echo '' >> ${conf}
+	echo '# kernel' >> ${conf}
+	echo "kernnel=${kernel}" >> ${conf}
+}
+
+configure_cli_inst(){
+	msg2 "Configuring cli-installer ..."
+	local path=$1${DATADIR}
+	[[ ! -d $path ]] && mkdir -p $path
+
+	cp ${profile_conf} $path
+
+	write_cli_inst_conf "$path"
+}
+
 configure_thus(){
 	msg2 "Configuring Thus ..."
 	source "$1/etc/mkinitcpio.d/${kernel}.preset"

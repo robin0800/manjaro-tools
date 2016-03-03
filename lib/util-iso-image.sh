@@ -18,25 +18,6 @@ copy_overlay(){
 	fi
 }
 
-write_profile_conf_entries(){
-	local conf=$1/profile.conf
-	echo '' >> ${conf}
-	echo '# profile image name' >> ${conf}
-	echo "profile=${profile}" >> ${conf}
-	echo '' >> ${conf}
-	echo '# iso_name' >> ${conf}
-	echo "iso_name=${iso_name}" >> ${conf}
-}
-
-copy_profile_conf(){
-	msg2 "Copying profile.conf ..."
-	[[ ! -d $1 ]] && mkdir -p $1
-
-	cp ${profile_conf} $1
-
-	write_profile_conf_entries $1
-}
-
 copy_cache_mhwd(){
 	msg2 "Copying mhwd package cache ..."
 	rsync -v --files-from="$1/cache-packages.txt" /var/cache/pacman/pkg "$1/opt/live/pkgs"
@@ -428,6 +409,7 @@ configure_live_image(){
 	configure_services_live "$1"
 	configure_calamares "$1"
 	configure_thus "$1"
+	configure_cli_inst "$1"
 	msg "Done configuring [live-image]"
 }
 
