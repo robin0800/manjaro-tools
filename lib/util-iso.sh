@@ -164,7 +164,6 @@ make_iso() {
 		[[ "${d##*/}" != "iso" ]] && \
 		[[ "${d##*/}" != "efiboot" ]] && \
 		[[ "$d" != "${work_dir}" ]]; then
-			clean_up_image "$d"
 			make_sqfs "$d"
 		fi
 	done
@@ -218,7 +217,7 @@ make_image_root() {
 		copy_overlay "${profile_dir}/root-overlay" "${path}"
 		configure_root_image "${path}"
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
-
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
 	fi
@@ -241,7 +240,7 @@ make_image_custom() {
 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		umount_image
-
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Desktop installation] (%s-image)" "${profile}"
 	fi
@@ -274,7 +273,7 @@ make_image_live() {
 
 		# Clean up GnuPG keys
 		rm -rf "${path}/etc/pacman.d/gnupg"
-
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Live installation] (live-image)"
 	fi
@@ -304,7 +303,7 @@ make_image_mhwd() {
 		configure_mhwd_drivers "${path}"
 
 		umount_image
-
+		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [drivers repository] (mhwd-image)"
 	fi
