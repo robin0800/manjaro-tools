@@ -376,7 +376,7 @@ configure_root_image(){
 configure_custom_image(){
 	msg "Configuring [%s-image]" "${profile}"
 	configure_plymouth "$1"
-	configure_displaymanager "$1"
+	[[ ${displaymanager} != 'none' ]] && configure_displaymanager "$1"
 	configure_services "$1"
 	msg "Done configuring [%s-image]" "${profile}"
 }
