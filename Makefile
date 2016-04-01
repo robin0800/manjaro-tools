@@ -1,4 +1,4 @@
-Version=0.11.4
+Version=0.11.5
 
 PREFIX = /usr/local
 SYSCONFDIR = /etc
@@ -54,8 +54,7 @@ SETS_ISO = \
 	data/iso.d/official.set \
 	data/iso.d/community.set \
 	data/iso.d/minimal.set \
-	data/iso.d/sonar.set \
-	data/iso.d/netrunner.set
+	data/iso.d/sonar.set
 
 BIN_ISO = \
 	bin/buildiso \
