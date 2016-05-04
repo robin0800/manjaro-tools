@@ -82,7 +82,9 @@ configure_accountsservice(){
 	if [ -d "${path}" ] ; then
 		echo "[User]" > ${path}/$2
 		echo "XSession=${default_desktop_file}" >> ${path}/$2
-		echo "Icon=/var/lib/AccountsService/icons/$2.png" >> ${path}/$2
+		if [[ -f "/var/lib/AccountsService/icons/$2.png" ]];then
+			echo "Icon=/var/lib/AccountsService/icons/$2.png" >> ${path}/$2
+		fi
 	fi
 }
 
