@@ -51,7 +51,7 @@ show_profile(){
 			msg2 "start_openrc_live: %s" "${start_openrc_live[*]}"
 			msg2 "disable_openrc: %s" "${disable_openrc[*]}"
 		fi
-		msg2 "is_custom_pac_conf: %s" "${is_custom_pac_conf}"
+# 		msg2 "is_custom_pac_conf: %s" "${is_custom_pac_conf}"
 	fi
 	reset_profile
 }

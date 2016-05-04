@@ -59,24 +59,24 @@ run_safe() {
 	set +e
 }
 
-clean_pacman_conf(){
-	local repositories=$(get_repos "${pacman_conf}") uri='file://'
-	msg "Cleaning [%s/etc/pacman.conf] ..." "$1"
-	for repo in ${repositories[@]}; do
-		case ${repo} in
-			'options'|'core'|'extra'|'community'|'multilib') continue ;;
-			*)
-				msg2 "parsing [%s] ..." "${repo}"
-				parse_section "${repo}" "${pacman_conf}"
-				if [[ ${pc_value} == $uri* ]]; then
-					msg2 "Removing local repo [%s] ..." "${repo}"
-					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
-				fi
-			;;
-		esac
-	done
-	msg "Done cleaning [%s/etc/pacman.conf]" "$1"
-}
+# clean_pacman_conf(){
+# 	local repositories=$(get_repos "${pacman_conf}") uri='file://'
+# 	msg "Cleaning [%s/etc/pacman.conf] ..." "$1"
+# 	for repo in ${repositories[@]}; do
+# 		case ${repo} in
+# 			'options'|'core'|'extra'|'community'|'multilib') continue ;;
+# 			*)
+# 				msg2 "parsing [%s] ..." "${repo}"
+# 				parse_section "${repo}" "${pacman_conf}"
+# 				if [[ ${pc_value} == $uri* ]]; then
+# 					msg2 "Removing local repo [%s] ..." "${repo}"
+# 					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
+# 				fi
+# 			;;
+# 		esac
+# 	done
+# 	msg "Done cleaning [%s/etc/pacman.conf]" "$1"
+# }
 
 # $1: image path
 make_sqfs() {
@@ -216,7 +216,7 @@ make_image_root() {
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		copy_overlay "${profile_dir}/root-overlay" "${path}"
 		configure_root_image "${path}"
-		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+# 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
@@ -237,7 +237,7 @@ make_image_custom() {
 		cp "${path}/${profile}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
 		[[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
 		configure_custom_image "${path}"
-		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+# 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		umount_image
 		clean_up_image "${path}"
@@ -267,7 +267,7 @@ make_image_live() {
 		pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
 		copy_overlay "${profile_dir}/live-overlay" "${path}"
 		configure_live_image "${path}"
-		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+# 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		umount_image
 
@@ -287,7 +287,7 @@ make_image_mhwd() {
 
 		mount_image_select "${path}"
 
-		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+# 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		download_to_cache "${path}" "${packages}"
 
@@ -527,13 +527,13 @@ load_pkgs(){
 }
 
 check_custom_pacman_conf(){
-	if [[ -f ${profile_dir}/pacman-${pacman_conf_arch}.conf ]]; then
-		pacman_conf="${profile_dir}/pacman-${pacman_conf_arch}.conf"
-		is_custom_pac_conf=true
-	else
+# 	if [[ -f ${profile_dir}/pacman-${pacman_conf_arch}.conf ]]; then
+# 		pacman_conf="${profile_dir}/pacman-${pacman_conf_arch}.conf"
+# 		is_custom_pac_conf=true
+# 	else
 		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
-		is_custom_pac_conf=false
-	fi
+# 		is_custom_pac_conf=false
+# 	fi
 }
 
 check_profile(){
@@ -669,7 +669,9 @@ load_profile(){
 
 	load_profile_config "$conf"
 
-	check_custom_pacman_conf
+# 	check_custom_pacman_conf
+
+	pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
 
 	iso_file=$(gen_iso_fn).iso
 
