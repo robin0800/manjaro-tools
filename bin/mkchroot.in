@@ -122,5 +122,6 @@ chroot_args=(${pac_conf:+-C "$pac_conf"} ${makepkg_conf:+-M "$makepkg_conf"} ${m
 ${copy_pac_conf} && chroot_args+=(-X)
 
 exec chroot-run \
+	"${chroot_args[@]}" \
 	 "$working_dir" locale-gen
 
