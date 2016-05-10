@@ -21,7 +21,6 @@ working_dir=''
 build_locales=false
 keep_mirrors=false
 keep_flag=''
-copy_pac_conf=false
 
 usage() {
 	echo "Usage: ${0##*/} [options] working-dir package-list..."
@@ -40,7 +39,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='hLKCx:M:S:c:B:'
+opts='hLKC:M:S:c:B:'
 
 while getopts ${opts} arg; do
 	case "${arg}" in
@@ -51,7 +50,6 @@ while getopts ${opts} arg; do
 		L) build_locales=true ;;
 		B) build_mirror="$OPTARG" ;;
 		K) keep_mirrors=true; keep_flag='-K' ;;
-		x) copy_pac_conf=true ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -119,9 +117,8 @@ if ${build_locales};then
 fi
 
 chroot_args=(${pac_conf:+-C "$pac_conf"} ${makepkg_conf:+-M "$makepkg_conf"} ${mirrors_conf:+-S "$mirrors_conf"} ${build_mirror:+-B "$build_mirror"} ${cache_dir:+-c "$cache_dir"} ${keep_flag})
-${copy_pac_conf} && chroot_args+=(-X)
 
 exec chroot-run \
-	"${chroot_args[@]}" \
+	${chroot_args[*]} \
 	 "$working_dir" locale-gen
 

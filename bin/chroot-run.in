@@ -20,7 +20,6 @@ import ${LIBDIR}/util-mount.sh
 
 working_dir=''
 keep_mirrors=false
-copy_pac_conf=false
 
 usage() {
 	echo "Usage: ${0##*/} [options] working-dir [run arguments]"
@@ -42,7 +41,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='hKCX:M:S:c:r:w:B:'
+opts='hKC:M:S:c:r:w:B:'
 
 while getopts ${opts} arg; do
 	case "${arg}" in
@@ -54,7 +53,6 @@ while getopts ${opts} arg; do
 		w) mountargs_rw="$OPTARG" ;;
 		B) build_mirror="$OPTARG" ;;
 		K) keep_mirrors=true ;;
-		X) copy_pac_conf=true ;;
 		h|?) usage ;;
 		*) error "invalid argument '$arg'"; usage ;;
 	esac
@@ -78,9 +76,7 @@ fi
 copy_hostconf () {
 	cp -a /etc/pacman.d/gnupg "$1/etc/pacman.d"
 
-	if ${copy_pac_conf}; then
-		[[ -n $pac_conf ]] && cp $pac_conf "$1/etc/pacman.conf"
-	fi
+	[[ -n $pac_conf ]] && cp $pac_conf "$1/etc/pacman.conf"
 
 	[[ -n $makepkg_conf ]] && cp $makepkg_conf "$1/etc/makepkg.conf"
 	[[ -n $mirrors_conf ]] && cp ${mirrors_conf} "$1/etc/pacman-mirrors.conf"
