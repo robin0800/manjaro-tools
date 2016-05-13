@@ -32,9 +32,9 @@ configure_user(){
 	# set up user and password
 	msg2 "Creating user ..."
 	if [[ -n ${password} ]];then
-		chroot $1 useradd -m -G ${addgroups} -p $(gen_pw) ${username}
+		chroot $1 useradd -m -G ${addgroups} -p $(gen_pw) -s ${login_shell} ${username}
 	else
-		chroot $1 useradd -m -G ${addgroups} ${username}
+		chroot $1 useradd -m -G ${addgroups} -s ${login_shell} ${username}
 	fi
 }
 

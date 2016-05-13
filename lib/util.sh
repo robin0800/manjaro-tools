@@ -283,6 +283,8 @@ init_buildiso(){
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
 
 	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
+
+	[[ -z ${login_shell} ]] && login_shell='/bin/bash'
 }
 
 init_deployiso(){

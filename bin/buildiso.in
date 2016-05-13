@@ -94,6 +94,7 @@ display_settings(){
 	msg2 "iso_compression: %s" "${iso_compression}"
 	msg2 "iso_checksum: %s" "${iso_checksum}"
 	msg2 "use_overlayfs: %s" "${use_overlayfs}"
+	msg2 "login_shell: %s" "${login_shell}"
 	${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
 
 	msg "BUILD QUEUE:"

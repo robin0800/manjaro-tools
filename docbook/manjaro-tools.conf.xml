@@ -272,6 +272,14 @@
 			</para></listitem>
 		</varlistentry>
 
+		<varlistentry>
+			<term><varname>login_shell=</varname></term>
+
+			<listitem><para>Accepts any login shell for the user, eg. /bin/zsh.
+			login_shell defaults to /bin/bash
+			</para></listitem>
+		</varlistentry>
+
 		</variablelist>
 	</refsect1>
 
