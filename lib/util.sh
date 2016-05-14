@@ -409,7 +409,7 @@ load_profile_config(){
 	[[ -z ${password} ]] && password="manjaro"
 
 	if [[ -z ${addgroups} ]];then
-		addgroups="video,audio,power,disk,storage,optical,network,lp,scanner,wheel"
+		addgroups="video,power,disk,storage,optical,network,lp,scanner,wheel"
 	fi
 
 	if [[ -z ${start_systemd[@]} ]];then
