@@ -104,9 +104,15 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-i systend|openrc</option></term>
+				<term><option>-i systemd|openrc</option></term>
 
 				<listitem><para>The init system on the iso</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><option>-s</option></term>
+
+				<listitem><para>Sign the iso.</para></listitem>
 			</varlistentry>
 
 			<varlistentry>
