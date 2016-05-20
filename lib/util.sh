@@ -53,6 +53,12 @@
 # 	echo ${repos[@]}
 # }
 
+reset_pac_conf(){
+	local conf=$1
+	sed -e "s|^.*HoldPkg     = pacman glibc|HoldPkg      = pacman glibc manjaro-system|" \
+		-e "s|^.*#CheckSpace|CheckSpace|" -i "$1"
+}
+
 read_set(){
 	local _space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \
