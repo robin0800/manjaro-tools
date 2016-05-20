@@ -59,25 +59,6 @@ run_safe() {
 	set +e
 }
 
-# clean_pacman_conf(){
-# 	local repositories=$(get_repos "${pacman_conf}") uri='file://'
-# 	msg "Cleaning [%s/etc/pacman.conf] ..." "$1"
-# 	for repo in ${repositories[@]}; do
-# 		case ${repo} in
-# 			'options'|'core'|'extra'|'community'|'multilib') continue ;;
-# 			*)
-# 				msg2 "parsing [%s] ..." "${repo}"
-# 				parse_section "${repo}" "${pacman_conf}"
-# 				if [[ ${pc_value} == $uri* ]]; then
-# 					msg2 "Removing local repo [%s] ..." "${repo}"
-# 					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
-# 				fi
-# 			;;
-# 		esac
-# 	done
-# 	msg "Done cleaning [%s/etc/pacman.conf]" "$1"
-# }
-
 # $1: image path
 make_sqfs() {
 	if [[ ! -d "$1" ]]; then
@@ -217,6 +198,9 @@ make_image_root() {
 		copy_overlay "${profile_dir}/root-overlay" "${path}"
 		configure_root_image "${path}"
 # 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+
+		reset_pac_conf "${path}"
+
 		clean_up_image "${path}"
 		: > ${work_dir}/build.${FUNCNAME}
 		msg "Done [Base installation] (root-image)"
@@ -238,6 +222,8 @@ make_image_custom() {
 		[[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
 		configure_custom_image "${path}"
 # 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+
+		reset_pac_conf "${path}"
 
 		umount_image
 		clean_up_image "${path}"
@@ -269,6 +255,8 @@ make_image_live() {
 		configure_live_image "${path}"
 # 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
+		reset_pac_conf "${path}"
+
 		umount_image
 
 		# Clean up GnuPG keys
@@ -288,6 +276,8 @@ make_image_mhwd() {
 		mount_image_select "${path}"
 
 # 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
+
+		reset_pac_conf "${path}"
 
 		download_to_cache "${path}" "${packages}"
 
