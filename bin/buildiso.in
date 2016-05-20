@@ -94,7 +94,7 @@ display_settings(){
 	msg2 "iso_checksum: %s" "${iso_checksum}"
 	msg2 "use_overlayfs: %s" "${use_overlayfs}"
 	${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
-	msg2 "is_custom_pac_conf: %s" "${is_custom_pac_conf}"
+	msg2 "pacman_conf: %s" "${pacman_conf}"
 
 	msg "BUILD QUEUE:"
 	run show_profile "${buildset_iso}"
@@ -185,6 +185,8 @@ check_root "$0" "${orig_argv[@]}"
 eval_buildset "${sets_dir_iso}" "${buildset_iso}"
 
 import ${LIBDIR}/util-iso.sh
+
+set_pacman_conf
 
 check_requirements
 

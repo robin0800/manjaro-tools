@@ -185,6 +185,13 @@ gen_iso_fn(){
 	echo $name
 }
 
+reset_pac_conf(){
+	info "Restoring [%s/etc/pacman.conf] ..." "$1"
+	sed -e 's|^.*HoldPkg.*|HoldPkg      = pacman glibc manjaro-system|' \
+		-e "s|^.*#CheckSpace|CheckSpace|" \
+		-i "$1/etc/pacman.conf"
+}
+
 # Base installation (root-image)
 make_image_root() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
@@ -197,7 +204,6 @@ make_image_root() {
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		copy_overlay "${profile_dir}/root-overlay" "${path}"
 		configure_root_image "${path}"
-# 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		reset_pac_conf "${path}"
 
@@ -221,7 +227,6 @@ make_image_custom() {
 		cp "${path}/${profile}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
 		[[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
 		configure_custom_image "${path}"
-# 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		reset_pac_conf "${path}"
 
@@ -253,7 +258,6 @@ make_image_live() {
 		pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
 		copy_overlay "${profile_dir}/live-overlay" "${path}"
 		configure_live_image "${path}"
-# 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		reset_pac_conf "${path}"
 
@@ -274,8 +278,6 @@ make_image_mhwd() {
 		mkdir -p ${path}/opt/live/pkgs
 
 		mount_image_select "${path}"
-
-# 		${is_custom_pac_conf} && clean_pacman_conf "${path}"
 
 		reset_pac_conf "${path}"
 
@@ -661,8 +663,6 @@ load_profile(){
 	info "Profile: [%s]" "${profile}"
 
 	load_profile_config "$conf"
-
-	set_pacman_conf
 
 	iso_file=$(gen_iso_fn).iso
 
