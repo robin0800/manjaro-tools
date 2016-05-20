@@ -53,10 +53,31 @@
 # 	echo ${repos[@]}
 # }
 
+# clean_pacman_conf(){
+# 	local repositories=$(get_repos "${pacman_conf}") uri='file://'
+# 	msg "Cleaning [%s/etc/pacman.conf] ..." "$1"
+# 	for repo in ${repositories[@]}; do
+# 		case ${repo} in
+# 			'options'|'core'|'extra'|'community'|'multilib') continue ;;
+# 			*)
+# 				msg2 "parsing [%s] ..." "${repo}"
+# 				parse_section "${repo}" "${pacman_conf}"
+# 				if [[ ${pc_value} == $uri* ]]; then
+# 					msg2 "Removing local repo [%s] ..." "${repo}"
+# 					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
+# 				fi
+# 			;;
+# 		esac
+# 	done
+# 	msg "Done cleaning [%s/etc/pacman.conf]" "$1"
+# }
+
 reset_pac_conf(){
-	local conf=$1
+	msg "Restoring [%s/etc/pacman.conf] ..." "$1"
 	sed -e "s|^.*HoldPkg     = pacman glibc|HoldPkg      = pacman glibc manjaro-system|" \
-		-e "s|^.*#CheckSpace|CheckSpace|" -i "$1"
+		-e "s|^.*#CheckSpace|CheckSpace|" \
+		-i "$1/etc/pacman.conf"
+	msg "Done restoring [%s/etc/pacman.conf]" "$1"
 }
 
 read_set(){
