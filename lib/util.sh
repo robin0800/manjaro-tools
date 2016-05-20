@@ -73,11 +73,10 @@
 # }
 
 reset_pac_conf(){
-	msg "Restoring [%s/etc/pacman.conf] ..." "$1"
-	sed -e "s|^.*HoldPkg     = pacman glibc|HoldPkg      = pacman glibc manjaro-system|" \
+	info "Restoring [%s/etc/pacman.conf] ..." "$1"
+	sed -e 's|^.*HoldPkg.*|HoldPkg      = pacman glibc manjaro-system|' \
 		-e "s|^.*#CheckSpace|CheckSpace|" \
 		-i "$1/etc/pacman.conf"
-	msg "Done restoring [%s/etc/pacman.conf]" "$1"
 }
 
 read_set(){
