@@ -72,13 +72,6 @@
 # 	msg "Done cleaning [%s/etc/pacman.conf]" "$1"
 # }
 
-reset_pac_conf(){
-	info "Restoring [%s/etc/pacman.conf] ..." "$1"
-	sed -e 's|^.*HoldPkg.*|HoldPkg      = pacman glibc manjaro-system|' \
-		-e "s|^.*#CheckSpace|CheckSpace|" \
-		-i "$1/etc/pacman.conf"
-}
-
 read_set(){
 	local _space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \
