@@ -51,7 +51,6 @@ show_profile(){
 			msg2 "start_openrc_live: %s" "${start_openrc_live[*]}"
 			msg2 "disable_openrc: %s" "${disable_openrc[*]}"
 		fi
-# 		msg2 "is_custom_pac_conf: %s" "${is_custom_pac_conf}"
 	fi
 	reset_profile
 }
@@ -96,6 +95,7 @@ display_settings(){
 	msg2 "use_overlayfs: %s" "${use_overlayfs}"
 	msg2 "login_shell: %s" "${login_shell}"
 	${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
+	msg2 "is_custom_pac_conf: %s" "${is_custom_pac_conf}"
 
 	msg "BUILD QUEUE:"
 	run show_profile "${buildset_iso}"

@@ -516,14 +516,17 @@ load_pkgs(){
 	fi
 }
 
-check_custom_pacman_conf(){
-# 	if [[ -f ${profile_dir}/pacman-${pacman_conf_arch}.conf ]]; then
-# 		pacman_conf="${profile_dir}/pacman-${pacman_conf_arch}.conf"
-# 		is_custom_pac_conf=true
-# 	else
+set_pacman_conf(){
+	if [[ -f ${USERCONFDIR}/user-repos.conf ]];then
+		local temp=/tmp/custom-pacman.conf
+		cat ${DATADIR}/pacman-${pacman_conf_arch}.conf > $temp
+		cat ${USERCONFDIR}/user-repos.conf >> $temp
+		pacman_conf=$temp
+		is_custom_pac_conf=true
+	else
 		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
-# 		is_custom_pac_conf=false
-# 	fi
+		is_custom_pac_conf=false
+	fi
 }
 
 check_profile(){
@@ -659,9 +662,7 @@ load_profile(){
 
 	load_profile_config "$conf"
 
-# 	check_custom_pacman_conf
-
-	pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
+	set_pacman_conf
 
 	iso_file=$(gen_iso_fn).iso
 
