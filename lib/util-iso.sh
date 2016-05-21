@@ -520,14 +520,12 @@ load_pkgs(){
 
 set_pacman_conf(){
 	if [[ -f ${USERCONFDIR}/user-repos.conf ]];then
-		local temp=/tmp/custom-pacman.conf
-		cat ${DATADIR}/pacman-${pacman_conf_arch}.conf > $temp
-		cat ${USERCONFDIR}/user-repos.conf >> $temp
-		pacman_conf=$temp
-		is_custom_pac_conf=true
+		local conf=/tmp/custom-pacman.conf
+		cat ${DATADIR}/pacman-${pacman_conf_arch}.conf > "$conf"
+		cat ${USERCONFDIR}/user-repos.conf >> "$conf"
+		pacman_conf="$conf"
 	else
 		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
-		is_custom_pac_conf=false
 	fi
 }
 
