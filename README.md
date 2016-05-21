@@ -268,12 +268,23 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 
 ####Special parameters
 
-######* -i
+######* -x
 * Build images only
 * will stop after all packages have been installed. No iso sqfs compression will be executed
 
-######* -s
-* Use this to sqfs compress the chroots if you previously used -i.
+######* -z
+* Use this to sqfs compress the chroots if you previously used -x.
+
+
+######* buildiso can be configured to use custom repos.
+
+* create a user-repos.conf
+
+~~~
+$HOME/.config/manjaro-tools/user-repos.conf
+~~~
+
+Add only your repos to user-repos.conf!
 
 
 ###4. buildtree
