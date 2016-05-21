@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.11.0
+Manjaro-tools-0.12.0
 
 User manual
 
@@ -128,9 +128,6 @@ overriding
 # experimental; use overlayfs instead of aufs
 # requires minimum 4.0 kernel on the build host and on iso in profile.conf
 # use_overlayfs="true"
-
-# the login shell
-# login_shell=/bin/bash
 
 ################ deployiso ################
 
