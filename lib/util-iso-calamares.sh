@@ -11,28 +11,30 @@
 
 write_calamares_branding_desc(){
 	local conf="$1/usr/share/calamares/branding/sonar/branding.desc"
-	echo '---' > "$conf"
-	echo "componentName:  sonar" >> $conf
-	echo '' >> $conf
-	echo 'strings:' >> $conf
-	echo "    productName:         ${dist_name} GNU Linux" >> $conf
-	echo "    shortProductName:    ${dist_name}" >> $conf
-	echo "    version:             ${dist_release}" >> $conf
-	echo "    shortVersion:        ${dist_release}" >> $conf
-	echo "    versionedName:       ${dist_name} GNU Linux  ${dist_release}" >> $conf
-	echo "    shortVersionedName:  ${dist_name} Linux ${dist_release}" >> $conf
-	echo "    bootloaderEntryName: ${dist_name}" >> $conf
-	echo '' >> $conf
-	echo 'images:' >> $conf
-	echo '    productLogo:         "squid.png"' >> $conf
-	echo '    productIcon:         "logo.png"' >> $conf
-	echo '    productWelcome:      "languages.png"' >> $conf
-	echo '' >> $conf
-	echo 'slideshow:               "show.qml"' >> $conf
-	echo 'style:' >> $conf
-	echo '   sidebarBackground:    "#292F34"' >> $conf
-	echo '   sidebarText:          "#FFFFFF"' >> $conf
-	echo '   sidebarTextSelect:    "#292F34"' >> $conf
+	if [[ -f "$conf" ]];then
+		echo '---' > "$conf"
+		echo "componentName:  sonar" >> "$conf"
+		echo '' >> $conf
+		echo 'strings:' >> $conf
+		echo "    productName:         ${dist_name} GNU Linux" >> "$conf"
+		echo "    shortProductName:    ${dist_name}" >> "$conf"
+		echo "    version:             ${dist_release}" >> "$conf"
+		echo "    shortVersion:        ${dist_release}" >> "$conf"
+		echo "    versionedName:       ${dist_name} GNU Linux  ${dist_release}" >> "$conf"
+		echo "    shortVersionedName:  ${dist_name} Linux ${dist_release}" >> "$conf"
+		echo "    bootloaderEntryName: ${dist_name}" >> "$conf"
+		echo '' >> $conf
+		echo 'images:' >> $conf
+		echo '    productLogo:         "squid.png"' >> "$conf"
+		echo '    productIcon:         "logo.png"' >> "$conf"
+		echo '    productWelcome:      "languages.png"' >> "$conf"
+		echo '' >> $conf
+		echo 'slideshow:               "show.qml"' >> "$conf"
+		echo 'style:' >> $conf
+		echo '   sidebarBackground:    "#292F34"' >> "$conf"
+		echo '   sidebarText:          "#FFFFFF"' >> "$conf"
+		echo '   sidebarTextSelect:    "#292F34"' >> "$conf"
+	fi
 }
 
 write_calamares_machineid_conf(){
