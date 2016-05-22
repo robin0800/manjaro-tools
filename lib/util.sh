@@ -364,6 +364,7 @@ reset_profile(){
 	unset start_openrc_live
 	unset packages_custom
 	unset packages_mhwd
+	unset login_shell
 }
 
 is_valid_bool(){
