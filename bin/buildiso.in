@@ -186,8 +186,6 @@ eval_buildset "${sets_dir_iso}" "${buildset_iso}"
 
 import ${LIBDIR}/util-iso.sh
 
-set_pacman_conf
-
 check_requirements
 
 ${pretend} && display_settings && exit 1

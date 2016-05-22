@@ -518,17 +518,6 @@ load_pkgs(){
 	fi
 }
 
-set_pacman_conf(){
-	if [[ -f ${USERCONFDIR}/user-repos.conf ]];then
-		local conf=/tmp/custom-pacman.conf
-		cat ${DATADIR}/pacman-${pacman_conf_arch}.conf > "$conf"
-		cat ${USERCONFDIR}/user-repos.conf >> "$conf"
-		pacman_conf="$conf"
-	else
-		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
-	fi
-}
-
 check_profile(){
 	local keyfiles=("${profile_dir}/mkinitcpio.conf"
 			"${profile_dir}/Packages-Root"
@@ -656,11 +645,25 @@ make_profile(){
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
+set_pacman_conf(){
+	if [[ -f ${profile_dir}/user-repos.conf ]];then
+		local conf=/tmp/custom-pacman.conf
+		cat ${DATADIR}/pacman-${pacman_conf_arch}.conf > "$conf"
+		cat ${profile_dir}/user-repos.conf >> "$conf"
+		pacman_conf="$conf"
+	else
+		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
+	fi
+}
+
 load_profile(){
 	conf="${profile_dir}/profile.conf"
+
 	info "Profile: [%s]" "${profile}"
 
 	load_profile_config "$conf"
+
+	set_pacman_conf
 
 	iso_file=$(gen_iso_fn).iso
 
