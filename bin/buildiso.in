@@ -66,7 +66,7 @@ display_settings(){
 	msg2 "buildset_iso: %s" "${buildset_iso}"
 	msg2 "is_buildset: %s" "${is_buildset}"
 	${verbose} && msg2 "run_dir: %s" "${run_dir}"
-	${is_log} && msg2 "log_dir: %s" "${log_dir}"
+	${verbose} && msg2 "log_dir: %s" "${log_dir}"
 	msg2 "pacman_conf: %s" "${pacman_conf}"
 
 	msg "OPTIONS:"
@@ -81,7 +81,6 @@ display_settings(){
 	msg2 "images_only: %s" "${images_only}"
 	msg2 "iso_only: %s" "${iso_only}"
 	msg2 "sign: %s" "${sign}"
-	msg2 "is_log: %s" "${is_log}"
 
 	msg "DIST SETTINGS:"
 	msg2 "dist_name: %s" "${dist_name}"
@@ -117,7 +116,6 @@ images_only=false
 iso_only=false
 verbose=false
 sign=false
-is_log=false
 
 pacman_conf_arch='default'
 
@@ -139,8 +137,7 @@ usage() {
 	echo '    -x                 Build images only'
 	echo '    -z                 Generate iso only'
 	echo '                       Requires pre built images (-x)'
-	echo '    -l                 Log the build process'
-	echo '    -v                 Verbose output, show profies detail (-q)'
+	echo '    -v                 Verbose output to log file, show profile detail (-q)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
 	echo ''
@@ -150,7 +147,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:clzxsvqh'
+opts='p:a:b:r:t:k:i:czxsvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -165,7 +162,6 @@ while getopts "${opts}" arg; do
 		c) clean_first=false ;;
 		x) images_only=true ;;
 		z) iso_only=true ;;
-		l) is_log=true ;;
 		v) verbose=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;

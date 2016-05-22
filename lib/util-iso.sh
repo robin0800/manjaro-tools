@@ -48,7 +48,7 @@ run_safe() {
 	restoretrap=$(trap -p ERR)
 	trap 'error_function $func' ERR SIGINT SIGTERM
 
-	if ${is_log};then
+	if ${verbose};then
 		run_log "$func"
 	else
 		"$func"
@@ -90,14 +90,14 @@ make_sqfs() {
 
 	if [[ "$name" == "mhwd-image" && ${used_kernel} < "4" ]]; then
 		mksqfs_args+=(-comp lz4)
-		if ${is_log};then
+		if ${verbose};then
 			mksquashfs "${mksqfs_args[@]}" >/dev/null
 		else
 			mksquashfs "${mksqfs_args[@]}"
 		fi
 	else
 		mksqfs_args+=(-comp ${iso_compression} ${highcomp})
-		if ${is_log};then
+		if ${verbose};then
 			mksquashfs "${mksqfs_args[@]}" >/dev/null
 		else
 			mksquashfs "${mksqfs_args[@]}"
