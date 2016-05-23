@@ -646,10 +646,13 @@ make_profile(){
 }
 
 set_pacman_conf(){
-	if [[ -f ${profile_dir}/user-repos.conf ]];then
+	local user_conf=${profile_dir}/user-repos.conf
+	if [[ -f ${user_conf} ]];then
+		info "detected: %s" "user-repos.conf"
+		check_user_repos_conf "${user_conf}"
 		local conf=/tmp/custom-pacman.conf
 		cat ${DATADIR}/pacman-${pacman_conf_arch}.conf > "$conf"
-		cat ${profile_dir}/user-repos.conf >> "$conf"
+		cat ${user_conf} >> "$conf"
 		pacman_conf="$conf"
 	else
 		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
