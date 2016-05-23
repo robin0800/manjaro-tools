@@ -9,68 +9,58 @@
 # GNU General Public License for more details.
 
 # $1: section
-# parse_section() {
-# 	local is_section=0
-# 	while read line; do
-# 		[[ $line =~ ^\ {0,}# ]] && continue
-# 		[[ -z "$line" ]] && continue
-# 		if [ $is_section == 0 ]; then
-# 			if [[ $line =~ ^\[.*?\] ]]; then
-# 				line=${line:1:$((${#line}-2))}
-# 				section=${line// /}
-# 				if [[ $section == $1 ]]; then
-# 					is_section=1
-# 					continue
-# 				fi
-# 				continue
-# 			fi
-# 		elif [[ $line =~ ^\[.*?\] && $is_section == 1 ]]; then
-# 			break
-# 		else
-# 			pc_key=${line%%=*}
-# 			pc_key=${pc_key// /}
-# 			pc_value=${line##*=}
-# 			pc_value=${pc_value## }
-# 			eval "$pc_key='$pc_value'"
-# 		fi
-# 	done < "$2"
-# }
-#
-# get_repos() {
-# 	local section repos=() filter='^\ {0,}#'
-# 	while read line; do
-# 		[[ $line =~ "${filter}" ]] && continue
-# 		[[ -z "$line" ]] && continue
-# 		if [[ $line =~ ^\[.*?\] ]]; then
-# 			line=${line:1:$((${#line}-2))}
-# 			section=${line// /}
-# 			case ${section} in
-# 				"options") continue ;;
-# 				*) repos+=("${section}") ;;
-# 			esac
-# 		fi
-# 	done < "$1"
-# 	echo ${repos[@]}
-# }
+parse_section() {
+	local is_section=0
+	while read line; do
+		[[ $line =~ ^\ {0,}# ]] && continue
+		[[ -z "$line" ]] && continue
+		if [ $is_section == 0 ]; then
+			if [[ $line =~ ^\[.*?\] ]]; then
+				line=${line:1:$((${#line}-2))}
+				section=${line// /}
+				if [[ $section == $1 ]]; then
+					is_section=1
+					continue
+				fi
+				continue
+			fi
+		elif [[ $line =~ ^\[.*?\] && $is_section == 1 ]]; then
+			break
+		else
+			pc_key=${line%%=*}
+			pc_key=${pc_key// /}
+			pc_value=${line##*=}
+			pc_value=${pc_value## }
+			eval "$pc_key='$pc_value'"
+		fi
+	done < "$2"
+}
 
-# clean_pacman_conf(){
-# 	local repositories=$(get_repos "${pacman_conf}") uri='file://'
-# 	msg "Cleaning [%s/etc/pacman.conf] ..." "$1"
-# 	for repo in ${repositories[@]}; do
-# 		case ${repo} in
-# 			'options'|'core'|'extra'|'community'|'multilib') continue ;;
-# 			*)
-# 				msg2 "parsing [%s] ..." "${repo}"
-# 				parse_section "${repo}" "${pacman_conf}"
-# 				if [[ ${pc_value} == $uri* ]]; then
-# 					msg2 "Removing local repo [%s] ..." "${repo}"
-# 					sed -i "/^\[${repo}/,/^Server/d" $1/etc/pacman.conf
-# 				fi
-# 			;;
-# 		esac
-# 	done
-# 	msg "Done cleaning [%s/etc/pacman.conf]" "$1"
-# }
+get_repos() {
+	local section repos=() filter='^\ {0,}#'
+	while read line; do
+		[[ $line =~ "${filter}" ]] && continue
+		[[ -z "$line" ]] && continue
+		if [[ $line =~ ^\[.*?\] ]]; then
+			line=${line:1:$((${#line}-2))}
+			section=${line// /}
+			case ${section} in
+				"options") continue ;;
+				*) repos+=("${section}") ;;
+			esac
+		fi
+	done < "$1"
+	echo ${repos[@]}
+}
+
+check_user_repos_conf(){
+	local repositories=$(get_repos "$1") uri='file://'
+	for repo in ${repositories[@]}; do
+		msg2 "parsing repo [%s] ..." "${repo}"
+		parse_section "${repo}" "$1"
+		[[ ${pc_value} == $uri* ]] && abort "Using local repositories is not supported!"
+	done
+}
 
 read_set(){
 	local _space="s| ||g" \
