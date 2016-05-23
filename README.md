@@ -275,17 +275,6 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 * Use this to sqfs compress the chroots if you previously used -x.
 
 
-######* buildiso can be configured to use custom repos.
-
-* create a user-repos.conf
-
-~~~
-$HOME/.config/manjaro-tools/user-repos.conf
-~~~
-
-Add only your repos to user-repos.conf!
-
-
 ###4. buildtree
 
 buildtree is a little tools to sync arch abs and manjaro PKGBUILD git repos.
