@@ -58,7 +58,7 @@ check_user_repos_conf(){
 	for repo in ${repositories[@]}; do
 		msg2 "parsing repo [%s] ..." "${repo}"
 		parse_section "${repo}" "$1"
-		[[ ${pc_value} == $uri* ]] && abort "Using local repositories is not supported!"
+		[[ ${pc_value} == $uri* ]] && die "Using local repositories is not supported!"
 	done
 }
 
