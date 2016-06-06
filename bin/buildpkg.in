@@ -42,8 +42,8 @@ display_settings(){
 	msg2 "is_buildset: %s" "${is_buildset}"
 
 	msg "OPTIONS:"
-	msg2 "arch: %s" "${arch}"
-	msg2 "branch: %s" "${branch}"
+	msg2 "arch: %s" "${target_arch}"
+	msg2 "branch: %s" "${target_branch}"
 	msg2 "chroots_pkg: %s" "${chroots_pkg}"
 
 	msg "ARGS:"
@@ -57,7 +57,7 @@ display_settings(){
 	msg "PATHS:"
 	msg2 "work_dir: %s" "${work_dir}"
 	msg2 "pkg_dir: %s" "${pkg_dir}"
-	msg2 "build_mirror: %s" "${build_mirror}/${branch}"
+	msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
 
 	if ${clean_first};then
 		msg "PKG:"
@@ -89,8 +89,8 @@ udev_root=false
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p <pkg>           Buildset or pkg [default: ${buildset_pkg}]"
-	echo "    -a <arch>          Arch [default: ${arch}]"
-	echo "    -b <branch>        Branch [default: ${branch}]"
+	echo "    -a <arch>          Arch [default: ${target_arch}]"
+	echo "    -b <branch>        Branch [default: ${target_branch}]"
 	echo '    -r <dir>           Chroots directory'
 	echo "                       [default: ${chroots_pkg}]"
 	echo '    -i <pkg>           Install a package into the working copy of the chroot'
@@ -113,8 +113,8 @@ opts='p:a:b:r:i:cwnsuqh'
 while getopts "${opts}" arg; do
 	case "${arg}" in
 		p) buildset_pkg="$OPTARG" ;;
-		a) arch="$OPTARG" ;;
-		b) branch="$OPTARG" ;;
+		a) target_arch="$OPTARG" ;;
+		b) target_branch="$OPTARG" ;;
 		r) chroots_pkg="$OPTARG" ;;
 		i) install_pkgs+="$OPTARG"; mkchrootpkg_args+=(-I ${install_pkgs[*]}) ;;
 		c) clean_first=true; mkchroot_args+=(-L) ;;
@@ -128,24 +128,24 @@ while getopts "${opts}" arg; do
 	esac
 done
 
-if [[ "${arch}" == 'multilib' ]]; then
-        pacman_conf_arch=${arch}
-        work_dir=${chroots_pkg}/${branch}/${arch}
-        pkg_dir=${cache_dir_pkg}/${branch}/${arch}
+if [[ "${target_arch}" == 'multilib' ]]; then
+        pacman_conf_arch=${target_arch}
+        work_dir=${chroots_pkg}/${target_branch}/${target_arch}
+        pkg_dir=${cache_dir_pkg}/${target_branch}/${target_arch}
         arch='x86_64'
         is_multilib=true
 else
         pacman_conf_arch='default'
-        work_dir=${chroots_pkg}/${branch}/${arch}
-        pkg_dir=${cache_dir_pkg}/${branch}/${arch}
+        work_dir=${chroots_pkg}/${target_branch}/${target_arch}
+        pkg_dir=${cache_dir_pkg}/${target_branch}/${target_arch}
         is_multilib=false
 fi
 
 pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
-makepkg_conf="${DATADIR}/makepkg-${arch}.conf"
-mirrors_conf="${DATADIR}/pacman-mirrors-${branch}.conf"
+makepkg_conf="${DATADIR}/makepkg-${target_arch}.conf"
+mirrors_conf="${DATADIR}/pacman-mirrors-${target_branch}.conf"
 
-mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}")
+mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}")
 
 mkchrootpkg_args+=(-r ${work_dir})
 

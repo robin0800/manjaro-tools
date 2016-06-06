@@ -265,7 +265,7 @@ configure_lsb(){
 }
 
 configure_mhwd(){
-	if [[ ${arch} == "x86_64" ]];then
+	if [[ ${target_arch} == "x86_64" ]];then
 		if ! ${multilib};then
 			msg2 "Disable mhwd lib32 support"
 			echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
@@ -425,13 +425,13 @@ download_to_cache(){
 	chroot-run \
 		  -r "${mountargs_ro}" \
 		  -w "${mountargs_rw}" \
-		  -B "${build_mirror}/${branch}" \
+		  -B "${build_mirror}/${target_branch}" \
 		  "$1" \
 		  pacman -v -Syw $2 --noconfirm || return 1
 	chroot-run \
 		  -r "${mountargs_ro}" \
 		  -w "${mountargs_rw}" \
-		  -B "${build_mirror}/${branch}" \
+		  -B "${build_mirror}/${target_branch}" \
 		  "$1" \
 		  pacman -v -Sp $2 --noconfirm > "$1"/cache-packages.txt
 	sed -ni '/.pkg.tar.xz/p' "$1"/cache-packages.txt
@@ -442,7 +442,7 @@ download_to_cache(){
 # $2: packages
 chroot_create(){
 	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
-	setarch "${arch}" \
+	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} $@
 }
 

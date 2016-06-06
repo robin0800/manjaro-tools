@@ -201,9 +201,9 @@ set_branch(){
 }
 
 init_common(){
-	[[ -z ${branch} ]] && branch='stable'
+	[[ -z ${target_branch} ]] && target_branch='stable'
 
-	[[ -z ${arch} ]] && arch=$(uname -m)
+	[[ -z ${target_arch} ]] && target_arch=$(uname -m)
 
 	[[ -z ${cache_dir} ]] && cache_dir='/var/cache/manjaro-tools'
 

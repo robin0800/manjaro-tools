@@ -68,7 +68,7 @@
 
 		<variablelist>
 			<varlistentry>
-				<term><varname>branch=</varname></term>
+				<term><varname>target_branch=</varname></term>
 
 				<listitem><para>Takes <option>stable</option> (the default),
 				<option>testing</option> or <option>unstable</option>. It defines
@@ -78,7 +78,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>arch=</varname></term>
+				<term><varname>target_arch=</varname></term>
 
 				<listitem><para>Takes <option>i686</option> or <option>x86_64</option>.
 				By default it will try to autodetect the current architecture.

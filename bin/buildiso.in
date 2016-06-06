@@ -32,7 +32,7 @@ show_profile(){
 		msg2 "plymouth_boot: %s" "${plymouth_boot}"
 		${plymouth_boot} && msg2 "plymouth_theme: %s" "${plymouth_theme}"
 
-		[[ ${arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
+		[[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
 
 		msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
 		msg2 "efi_part_size: %s" "${efi_part_size}"
@@ -70,8 +70,8 @@ display_settings(){
 	msg2 "pacman_conf: %s" "${pacman_conf}"
 
 	msg "OPTIONS:"
-	msg2 "arch: %s" "${arch}"
-	msg2 "branch: %s" "${branch}"
+	msg2 "arch: %s" "${target_arch}"
+	msg2 "branch: %s" "${target_branch}"
 	msg2 "chroots_iso: %s" "${chroots_iso}"
 	msg2 "initsys: %s" "${initsys}"
 	msg2 "kernel: %s" "${kernel}"
@@ -122,8 +122,8 @@ pacman_conf_arch='default'
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p <profile>       Buildset or profile [default: ${buildset_iso}]"
-	echo "    -a <arch>          Arch [default: ${arch}]"
-	echo "    -b <branch>        Branch [default: ${branch}]"
+	echo "    -a <arch>          Arch [default: ${target_arch}]"
+	echo "    -b <branch>        Branch [default: ${target_branch}]"
 	echo '    -r <dir>           Chroots directory'
 	echo "                       [default: ${chroots_iso}]"
 	echo '    -t <dir>           Target directory'
@@ -152,8 +152,8 @@ opts='p:a:b:r:t:k:i:czxsvqh'
 while getopts "${opts}" arg; do
 	case "${arg}" in
 		p) buildset_iso="$OPTARG" ;;
-		a) arch="$OPTARG" ;;
-		b) branch="$OPTARG" ;;
+		a) target_arch="$OPTARG" ;;
+		b) target_branch="$OPTARG" ;;
 		r) chroots_iso="$OPTARG" ;;
 		t) cache_dir_iso="$OPTARG" ;;
 		k) kernel="$OPTARG" ;;
@@ -173,9 +173,9 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-[[ "${arch}" == 'x86_64' ]] && pacman_conf_arch='multilib'
+[[ "${target_arch}" == 'x86_64' ]] && pacman_conf_arch='multilib'
 
-mirrors_conf="${DATADIR}/pacman-mirrors-${branch}.conf"
+mirrors_conf="${DATADIR}/pacman-mirrors-${target_branch}.conf"
 
 check_root "$0" "${orig_argv[@]}"
 

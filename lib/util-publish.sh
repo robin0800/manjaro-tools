@@ -25,7 +25,7 @@ create_subtree(){
 
 prepare_transfer(){
 	edition=$(get_edition $1)
-	remote_dir="${edition}/$1/${dist_release}/${arch}"
+	remote_dir="${edition}/$1/${dist_release}/${target_arch}"
 	src_dir="${run_dir}/${remote_dir}"
 }
 
@@ -36,7 +36,7 @@ gen_iso_fn(){
 	[[ ${edition} == 'community' ]] && vars+=("${edition}")
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
-	vars+=("${arch}")
+	vars+=("${target_arch}")
 	for n in ${vars[@]};do
 		name=${name:-}${name:+-}${n}
 	done
@@ -59,7 +59,7 @@ sync_dir(){
 	prepare_transfer "$1"
 	${torrent_create} && create_torrent "$1"
 	${remote_create} && create_subtree "$1"
-	msg "Start upload [%s] (%s) ..." "$1" "${arch}"
+	msg "Start upload [%s] (%s) ..." "$1" "${target_arch}"
 	rsync ${rsync_args[*]} ${src_dir}/ ${sf_url}/${remote_dir}/
 	msg "Done upload [%s]" "$1"
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"

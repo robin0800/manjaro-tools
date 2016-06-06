@@ -84,30 +84,30 @@ write_loader_conf(){
 	local conf=$1/${fn}
 	msg2 "Writing %s ..." "${fn}"
 	echo 'timeout 3' > ${conf}
-	echo "default ${iso_name}-${arch}" >> ${conf}
+	echo "default ${iso_name}-${target_arch}" >> ${conf}
 }
 
 write_efi_shellv1_conf(){
-	local fn=uefi-shell-v1-${arch}.conf
+	local fn=uefi-shell-v1-${target_arch}.conf
 	local conf=$1/${fn}
 	msg2 "Writing %s ..." "${fn}"
-	echo "title  UEFI Shell ${arch} v1" > ${conf}
+	echo "title  UEFI Shell ${target_arch} v1" > ${conf}
 	echo "efi    /EFI/shellx64_v1.efi" >> ${conf}
 }
 
 write_efi_shellv2_conf(){
-	local fn=uefi-shell-v2-${arch}.conf
+	local fn=uefi-shell-v2-${target_arch}.conf
 	local conf=$1/${fn}
 	msg2 "Writing %s ..." "${fn}"
-	echo "title  UEFI Shell ${arch} v2" > ${conf}
+	echo "title  UEFI Shell ${target_arch} v2" > ${conf}
 	echo "efi    /EFI/shellx64_v2.efi" >> ${conf}
 }
 
 write_dvd_conf(){
-	local fn=${iso_name}-${arch}.conf
+	local fn=${iso_name}-${target_arch}.conf
 	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
-	echo "title   ${dist_name} Linux ${arch} UEFI DVD (default)" > ${conf}
+	echo "title   ${dist_name} Linux ${target_arch} UEFI DVD (default)" > ${conf}
 	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
 	if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
@@ -118,10 +118,10 @@ write_dvd_conf(){
 }
 
 write_dvd_nonfree_conf(){
-	local fn=${iso_name}-${arch}-nonfree.conf
+	local fn=${iso_name}-${target_arch}-nonfree.conf
 	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
-	echo "title   ${dist_name} Linux ${arch} UEFI DVD (nonfree)" > ${conf}
+	echo "title   ${dist_name} Linux ${target_arch} UEFI DVD (nonfree)" > ${conf}
 	echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
 	if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
@@ -132,30 +132,30 @@ write_dvd_nonfree_conf(){
 }
 
 write_usb_conf(){
-	local fn=${iso_name}-${arch}.conf
+	local fn=${iso_name}-${target_arch}.conf
 	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
-	echo "title   ${dist_name} Linux ${arch} UEFI USB (default)" > ${conf}
-	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+	echo "title   ${dist_name} Linux ${target_arch} UEFI USB (default)" > ${conf}
+	echo "linux   /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
 	if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
 		echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
 	fi
-	echo "initrd  /${iso_name}/boot/${arch}/${iso_name}.img" >> ${conf}
+	echo "initrd  /${iso_name}/boot/${target_arch}/${iso_name}.img" >> ${conf}
 	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free" >> ${conf}
 }
 
 write_usb_nonfree_conf(){
-	local fn=${iso_name}-${arch}-nonfree.conf
+	local fn=${iso_name}-${target_arch}-nonfree.conf
 	local conf=$1/${fn} path=$2
 	msg2 "Writing %s ..." "${fn}"
-	echo "title   ${dist_name} Linux ${arch} UEFI USB (nonfree)" > ${conf}
-	echo "linux   /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+	echo "title   ${dist_name} Linux ${target_arch} UEFI USB (nonfree)" > ${conf}
+	echo "linux   /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
 	if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
 		msg2 "Using intel_ucode.img ..."
 		echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
 	fi
-	echo "initrd  /${iso_name}/boot/${arch}/${iso_name}.img" >> ${conf}
+	echo "initrd  /${iso_name}/boot/${target_arch}/${iso_name}.img" >> ${conf}
 	echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=nonfree nonfree=yes" >> ${conf}
 }
 
@@ -195,7 +195,7 @@ gen_boot_args(){
 }
 
 gen_initrd_arg(){
-	local path="/${iso_name}/boot/${arch}/${iso_name}.img"
+	local path="/${iso_name}/boot/${target_arch}/${iso_name}.img"
 	local arg="initrd=${path}"
 	if [[ -f $1/${iso_name}/boot/intel_ucode.img ]] ; then
 		arg="initrd=/${iso_name}/boot/intel_ucode.img,${path}"
@@ -215,7 +215,7 @@ write_isolinux_cfg(){
 	echo "timeout  200" >> ${conf}
 	echo '' >> ${conf}
 	echo "label start" >> ${conf}
-	echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+	echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
 
 	local boot_args=($(gen_boot_args))
 	local initrd_arg=$(gen_initrd_arg $path)
@@ -225,7 +225,7 @@ write_isolinux_cfg(){
 	echo '' >> ${conf}
 	if ${nonfree_xorg};then
 		echo "label nonfree" >> ${conf}
-		echo "  kernel /${iso_name}/boot/${arch}/${iso_name}" >> ${conf}
+		echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
 		echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree ${boot_args[@]} showopts" >> ${conf}
 		echo '' >> ${conf}
 	fi
@@ -264,7 +264,7 @@ update_isolinux_cfg(){
 	msg2 "Updating %s ..." "${fn}"
 	sed -i "s|%ISO_LABEL%|${iso_label}|g;
 			s|%ISO_NAME%|${iso_name}|g;
-			s|%ARCH%|${arch}|g" $2/${fn}
+			s|%ARCH%|${target_arch}|g" $2/${fn}
 }
 
 update_isolinux_msg(){
@@ -279,15 +279,15 @@ write_isomounts(){
 	echo '# Sample kernel argument in syslinux: overlay=extra,extra2' >> ${file}
 	echo '' >> ${file}
 	msg2 "Writing live entry ..."
-	echo "${arch}/live-image.sqfs ${arch} / squashfs" >> ${file}
+	echo "${target_arch}/live-image.sqfs ${target_arch} / squashfs" >> ${file}
 	if [[ -f ${packages_mhwd} ]] ; then
 		msg2 "Writing mhwd entry ..."
-		echo "${arch}/mhwd-image.sqfs ${arch} / squashfs" >> ${file}
+		echo "${target_arch}/mhwd-image.sqfs ${target_arch} / squashfs" >> ${file}
 	fi
 	if [[ -f "${packages_custom}" ]] ; then
 		msg2 "Writing %s entry ..." "${profile}"
-		echo "${arch}/${profile}-image.sqfs ${arch} / squashfs" >> ${file}
+		echo "${target_arch}/${profile}-image.sqfs ${target_arch} / squashfs" >> ${file}
 	fi
 	msg2 "Writing root entry ..."
-	echo "${arch}/root-image.sqfs ${arch} / squashfs" >> ${file}
+	echo "${target_arch}/root-image.sqfs ${target_arch} / squashfs" >> ${file}
 }

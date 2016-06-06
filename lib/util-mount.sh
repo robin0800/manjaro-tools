@@ -97,10 +97,10 @@ chroot_mount_partitions(){
 
 	local chroot_arch=$(get_chroot_arch $1)
 	[[ ${chroot_arch} == x86-64 ]] && chroot_arch=${chroot_arch/-/_}
-	case ${arch} in
+	case ${target_arch} in
 		i686)
 			if [[ ${chroot_arch} == x86_64 ]];then
-				die "You can't chroot from %s host into %s!" "${arch}" "${chroot_arch}"
+				die "You can't chroot from %s host into %s!" "${target_arch}" "${chroot_arch}"
 			fi
 		;;
 	esac

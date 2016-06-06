@@ -51,10 +51,10 @@ overriding
 ################ manjaro-tools.conf ##################
 ######################################################
 
-# default branch
-# branch=stable
+# default target branch
+# target_branch=stable
 
-# default arch: auto detect
+# default target arch: auto detect
 # arch=$(uname -m)
 
 # cache dir where buildpkg, buildtree cache packages/pkgbuild, builiso iso files

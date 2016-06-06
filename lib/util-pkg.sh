@@ -144,16 +144,16 @@ init_base_devel(){
 }
 
 chroot_create(){
-	msg "Creating chroot for [%s] (%s)..." "${branch}" "${arch}"
+	msg "Creating chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
 	mkdir -p "${work_dir}"
-	setarch "${arch}" \
+	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} \
 		"${work_dir}/root" \
 		${base_packages[*]} || abort
 }
 
 chroot_clean(){
-	msg "Cleaning chroot for [%s] (%s)..." "${branch}" "${arch}"
+	msg "Cleaning chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
 	for copy in "${work_dir}"/*; do
 		[[ -d ${copy} ]] || continue
 		msg2 "Deleting chroot copy %s ..." "$(basename "${copy}")"
@@ -171,7 +171,7 @@ chroot_clean(){
 }
 
 chroot_update(){
-	msg "Updating chroot for [%s] (%s)..." "${branch}" "${arch}"
+	msg "Updating chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
 	chroot-run ${mkchroot_args[*]} \
 			"${work_dir}/${OWNER}" \
 			pacman -Syu --noconfirm || abort
@@ -193,13 +193,12 @@ sign_pkg(){
 }
 
 post_build(){
-	local _arch=${arch}
 	source PKGBUILD
 	local ext='pkg.tar.xz' pinfo loglist=() lname
 	if [[ ${arch} == "any" ]]; then
 		pinfo=${pkgver}-${pkgrel}-any
 	else
-		pinfo=${pkgver}-${pkgrel}-${_arch}
+		pinfo=${pkgver}-${pkgrel}-${arch}
 	fi
 	if [[ -n $PKGDEST ]];then
 		if [[ -n ${pkgbase} ]];then
@@ -226,7 +225,6 @@ post_build(){
 		tar -cJf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
 		find . -maxdepth 1 -name '*.log' -delete #&> /dev/null
 	fi
-	arch=$_arch
 }
 
 chroot_init(){
@@ -243,7 +241,7 @@ chroot_init(){
 }
 
 build_pkg(){
-	setarch "${arch}" \
+	setarch "${target_arch}" \
 		mkchrootpkg ${mkchrootpkg_args[*]}
 }
 

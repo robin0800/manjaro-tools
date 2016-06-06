@@ -65,7 +65,7 @@ make_sqfs() {
 		error "$1 is not a directory"
 		return 1
 	fi
-	local timer=$(get_timer) path=${work_dir}/iso/${iso_name}/${arch}
+	local timer=$(get_timer) path=${work_dir}/iso/${iso_name}/${target_arch}
 	local name=${1##*/}
 	local sq_img="${path}/$name.sqfs"
 	mkdir -p ${path}
@@ -178,7 +178,7 @@ gen_iso_fn(){
 	[[ ${edition} == 'community' ]] && vars+=("${edition}")
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
-	vars+=("${arch}")
+	vars+=("${target_arch}")
 	for n in ${vars[@]};do
 		name=${name:-}${name:+-}${n}
 	done
@@ -305,9 +305,9 @@ make_image_boot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [%s/boot]" "${iso_name}"
 		local path_iso="${work_dir}/iso/${iso_name}/boot"
-		mkdir -p ${path_iso}/${arch}
-		cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${arch}/memtest
-		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${arch}/${iso_name}
+		mkdir -p ${path_iso}/${target_arch}
+		cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${target_arch}/memtest
+		cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${target_arch}/${iso_name}
 		local path="${work_dir}/boot-image"
 		mkdir -p ${path}
 
@@ -317,7 +317,7 @@ make_image_boot() {
 
 		gen_boot_image "${path}"
 
-		mv ${path}/boot/${iso_name}.img ${path_iso}/${arch}/${iso_name}.img
+		mv ${path}/boot/${iso_name}.img ${path_iso}/${target_arch}/${iso_name}.img
 		[[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
 
 		umount_image
@@ -428,7 +428,7 @@ load_pkgs(){
 		_init="s|>systemd||g"
 		_init_rm="s|>openrc.*||g"
 	fi
-	if [[ "${arch}" == "i686" ]]; then
+	if [[ "${target_arch}" == "i686" ]]; then
 		_arch="s|>i686||g"
 		_arch_rm="s|>x86_64.*||g"
 		_multi="s|>multilib.*||g"
@@ -560,11 +560,11 @@ check_profile(){
 
 check_requirements(){
 	[[ -f ${run_dir}/.buildiso ]] || die "%s is not a valid iso profiles directory!" "${run_dir}"
-	if ! $(is_valid_arch_iso ${arch});then
-		die "%s is not a valid arch!" "${arch}"
+	if ! $(is_valid_arch_iso ${target_arch});then
+		die "%s is not a valid arch!" "${target_arch}"
 	fi
-	if ! $(is_valid_branch ${branch});then
-		die "%s is not a valid branch!" "${branch}"
+	if ! $(is_valid_branch ${target_branch});then
+		die "%s is not a valid branch!" "${target_branch}"
 	fi
 
 	if ! is_valid_init "${initsys}";then
@@ -614,7 +614,7 @@ prepare_images(){
 		run_safe "make_image_mhwd"
 	fi
 	run_safe "make_image_boot"
-	if [[ "${arch}" == "x86_64" ]]; then
+	if [[ "${target_arch}" == "x86_64" ]]; then
 		run_safe "make_efi"
 		run_safe "make_efiboot"
 	fi
@@ -670,10 +670,10 @@ load_profile(){
 
 	iso_file=$(gen_iso_fn).iso
 
-	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${branch}" -K)
-	work_dir=${chroots_iso}/${profile}/${arch}
+	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -K)
+	work_dir=${chroots_iso}/${profile}/${target_arch}
 
-	iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}/${arch}"
+	iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}/${target_arch}"
 
 	prepare_dir "${iso_dir}"
 	prepare_dir "${log_dir}"
