@@ -55,7 +55,7 @@ overriding
 # target_branch=stable
 
 # default target arch: auto detect
-# arch=$(uname -m)
+# target_arch=$(uname -m)
 
 # cache dir where buildpkg, buildtree cache packages/pkgbuild, builiso iso files
 # cache_dir=/var/cache/manjaro-tools
