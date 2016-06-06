@@ -193,25 +193,35 @@ sign_pkg(){
 }
 
 move_to_cache(){
-	mv -v $1 ${pkg_dir}/
+	msg2 "Moving [%s] to [%s]" "$1" "${pkg_dir}"
+	mv $1 ${pkg_dir}/
+}
+
+archive_logs(){
+	msg2 "Archiving log file ..."
+	tar -cJf $1.log.tar.xz $2
 }
 
 post_build(){
 	source PKGBUILD
 	local ext='pkg.tar.xz'
 	for pkg in ${pkgname[@]};do
-		local ver=$(get_full_version "$pkg")
+		local ver=$(get_full_version "$pkg") src logsrc
+		src=$pkg-$ver-$arch.$ext
+		logsrc=
 		if [[ -n $PKGDEST ]];then
-			move_to_cache "$PKGDEST/$pkg-$ver-$arch.$ext"
+			move_to_cache "$PKGDEST/$src"
 		else
-			move_to_cache "$pkg-$ver-$arch.$ext"
+			move_to_cache "$src"
 		fi
 	done
 	chown -R "${OWNER}:users" "${pkg_dir}"
-# 	if [[ -z $LOGDEST ]];then
-# 		tar -cJf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
-# 		find . -maxdepth 1 -name '*.log' -delete #&> /dev/null
-# 	fi
+	if [[ -z $LOGDEST ]];then
+		local name=${pkgbase:-$pkgname}
+		local ver=$(get_full_version "$name")
+		archive_logs "$name-$ver-$arch.log.tar.xz" "$name-$ver-$arch"*.log
+		find . -maxdepth 1 -name '*.log' -delete #&> /dev/null
+	fi
 }
 
 chroot_init(){
