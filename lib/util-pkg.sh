@@ -192,39 +192,26 @@ sign_pkg(){
 	su ${OWNER} -c "signfile ${pkg_dir}/$1"
 }
 
+move_to_cache(){
+	mv -v $1 ${pkg_dir}/
+}
+
 post_build(){
 	source PKGBUILD
-	local ext='pkg.tar.xz' pinfo loglist=() lname
-	if [[ ${arch} == "any" ]]; then
-		pinfo=${pkgver}-${pkgrel}-any
-	else
-		pinfo=${pkgver}-${pkgrel}-${arch}
-	fi
-	if [[ -n $PKGDEST ]];then
-		if [[ -n ${pkgbase} ]];then
-			for p in ${pkgname[@]};do
-				mv $PKGDEST/${p}-${pinfo}.${ext} ${pkg_dir}/
-				${sign} && sign_pkg ${p}-${pinfo}.${ext}
-				loglist+=("*$p*.log")
-				lname=${pkgbase}
-			done
+	local ext='pkg.tar.xz'
+	for pkg in ${pkgname[@]};do
+		local ver=(get_full_version "$pkg")
+		if [[ -n $PKGDEST ]];then
+			move_to_cache "$PKGDEST/$pkg-$ver-$arch.$ext"
 		else
-			mv $PKGDEST/${pkgname}-${pinfo}.${ext} ${pkg_dir}/
-			${sign} && sign_pkg ${pkgname}-${pinfo}.${ext}
-			loglist+=("*${pkgname}*.log")
-			lname=${pkgname}
+			move_to_cache "$pkg-$ver-$arch.$ext"
 		fi
-	else
-		mv *.${ext} ${pkg_dir}
-		${sign} && sign_pkg ${pkgname}-${pinfo}.${ext}
-		loglist+=("*${pkgname}*.log")
-		lname=${pkgname}
-	fi
+	done
 	chown -R "${OWNER}:users" "${pkg_dir}"
-	if [[ -z $LOGDEST ]];then
-		tar -cJf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
-		find . -maxdepth 1 -name '*.log' -delete #&> /dev/null
-	fi
+# 	if [[ -z $LOGDEST ]];then
+# 		tar -cJf ${lname}-${pinfo}.log.tar.xz ${loglist[@]}
+# 		find . -maxdepth 1 -name '*.log' -delete #&> /dev/null
+# 	fi
 }
 
 chroot_init(){
