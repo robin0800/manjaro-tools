@@ -193,22 +193,26 @@ sign_pkg(){
 }
 
 move_to_cache(){
-	msg2 "Moving [%s] to [%s]" "$1" "${pkg_dir}"
+	msg2 "Moving [%s] -> [%s]" "${1##*/}" "${pkg_dir}"
 	mv $1 ${pkg_dir}/
 }
 
 archive_logs(){
-	msg2 "Archiving log file ..."
+	msg2 "Archiving log files %s ..." "$1.log.tar.xz"
 	tar -cJf $1.log.tar.xz $2
 }
 
 post_build(){
 	source PKGBUILD
-	local ext='pkg.tar.xz'
+	local ext='pkg.tar.xz' tarch
 	for pkg in ${pkgname[@]};do
+		case $arch in
+			any) tarch='any' ;;
+			*) tarch=${target_arch}
+		esac
 		local ver=$(get_full_version "$pkg") src logsrc
-		src=$pkg-$ver-$arch.$ext
-		logsrc=
+		src=$pkg-$ver-$tarch.$ext
+
 		if [[ -n $PKGDEST ]];then
 			move_to_cache "$PKGDEST/$src"
 		else
@@ -219,7 +223,8 @@ post_build(){
 	if [[ -z $LOGDEST ]];then
 		local name=${pkgbase:-$pkgname}
 		local ver=$(get_full_version "$name")
-		archive_logs "$name-$ver-$arch.log.tar.xz" "$name-$ver-$arch"*.log
+		logsrc=$(find . -maxdepth 1 -name "$name-$ver-$target_arch*.log")
+		archive_logs "$name-$ver-$target_arch" "${logsrc[@]}"
 		find . -maxdepth 1 -name '*.log' -delete #&> /dev/null
 	fi
 }
