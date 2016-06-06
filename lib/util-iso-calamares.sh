@@ -203,7 +203,7 @@ write_cli_inst_conf(){
 	echo "iso_name=${iso_name}" >> ${conf}
 	echo '' >> ${conf}
 	echo '# kernel' >> ${conf}
-	echo "kernnel=${kernel}" >> ${conf}
+	echo "kernel=${kernel}" >> ${conf}
 }
 
 configure_cli_inst(){
