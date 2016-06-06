@@ -195,11 +195,15 @@ sign_pkg(){
 move_to_cache(){
 	msg2 "Moving [%s] -> [%s]" "${1##*/}" "${pkg_dir}"
 	mv $1 ${pkg_dir}/
+	chown -R "${OWNER}:users" "${pkg_dir}"
 }
 
 archive_logs(){
 	msg2 "Archiving log files %s ..." "$1.log.tar.xz"
 	tar -cJf $1.log.tar.xz $2
+	msg2 "Cleaning log files ..."
+	find . -maxdepth 1 -name '*.log' -delete
+	chown "${OWNER}:users" "$1.log.tar"
 }
 
 post_build(){
@@ -210,22 +214,20 @@ post_build(){
 			any) tarch='any' ;;
 			*) tarch=${target_arch}
 		esac
-		local ver=$(get_full_version "$pkg") src logsrc
+		local ver=$(get_full_version "$pkg") src
 		src=$pkg-$ver-$tarch.$ext
-
 		if [[ -n $PKGDEST ]];then
 			move_to_cache "$PKGDEST/$src"
 		else
 			move_to_cache "$src"
 		fi
 	done
-	chown -R "${OWNER}:users" "${pkg_dir}"
 	if [[ -z $LOGDEST ]];then
-		local name=${pkgbase:-$pkgname}
-		local ver=$(get_full_version "$name")
-		logsrc=$(find . -maxdepth 1 -name "$name-$ver-$target_arch*.log")
-		archive_logs "$name-$ver-$target_arch" "${logsrc[@]}"
-		find . -maxdepth 1 -name '*.log' -delete #&> /dev/null
+		local name=${pkgbase:-$pkgname} ver logsrc archive
+		ver=$(get_full_version "$name")
+		archive=$name-$ver-${target_arch}
+		logsrc=$(find . -maxdepth 1 -name "$archive*.log")
+		archive_logs "$archive" "${logsrc[@]}"
 	fi
 }
 
