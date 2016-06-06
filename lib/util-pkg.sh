@@ -200,7 +200,7 @@ post_build(){
 	source PKGBUILD
 	local ext='pkg.tar.xz'
 	for pkg in ${pkgname[@]};do
-		local ver=(get_full_version "$pkg")
+		local ver=$(get_full_version "$pkg")
 		if [[ -n $PKGDEST ]];then
 			move_to_cache "$PKGDEST/$pkg-$ver-$arch.$ext"
 		else
