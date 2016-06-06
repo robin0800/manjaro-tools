@@ -199,11 +199,12 @@ move_to_cache(){
 }
 
 archive_logs(){
-	msg2 "Archiving log files %s ..." "$1.log.tar.xz"
-	tar -cJf $1.log.tar.xz $2
+	local ext=log.tar.xz
+	msg2 "Archiving log files %s ..." "$1.$ext"
+	tar -cJf $1.$ext $2
 	msg2 "Cleaning log files ..."
 	find . -maxdepth 1 -name '*.log' -delete
-	chown "${OWNER}:users" "$1.log.tar"
+	chown "${OWNER}:users" "$1.$ext"
 }
 
 post_build(){
