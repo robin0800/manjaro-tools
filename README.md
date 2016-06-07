@@ -95,10 +95,10 @@ overriding
 # dist_name="Manjaro"
 
 # unset defaults to given value
-# dist_release=15.12
+# dist_release=16.06
 
 # unset defaults to value sourced from /etc/lsb-release
-# dist_codename="Capella"
+# dist_codename="Daniella"
 
 # unset defaults to given value
 # dist_branding="MJRO"
