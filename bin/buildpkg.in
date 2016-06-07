@@ -128,22 +128,7 @@ while getopts "${opts}" arg; do
 	esac
 done
 
-if [[ "${target_arch}" == 'multilib' ]]; then
-        pacman_conf_arch=${target_arch}
-        work_dir=${chroots_pkg}/${target_branch}/${target_arch}
-        pkg_dir=${cache_dir_pkg}/${target_branch}/${target_arch}
-        arch='x86_64'
-        is_multilib=true
-else
-        pacman_conf_arch='default'
-        work_dir=${chroots_pkg}/${target_branch}/${target_arch}
-        pkg_dir=${cache_dir_pkg}/${target_branch}/${target_arch}
-        is_multilib=false
-fi
-
-pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
-makepkg_conf="${DATADIR}/makepkg-${target_arch}.conf"
-mirrors_conf="${DATADIR}/pacman-mirrors-${target_branch}.conf"
+configure_chroot_arch "${target_arch}"
 
 mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}")
 

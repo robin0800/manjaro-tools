@@ -9,6 +9,76 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+preconf_arm(){
+	local conf_dir=/tmp
+	cp "${DATADIR}/pacman-arm.conf" "$conf_dir/pacman-$1.conf"
+	cp "${DATADIR}/makepkg-arm.conf" "$conf_dir/makepkg-$1.conf"
+	sed -i "$conf_dir/makepkg-$1.conf" \
+		-e "s|@CARCH[@]|$1|g" \
+		-e "s|@CHOST[@]|$2|g" \
+		-e "s|@CARCHFLAGS[@]|$3|g"
+	sed -i "$conf_dir/pacman-$1.conf" -e "s|@CARCH[@]|$1|g"
+
+	work_dir="${chroots_pkg}/${target_branch}/$1"
+	pkg_dir="${cache_dir_pkg}/${target_branch}/$1"
+
+	makepkg_conf="$conf_dir/makepkg-$1.conf"
+	pacman_conf="$conf_dir/pacman-$1.conf"
+}
+
+preconf(){
+	work_dir="${chroots_pkg}/${target_branch}/$1"
+	pkg_dir="${cache_dir_pkg}/${target_branch}/$1"
+	if [[ "$1" == 'multilib' ]];then
+		target_arch='x86_64'
+		is_multilib=true
+	else
+		is_multilib=false
+	fi
+	makepkg_conf="${DATADIR}/makepkg-${target_arch}.conf"
+	pacman_conf="${DATADIR}/pacman-$1.conf"
+}
+
+configure_chroot_arch(){
+	local conf_arch chost_desc cflags
+	case "$1" in
+		'arm')
+			conf_arch="$1"
+			chost_desc="armv5tel-unknown-linux-gnueabi"
+			cflags="-march=armv5te "
+			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
+		;;
+		'armv6h')
+			conf_arch="$1"
+			chost_desc="armv6l-unknown-linux-gnueabihf"
+			cflags="-march=armv6 -mfloat-abi=hard -mfpu=vfp "
+			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
+		;;
+		'armv7h')
+			conf_arch="$1"
+			chost_desc="armv7l-unknown-linux-gnueabihf"
+			cflags="-march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 "
+			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
+		;;
+		'aarch64')
+			conf_arch="$1"
+			chost_desc="aarch64-unknown-linux-gnu"
+			cflags="-march=armv8-a "
+			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
+		;;
+		'multilib')
+			conf_arch="multilib"
+			preconf "$conf_arch"
+		;;
+		*)
+			conf_arch='default'
+			preconf "$conf_arch"
+		;;
+	esac
+
+	mirrors_conf="${DATADIR}/pacman-mirrors-${target_branch}.conf"
+}
+
 pkgver_equal() {
 	local left right
 
