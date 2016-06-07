@@ -27,19 +27,26 @@ preconf_arm(){
 }
 
 preconf(){
-	work_dir="${chroots_pkg}/${target_branch}/$1"
-	pkg_dir="${cache_dir_pkg}/${target_branch}/$1"
-	if [[ "$1" == 'multilib' ]];then
+	local arch="$1" tarch="$2"
+	work_dir="${chroots_pkg}/${target_branch}/$tarch"
+	pkg_dir="${cache_dir_pkg}/${target_branch}/$tarch"
+	if [[ "$arch" == 'multilib' ]];then
 		target_arch='x86_64'
 		is_multilib=true
 	else
 		is_multilib=false
 	fi
 	makepkg_conf="${DATADIR}/makepkg-${target_arch}.conf"
-	pacman_conf="${DATADIR}/pacman-$1.conf"
+	pacman_conf="${DATADIR}/pacman-$arch.conf"
 }
 
 configure_chroot_arch(){
+	if ! is_valid_arch_pkg "$1";then
+		die "%s is not a valid arch!" "$1"
+	fi
+	if ! is_valid_branch "$1";then
+		die "%s is not a valid branch!" "${target_branch}"
+	fi
 	local conf_arch chost_desc cflags
 	case "$1" in
 		'arm')
@@ -317,15 +324,17 @@ chroot_init(){
 
 build_pkg(){
 	setarch "${target_arch}" \
-		mkchrootpkg ${mkchrootpkg_args[*]}
+		mkchrootpkg ${mkchrootpkg_args[*]} || return 1
+		if [ $? -eq 0 ]; then
+			post_build
+		fi
 }
 
 make_pkg(){
 	check_build "$1"
 	msg "Start building [%s]" "$1"
 	cd $1
-		build_pkg || die
-		post_build
+		build_pkg
 	cd ..
 	msg "Finished building [%s]" "$1"
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"

@@ -76,7 +76,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-a i686|x86_64|multilib</option></term>
+				<term><option>-a i686|x86_64|multilib|arm|armv6h|armv7h|aarch64</option></term>
 
 				<listitem><para>Architecture that the iso will be built. Can be i686, x86_64 or multilib.</para></listitem>
 			</varlistentry>

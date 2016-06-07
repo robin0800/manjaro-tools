@@ -58,6 +58,8 @@ display_settings(){
 	msg2 "work_dir: %s" "${work_dir}"
 	msg2 "pkg_dir: %s" "${pkg_dir}"
 	msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
+	msg2 "pacman_conf: %s" "${pacman_conf}"
+	msg2 "makepkg_conf: %s" "${makepkg_conf}"
 
 	if ${clean_first};then
 		msg "PKG:"

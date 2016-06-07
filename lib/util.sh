@@ -536,7 +536,7 @@ is_valid_init(){
 
 is_valid_arch_pkg(){
 	case $1 in
-		'i686'|'x86_64'|'multilib') return 0 ;;
+		'i686'|'x86_64'|'multilib'|'arm'|'armv6h'|'armv7h'|'aarch64') return 0 ;;
 		*) return 1 ;;
 	esac
 }
