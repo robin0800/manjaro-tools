@@ -267,7 +267,7 @@ clean_up(){
 }
 
 sign_pkg(){
-	su ${OWNER} -c "signfile ${pkg_dir}$1"
+	su ${OWNER} -c "signfile ${pkg_dir}/$1"
 }
 
 move_to_cache(){
