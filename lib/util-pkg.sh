@@ -10,20 +10,20 @@
 # GNU General Public License for more details.
 
 preconf_arm(){
-	local conf_dir=/tmp
-	cp "${DATADIR}/pacman-arm.conf" "$conf_dir/pacman-$1.conf"
-	cp "${DATADIR}/makepkg-arm.conf" "$conf_dir/makepkg-$1.conf"
-	sed -i "$conf_dir/makepkg-$1.conf" \
-		-e "s|@CARCH[@]|$1|g" \
-		-e "s|@CHOST[@]|$2|g" \
-		-e "s|@CARCHFLAGS[@]|$3|g"
-	sed -i "$conf_dir/pacman-$1.conf" -e "s|@CARCH[@]|$1|g"
+	local conf_dir=/tmp tarch="$1" desc=$2 flags=$3
+	cp "${DATADIR}/pacman-arm.conf" "$conf_dir/pacman-$tarch.conf"
+	cp "${DATADIR}/makepkg-arm.conf" "$conf_dir/makepkg-$tarch.conf"
+	sed -i "$conf_dir/makepkg-$tarch.conf" \
+		-e "s|@CARCH[@]|$tarch|g" \
+		-e "s|@CHOST[@]|$desc|g" \
+		-e "s|@CARCHFLAGS[@]|$flags|g"
+	sed -i "$conf_dir/pacman-$tarch.conf" -e "s|@CARCH[@]|$tarch|g"
 
-	work_dir="${chroots_pkg}/${target_branch}/$1"
-	pkg_dir="${cache_dir_pkg}/${target_branch}/$1"
+	work_dir="${chroots_pkg}/${target_branch}/$tarch"
+	pkg_dir="${cache_dir_pkg}/${target_branch}/$tarch"
 
-	makepkg_conf="$conf_dir/makepkg-$1.conf"
-	pacman_conf="$conf_dir/pacman-$1.conf"
+	makepkg_conf="$conf_dir/makepkg-$tarch.conf"
+	pacman_conf="$conf_dir/pacman-$tarch.conf"
 }
 
 preconf(){
@@ -40,11 +40,12 @@ preconf(){
 	pacman_conf="${DATADIR}/pacman-$arch.conf"
 }
 
+# $1: target_arch
 configure_chroot_arch(){
 	if ! is_valid_arch_pkg "$1";then
 		die "%s is not a valid arch!" "$1"
 	fi
-	if ! is_valid_branch "$1";then
+	if ! is_valid_branch "${target_branch}";then
 		die "%s is not a valid branch!" "${target_branch}"
 	fi
 	local conf_arch chost_desc cflags
@@ -75,11 +76,11 @@ configure_chroot_arch(){
 		;;
 		'multilib')
 			conf_arch="multilib"
-			preconf "$conf_arch"
+			preconf "$conf_arch" "$1"
 		;;
 		*)
 			conf_arch='default'
-			preconf "$conf_arch"
+			preconf "$conf_arch" "$1"
 		;;
 	esac
 
@@ -266,12 +267,13 @@ clean_up(){
 }
 
 sign_pkg(){
-	su ${OWNER} -c "signfile ${pkg_dir}/$1"
+	su ${OWNER} -c "signfile ${pkg_dir}$1"
 }
 
 move_to_cache(){
 	msg2 "Moving [%s] -> [%s]" "${1##*/}" "${pkg_dir}"
 	mv $1 ${pkg_dir}/
+	${sign} && sign_pkg "${1##*/}"
 	chown -R "${OWNER}:users" "${pkg_dir}"
 }
 
