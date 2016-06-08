@@ -224,6 +224,7 @@ init_base_devel(){
 chroot_create(){
 	msg "Creating chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
 	mkdir -p "${work_dir}"
+	mkchroot_args+=(-L)
 	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} \
 		"${work_dir}/root" \

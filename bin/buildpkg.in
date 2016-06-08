@@ -119,7 +119,7 @@ while getopts "${opts}" arg; do
 		b) target_branch="$OPTARG" ;;
 		r) chroots_pkg="$OPTARG" ;;
 		i) install_pkgs+="$OPTARG"; mkchrootpkg_args+=(-I ${install_pkgs[*]}) ;;
-		c) clean_first=true; mkchroot_args+=(-L) ;;
+		c) clean_first=true ;;
 		w) wipe_clean=true ;;
 		n) namcap=true; mkchrootpkg_args+=(-n) ;;
 		s) sign=true ;;
@@ -132,7 +132,7 @@ done
 
 configure_chroot_arch "${target_arch}"
 
-mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -L)
+mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}")
 
 mkchrootpkg_args+=(-r ${work_dir})
 
