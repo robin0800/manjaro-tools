@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 preconf_arm(){
-	local conf_dir=/tmp tarch="$1" desc=$2 flags=$3
+	local conf_dir=/tmp tarch="$1" desc="$2" flags="$3"
 	cp "${DATADIR}/pacman-arm.conf" "$conf_dir/pacman-$tarch.conf"
 	cp "${DATADIR}/makepkg-arm.conf" "$conf_dir/makepkg-$tarch.conf"
 	sed -i "$conf_dir/makepkg-$tarch.conf" \
@@ -27,10 +27,10 @@ preconf_arm(){
 }
 
 preconf(){
-	local arch="$1" tarch="$2"
-	work_dir="${chroots_pkg}/${target_branch}/$tarch"
-	pkg_dir="${cache_dir_pkg}/${target_branch}/$tarch"
-	if [[ "$arch" == 'multilib' ]];then
+	local arch="$1"
+	work_dir="${chroots_pkg}/${target_branch}/${target_arch}"
+	pkg_dir="${cache_dir_pkg}/${target_branch}/${target_arch}"
+	if [[ "$pac_conf_arch" == 'multilib' ]];then
 		target_arch='x86_64'
 		is_multilib=true
 	else
@@ -75,12 +75,12 @@ configure_chroot_arch(){
 			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
 		;;
 		'multilib')
-			conf_arch="multilib"
-			preconf "$conf_arch" "$1"
+			conf_arch='multilib'
+			preconf "$conf_arch"
 		;;
 		*)
 			conf_arch='default'
-			preconf "$conf_arch" "$1"
+			preconf "$conf_arch"
 		;;
 	esac
 
