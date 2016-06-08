@@ -30,7 +30,7 @@ preconf(){
 	local arch="$1"
 	work_dir="${chroots_pkg}/${target_branch}/${target_arch}"
 	pkg_dir="${cache_dir_pkg}/${target_branch}/${target_arch}"
-	if [[ "$pac_conf_arch" == 'multilib' ]];then
+	if [[ "$arch" == 'multilib' ]];then
 		target_arch='x86_64'
 		is_multilib=true
 	else
