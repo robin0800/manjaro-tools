@@ -317,7 +317,7 @@ download_sources
 
 prepare_chroot
 
-mountargs_rw="${PWD}:/startdir_host,${SRCDEST}:/srcdest_host"
+mountargs_rw="${PWD}:/startdir,${SRCDEST}:/srcdest"
 
 if chroot-run -r "${mountargs_ro}" \
 	      -w "${mountargs_rw}" \
