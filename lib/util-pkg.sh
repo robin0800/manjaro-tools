@@ -11,7 +11,7 @@
 
 load_compiler_settings(){
 	local tarch="$1" conf
-	conf=${pkgarch_dir}/$tarch.conf
+	conf=${make_conf_dir}/$tarch.conf
 
 	[[ -f $conf ]] || return 1
 

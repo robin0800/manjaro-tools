@@ -92,8 +92,8 @@ list_sets(){
 	echo $prof
 }
 
-# $1: pkgarch_dir
-list_pkgarches(){
+# $1: make_conf_dir
+list_make_profiles(){
 	local arch temp
 	for item in $(ls $1/*.conf); do
 		temp=${item##*/}
@@ -251,7 +251,7 @@ init_buildpkg(){
 
 	sets_dir_pkg="${SYSCONFDIR}/pkg.d"
 
-	pkgarch_dir="${SYSCONFDIR}/make.conf.d"
+	make_conf_dir="${SYSCONFDIR}/make.conf.d"
 
 	[[ -d ${USERCONFDIR}/pkg.d ]] && sets_dir_pkg=${USERCONFDIR}/pkg.d
 
@@ -558,7 +558,7 @@ is_valid_init(){
 
 is_valid_arch_pkg(){
 	eval "case $1 in
-		$(list_pkgarches "${pkgarch_dir}")) return 0 ;;
+		$(list_make_profiles "${make_conf_dir}")) return 0 ;;
 		*) return 1 ;;
 	esac"
 }

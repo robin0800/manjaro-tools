@@ -41,8 +41,8 @@ display_settings(){
 	msg2 "buildsets: %s" "$(list_sets ${sets_dir_pkg})"
 	msg2 "buildset_pkg: %s" "${buildset_pkg}"
 	msg2 "is_buildset: %s" "${is_buildset}"
-	msg2 "pkgarch_dir: %s" "${pkgarch_dir}"
-	msg2 "pkgarches: %s" "$(list_pkgarches ${pkgarch_dir})"
+	msg2 "make_conf_dir: %s" "${make_conf_dir}"
+	msg2 "make_profiles: %s" "$(list_make_profiles ${make_conf_dir})"
 
 	msg "OPTIONS:"
 	msg2 "arch: %s" "${target_arch}"
