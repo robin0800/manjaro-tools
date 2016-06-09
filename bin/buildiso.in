@@ -122,8 +122,6 @@ iso_only=false
 verbose=false
 sign=false
 
-pacman_conf_arch='default'
-
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p <profile>       Buildset or profile [default: ${buildset_iso}]"
@@ -177,8 +175,6 @@ done
 shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
-
-[[ "${target_arch}" == 'x86_64' ]] && pacman_conf_arch='multilib'
 
 mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
 

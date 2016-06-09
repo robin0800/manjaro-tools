@@ -645,18 +645,19 @@ make_profile(){
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
 
-set_pacman_conf(){
-	local user_conf=${profile_dir}/user-repos.conf
+get_pacman_conf(){
+	local user_conf=${profile_dir}/user-repos.conf pac_arch='default' conf
+	[[ "${target_arch}" == 'x86_64' ]] && pac_arch='multilib'
 	if [[ -f ${user_conf} ]];then
 		info "detected: %s" "user-repos.conf"
 		check_user_repos_conf "${user_conf}"
-		local conf=/tmp/custom-pacman.conf
-		cat ${DATADIR}/pacman-${pacman_conf_arch}.conf > "$conf"
+		conf=/tmp/custom-pacman.conf
+		cat ${DATADIR}/pacman-$pac_arch.conf > "$conf"
 		cat ${user_conf} >> "$conf"
-		pacman_conf="$conf"
 	else
-		pacman_conf="${DATADIR}/pacman-${pacman_conf_arch}.conf"
+		conf="${DATADIR}/pacman-$pac_arch.conf"
 	fi
+	echo "$conf"
 }
 
 load_profile(){
@@ -666,7 +667,7 @@ load_profile(){
 
 	load_profile_config "$conf"
 
-	set_pacman_conf
+	pacman_conf=$(get_pacman_conf)
 
 	iso_file=$(gen_iso_fn).iso
 
