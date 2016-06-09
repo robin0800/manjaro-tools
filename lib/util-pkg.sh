@@ -45,6 +45,7 @@ prepare_conf(){
 			carch="$1"
 			chost="armv7l-unknown-linux-gnueabihf"
 			cflags="-march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
+		;;
 		'aarch64')
 			carch="$1"
 			chost="aarch64-unknown-linux-gnu"

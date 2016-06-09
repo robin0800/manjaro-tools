@@ -67,7 +67,7 @@ get_pac_mirrors_conf(){
 	conf="$conf_dir/pacman-mirrors-$1.conf"
 	cp "${DATADIR}/pacman-mirrors.conf" "$conf"
 	sed -i "$conf" \
-		-e "s|^.*Branch.*|Branch = $1|"
+		-e "s|Branch = stable|Branch = $1|"
 
 	echo "$conf"
 }
