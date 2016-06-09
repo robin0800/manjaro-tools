@@ -62,6 +62,16 @@ check_user_repos_conf(){
 	done
 }
 
+get_pac_mirrors_conf(){
+	local conf_dir=/tmp conf
+	conf="$conf_dir/pacman-mirrors-$1.conf"
+	cp "${DATADIR}/pacman-mirrors.conf" "$conf"
+	sed -i "$conf" \
+		-e "s|^.*Branch.*|Branch = $1|"
+
+	echo "$conf"
+}
+
 read_set(){
 	local _space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \

@@ -9,82 +9,71 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-preconf_arm(){
-	local conf_dir=/tmp tarch="$1" desc="$2" flags="$3"
-	cp "${DATADIR}/pacman-arm.conf" "$conf_dir/pacman-$tarch.conf"
-	cp "${DATADIR}/makepkg-arm.conf" "$conf_dir/makepkg-$tarch.conf"
-	sed -i "$conf_dir/makepkg-$tarch.conf" \
-		-e "s|@CARCH[@]|$tarch|g" \
-		-e "s|@CHOST[@]|$desc|g" \
-		-e "s|@CARCHFLAGS[@]|$flags|g"
-	sed -i "$conf_dir/pacman-$tarch.conf" -e "s|@CARCH[@]|$tarch|g"
+get_makepkg_conf(){
+	local conf_dir=/tmp conf
+	conf="$conf_dir/makepkg-$1.conf"
 
-	work_dir="${chroots_pkg}/${target_branch}/$tarch"
-	pkg_dir="${cache_dir_pkg}/${target_branch}/$tarch"
+	cp "${DATADIR}/makepkg.conf" "$conf"
 
-	makepkg_conf="$conf_dir/makepkg-$tarch.conf"
-	pacman_conf="$conf_dir/pacman-$tarch.conf"
-}
+	sed -i "$conf" \
+		-e "s|@CARCH[@]|$2|g" \
+		-e "s|@CHOST[@]|$3|g" \
+		-e "s|@CARCHFLAGS[@]|$4|g"
 
-preconf(){
-	local arch="$1"
-	work_dir="${chroots_pkg}/${target_branch}/${target_arch}"
-	pkg_dir="${cache_dir_pkg}/${target_branch}/${target_arch}"
-	if [[ "$arch" == 'multilib' ]];then
-		target_arch='x86_64'
-		is_multilib=true
-	else
-		is_multilib=false
-	fi
-	makepkg_conf="${DATADIR}/makepkg-${target_arch}.conf"
-	pacman_conf="${DATADIR}/pacman-$arch.conf"
+	echo "$conf"
 }
 
 # $1: target_arch
-configure_chroot_arch(){
+prepare_conf(){
 	if ! is_valid_arch_pkg "$1";then
 		die "%s is not a valid arch!" "$1"
 	fi
-	if ! is_valid_branch "${target_branch}";then
-		die "%s is not a valid branch!" "${target_branch}"
-	fi
-	local conf_arch chost_desc cflags
+
+	local carch chost cflags pac_arch='default'
 	case "$1" in
 		'arm')
-			conf_arch="$1"
-			chost_desc="armv5tel-unknown-linux-gnueabi"
-			cflags="-march=armv5te "
-			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
+			carch="$1"
+			chost="armv5tel-unknown-linux-gnueabi"
+			cflags="-march=armv5te -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
 		;;
 		'armv6h')
-			conf_arch="$1"
-			chost_desc="armv6l-unknown-linux-gnueabihf"
-			cflags="-march=armv6 -mfloat-abi=hard -mfpu=vfp "
-			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
+			carch="$1"
+			chost="armv6l-unknown-linux-gnueabihf"
+			cflags="-march=armv6 -mfloat-abi=hard -mfpu=vfp -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
 		;;
 		'armv7h')
-			conf_arch="$1"
-			chost_desc="armv7l-unknown-linux-gnueabihf"
-			cflags="-march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 "
-			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
-		;;
+			carch="$1"
+			chost="armv7l-unknown-linux-gnueabihf"
+			cflags="-march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
 		'aarch64')
-			conf_arch="$1"
-			chost_desc="aarch64-unknown-linux-gnu"
-			cflags="-march=armv8-a "
-			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
+			carch="$1"
+			chost="aarch64-unknown-linux-gnu"
+			cflags="-march=armv8-a -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
 		;;
-		'multilib')
-			conf_arch='multilib'
-			preconf "$conf_arch"
+		'x86_64'|'multilib')
+			carch="x86_64"
+			chost="x86_64-pc-linux-gnu"
+			cflags="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong"
+			if [[ "$1" == 'multilib' ]];then
+				pac_arch='multilib'
+				is_multilib=true
+			fi
 		;;
-		*)
-			conf_arch='default'
-			preconf "$conf_arch"
+		'i686')
+			carch="$1"
+			chost="i686-pc-linux-gnu"
+			cflags="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong"
 		;;
 	esac
 
-	mirrors_conf="${DATADIR}/pacman-mirrors-${target_branch}.conf"
+	pacman_conf="${DATADIR}/pacman-$pac_arch.conf"
+
+	work_dir="${chroots_pkg}/${target_branch}/$1"
+	pkg_dir="${cache_dir_pkg}/${target_branch}/$1"
+
+	[[ "$pac_arch" == 'multilib' ]] && target_arch='x86_64'
+
+	makepkg_conf=$(get_makepkg_conf "${target_arch}" "$carch" "$chost" "$cflags")
 }
 
 pkgver_equal() {

@@ -23,10 +23,7 @@ LIBS_BASE = \
 SHARED_BASE = \
 	data/pacman-default.conf \
 	data/pacman-multilib.conf \
-	data/pacman-mirrors-stable.conf \
-	data/pacman-mirrors-testing.conf \
-	data/pacman-mirrors-unstable.conf \
-	data/pacman-arm.conf
+	data/pacman-mirrors.conf
 
 SETS_PKG = \
 	data/pkg.d/default.set
@@ -46,10 +43,8 @@ LIBS_PKG = \
 	lib/util-pkgtree.sh
 
 SHARED_PKG = \
-	data/makepkg-i686.conf \
-	data/base-devel-udev \
-	data/makepkg-x86_64.conf \
-	data/makepkg-arm.conf
+	data/makepkg.conf \
+	data/base-devel-udev
 
 SETS_ISO = \
 	data/iso.d/default.set \

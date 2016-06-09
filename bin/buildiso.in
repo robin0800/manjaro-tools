@@ -175,7 +175,7 @@ timer_start=$(get_timer)
 
 [[ "${target_arch}" == 'x86_64' ]] && pacman_conf_arch='multilib'
 
-mirrors_conf="${DATADIR}/pacman-mirrors-${target_branch}.conf"
+mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
 
 check_root "$0" "${orig_argv[@]}"
 
