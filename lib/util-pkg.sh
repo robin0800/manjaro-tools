@@ -16,11 +16,21 @@ get_makepkg_conf(){
 	cp "${DATADIR}/makepkg.conf" "$conf"
 
 	sed -i "$conf" \
-		-e "s|@CARCH[@]|$2|g" \
-		-e "s|@CHOST[@]|$3|g" \
-		-e "s|@CARCHFLAGS[@]|$4|g"
+		-e "s|@CARCH[@]|$carch|g" \
+		-e "s|@CHOST[@]|$chost|g" \
+		-e "s|@CARCHFLAGS[@]|$cflags|g"
 
 	echo "$conf"
+}
+
+load_compiler_settings(){
+	local tarch="$1"
+
+	[[ -f ${pkgarch_dir}/$tarch.conf ]] || return 1
+
+	source ${pkgarch_dir}/$tarch.conf
+
+	return 0
 }
 
 # $1: target_arch
@@ -29,43 +39,15 @@ prepare_conf(){
 		die "%s is not a valid arch!" "$1"
 	fi
 
-	local carch chost cflags pac_arch='default'
-	case "$1" in
-		'arm')
-			carch="$1"
-			chost="armv5tel-unknown-linux-gnueabi"
-			cflags="-march=armv5te -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
-		;;
-		'armv6h')
-			carch="$1"
-			chost="armv6l-unknown-linux-gnueabihf"
-			cflags="-march=armv6 -mfloat-abi=hard -mfpu=vfp -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
-		;;
-		'armv7h')
-			carch="$1"
-			chost="armv7l-unknown-linux-gnueabihf"
-			cflags="-march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
-		;;
-		'aarch64')
-			carch="$1"
-			chost="aarch64-unknown-linux-gnu"
-			cflags="-march=armv8-a -O2 -pipe -fstack-protector --param=ssp-buffer-size=4"
-		;;
-		'x86_64'|'multilib')
-			carch="x86_64"
-			chost="x86_64-pc-linux-gnu"
-			cflags="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong"
-			if [[ "$1" == 'multilib' ]];then
-				pac_arch='multilib'
-				is_multilib=true
-			fi
-		;;
-		'i686')
-			carch="$1"
-			chost="i686-pc-linux-gnu"
-			cflags="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong"
-		;;
-	esac
+	local pac_arch='default'
+
+	if [[ "$1" == 'multilib' ]];then
+		load_compiler_settings "x86_64"
+		pac_arch='multilib'
+		is_multilib=true
+	else
+		load_compiler_settings "$1"
+	fi
 
 	pacman_conf="${DATADIR}/pacman-$pac_arch.conf"
 
@@ -73,8 +55,6 @@ prepare_conf(){
 	pkg_dir="${cache_dir_pkg}/${target_branch}/$1"
 
 	[[ "$pac_arch" == 'multilib' ]] && target_arch='x86_64'
-
-	makepkg_conf=$(get_makepkg_conf "${target_arch}" "$carch" "$chost" "$cflags")
 }
 
 pkgver_equal() {

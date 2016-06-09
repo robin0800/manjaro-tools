@@ -92,6 +92,16 @@ list_sets(){
 	echo $prof
 }
 
+# $1: pkgarch_dir
+list_pkgarches(){
+	local arch temp
+	for item in $(ls $1/*.conf); do
+		temp=${item##*/}
+		arch=${arch:-}${arch:+|}${temp%.set}
+	done
+	echo $arch
+}
+
 # $1: sets_dir
 # $2: buildset
 eval_buildset(){
@@ -240,6 +250,8 @@ init_buildpkg(){
 	chroots_pkg="${chroots_dir}/buildpkg"
 
 	sets_dir_pkg="${SYSCONFDIR}/pkg.d"
+
+	pkgarch_dir="${SYSCONFDIR}/pkgarch.d"
 
 	[[ -d ${USERCONFDIR}/pkg.d ]] && sets_dir_pkg=${USERCONFDIR}/pkg.d
 
@@ -545,10 +557,10 @@ is_valid_init(){
 }
 
 is_valid_arch_pkg(){
-	case $1 in
-		'i686'|'x86_64'|'multilib'|'arm'|'armv6h'|'armv7h'|'aarch64') return 0 ;;
+	eval "case $1 in
+		$(list_pkgarches "${pkgarch_dir}")|multilib) return 0 ;;
 		*) return 1 ;;
-	esac
+	esac"
 }
 
 is_valid_arch_iso(){
