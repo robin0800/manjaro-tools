@@ -62,7 +62,7 @@ display_settings(){
 	msg "PATHS:"
 	msg2 "work_dir: %s" "${work_dir}"
 	msg2 "pkg_dir: %s" "${pkg_dir}"
-	msg2 "mirrors_conf: %s" "${mirrors_conf}"
+# 	msg2 "mirrors_conf: %s" "${mirrors_conf}"
 # 	msg2 "pacman_conf: %s" "${pacman_conf}"
 # 	msg2 "makepkg_conf: %s" "${makepkg_conf}"
 
