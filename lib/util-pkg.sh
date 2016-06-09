@@ -15,7 +15,7 @@ load_compiler_settings(){
 
 	[[ -f $conf ]] || return 1
 
-	info "Loading %s compiler settings ..." "$tarch"
+	info "Loading compiler settings: %s" "$tarch"
 	source $conf
 
 	return 0
@@ -166,7 +166,7 @@ load_group(){
 		devel_group='' \
 		file=${DATADIR}/base-devel-udev
 
-        info "Loading Group [%s] ..." "$file"
+        info "Loading custom group: %s" "$file"
 
 	if ${is_multilib}; then
 		_multi="s|>multilib||g"
