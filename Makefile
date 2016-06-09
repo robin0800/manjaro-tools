@@ -31,11 +31,10 @@ LIST_PKG = \
 ARCH_CONF = \
 	data/make.conf.d/i686.conf \
 	data/make.conf.d/x86_64.conf \
-	data/make.conf.d/multilib.conf \
-	data/make.conf.d/aarch64.conf \
-	data/make.conf.d/arm.conf \
-	data/make.conf.d/armv6h.conf \
-	data/make.conf.d/armv7h.conf
+	data/make.conf.d/multilib.conf
+# 	data/make.conf.d/aarch64.conf \
+# 	data/make.conf.d/armv6h.conf \
+# 	data/make.conf.d/armv7h.conf
 
 BIN_PKG = \
 	bin/checkpkg \
