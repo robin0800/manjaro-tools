@@ -84,16 +84,16 @@ read_build_list(){
 
 # $1: list_dir
 show_build_lists(){
-	local prof temp
+	local list temp
 	for item in $(ls $1/*.list); do
 		temp=${item##*/}
-		prof=${prof:-}${prof:+|}${temp%.list}
+		list=${list:-}${list:+|}${temp%.list}
 	done
-	echo $prof
+	echo $list
 }
 
 # $1: make_conf_dir
-show_make_profiles(){
+show_build_profiles(){
 	local arch temp
 	for item in $(ls $1/*.conf); do
 		temp=${item##*/}
@@ -558,7 +558,7 @@ is_valid_init(){
 
 is_valid_arch_pkg(){
 	eval "case $1 in
-		$(show_make_profiles "${make_conf_dir}")) return 0 ;;
+		$(show_build_profiles "${make_conf_dir}")) return 0 ;;
 		*) return 1 ;;
 	esac"
 }
