@@ -37,12 +37,12 @@ display_settings(){
 	show_config
 
 	msg "PROFILE:"
-	msg2 "sets_dir_pkg: %s" "${sets_dir_pkg}"
-	msg2 "buildsets: %s" "$(list_sets ${sets_dir_pkg})"
-	msg2 "buildset_pkg: %s" "${buildset_pkg}"
-	msg2 "is_buildset: %s" "${is_buildset}"
+	msg2 "list_dir_pkg: %s" "${list_dir_pkg}"
+	msg2 "build _lists: %s" "$(show_build_lists ${list_dir_pkg})"
+	msg2 "build_list_pkg: %s" "${build_list_pkg}"
+	msg2 "is_build_list: %s" "${is_build_list}"
 	msg2 "make_conf_dir: %s" "${make_conf_dir}"
-	msg2 "make_profiles: %s" "$(list_make_profiles ${make_conf_dir})"
+	msg2 "make_profiles: %s" "$(show_make_profiles ${make_conf_dir})"
 
 	msg "OPTIONS:"
 	msg2 "arch: %s" "${target_arch}"
@@ -71,7 +71,7 @@ display_settings(){
 	fi
 
 	msg "BUILD QUEUE:"
-	run show_pkg "${buildset_pkg}"
+	run show_pkg "${build_list_pkg}"
 }
 
 load_user_info
@@ -88,14 +88,14 @@ clean_first=false
 wipe_clean=false
 namcap=false
 pretend=false
-is_buildset=false
+is_build_list=false
 sign=false
 udev_root=false
 is_multilib=false
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
-	echo "    -p <pkg>           Buildset or pkg [default: ${buildset_pkg}]"
+	echo "    -p <pkg>           Build list or pkg [default: ${build_list_pkg}]"
 	echo "    -a <arch>          Arch [default: ${target_arch}]"
 	echo "    -b <branch>        Branch [default: ${target_branch}]"
 	echo '    -r <dir>           Chroots directory'
@@ -119,7 +119,7 @@ opts='p:a:b:r:i:cwnsuqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-		p) buildset_pkg="$OPTARG" ;;
+		p) build_list_pkg="$OPTARG" ;;
 		a) target_arch="$OPTARG" ;;
 		b) target_branch="$OPTARG" ;;
 		r) chroots_pkg="$OPTARG" ;;
@@ -147,7 +147,7 @@ mkchrootpkg_args+=(-r ${work_dir})
 
 timer_start=$(get_timer)
 
-eval_buildset "${sets_dir_pkg}" "${buildset_pkg}"
+eval_build_list "${list_dir_pkg}" "${build_list_pkg}"
 
 prepare_dir "${pkg_dir}"
 
@@ -159,4 +159,4 @@ ${wipe_clean} && clean_up
 
 chroot_init
 
-run make_pkg "${buildset_pkg}"
+run make_pkg "${build_list_pkg}"

@@ -155,7 +155,7 @@ check_build(){
 
 find_pkg(){
 	local result=$(find . -type d -name "$1")
-	[[ -z $result ]] && die "%s is not a valid package or buildset!" "$1"
+	[[ -z $result ]] && die "%s is not a valid package or build list!" "$1"
 }
 
 load_group(){

@@ -160,9 +160,9 @@
 
 		<variablelist>
 			<varlistentry>
-				<term><varname>buildset_pkg=</varname></term>
+				<term><varname>build_list_pkg=</varname></term>
 
-				<listitem><para>Default set for buildpkg without the .set
+				<listitem><para>Default list for buildpkg without the .list
 				extension.
 				</para></listitem>
 			</varlistentry>
@@ -177,9 +177,9 @@
 
 		<variablelist>
 		<varlistentry>
-			<term><varname>buildset_iso=</varname></term>
+			<term><varname>build_list_iso=</varname></term>
 
-			<listitem><para>Default set for buildiso without the .set
+			<listitem><para>Default list for buildiso without the .list
 			extension.
 			</para></listitem>
 		</varlistentry>

@@ -33,7 +33,7 @@ By default it is commented and shows just initialization values done in code.
 Tools configuration is done in manjaro-tools.conf or by args.
 Specifying args will override manjaro-tools.conf settings.
 
-User sets can be placed in
+User build lists can be placed in
 
 ~~~
 $HOME/.config/manjaro-tools/{pkg,iso}.d
@@ -81,15 +81,15 @@ overriding
 
 ################ buildpkg ################
 
-# default pkg buildset; name without .set extension
-# buildset_pkg=default
+# default pkg build list; name without .list extension
+# build_list_pkg=default
 
 ################ buildiso ################
 
 # profile_repo='manjaro-tools-iso-profiles'
 
-# default iso buildset; name without .set extension
-# buildset_iso=default
+# default iso build list; name without .list extension
+# build_list_iso=default
 
 # unset defaults to given value
 # dist_name="Manjaro"
@@ -355,7 +355,7 @@ Usage: deployiso [options]
     -h                 This help
 ~~~
 
-######* upload official buildset, ie all built iso defined in a buildset
+######* upload official build list, ie all built iso defined in a build list
 
 ~~~
 deployiso -p official -c

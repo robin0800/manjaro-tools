@@ -72,28 +72,28 @@ get_pac_mirrors_conf(){
 	echo "$conf"
 }
 
-read_set(){
+read_build_list(){
 	local _space="s| ||g" \
 		_clean=':a;N;$!ba;s/\n/ /g' \
 		_com_rm="s|#.*||g"
 
-	stack=$(sed "$_com_rm" "$1.set" \
+	build_list=$(sed "$_com_rm" "$1.list" \
 		| sed "$_space" \
 		| sed "$_clean")
 }
 
-# $1: sets_dir
-list_sets(){
+# $1: list_dir
+show_build_lists(){
 	local prof temp
-	for item in $(ls $1/*.set); do
+	for item in $(ls $1/*.list); do
 		temp=${item##*/}
-		prof=${prof:-}${prof:+|}${temp%.set}
+		prof=${prof:-}${prof:+|}${temp%.list}
 	done
 	echo $prof
 }
 
 # $1: make_conf_dir
-list_make_profiles(){
+show_make_profiles(){
 	local arch temp
 	for item in $(ls $1/*.conf); do
 		temp=${item##*/}
@@ -102,18 +102,18 @@ list_make_profiles(){
 	echo $arch
 }
 
-# $1: sets_dir
-# $2: buildset
-eval_buildset(){
+# $1: list_dir
+# $2: build list
+eval_build_list(){
 	eval "case $2 in
-		$(list_sets $1)) is_buildset=true; read_set $1/$2 ;;
-		*) is_buildset=false ;;
+		$(show_build_lists $1)) is_build_list=true; read_build_list $1/$2 ;;
+		*) is_build_list=false ;;
 	esac"
 }
 
 get_edition(){
 	local result=$(find ${run_dir} -maxdepth 2 -name "$1") path
-	[[ -z $result ]] && die "%s is not a valid profile or buildset!" "$1"
+	[[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
 	path=${result%/*}
 	echo ${path##*/}
 }
@@ -249,13 +249,13 @@ init_buildtree(){
 init_buildpkg(){
 	chroots_pkg="${chroots_dir}/buildpkg"
 
-	sets_dir_pkg="${SYSCONFDIR}/pkg.d"
+	list_dir_pkg="${SYSCONFDIR}/pkg.list.d"
 
 	make_conf_dir="${SYSCONFDIR}/make.conf.d"
 
-	[[ -d ${USERCONFDIR}/pkg.d ]] && sets_dir_pkg=${USERCONFDIR}/pkg.d
+	[[ -d ${USERCONFDIR}/pkg.list.d ]] && list_dir_pkg=${USERCONFDIR}/pkg.list.d
 
-	[[ -z ${buildset_pkg} ]] && buildset_pkg='default'
+	[[ -z ${build_list_pkg} ]] && build_list_pkg='default'
 
 	cache_dir_pkg=${cache_dir}/pkg
 }
@@ -277,11 +277,11 @@ get_codename(){
 init_buildiso(){
 	chroots_iso="${chroots_dir}/buildiso"
 
-	sets_dir_iso="${SYSCONFDIR}/iso.d"
+	list_dir_iso="${SYSCONFDIR}/iso.list.d"
 
-	[[ -d ${USERCONFDIR}/iso.d ]] && sets_dir_iso=${USERCONFDIR}/iso.d
+	[[ -d ${USERCONFDIR}/iso.list.d ]] && list_dir_iso=${USERCONFDIR}/iso.list.d
 
-	[[ -z ${buildset_iso} ]] && buildset_iso='default'
+	[[ -z ${build_list_iso} ]] && build_list_iso='default'
 
 	cache_dir_iso="${cache_dir}/iso"
 
@@ -558,7 +558,7 @@ is_valid_init(){
 
 is_valid_arch_pkg(){
 	eval "case $1 in
-		$(list_make_profiles "${make_conf_dir}")) return 0 ;;
+		$(show_make_profiles "${make_conf_dir}")) return 0 ;;
 		*) return 1 ;;
 	esac"
 }
@@ -578,8 +578,8 @@ is_valid_branch(){
 }
 
 run(){
-	if ${is_buildset};then
-		for item in ${stack[@]};do
+	if ${is_build_list};then
+		for item in ${build_list[@]};do
 			$1 $item
 		done
 	else
