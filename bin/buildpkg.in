@@ -41,6 +41,7 @@ display_settings(){
 	msg2 "buildset_pkg: %s" "${buildset_pkg}"
 	msg2 "is_buildset: %s" "${is_buildset}"
 	msg2 "pkgarch_dir: %s" "${pkgarch_dir}"
+	msg2 "pkgarches: %s" "$(list_pkgarches ${pkgarch_dir})"
 
 	msg "OPTIONS:"
 	msg2 "arch: %s" "${target_arch}"
@@ -133,6 +134,8 @@ while getopts "${opts}" arg; do
 	esac
 done
 
+check_root "$0" "${orig_argv[@]}"
+
 prepare_conf "${target_arch}"
 
 mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
@@ -141,8 +144,6 @@ makepkg_conf=$(get_makepkg_conf "${target_arch}")
 mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}")
 
 mkchrootpkg_args+=(-r ${work_dir})
-
-check_root "$0" "${orig_argv[@]}"
 
 timer_start=$(get_timer)
 

@@ -9,28 +9,32 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+load_compiler_settings(){
+	local tarch="$1" conf
+	conf=${pkgarch_dir}/$tarch.conf
+
+	[[ -f $conf ]] || return 1
+
+	info "Loading %s compiler settings ..." "$tarch"
+	source $conf
+
+	return 0
+}
+
 get_makepkg_conf(){
 	local conf_dir=/tmp conf
 	conf="$conf_dir/makepkg-$1.conf"
 
 	cp "${DATADIR}/makepkg.conf" "$conf"
 
+	load_compiler_settings "$1"
+
 	sed -i "$conf" \
 		-e "s|@CARCH[@]|$carch|g" \
 		-e "s|@CHOST[@]|$chost|g" \
-		-e "s|@CARCHFLAGS[@]|$cflags|g"
+		-e "s|@CFLAGS[@]|$cflags|g"
 
 	echo "$conf"
-}
-
-load_compiler_settings(){
-	local tarch="$1"
-
-	[[ -f ${pkgarch_dir}/$tarch.conf ]] || return 1
-
-	source ${pkgarch_dir}/$tarch.conf
-
-	return 0
 }
 
 # $1: target_arch
@@ -42,11 +46,8 @@ prepare_conf(){
 	local pac_arch='default'
 
 	if [[ "$1" == 'multilib' ]];then
-		load_compiler_settings "x86_64"
 		pac_arch='multilib'
 		is_multilib=true
-	else
-		load_compiler_settings "$1"
 	fi
 
 	pacman_conf="${DATADIR}/pacman-$pac_arch.conf"

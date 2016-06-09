@@ -31,6 +31,7 @@ SETS_PKG = \
 ARCH_CONF = \
 	data/pkgarch.d/i686.conf \
 	data/pkgarch.d/x86_64.conf \
+	data/pkgarch.d/multilib.conf \
 	data/pkgarch.d/aarch64.conf \
 	data/pkgarch.d/arm.conf \
 	data/pkgarch.d/armv6h.conf \

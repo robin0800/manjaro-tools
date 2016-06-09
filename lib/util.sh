@@ -97,7 +97,7 @@ list_pkgarches(){
 	local arch temp
 	for item in $(ls $1/*.conf); do
 		temp=${item##*/}
-		arch=${arch:-}${arch:+|}${temp%.set}
+		arch=${arch:-}${arch:+|}${temp%.conf}
 	done
 	echo $arch
 }
@@ -558,7 +558,7 @@ is_valid_init(){
 
 is_valid_arch_pkg(){
 	eval "case $1 in
-		$(list_pkgarches "${pkgarch_dir}")|multilib) return 0 ;;
+		$(list_pkgarches "${pkgarch_dir}")) return 0 ;;
 		*) return 1 ;;
 	esac"
 }
