@@ -55,6 +55,8 @@ prepare_conf(){
 	work_dir="${chroots_pkg}/${target_branch}/$1"
 	pkg_dir="${cache_dir_pkg}/${target_branch}/$1"
 
+	makepkg_conf=$(get_makepkg_conf "$1")
+
 	[[ "$pac_arch" == 'multilib' ]] && target_arch='x86_64'
 }
 
