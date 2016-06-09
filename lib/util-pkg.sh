@@ -304,10 +304,8 @@ post_build(){
 
 chroot_init(){
 	local timer=$(get_timer)
-	if ${clean_first}; then
+	if ${clean_first} || [[ ! -d "${work_dir}" ]]; then
 		chroot_clean
-		chroot_create
-	elif [[ ! -d "${work_dir}" ]]; then
 		chroot_create
 	else
 		chroot_update
