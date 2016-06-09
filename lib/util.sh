@@ -251,7 +251,7 @@ init_buildpkg(){
 
 	sets_dir_pkg="${SYSCONFDIR}/pkg.d"
 
-	pkgarch_dir="${SYSCONFDIR}/pkgarch.d"
+	pkgarch_dir="${SYSCONFDIR}/make.conf.d"
 
 	[[ -d ${USERCONFDIR}/pkg.d ]] && sets_dir_pkg=${USERCONFDIR}/pkg.d
 

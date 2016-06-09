@@ -29,13 +29,13 @@ SETS_PKG = \
 	data/pkg.d/default.set
 
 ARCH_CONF = \
-	data/pkgarch.d/i686.conf \
-	data/pkgarch.d/x86_64.conf \
-	data/pkgarch.d/multilib.conf \
-	data/pkgarch.d/aarch64.conf \
-	data/pkgarch.d/arm.conf \
-	data/pkgarch.d/armv6h.conf \
-	data/pkgarch.d/armv7h.conf
+	data/make.conf.d/i686.conf \
+	data/make.conf.d/x86_64.conf \
+	data/make.conf.d/multilib.conf \
+	data/make.conf.d/aarch64.conf \
+	data/make.conf.d/arm.conf \
+	data/make.conf.d/armv6h.conf \
+	data/make.conf.d/armv7h.conf
 
 BIN_PKG = \
 	bin/checkpkg \
@@ -143,8 +143,8 @@ install_pkg:
 	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.d
 	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.d
 
-	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkgarch.d
-	install -m0644 ${ARCH_CONF} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkgarch.d
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/make.conf.d
+	install -m0644 ${ARCH_CONF} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/make.conf.d
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/bin
 	install -m0755 ${BIN_PKG} $(DESTDIR)$(PREFIX)/bin
@@ -196,7 +196,7 @@ uninstall_base:
 
 uninstall_pkg:
 	for f in ${SETS_PKG}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.d/$$f; done
-	for f in ${ARCH_CONF}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkgarch.d/$$f; done
+	for f in ${ARCH_CONF}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/make.conf.d/$$f; done
 	for f in ${BIN_PKG}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/bin/find-libprovides
 	for f in ${SHARED_PKG}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
