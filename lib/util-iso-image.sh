@@ -441,7 +441,7 @@ download_to_cache(){
 # $1: image path
 # $2: packages
 chroot_create(){
-	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
+	[[ "${1##*/}" == "root-image" ]] && local flag="-L"
 	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} $@
 }
