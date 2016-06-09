@@ -33,16 +33,18 @@ By default it is commented and shows just initialization values done in code.
 Tools configuration is done in manjaro-tools.conf or by args.
 Specifying args will override manjaro-tools.conf settings.
 
-User build lists can be placed in
+User build lists(eg 'my-super-build.list') can be placed in
 
 ~~~
-$HOME/.config/manjaro-tools/{pkg,iso}.d
+$HOME/.config/manjaro-tools/pkg.list.d
+$HOME/.config/manjaro-tools/iso.list.d
 ~~~
 
 overriding
 
 ~~~
-/etc/manjaro-tools/{pkg,iso}.d
+/etc/manjaro-tools/pkg.list.d
+/etc/manjaro-tools/iso.list.d
 ~~~
 
 
