@@ -669,6 +669,8 @@ load_profile(){
 
 	pacman_conf=$(get_pacman_conf)
 
+	mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
+
 	iso_file=$(gen_iso_fn).iso
 
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -K)

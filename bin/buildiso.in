@@ -22,6 +22,7 @@ import ${LIBDIR}/util.sh
 show_profile(){
 	prepare_profile "$1"
 	msg2 "pacman_conf: %s" "${pacman_conf}"
+# 	msg2 "mirrors_conf: %s" "${mirrors_conf}"
 	if ${verbose};then
 		msg2 "work_dir: %s" "${work_dir}"
 		msg2 "iso_dir: %s" "${iso_dir}"
@@ -85,7 +86,6 @@ display_settings(){
 		msg "PATHS:"
 		msg2 "run_dir: %s" "${run_dir}"
 		msg2 "log_dir: %s" "${log_dir}"
-# 		msg2 "mirrors_conf: %s" "${mirrors_conf}"
 	fi
 
 	msg "DIST SETTINGS:"
@@ -176,8 +176,6 @@ done
 shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
-
-mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
 
 check_root "$0" "${orig_argv[@]}"
 

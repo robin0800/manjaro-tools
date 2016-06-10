@@ -38,12 +38,10 @@ write_calamares_branding_desc(){
 }
 
 write_calamares_machineid_conf(){
-	if [[ ${initsys} == 'openrc' ]];then
-		local conf="$1/etc/calamares/modules/machineid.conf"
-		echo "systemd: false" > $conf
-		echo "dbus: true" >> $conf
-		echo "symlink: true" >> $conf
-	fi
+	local conf="$1/etc/calamares/modules/machineid.conf"
+	echo "systemd: false" > $conf
+	echo "dbus: true" >> $conf
+	echo "symlink: true" >> $conf
 }
 
 write_calamares_finished_conf(){
@@ -117,7 +115,7 @@ write_calamares_displaymanager_conf(){
 	echo "displaymanagers:" > "$conf"
 	echo "  - ${displaymanager}" >> "$conf"
 	echo '' >> "$conf"
-	if [[ ${default_desktop_executable} != "none" ]] && [[ ${default_desktop_file} != "none" ]]; then
+	if $(is_valid_de); then
 		echo "defaultDesktopEnvironment:" >> "$conf"
 		echo "    executable: \"${default_desktop_executable}\"" >> "$conf"
 		echo "    desktopFile: \"${default_desktop_file}\"" >> "$conf"

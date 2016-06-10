@@ -120,7 +120,6 @@ set_xdm(){
 }
 
 is_valid_de(){
-	local func=$1
 	if [[ ${default_desktop_executable} != "none" ]] && \
 	[[ ${default_desktop_file} != "none" ]]; then
 		return 0
