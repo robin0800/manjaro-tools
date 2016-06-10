@@ -199,7 +199,7 @@ make_image_root() {
 		local path="${work_dir}/root-image"
 		mkdir -p ${path}
 
-		chroot_create "${path}" "${packages}"
+		chroot_create "${path}" "${packages}" || die
 
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		copy_overlay "${profile_dir}/root-overlay" "${path}"
