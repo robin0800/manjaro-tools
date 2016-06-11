@@ -22,8 +22,7 @@ load_compiler_settings(){
 }
 
 get_makepkg_conf(){
-	local conf_dir=/tmp conf
-	conf="$conf_dir/makepkg-$1.conf"
+	local conf="${tmp_dir}/makepkg-$1.conf"
 
 	cp "${DATADIR}/makepkg.conf" "$conf"
 
@@ -252,7 +251,7 @@ move_to_cache(){
 }
 
 archive_logs(){
-	local archive name="$1" ext=log.tar.xz ver src=/tmp/archives.list
+	local archive name="$1" ext=log.tar.xz ver src=${tmp_dir}/archives.list
 	ver=$(get_full_version "$name")
 	archive="${name}-${ver}-${target_arch}"
 	find . -maxdepth 1 -name "$archive*.log" > $src

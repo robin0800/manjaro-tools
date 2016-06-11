@@ -63,8 +63,7 @@ check_user_repos_conf(){
 }
 
 get_pac_mirrors_conf(){
-	local conf_dir=/tmp conf
-	conf="$conf_dir/pacman-mirrors-$1.conf"
+	local conf="$tmp_dir/pacman-mirrors-$1.conf"
 	cp "${DATADIR}/pacman-mirrors.conf" "$conf"
 	sed -i "$conf" \
 		-e "s|Branch = stable|Branch = $1|"
@@ -232,6 +231,8 @@ init_common(){
 	[[ -z ${log_dir} ]] && log_dir='/var/log/manjaro-tools'
 
 	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
+
+	[[ -z ${tmp_dir} ]] && tmp_dir='/tmp/manjaro-tools'
 }
 
 init_buildtree(){

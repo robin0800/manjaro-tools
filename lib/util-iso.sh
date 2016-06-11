@@ -29,8 +29,8 @@ error_function() {
 # $1: function
 run_log(){
 	local func="$1"
-	local tmpfile=/tmp/$func.ansi.log logfile=${log_dir}/$(gen_iso_fn).$func.log
-	logpipe=$(mktemp -u "/tmp/$func.pipe.XXXXXXXX")
+	local tmpfile=${tmp_dir}/$func.ansi.log logfile=${log_dir}/$(gen_iso_fn).$func.log
+	logpipe=$(mktemp -u "${tmp_dir}/$func.pipe.XXXXXXXX")
 	mkfifo "$logpipe"
 	tee "$tmpfile" < "$logpipe" &
 	local teepid=$!
@@ -72,8 +72,8 @@ make_sqfs() {
 	msg "Generating SquashFS image for %s" "${1}"
 	if [[ -f "${sq_img}" ]]; then
 		local has_changed_dir=$(find ${1} -newer ${sq_img})
-		msg2 "Possible changes for %s ..." "${1}"  >> /tmp/buildiso.debug
-		msg2 "%s" "${has_changed_dir}" >> /tmp/buildiso.debug
+		msg2 "Possible changes for %s ..." "${1}"  >> ${tmp_dir}/buildiso.debug
+		msg2 "%s" "${has_changed_dir}" >> ${tmp_dir}/buildiso.debug
 		if [[ -n "${has_changed_dir}" ]]; then
 			msg2 "SquashFS image %s is not up to date, rebuilding..." "${sq_img}"
 			rm "${sq_img}"
@@ -651,7 +651,7 @@ get_pacman_conf(){
 	if [[ -f ${user_conf} ]];then
 		info "detected: %s" "user-repos.conf"
 		check_user_repos_conf "${user_conf}"
-		conf=/tmp/custom-pacman.conf
+		conf=${tmp_dir}/custom-pacman.conf
 		cat ${DATADIR}/pacman-$pac_arch.conf > "$conf"
 		cat ${user_conf} >> "$conf"
 	else

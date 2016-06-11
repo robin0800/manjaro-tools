@@ -179,6 +179,8 @@ timer_start=$(get_timer)
 
 check_root "$0" "${orig_argv[@]}"
 
+prepare_dir "${tmp_dir}"
+
 eval_build_list "${list_dir_iso}" "${build_list_iso}"
 
 import ${LIBDIR}/util-iso.sh
