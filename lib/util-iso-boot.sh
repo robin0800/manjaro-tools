@@ -61,7 +61,11 @@ copy_efi_loaders(){
 	msg2 "Copying efi loaders ..."
 	cp $1/usr/share/efitools/efi/PreLoader.efi $2/bootx64.efi
 	cp $1/usr/share/efitools/efi/HashTool.efi $2/
-	cp $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi $2/loader.efi
+	if [[ -f $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi ]] ; then
+		cp $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi $2/loader.efi
+	else
+		cp $1/usr/share/efitools/efi/Loader.efi $2/loader.efi
+	fi
 }
 
 copy_boot_images(){
