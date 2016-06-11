@@ -140,6 +140,8 @@ shift $(($OPTIND - 1))
 
 check_root "$0" "${orig_argv[@]}"
 
+prepare_dir "${tmp_dir}"
+
 prepare_conf "${target_arch}"
 
 mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
@@ -153,7 +155,6 @@ timer_start=$(get_timer)
 eval_build_list "${list_dir_pkg}" "${build_list_pkg}"
 
 prepare_dir "${pkg_dir}"
-prepare_dir "${tmp_dir}"
 
 init_base_devel
 
