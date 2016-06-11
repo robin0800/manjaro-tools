@@ -400,6 +400,9 @@ configure_live_image(){
 
 			msg2 "Configuring hostname ..."
 			echo ${hostname} > $1/etc/hostname
+
+			msg2 "Disable systemd-gpt-auto-generator"
+			ln -sfv /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
 		;;
 		'openrc')
 			msg2 "Configuring hostname ..."
