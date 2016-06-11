@@ -252,17 +252,20 @@ move_to_cache(){
 }
 
 archive_logs(){
-	local ext=log.tar.xz
-	msg2 "Archiving log files %s ..." "$1.$ext"
-	tar -cJf $1.$ext $2
+	local archive name="$1" ext=log.tar.xz ver src=/tmp/archives.list
+	ver=$(get_full_version "$name")
+	archive="${name}-${ver}-${target_arch}"
+	find . -maxdepth 1 -name "$archive*.log" > $src
+	msg2 "Archiving log files [%s] ..." "$archive.$ext"
+	tar -cJf $PWD/$archive.$ext -T $src
 	msg2 "Cleaning log files ..."
 	find . -maxdepth 1 -name '*.log' -delete
-	chown "${OWNER}:users" "$1.$ext"
+	chown "${OWNER}:users" "$archive.$ext"
 }
 
 post_build(){
 	source PKGBUILD
-	local ext='pkg.tar.xz' tarch
+	local ext='pkg.tar.xz' tarch ver src
 	for pkg in ${pkgname[@]};do
 		case $arch in
 			any) tarch='any' ;;
@@ -277,11 +280,8 @@ post_build(){
 		fi
 	done
 	if [[ -z $LOGDEST ]];then
-		local name=${pkgbase:-$pkgname} ver logsrc archive
-		ver=$(get_full_version "$name")
-		archive=$name-$ver-${target_arch}
-		logsrc=$(find . -maxdepth 1 -name "$archive*.log")
-		archive_logs "$archive" "${logsrc[@]}"
+		local name=${pkgbase:-$pkgname}
+		archive_logs "$name"
 	fi
 }
 
