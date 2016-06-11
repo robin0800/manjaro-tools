@@ -197,8 +197,6 @@ prepare_chroot() {
 	printf >>"$copydir/etc/group"  'builduser:x:%d:\n' $builduser_gid
 	printf >>"$copydir/etc/passwd" 'builduser:x:%d:%d:builduser:/build:/bin/bash\n' $builduser_uid $builduser_gid
 
-	info "copydir: %s" "$copydir"
-
 	$install -d "$copydir"/{build,build/.gnupg,startdir,{pkg,srcpkg,src,log}dest}
 
 	for x in .gnupg/pubring.{kbx,gpg}; do

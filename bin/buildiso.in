@@ -21,6 +21,8 @@ import ${LIBDIR}/util.sh
 
 show_profile(){
 	prepare_profile "$1"
+	msg2 "pacman_conf: %s" "${pacman_conf}"
+# 	msg2 "mirrors_conf: %s" "${mirrors_conf}"
 	if ${verbose};then
 		msg2 "work_dir: %s" "${work_dir}"
 		msg2 "iso_dir: %s" "${iso_dir}"
@@ -61,13 +63,11 @@ display_settings(){
 	show_config
 
 	msg "PROFILE:"
-	msg2 "sets_dir_iso: %s" "${sets_dir_iso}"
-	msg2 "buildsets: %s" "$(list_sets ${sets_dir_iso})"
-	msg2 "buildset_iso: %s" "${buildset_iso}"
-	msg2 "is_buildset: %s" "${is_buildset}"
-	${verbose} && msg2 "run_dir: %s" "${run_dir}"
-	${verbose} && msg2 "log_dir: %s" "${log_dir}"
-	msg2 "pacman_conf: %s" "${pacman_conf}"
+	msg2 "list_dir_iso: %s" "${list_dir_iso}"
+	msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
+	msg2 "build_list_iso: %s" "${build_list_iso}"
+	msg2 "is_build_list: %s" "${is_build_list}"
+	msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
 
 	msg "OPTIONS:"
 	msg2 "arch: %s" "${target_arch}"
@@ -81,6 +81,12 @@ display_settings(){
 	msg2 "images_only: %s" "${images_only}"
 	msg2 "iso_only: %s" "${iso_only}"
 	msg2 "sign: %s" "${sign}"
+
+	if ${verbose}; then
+		msg "PATHS:"
+		msg2 "run_dir: %s" "${run_dir}"
+		msg2 "log_dir: %s" "${log_dir}"
+	fi
 
 	msg "DIST SETTINGS:"
 	msg2 "dist_name: %s" "${dist_name}"
@@ -97,7 +103,7 @@ display_settings(){
 	${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
 
 	msg "BUILD QUEUE:"
-	run show_profile "${buildset_iso}"
+	run show_profile "${build_list_iso}"
 }
 
 load_user_info
@@ -117,11 +123,9 @@ iso_only=false
 verbose=false
 sign=false
 
-pacman_conf_arch='default'
-
 usage() {
 	echo "Usage: ${0##*/} [options]"
-	echo "    -p <profile>       Buildset or profile [default: ${buildset_iso}]"
+	echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
 	echo "    -a <arch>          Arch [default: ${target_arch}]"
 	echo "    -b <branch>        Branch [default: ${target_branch}]"
 	echo '    -r <dir>           Chroots directory'
@@ -151,7 +155,7 @@ opts='p:a:b:r:t:k:i:czxsvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-		p) buildset_iso="$OPTARG" ;;
+		p) build_list_iso="$OPTARG" ;;
 		a) target_arch="$OPTARG" ;;
 		b) target_branch="$OPTARG" ;;
 		r) chroots_iso="$OPTARG" ;;
@@ -173,13 +177,9 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-[[ "${target_arch}" == 'x86_64' ]] && pacman_conf_arch='multilib'
-
-mirrors_conf="${DATADIR}/pacman-mirrors-${target_branch}.conf"
-
 check_root "$0" "${orig_argv[@]}"
 
-eval_buildset "${sets_dir_iso}" "${buildset_iso}"
+eval_build_list "${list_dir_iso}" "${build_list_iso}"
 
 import ${LIBDIR}/util-iso.sh
 
@@ -187,4 +187,4 @@ check_requirements
 
 ${pretend} && display_settings && exit 1
 
-run build "${buildset_iso}"
+run build "${build_list_iso}"

@@ -23,13 +23,18 @@ LIBS_BASE = \
 SHARED_BASE = \
 	data/pacman-default.conf \
 	data/pacman-multilib.conf \
-	data/pacman-mirrors-stable.conf \
-	data/pacman-mirrors-testing.conf \
-	data/pacman-mirrors-unstable.conf \
-	data/pacman-arm.conf
+	data/pacman-mirrors.conf
 
-SETS_PKG = \
-	data/pkg.d/default.set
+LIST_PKG = \
+	data/pkg.list.d/default.list
+
+ARCH_CONF = \
+	data/make.conf.d/i686.conf \
+	data/make.conf.d/x86_64.conf \
+	data/make.conf.d/multilib.conf
+# 	data/make.conf.d/aarch64.conf \
+# 	data/make.conf.d/armv6h.conf \
+# 	data/make.conf.d/armv7h.conf
 
 BIN_PKG = \
 	bin/checkpkg \
@@ -46,17 +51,15 @@ LIBS_PKG = \
 	lib/util-pkgtree.sh
 
 SHARED_PKG = \
-	data/makepkg-i686.conf \
-	data/base-devel-udev \
-	data/makepkg-x86_64.conf \
-	data/makepkg-arm.conf
+	data/makepkg.conf \
+	data/base-devel-udev
 
-SETS_ISO = \
-	data/iso.d/default.set \
-	data/iso.d/official.set \
-	data/iso.d/community.set \
-	data/iso.d/minimal.set \
-	data/iso.d/sonar.set
+LIST_ISO = \
+	data/iso.list.d/default.list \
+	data/iso.list.d/official.list \
+	data/iso.list.d/community.list \
+	data/iso.list.d/minimal.list \
+	data/iso.list.d/sonar.list
 
 BIN_ISO = \
 	bin/buildiso \
@@ -136,8 +139,11 @@ install_base:
 	install -m0644 ${SHARED_BASE} $(DESTDIR)$(PREFIX)/share/manjaro-tools
 
 install_pkg:
-	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.d
-	install -m0644 ${SETS_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.d
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.list.d
+	install -m0644 ${LIST_PKG} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.list.d
+
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/make.conf.d
+	install -m0644 ${ARCH_CONF} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/make.conf.d
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/bin
 	install -m0755 ${BIN_PKG} $(DESTDIR)$(PREFIX)/bin
@@ -155,8 +161,8 @@ install_pkg:
 	gzip -c man/buildtree.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildtree.1.gz
 
 install_iso:
-	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/iso.d
-	install -m0644 ${SETS_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/iso.d
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/iso.list.d
+	install -m0644 ${LIST_ISO} $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/iso.list.d
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/bin
 	install -m0755 ${BIN_ISO} $(DESTDIR)$(PREFIX)/bin
@@ -188,7 +194,8 @@ uninstall_base:
 	for f in ${LIBS_BASE}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
 
 uninstall_pkg:
-	for f in ${SETS_PKG}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.d/$$f; done
+	for f in ${LIST_PKG}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/pkg.list.d/$$f; done
+	for f in ${ARCH_CONF}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/make.conf.d/$$f; done
 	for f in ${BIN_PKG}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/bin/find-libprovides
 	for f in ${SHARED_PKG}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
@@ -197,7 +204,7 @@ uninstall_pkg:
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildtree.1.gz
 
 uninstall_iso:
-	for f in ${SETS_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/iso.d/$$f; done
+	for f in ${LIST_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/iso.list.d/$$f; done
 	for f in ${BIN_ISO}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${SHARED_ISO}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
 	for f in ${LIBS_ISO}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done

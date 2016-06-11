@@ -120,7 +120,6 @@ set_xdm(){
 }
 
 is_valid_de(){
-	local func=$1
 	if [[ ${default_desktop_executable} != "none" ]] && \
 	[[ ${default_desktop_file} != "none" ]]; then
 		return 0
@@ -444,7 +443,7 @@ download_to_cache(){
 # $1: image path
 # $2: packages
 chroot_create(){
-	[[ "$1" == "${work_dir}/root-image" ]] && local flag="-L"
+	[[ "${1##*/}" == "root-image" ]] && local flag="-L"
 	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} $@
 }

@@ -74,8 +74,8 @@
 			<varlistentry>
 				<term><option>-p PROFILE...</option></term>
 
-				<listitem><para>Name of the buildset or name of the directory
-				you will build. It needs to cantains a existing buildset or a
+				<listitem><para>Name of the build list or name of the directory
+				you will build. It needs to cantains a existing build list or a
 				folder with a valid profile.</para></listitem>
 			</varlistentry>
 

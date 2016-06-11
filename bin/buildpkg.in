@@ -23,6 +23,7 @@ import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-pkg.sh
 
 show_pkg(){
+	check_build "$1"
 	cd $1
 		source PKGBUILD
 		for n in ${pkgname[@]}; do
@@ -36,15 +37,19 @@ display_settings(){
 	show_config
 
 	msg "PROFILE:"
-	msg2 "sets_dir_pkg: %s" "${sets_dir_pkg}"
-	msg2 "buildsets: %s" "$(list_sets ${sets_dir_pkg})"
-	msg2 "buildset_pkg: %s" "${buildset_pkg}"
-	msg2 "is_buildset: %s" "${is_buildset}"
+	msg2 "list_dir_pkg: %s" "${list_dir_pkg}"
+	msg2 "build_lists: %s" "$(show_build_lists ${list_dir_pkg})"
+	msg2 "build_list_pkg: %s" "${build_list_pkg}"
+	msg2 "is_build_list: %s" "${is_build_list}"
+	msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
+# 	msg2 "make_conf_dir: %s" "${make_conf_dir}"
+# 	msg2 "build_profiles: %s" "$(show_build_profiles ${make_conf_dir})"
 
 	msg "OPTIONS:"
 	msg2 "arch: %s" "${target_arch}"
 	msg2 "branch: %s" "${target_branch}"
 	msg2 "chroots_pkg: %s" "${chroots_pkg}"
+
 
 	msg "ARGS:"
 	msg2 "clean_first: %s" "${clean_first}"
@@ -57,9 +62,9 @@ display_settings(){
 	msg "PATHS:"
 	msg2 "work_dir: %s" "${work_dir}"
 	msg2 "pkg_dir: %s" "${pkg_dir}"
-	msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
-	msg2 "pacman_conf: %s" "${pacman_conf}"
-	msg2 "makepkg_conf: %s" "${makepkg_conf}"
+# 	msg2 "mirrors_conf: %s" "${mirrors_conf}"
+# 	msg2 "pacman_conf: %s" "${pacman_conf}"
+# 	msg2 "makepkg_conf: %s" "${makepkg_conf}"
 
 	if ${clean_first};then
 		msg "PKG:"
@@ -67,7 +72,7 @@ display_settings(){
 	fi
 
 	msg "BUILD QUEUE:"
-	run show_pkg "${buildset_pkg}"
+	run show_pkg "${build_list_pkg}"
 }
 
 load_user_info
@@ -84,13 +89,14 @@ clean_first=false
 wipe_clean=false
 namcap=false
 pretend=false
-is_buildset=false
+is_build_list=false
 sign=false
 udev_root=false
+is_multilib=false
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
-	echo "    -p <pkg>           Buildset or pkg [default: ${buildset_pkg}]"
+	echo "    -p <pkg>           Build list or pkg [default: ${build_list_pkg}]"
 	echo "    -a <arch>          Arch [default: ${target_arch}]"
 	echo "    -b <branch>        Branch [default: ${target_branch}]"
 	echo '    -r <dir>           Chroots directory'
@@ -114,12 +120,12 @@ opts='p:a:b:r:i:cwnsuqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-		p) buildset_pkg="$OPTARG" ;;
+		p) build_list_pkg="$OPTARG" ;;
 		a) target_arch="$OPTARG" ;;
 		b) target_branch="$OPTARG" ;;
 		r) chroots_pkg="$OPTARG" ;;
 		i) install_pkgs+="$OPTARG"; mkchrootpkg_args+=(-I ${install_pkgs[*]}) ;;
-		c) clean_first=true; mkchroot_args+=(-L) ;;
+		c) clean_first=true ;;
 		w) wipe_clean=true ;;
 		n) namcap=true; mkchrootpkg_args+=(-n) ;;
 		s) sign=true ;;
@@ -130,17 +136,19 @@ while getopts "${opts}" arg; do
 	esac
 done
 
-configure_chroot_arch "${target_arch}"
+check_root "$0" "${orig_argv[@]}"
+
+prepare_conf "${target_arch}"
+
+mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
 
 mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}")
 
 mkchrootpkg_args+=(-r ${work_dir})
 
-check_root "$0" "${orig_argv[@]}"
-
 timer_start=$(get_timer)
 
-eval_buildset "${sets_dir_pkg}" "${buildset_pkg}"
+eval_build_list "${list_dir_pkg}" "${build_list_pkg}"
 
 prepare_dir "${pkg_dir}"
 
@@ -152,4 +160,4 @@ ${wipe_clean} && clean_up
 
 chroot_init
 
-run make_pkg "${buildset_pkg}"
+run make_pkg "${build_list_pkg}"

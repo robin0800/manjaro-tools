@@ -9,82 +9,55 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-preconf_arm(){
-	local conf_dir=/tmp tarch="$1" desc="$2" flags="$3"
-	cp "${DATADIR}/pacman-arm.conf" "$conf_dir/pacman-$tarch.conf"
-	cp "${DATADIR}/makepkg-arm.conf" "$conf_dir/makepkg-$tarch.conf"
-	sed -i "$conf_dir/makepkg-$tarch.conf" \
-		-e "s|@CARCH[@]|$tarch|g" \
-		-e "s|@CHOST[@]|$desc|g" \
-		-e "s|@CARCHFLAGS[@]|$flags|g"
-	sed -i "$conf_dir/pacman-$tarch.conf" -e "s|@CARCH[@]|$tarch|g"
+load_compiler_settings(){
+	local tarch="$1" conf
+	conf=${make_conf_dir}/$tarch.conf
 
-	work_dir="${chroots_pkg}/${target_branch}/$tarch"
-	pkg_dir="${cache_dir_pkg}/${target_branch}/$tarch"
+	[[ -f $conf ]] || return 1
 
-	makepkg_conf="$conf_dir/makepkg-$tarch.conf"
-	pacman_conf="$conf_dir/pacman-$tarch.conf"
+	info "Loading compiler settings: %s" "$tarch"
+	source $conf
+
+	return 0
 }
 
-preconf(){
-	local arch="$1"
-	work_dir="${chroots_pkg}/${target_branch}/${target_arch}"
-	pkg_dir="${cache_dir_pkg}/${target_branch}/${target_arch}"
-	if [[ "$arch" == 'multilib' ]];then
-		target_arch='x86_64'
-		is_multilib=true
-	else
-		is_multilib=false
-	fi
-	makepkg_conf="${DATADIR}/makepkg-${target_arch}.conf"
-	pacman_conf="${DATADIR}/pacman-$arch.conf"
+get_makepkg_conf(){
+	local conf_dir=/tmp conf
+	conf="$conf_dir/makepkg-$1.conf"
+
+	cp "${DATADIR}/makepkg.conf" "$conf"
+
+	load_compiler_settings "$1"
+
+	sed -i "$conf" \
+		-e "s|@CARCH[@]|$carch|g" \
+		-e "s|@CHOST[@]|$chost|g" \
+		-e "s|@CFLAGS[@]|$cflags|g"
+
+	echo "$conf"
 }
 
 # $1: target_arch
-configure_chroot_arch(){
+prepare_conf(){
 	if ! is_valid_arch_pkg "$1";then
 		die "%s is not a valid arch!" "$1"
 	fi
-	if ! is_valid_branch "${target_branch}";then
-		die "%s is not a valid branch!" "${target_branch}"
-	fi
-	local conf_arch chost_desc cflags
-	case "$1" in
-		'arm')
-			conf_arch="$1"
-			chost_desc="armv5tel-unknown-linux-gnueabi"
-			cflags="-march=armv5te "
-			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
-		;;
-		'armv6h')
-			conf_arch="$1"
-			chost_desc="armv6l-unknown-linux-gnueabihf"
-			cflags="-march=armv6 -mfloat-abi=hard -mfpu=vfp "
-			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
-		;;
-		'armv7h')
-			conf_arch="$1"
-			chost_desc="armv7l-unknown-linux-gnueabihf"
-			cflags="-march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 "
-			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
-		;;
-		'aarch64')
-			conf_arch="$1"
-			chost_desc="aarch64-unknown-linux-gnu"
-			cflags="-march=armv8-a "
-			preconf_arm "$conf_arch" "$chost_desc" "$cflags"
-		;;
-		'multilib')
-			conf_arch='multilib'
-			preconf "$conf_arch"
-		;;
-		*)
-			conf_arch='default'
-			preconf "$conf_arch"
-		;;
-	esac
 
-	mirrors_conf="${DATADIR}/pacman-mirrors-${target_branch}.conf"
+	local pac_arch='default'
+
+	if [[ "$1" == 'multilib' ]];then
+		pac_arch='multilib'
+		is_multilib=true
+	fi
+
+	pacman_conf="${DATADIR}/pacman-$pac_arch.conf"
+
+	work_dir="${chroots_pkg}/${target_branch}/$1"
+	pkg_dir="${cache_dir_pkg}/${target_branch}/$1"
+
+	makepkg_conf=$(get_makepkg_conf "$1")
+
+	[[ "$pac_arch" == 'multilib' ]] && target_arch='x86_64'
 }
 
 pkgver_equal() {
@@ -182,7 +155,7 @@ check_build(){
 
 find_pkg(){
 	local result=$(find . -type d -name "$1")
-	[[ -z $result ]] && die "%s is not a valid package or buildset!" "$1"
+	[[ -z $result ]] && die "%s is not a valid package or build list!" "$1"
 }
 
 load_group(){
@@ -193,7 +166,7 @@ load_group(){
 		devel_group='' \
 		file=${DATADIR}/base-devel-udev
 
-        info "Loading Group [%s] ..." "$file"
+        info "Loading custom group: %s" "$file"
 
 	if ${is_multilib}; then
 		_multi="s|>multilib||g"
@@ -224,6 +197,7 @@ init_base_devel(){
 chroot_create(){
 	msg "Creating chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
 	mkdir -p "${work_dir}"
+	mkchroot_args+=(-L)
 	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} \
 		"${work_dir}/root" \
@@ -278,17 +252,20 @@ move_to_cache(){
 }
 
 archive_logs(){
-	local ext=log.tar.xz
-	msg2 "Archiving log files %s ..." "$1.$ext"
-	tar -cJf $1.$ext $2
+	local archive name="$1" ext=log.tar.xz ver src=/tmp/archives.list
+	ver=$(get_full_version "$name")
+	archive="${name}-${ver}-${target_arch}"
+	find . -maxdepth 1 -name "$archive*.log" > $src
+	msg2 "Archiving log files [%s] ..." "$archive.$ext"
+	tar -cJf $PWD/$archive.$ext -T $src
 	msg2 "Cleaning log files ..."
 	find . -maxdepth 1 -name '*.log' -delete
-	chown "${OWNER}:users" "$1.$ext"
+	chown "${OWNER}:users" "$archive.$ext"
 }
 
 post_build(){
 	source PKGBUILD
-	local ext='pkg.tar.xz' tarch
+	local ext='pkg.tar.xz' tarch ver src
 	for pkg in ${pkgname[@]};do
 		case $arch in
 			any) tarch='any' ;;
@@ -303,20 +280,15 @@ post_build(){
 		fi
 	done
 	if [[ -z $LOGDEST ]];then
-		local name=${pkgbase:-$pkgname} ver logsrc archive
-		ver=$(get_full_version "$name")
-		archive=$name-$ver-${target_arch}
-		logsrc=$(find . -maxdepth 1 -name "$archive*.log")
-		archive_logs "$archive" "${logsrc[@]}"
+		local name=${pkgbase:-$pkgname}
+		archive_logs "$name"
 	fi
 }
 
 chroot_init(){
 	local timer=$(get_timer)
-	if ${clean_first}; then
+	if ${clean_first} || [[ ! -d "${work_dir}" ]]; then
 		chroot_clean
-		chroot_create
-	elif [[ ! -d "${work_dir}" ]]; then
 		chroot_create
 	else
 		chroot_update
