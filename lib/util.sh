@@ -518,6 +518,7 @@ show_config(){
 	else
 		msg2 "manjaro_tools_conf: %s" "${manjaro_tools_conf}"
 	fi
+	msg2 "log_dir: %s" "${log_dir}"
 }
 
 # $1: chroot
