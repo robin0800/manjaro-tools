@@ -29,8 +29,8 @@ error_function() {
 # $1: function
 run_log(){
 	local func="$1"
-	local tmpfile=/tmp/$func.ansi.log logfile=${log_dir}/$(gen_iso_fn).$func.log
-	logpipe=$(mktemp -u "/tmp/$func.pipe.XXXXXXXX")
+	local tmpfile=${tmp_dir}/$func.ansi.log logfile=${log_dir}/$(gen_iso_fn).$func.log
+	logpipe=$(mktemp -u "${tmp_dir}/$func.pipe.XXXXXXXX")
 	mkfifo "$logpipe"
 	tee "$tmpfile" < "$logpipe" &
 	local teepid=$!
@@ -72,8 +72,8 @@ make_sqfs() {
 	msg "Generating SquashFS image for %s" "${1}"
 	if [[ -f "${sq_img}" ]]; then
 		local has_changed_dir=$(find ${1} -newer ${sq_img})
-		msg2 "Possible changes for %s ..." "${1}"  >> /tmp/buildiso.debug
-		msg2 "%s" "${has_changed_dir}" >> /tmp/buildiso.debug
+		msg2 "Possible changes for %s ..." "${1}"  >> ${tmp_dir}/buildiso.debug
+		msg2 "%s" "${has_changed_dir}" >> ${tmp_dir}/buildiso.debug
 		if [[ -n "${has_changed_dir}" ]]; then
 			msg2 "SquashFS image %s is not up to date, rebuilding..." "${sq_img}"
 			rm "${sq_img}"
@@ -281,9 +281,7 @@ make_image_mhwd() {
 
 		reset_pac_conf "${path}"
 
-		download_to_cache "${path}" "${packages}"
-
-		copy_cache_mhwd "${work_dir}/mhwd-image"
+		copy_from_cache "${path}" "${packages}"
 
 		if [[ -n "${packages_cleanup}" ]]; then
 			for mhwd_clean in ${packages_cleanup}; do
@@ -479,13 +477,11 @@ load_pkgs(){
 		_purge="s|>cleanup.*||g" \
 		_purge_rm="s|>cleanup||g"
 
-	local list
+	local list="$1"
 
-	if [[ $1 == "${packages_custom}" ]];then
-		sort -u $(get_shared_list) ${packages_custom} > ${work_dir}/pkgs_merged
-		list=${work_dir}/pkgs_merged
-	else
-		list=$1
+	if [[ "$list" == "${packages_custom}" ]];then
+		sort -u $(get_shared_list) ${packages_custom} > ${tmp_dir}/packages-desktop.list
+		list=${tmp_dir}/packages-desktop.list
 	fi
 
 	packages=$(sed "$_com_rm" "$list" \
@@ -623,6 +619,15 @@ prepare_images(){
 	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
+ archive_logs(){
+	local name=$(gen_iso_fn) ext=log.tar.xz src=${tmp_dir}/archives.list
+	find ${log_dir} -maxdepth 1 -name "$name*.log" -printf "%f\n" > $src
+	msg2 "Archiving log files [%s] ..." "$name.$ext"
+	tar -cJf ${log_dir}/$name.$ext -C ${log_dir} -T $src
+	msg2 "Cleaning log files ..."
+	find ${log_dir} -maxdepth 1 -name "$name*.log" -delete
+ }
+
 make_profile(){
 	msg "Start building [%s]" "${profile}"
 	import ${LIBDIR}/util-iso-${iso_fs}.sh
@@ -630,15 +635,18 @@ make_profile(){
 	if ${iso_only}; then
 		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -x" "${profile}"
 		compress_images
+		${verbose} && archive_logs
 		exit 1
 	fi
 	if ${images_only}; then
 		prepare_images
+		${verbose} && archive_logs
 		warning "Continue compress: buildiso -p %s -zc ..." "${profile}"
 		exit 1
 	else
 		prepare_images
 		compress_images
+		${verbose} && archive_logs
 	fi
 	reset_profile
 	msg "Finished building [%s]" "${profile}"
@@ -651,9 +659,8 @@ get_pacman_conf(){
 	if [[ -f ${user_conf} ]];then
 		info "detected: %s" "user-repos.conf"
 		check_user_repos_conf "${user_conf}"
-		conf=/tmp/custom-pacman.conf
-		cat ${DATADIR}/pacman-$pac_arch.conf > "$conf"
-		cat ${user_conf} >> "$conf"
+		conf=${tmp_dir}/custom-pacman.conf
+		cat ${DATADIR}/pacman-$pac_arch.conf ${user_conf} > "$conf"
 	else
 		conf="${DATADIR}/pacman-$pac_arch.conf"
 	fi

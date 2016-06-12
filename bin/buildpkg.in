@@ -57,14 +57,10 @@ display_settings(){
 	msg2 "namcap: %s" "${namcap}"
 	msg2 "sign: %s" "${sign}"
 	msg2 "udev_root: %s" "${udev_root}"
-# 	msg2 "mkchroot_args: %s" "${mkchroot_args[*]}"
 
 	msg "PATHS:"
 	msg2 "work_dir: %s" "${work_dir}"
 	msg2 "pkg_dir: %s" "${pkg_dir}"
-# 	msg2 "mirrors_conf: %s" "${mirrors_conf}"
-# 	msg2 "pacman_conf: %s" "${pacman_conf}"
-# 	msg2 "makepkg_conf: %s" "${makepkg_conf}"
 
 	if ${clean_first};then
 		msg "PKG:"
@@ -136,7 +132,11 @@ while getopts "${opts}" arg; do
 	esac
 done
 
+shift $(($OPTIND - 1))
+
 check_root "$0" "${orig_argv[@]}"
+
+prepare_dir "${tmp_dir}"
 
 prepare_conf "${target_arch}"
 

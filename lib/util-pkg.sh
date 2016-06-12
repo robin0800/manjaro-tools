@@ -22,8 +22,7 @@ load_compiler_settings(){
 }
 
 get_makepkg_conf(){
-	local conf_dir=/tmp conf
-	conf="$conf_dir/makepkg-$1.conf"
+	local conf="${tmp_dir}/makepkg-$1.conf"
 
 	cp "${DATADIR}/makepkg.conf" "$conf"
 
@@ -245,22 +244,29 @@ sign_pkg(){
 }
 
 move_to_cache(){
-	msg2 "Moving [%s] -> [%s]" "${1##*/}" "${pkg_dir}"
-	mv $1 ${pkg_dir}/
-	${sign} && sign_pkg "${1##*/}"
+	local src="$1"
+	[[ -n $PKGDEST ]] && src="$PKGDEST/$1"
+	msg2 "Moving [%s] -> [%s]" "${src##*/}" "${pkg_dir}"
+	mv $src ${pkg_dir}/
+	${sign} && sign_pkg "${src##*/}"
 	chown -R "${OWNER}:users" "${pkg_dir}"
+
 }
 
 archive_logs(){
-	local archive name="$1" ext=log.tar.xz ver src=/tmp/archives.list
+	local archive name="$1" ext=log.tar.xz ver src=${tmp_dir}/archives.list
 	ver=$(get_full_version "$name")
 	archive="${name}-${ver}-${target_arch}"
 	find . -maxdepth 1 -name "$archive*.log" > $src
 	msg2 "Archiving log files [%s] ..." "$archive.$ext"
-	tar -cJf $PWD/$archive.$ext -T $src
+	tar -cJf ${log_dir}/$archive.$ext -T $src
 	msg2 "Cleaning log files ..."
-	find . -maxdepth 1 -name '*.log' -delete
-	chown "${OWNER}:users" "$archive.$ext"
+	if [[ -z $LOGDEST ]];then
+		find . -maxdepth 1 -name "$archive*.log" -delete
+		chown "${OWNER}:users" "$archive.$ext"
+	else
+		find $LOGDEST -maxdepth 1 -name "$archive*.log" -delete
+	fi
 }
 
 post_build(){
@@ -273,16 +279,11 @@ post_build(){
 		esac
 		local ver=$(get_full_version "$pkg") src
 		src=$pkg-$ver-$tarch.$ext
-		if [[ -n $PKGDEST ]];then
-			move_to_cache "$PKGDEST/$src"
-		else
-			move_to_cache "$src"
-		fi
+		move_to_cache "$src"
 	done
-	if [[ -z $LOGDEST ]];then
-		local name=${pkgbase:-$pkgname}
-		archive_logs "$name"
-	fi
+
+	local name=${pkgbase:-$pkgname}
+	archive_logs "$name"
 }
 
 chroot_init(){

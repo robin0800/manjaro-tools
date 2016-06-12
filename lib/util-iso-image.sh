@@ -18,11 +18,6 @@ copy_overlay(){
 	fi
 }
 
-copy_cache_mhwd(){
-	msg2 "Copying mhwd package cache ..."
-	rsync -v --files-from="$1/cache-packages.txt" /var/cache/pacman/pkg "$1/opt/live/pkgs"
-}
-
 gen_pw(){
 	echo $(perl -e 'print crypt($ARGV[0], "password")' ${password})
 }
@@ -423,7 +418,8 @@ make_repo(){
 
 # $1: work dir
 # $2: pkglist
-download_to_cache(){
+copy_from_cache(){
+	local list="${tmp_dir}"/mhwd-cache.list
 	chroot-run \
 		  -r "${mountargs_ro}" \
 		  -w "${mountargs_rw}" \
@@ -435,9 +431,12 @@ download_to_cache(){
 		  -w "${mountargs_rw}" \
 		  -B "${build_mirror}/${target_branch}" \
 		  "$1" \
-		  pacman -v -Sp $2 --noconfirm > "$1"/cache-packages.txt
-	sed -ni '/.pkg.tar.xz/p' "$1"/cache-packages.txt
-	sed -i "s/.*\///" "$1"/cache-packages.txt
+		  pacman -v -Sp $2 --noconfirm > "$list"
+	sed -ni '/.pkg.tar.xz/p' "$list"
+	sed -i "s/.*\///" "$list"
+
+	msg2 "Copying mhwd package cache ..."
+	rsync -v --files-from="$list" /var/cache/pacman/pkg "$1/opt/live/pkgs"
 }
 
 # $1: image path
@@ -461,7 +460,6 @@ clean_up_image(){
 		if [[ -d $path ]];then
 			find "$path" -mindepth 0 -delete &> /dev/null
 		fi
-		rm -f "$1/cache-packages.txt"
         else
 
 		[[ -f "$1/etc/locale.gen.bak" ]] && \
