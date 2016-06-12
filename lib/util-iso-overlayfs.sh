@@ -28,8 +28,10 @@ mount_image_custom(){
 }
 
 umount_image(){
-        info "%s umount: [%s]" "${iso_fs}" "${IMAGE_ACTIVE_MOUNTS[@]}"
-        umount "${IMAGE_ACTIVE_MOUNTS[@]}"
-        unset IMAGE_ACTIVE_MOUNTS
-        rm -rf "${work_dir}/work"
+	if [[ -n ${IMAGE_ACTIVE_MOUNTS[@]} ]];then
+		info "%s umount: [%s]" "${iso_fs}" "${IMAGE_ACTIVE_MOUNTS[@]}"
+		umount "${IMAGE_ACTIVE_MOUNTS[@]}"
+		unset IMAGE_ACTIVE_MOUNTS
+		rm -rf "${work_dir}/work"
+        fi
 }

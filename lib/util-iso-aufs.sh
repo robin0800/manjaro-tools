@@ -27,7 +27,9 @@ mount_image_custom(){
 
 # $1: image path
 umount_image(){
-        umount "${IMAGE_ACTIVE_MOUNTS[@]}"
-        unset IMAGE_ACTIVE_MOUNTS
-	find $1 -name '.wh.*' -delete &> /dev/null
+	if [[ -n ${IMAGE_ACTIVE_MOUNTS[@]} ]];then
+		umount "${IMAGE_ACTIVE_MOUNTS[@]}"
+		unset IMAGE_ACTIVE_MOUNTS
+		find $1 -name '.wh.*' -delete &> /dev/null
+	fi
 }
