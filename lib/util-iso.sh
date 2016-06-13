@@ -46,7 +46,7 @@ run_safe() {
 	set -e
 	set -E
 	restoretrap=$(trap -p ERR)
-	trap 'error_function $func' ERR SIGINT SIGTERM
+	trap 'error_function $func' ERR
 
 	if ${verbose};then
 		run_log "$func"
@@ -57,6 +57,14 @@ run_safe() {
 	eval $restoretrap
 	set +E
 	set +e
+}
+
+trap_exit() {
+	local sig=$1; shift
+	error "$@"
+	umount_image
+	trap -- "$sig"
+	kill "-$sig" "$$"
 }
 
 # $1: image path

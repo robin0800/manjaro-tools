@@ -169,6 +169,12 @@ done
 
 shift $(($OPTIND - 1))
 
+for sig in TERM HUP QUIT; do
+	trap "trap_exit $sig \"$(gettext "%s signal caught. Exiting...")\" \"$sig\"" "$sig"
+done
+trap 'trap_exit INT "$(gettext "Aborted by user! Exiting...")"' INT
+trap 'trap_exit USR1 "$(gettext "An unknown error has occurred. Exiting...")"' ERR
+
 timer_start=$(get_timer)
 
 check_root "$0" "${orig_argv[@]}"
