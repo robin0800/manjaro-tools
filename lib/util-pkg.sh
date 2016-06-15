@@ -253,14 +253,19 @@ move_to_cache(){
 }
 
 archive_logs(){
-	local archive name="$1" ext=log.tar.xz ver src=${tmp_dir}/archives.list target=$PWD
+	local archive name="$1" ext=log.tar.xz ver src=${tmp_dir}/archives.list target='.'
 	ver=$(get_full_version "$name")
 	archive="${name}-${ver}-${target_arch}"
-	find $target -maxdepth 1 -name "$archive*.log" > $src
+	if [[ -n $LOGDEST ]];then
+            target=$LOGDEST
+            find $target -maxdepth 1 -name "$archive*.log" -printf "%f\n" > $src
+	else
+            find $target -maxdepth 1 -name "$archive*.log" > $src
+	fi
 	msg2 "Archiving log files [%s] ..." "$archive.$ext"
-	tar -cJf ${log_dir}/$archive.$ext -T $src
+	tar -cJf ${log_dir}/$archive.$ext  -C "$target" -T $src
 	msg2 "Cleaning log files ..."
-	[[ -n $LOGDEST ]] && target=$LOGDEST
+
 	find $target -maxdepth 1 -name "$archive*.log" -delete
 }
 
