@@ -250,23 +250,18 @@ move_to_cache(){
 	mv $src ${pkg_dir}/
 	${sign} && sign_pkg "${src##*/}"
 	chown -R "${OWNER}:users" "${pkg_dir}"
-
 }
 
 archive_logs(){
-	local archive name="$1" ext=log.tar.xz ver src=${tmp_dir}/archives.list
+	local archive name="$1" ext=log.tar.xz ver src=${tmp_dir}/archives.list target=$PWD
 	ver=$(get_full_version "$name")
 	archive="${name}-${ver}-${target_arch}"
-	find . -maxdepth 1 -name "$archive*.log" > $src
+	find $target -maxdepth 1 -name "$archive*.log" > $src
 	msg2 "Archiving log files [%s] ..." "$archive.$ext"
 	tar -cJf ${log_dir}/$archive.$ext -T $src
 	msg2 "Cleaning log files ..."
-	if [[ -z $LOGDEST ]];then
-		find . -maxdepth 1 -name "$archive*.log" -delete
-		chown "${OWNER}:users" "$archive.$ext"
-	else
-		find $LOGDEST -maxdepth 1 -name "$archive*.log" -delete
-	fi
+	[[ -n $LOGDEST ]] && target=$LOGDEST
+	find $target -maxdepth 1 -name "$archive*.log" -delete
 }
 
 post_build(){
@@ -281,7 +276,6 @@ post_build(){
 		src=$pkg-$ver-$tarch.$ext
 		move_to_cache "$src"
 	done
-
 	local name=${pkgbase:-$pkgname}
 	archive_logs "$name"
 }
