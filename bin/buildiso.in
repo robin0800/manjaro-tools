@@ -168,9 +168,9 @@ done
 
 shift $(($OPTIND - 1))
 
-check_requirements
-
 import ${LIBDIR}/util-iso.sh
+
+check_requirements
 
 for sig in TERM HUP QUIT; do
 	trap "trap_exit $sig \"$(gettext "%s signal caught. Exiting...")\" \"$sig\"" "$sig"
