@@ -230,6 +230,8 @@ init_common(){
 
 	[[ -z ${log_dir} ]] && log_dir='/var/log/manjaro-tools'
 
+	prepare_dir "${log_dir}"
+
 	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
 
 	[[ -z ${tmp_dir} ]] && tmp_dir='/tmp/manjaro-tools'
