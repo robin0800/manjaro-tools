@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.12.0
+Manjaro-tools-0.12
 
 User manual
 
