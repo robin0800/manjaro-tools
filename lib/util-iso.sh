@@ -586,7 +586,6 @@ check_requirements(){
 	else
 		iso_fs="aufs"
 	fi
-	import ${LIBDIR}/util-iso-${iso_fs}.sh
 }
 
 sign_iso(){
@@ -639,6 +638,7 @@ prepare_images(){
 
 make_profile(){
 	msg "Start building [%s]" "${profile}"
+	import ${LIBDIR}/util-iso-${iso_fs}.sh
 	${clean_first} && chroot_clean "${work_dir}"
 	if ${iso_only}; then
 		[[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -x" "${profile}"

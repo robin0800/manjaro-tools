@@ -168,10 +168,6 @@ done
 
 shift $(($OPTIND - 1))
 
-import ${LIBDIR}/util-iso.sh
-
-check_requirements
-
 for sig in TERM HUP QUIT; do
 	trap "trap_exit $sig \"$(gettext "%s signal caught. Exiting...")\" \"$sig\"" "$sig"
 done
@@ -185,6 +181,10 @@ check_root "$0" "${orig_argv[@]}"
 prepare_dir "${tmp_dir}"
 
 eval_build_list "${list_dir_iso}" "${build_list_iso}"
+
+import ${LIBDIR}/util-iso.sh
+
+check_requirements
 
 ${pretend} && display_settings && exit 1
 
