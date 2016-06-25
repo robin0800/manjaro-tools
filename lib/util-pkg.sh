@@ -249,6 +249,7 @@ move_to_cache(){
 	msg2 "Moving [%s] -> [%s]" "${src##*/}" "${pkg_dir}"
 	mv $src ${pkg_dir}/
 	${sign} && sign_pkg "${src##*/}"
+	[[ -n $PKGDEST ]] || rm "$1"
 	chown -R "${OWNER}:users" "${pkg_dir}"
 }
 
