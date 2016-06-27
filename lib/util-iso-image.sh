@@ -70,6 +70,7 @@ configure_environment(){
 			fi
 			if [[ -f "$1/usr/lib/qt/plugins/platformthemes/libqt5ct.so" ]];then
 				echo "QT_QPA_PLATFORMTHEME=qt5ct" >> $1/etc/environment
+				sed -i '/QT_STYLE_OVERRIDE=gtk/d' $1/etc/environment
 			fi
 		;;
 	esac
