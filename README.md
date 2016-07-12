@@ -1,7 +1,7 @@
 manjaro-tools
 =============
 
-Manjaro-tools-0.12
+Manjaro-tools-0.13
 
 User manual
 
@@ -133,26 +133,11 @@ overriding
 
 ################ deployiso ################
 
-# the server url
-# remote_url=sourceforge.net
-
-# the server project
-# remote_project=manjaro-testing
-
-# the server home
-# remote_target=/home/frs/project
-
 # the server user
 # remote_user=[SetUser]
 
 # set upload bandwidth limit in kB/s
 # limit=100
-
-# the torrent tracker url
-# tracker_url=""
-
-# Piece size, 2^n
-# piece_size=21
 ~~~
 
 ###2. buildpkg
@@ -246,6 +231,7 @@ Usage: buildiso [options]
     -x                 Build images only
     -z                 Generate iso only
                        Requires pre built images (-x)
+    -w                 Create iso torrent
     -v                 Verbose output to log file, show profile detail (-q)
     -q                 Query settings and pretend build
     -h                 This help
@@ -345,13 +331,9 @@ Ideally, you have a running ssh agent on the host, and your key added, and your 
 $ deployiso -h
 Usage: deployiso [options]
     -p                 Source folder to upload [default:default]
-    -a                 Arch to upload [default:x86_64]
-    -i                 The iso's init system [default:systemd]
     -l                 Limit bandwidth in kB/s [default:80]
-    -c                 Create new remote edition_type with subtree
-    -t                 Create a torrent from source folder
-    -t                 Create torrent from source folder
-    -u                 Update remote iso
+    -c                 Create new remote release directory
+    -u                 Update remote directory
     -q                 Query settings and pretend upload
     -v                 Verbose output
     -h                 This help
