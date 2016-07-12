@@ -691,9 +691,16 @@ load_profile(){
 	mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -K)
 	work_dir=${chroots_iso}/${profile}/${target_arch}
 
-	iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}/${target_arch}"
+	iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
 
 	prepare_dir "${iso_dir}"
+}
+
+get_edition(){
+	local result=$(find ${run_dir} -maxdepth 2 -name "$1") path
+	[[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
+	path=${result%/*}
+	echo ${path##*/}
 }
 
 prepare_profile(){

@@ -110,13 +110,6 @@ eval_build_list(){
 	esac"
 }
 
-get_edition(){
-	local result=$(find ${run_dir} -maxdepth 2 -name "$1") path
-	[[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
-	path=${result%/*}
-	echo ${path##*/}
-}
-
 in_array() {
 	local needle=$1; shift
 	local item
@@ -321,7 +314,7 @@ init_deployiso(){
 
 	[[ -z ${remote_target} ]] && remote_target="/home/frs/project"
 
-	[[ -z ${remote_project} ]] && remote_project="manjaro-testing"
+# 	[[ -z ${remote_project} ]] && remote_project="manjaro-testing"
 
 	[[ -z ${remote_user} ]] && remote_user="[SetUser]"
 
@@ -329,9 +322,9 @@ init_deployiso(){
 
 	[[ -z ${limit} ]] && limit=100
 
-	[[ -z ${tracker_url} ]] && tracker_url=""
-
-	[[ -z ${piece_size} ]] && piece_size=21
+# 	[[ -z ${tracker_url} ]] && tracker_url=""
+#
+# 	[[ -z ${piece_size} ]] && piece_size=21
 }
 
 load_config(){
