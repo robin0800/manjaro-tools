@@ -594,15 +594,10 @@ sign_iso(){
 }
 
 make_torrent(){
-	msg2 "Creating torrent ..."
-	local name=$(gen_iso_fn).torrent
-	[[ -f ${iso_dir}/${name} ]] && rm ${iso_dir}/${name}
-	if [[ "${edition}" == 'official' ]];then
-		set_remote_project "${edition}"
-		local webseed_url="http://${remote_url}/projects/${remote_project}/${dist_release}/${profile}/${iso_file}"
-		mktorrent_args+=(-w ${webseed_url})
-	fi
-	mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${name} ${iso_dir}
+	local fn=$(gen_iso_fn).torrent
+	msg2 "Creating (%s) ..." "${fn}"
+	[[ -f ${iso_dir}/${fn} ]] && rm ${iso_dir}/${fn}
+	mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${fn} ${iso_dir}
 }
 
 compress_images(){
@@ -709,6 +704,13 @@ load_profile(){
 	prepare_dir "${iso_dir}"
 
 	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url})
+
+	if [[ "${edition}" == 'official' ]];then
+		set_remote_project "${edition}"
+		local webseed_url url="http://${remote_url}/projects/${remote_project}"
+		webseed_url="${url}/${dist_release}/${profile}/${iso_file}"
+		mktorrent_args+=(-w ${webseed_url})
+	fi
 }
 
 get_edition(){
