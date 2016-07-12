@@ -118,6 +118,21 @@
 				packages.
 				</para></listitem>
 			</varlistentry>
+
+			<!--<varlistentry>
+				<term><varname>remote_url=</varname></term>
+
+				<listitem><para>Default url to be used for upload.
+				</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><varname>remote_target=</varname></term>
+
+				<listitem><para>Default server path to be used for upload.
+				</para></listitem>
+			</varlistentry>-->
+
 		</variablelist>
 	</refsect1>
 
@@ -283,27 +298,6 @@
 		<variablelist>
 
 			<varlistentry>
-				<term><varname>remote_url=</varname></term>
-
-				<listitem><para>Default url to be used for upload.
-				</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><varname>remote_project=</varname></term>
-
-				<listitem><para>Default project to be used for upload.
-				</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><varname>remote_target=</varname></term>
-
-				<listitem><para>Default server path to be used for upload.
-				</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
 				<term><varname>remote_user=</varname></term>
 
 				<listitem><para>Default user to be used for upload.
@@ -317,20 +311,7 @@
 				</para></listitem>
 			</varlistentry>
 
-			<varlistentry>
-				<term><varname>tracker_url=</varname></term>
 
-				<listitem><para>Default tracker announce for the torrent.
-				The tracker url can also contain comma separated urls.
-				</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><varname>piece_size=</varname></term>
-
-				<listitem><para>Default priece size for the torrent in 2^n.
-				</para></listitem>
-			</varlistentry>
 		</variablelist>
 	</refsect1>
 

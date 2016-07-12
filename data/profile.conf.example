@@ -21,6 +21,12 @@
 # use pxe
 # pxe_boot="true"
 
+# the torrent tracker urls, comma separated
+# tracker_url=''
+
+# Piece size, 2^n
+# piece_size=21
+
 ################ install ################
 
 # possible values: grub;systemd-boot

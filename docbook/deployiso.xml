@@ -78,20 +78,9 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><option>-a i686|x86_64</option></term>
-
-				<listitem><para>Architecture of the iso to upload. Can be i686 or x86_64.</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
 				<term><option>-c</option></term>
 
-				<listitem><para>Create new remote edition_type with subtree.</para></listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><option>-t</option></term>
-
-				<listitem><para>Create a torrent from the source directory.</para></listitem>
+				<listitem><para>Create new remote release.</para></listitem>
 			</varlistentry>
 
 			<varlistentry>

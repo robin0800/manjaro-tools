@@ -593,12 +593,25 @@ sign_iso(){
 	su ${OWNER} -c "signfile ${iso_dir}/$1"
 }
 
+make_torrent(){
+	msg2 "Creating torrent ..."
+	local name=$(gen_iso_fn).torrent
+	[[ -f ${iso_dir}/${name} ]] && rm ${iso_dir}/${name}
+	if [[ "${edition}" == 'official' ]];then
+		set_remote_project "${edition}"
+		local webseed_url="http://${remote_url}/projects/${remote_project}/${dist_release}/${profile}/${iso_file}"
+		mktorrent_args+=(-w ${webseed_url})
+	fi
+	mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${name} ${iso_dir}
+}
+
 compress_images(){
 	local timer=$(get_timer)
 	run_safe "make_iso"
 	make_checksum "${iso_file}"
 	chown -R "${OWNER}:users" "${iso_dir}"
 	${sign} && sign_iso "${iso_file}"
+	${is_torrent} && make_torrent
 	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
@@ -694,6 +707,8 @@ load_profile(){
 	iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
 
 	prepare_dir "${iso_dir}"
+
+	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url})
 }
 
 get_edition(){

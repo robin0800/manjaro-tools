@@ -22,6 +22,7 @@ import ${LIBDIR}/util-publish.sh
 show_profile(){
 	prepare_transfer "$1"
 	info "Profile: [$1]"
+	msg2 "remote_project: %s" "${remote_project}"
 	msg2 "src_dir: ${src_dir}"
 	msg2 "remote_dir: ${remote_dir}"
 }
@@ -37,30 +38,20 @@ display_settings(){
 	msg2 "is_build_list: %s" "${is_build_list}"
 
 	msg "OPTIONS:"
-# 	msg2 "arch: %s" "${target_arch}"
-# 	msg2 "initsys: %s" "${initsys}"
 	msg2 "limit: %s kB/s" "${limit}"
 
 	msg "ARGS:"
 	msg2 "update: %s" "${update}"
 	msg2 "release_create: %s" "${release_create}"
-# 	msg2 "torrent_create: %s" "${torrent_create}"
 	msg2 "verbose: %s" "${verbose}"
 	msg2 "rsync_args: %s" "${rsync_args[*]}"
-# 	${torrent_create} && msg2 "mktorrent_args: %s" "${mktorrent_args[*]}"
 
 	msg "HOST:"
 	msg2 "dist_release: %s" "${dist_release}"
 
 	msg "REMOTE:"
-# 	msg2 "remote_url: %s" "${remote_url}"
-	msg2 "remote_project: %s" "${remote_project}"
-# 	msg2 "remote_target: %s" "${remote_target}"
 	msg2 "remote_user: %s" "${remote_user}"
-# 	if ${torrent_create};then
-# 		msg2 "tracker_url: %s" "${tracker_url}"
-# 		msg2 "piece_size: %s" "${piece_size}"
-# 	fi
+
 	msg "UPLOAD QUEUE:"
 	run show_profile "${build_list_iso}"
 }
@@ -75,20 +66,15 @@ pretend=false
 release_create=false
 update=false
 verbose=false
-# torrent_create=false
 
 rsync_args=(-aP --progress -e ssh)
-# mktorrent_args=(-v -p)
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
 	echo "    -p                 Source folder to upload [default:${build_list_iso}]"
-# 	echo "    -a                 Arch to upload [default:${target_arch}]"
-# 	echo "    -i                 The iso's init system [default:${initsys}]"
 	echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
 	echo '    -c                 Create new remote release directory'
-# 	echo '    -t                 Create a torrent from source folder'
-	echo '    -u                 Update remote iso'
+	echo '    -u                 Update remote directory'
 	echo '    -q                 Query settings and pretend upload'
 	echo '    -v                 Verbose output'
 	echo '    -h                 This help'
@@ -102,11 +88,8 @@ opts='p:l:cuvqh'
 while getopts "${opts}" arg; do
 	case "${arg}" in
                 p) build_list_iso="$OPTARG" ;;
-#                 a) target_arch="$OPTARG" ;;
-#                 i) initsys="$OPTARG" ;;
                 l) limit="$OPTARG" ;;
                 c) release_create=true ;;
-#                 t) torrent_create=true ;;
                 u) update=true; rsync_args+=(-u) ;;
                 v) verbose=true; rsync_args+=(-v --stats) ;;
 		q) pretend=true; rsync_args+=(-n) ;;
@@ -122,7 +105,6 @@ timer_start=$(get_timer)
 eval_build_list "${list_dir_iso}" "${build_list_iso}"
 
 rsync_args+=(--bwlimit=${limit})
-# mktorrent_args+=(-l ${piece_size} -a ${tracker_url})
 
 ${pretend} && display_settings && exit 1
 

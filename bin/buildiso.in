@@ -53,6 +53,11 @@ show_profile(){
 			msg2 "start_openrc_live: %s" "${start_openrc_live[*]}"
 			msg2 "disable_openrc: %s" "${disable_openrc[*]}"
 		fi
+		if ${is_torrent};then
+			msg2 "tracker_url: %s" "${tracker_url}"
+			msg2 "piece_size: %s" "${piece_size}"
+			msg2 "mktorrent_args: %s" "${mktorrent_args[*]}"
+		fi
 	fi
 	reset_profile
 }
@@ -81,6 +86,7 @@ display_settings(){
 	msg2 "images_only: %s" "${images_only}"
 	msg2 "iso_only: %s" "${iso_only}"
 	msg2 "sign: %s" "${sign}"
+	msg2 "is_torrent: %s" "${is_torrent}"
 
 	msg "DIST SETTINGS:"
 	msg2 "dist_name: %s" "${dist_name}"
@@ -115,6 +121,7 @@ images_only=false
 iso_only=false
 verbose=false
 sign=false
+is_torrent=false
 
 usage() {
 	echo "Usage: ${0##*/} [options]"
@@ -134,6 +141,7 @@ usage() {
 	echo '    -x                 Build images only'
 	echo '    -z                 Generate iso only'
 	echo '                       Requires pre built images (-x)'
+	echo '    -w                 Create iso torrent'
 	echo '    -v                 Verbose output to log file, show profile detail (-q)'
 	echo '    -q                 Query settings and pretend build'
 	echo '    -h                 This help'
@@ -144,7 +152,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:czxsvqh'
+opts='p:a:b:r:t:k:i:czxswvqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -159,6 +167,7 @@ while getopts "${opts}" arg; do
 		c) clean_first=false ;;
 		x) images_only=true ;;
 		z) iso_only=true ;;
+		w) is_torrent=true ;;
 		v) verbose=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;

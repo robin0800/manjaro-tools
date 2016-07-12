@@ -141,6 +141,13 @@ show_elapsed_time(){
 	info "Time %s: %s minutes" "$1" "$(elapsed_time $2)"
 }
 
+set_remote_project(){
+	case "$1" in
+		'community'|'minimal') remote_project='manjaro-community' ;;
+		'official') remote_project='manjaro' ;;
+	esac
+}
+
 lock() {
 	eval "exec $1>"'"$2"'
 	if ! flock -n $1; then
@@ -226,6 +233,10 @@ init_common(){
 	[[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
 
 	[[ -z ${tmp_dir} ]] && tmp_dir='/tmp/manjaro-tools'
+
+	[[ -z ${remote_url} ]] && remote_url="sourceforge.net"
+
+	[[ -z ${remote_target} ]] && remote_target="/home/frs/project"
 }
 
 init_buildtree(){
@@ -312,19 +323,9 @@ init_buildiso(){
 
 init_deployiso(){
 
-	[[ -z ${remote_target} ]] && remote_target="/home/frs/project"
-
-# 	[[ -z ${remote_project} ]] && remote_project="manjaro-testing"
-
 	[[ -z ${remote_user} ]] && remote_user="[SetUser]"
 
-	[[ -z ${remote_url} ]] && remote_url="sourceforge.net"
-
 	[[ -z ${limit} ]] && limit=100
-
-# 	[[ -z ${tracker_url} ]] && tracker_url=""
-#
-# 	[[ -z ${piece_size} ]] && piece_size=21
 }
 
 load_config(){
@@ -371,6 +372,8 @@ reset_profile(){
 	unset packages_custom
 	unset packages_mhwd
 	unset login_shell
+	unset tracker_url
+	unset piece_size
 }
 
 is_valid_bool(){
@@ -457,6 +460,10 @@ load_profile_config(){
 	if [[ -z ${start_openrc_live[@]} ]];then
 		start_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
 	fi
+
+	[[ -z ${tracker_url} ]] && tracker_url=()
+
+	[[ -z ${piece_size} ]] && piece_size=21
 
 	check_profile_vars
 
