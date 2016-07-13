@@ -250,7 +250,7 @@ move_to_cache(){
 	mv $src ${pkg_dir}/
 	${sign} && sign_pkg "${src##*/}"
 	[[ -n $PKGDEST ]] && rm "$1"
-	chown -R "${OWNER}:users" "${pkg_dir}"
+	chown -R "${OWNER}:${OWNER}" "${pkg_dir}"
 }
 
 archive_logs(){

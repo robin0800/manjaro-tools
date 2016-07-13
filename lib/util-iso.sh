@@ -604,7 +604,7 @@ compress_images(){
 	local timer=$(get_timer)
 	run_safe "make_iso"
 	make_checksum "${iso_file}"
-	chown -R "${OWNER}:users" "${iso_dir}"
+	chown -R "${OWNER}:${OWNER}" "${iso_dir}"
 	${sign} && sign_iso "${iso_file}"
 	${is_torrent} && make_torrent
 	show_elapsed_time "${FUNCNAME}" "${timer}"
@@ -702,6 +702,7 @@ load_profile(){
 	iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
 
 	prepare_dir "${iso_dir}"
+	chown "${OWNER}:${OWNER}" "${iso_dir}"
 
 	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url})
 
