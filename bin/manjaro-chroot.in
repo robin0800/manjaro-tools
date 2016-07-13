@@ -49,7 +49,7 @@ usage() {
 	echo "    If 'command' is unspecified, ${0##*/} will launch /bin/sh."
 	echo ''
 	echo "    If 'automount' is true, ${0##*/} will launch /bin/bash"
-	echo "    and ${chroots_dir}/manjaro-chroot."
+	echo "    and ${chrootdir}."
 	echo ''
 	echo ''
 	exit $1
@@ -72,8 +72,7 @@ shift $(( OPTIND - 1 ))
 check_root "$0" "${orig_argv[@]}"
 
 if ${automount};then
-	chrootdir=${chroots_dir}/manjaro-chroot
-	prepare_dir ${chrootdir}
+	chrootdir=/mnt
 	run_args=/bin/bash
 
 	${pretend} && display_settings && exit 1
