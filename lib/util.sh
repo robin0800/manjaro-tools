@@ -461,7 +461,7 @@ load_profile_config(){
 		start_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
 	fi
 
-	[[ -z ${tracker_url} ]] && tracker_url=()
+	[[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
 
 	[[ -z ${piece_size} ]] && piece_size=21
 
