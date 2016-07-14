@@ -605,9 +605,9 @@ compress_images(){
 	local timer=$(get_timer)
 	run_safe "make_iso"
 	make_checksum "${iso_file}"
-	chown -R "${OWNER}:${OWNER}" "${iso_dir}"
 	${sign} && sign_iso "${iso_file}"
 	${is_torrent} && make_torrent
+	chown -R "${OWNER}:${OWNER}" "${iso_dir}"
 	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
