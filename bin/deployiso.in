@@ -108,6 +108,4 @@ rsync_args+=(--bwlimit=${limit})
 
 ${pretend} && display_settings && exit 1
 
-${release} && create_release
-
 run sync_dir "${build_list_iso}"

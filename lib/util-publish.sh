@@ -18,7 +18,7 @@ create_release(){
 
 get_edition(){
 	local result=$(find ${run_dir} -maxdepth 3 -name "$1") path
-# 	[[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
+	[[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
 	path=${result%/*}
 	path=${path%/*}
 	echo ${path##*/}
@@ -28,13 +28,17 @@ prepare_transfer(){
 	local edition=$(get_edition $1)
 	set_remote_project "${edition}"
 	sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
-
 	remote_dir="${dist_release}/$1"
 	src_dir="${run_dir}/${edition}/${remote_dir}"
 }
 
 sync_dir(){
 	prepare_transfer "$1"
+	local exists=false
+	if ${release} && ! ${exists};then
+		create_release
+		exists=true
+	fi
 	msg "Start upload [%s] ..." "$1"
 	rsync ${rsync_args[*]} ${src_dir}/ ${sf_url}/${remote_dir}/
 	msg "Done upload [%s]" "$1"
