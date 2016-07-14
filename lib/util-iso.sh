@@ -595,10 +595,10 @@ sign_iso(){
 }
 
 make_torrent(){
-	local fn=$(gen_iso_fn).torrent
+	local fn=${iso_file}.torrent
 	msg2 "Creating (%s) ..." "${fn}"
 	[[ -f ${iso_dir}/${fn} ]] && rm ${iso_dir}/${fn}
-	mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${fn} ${iso_dir}
+	mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${fn} ${iso_dir}/${iso_file}
 }
 
 compress_images(){
@@ -684,6 +684,15 @@ get_pacman_conf(){
 	echo "$conf"
 }
 
+gen_webseed(){
+	local mirrors=('lweb' 'jaist' 'vorboss' 'netcologne') webseed url
+        url=${remote_url}/projects/${remote_project}/files/${dist_release}/${profile}/${iso_file}
+	for m in ${mirrors[@]};do
+		webseed=${webseed:-}${webseed:+,}"http://${m}.${url}"
+	done
+	echo ${webseed}
+}
+
 load_profile(){
 	conf="${profile_dir}/profile.conf"
 
@@ -707,11 +716,10 @@ load_profile(){
 
 	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url})
 
+	set_remote_project "${edition}"
+
 	if [[ "${edition}" == 'official' ]];then
-		set_remote_project "${edition}"
-		local webseed_url url="http://${remote_url}/projects/${remote_project}"
-		webseed_url="${url}/${dist_release}/${profile}/${iso_file}"
-		mktorrent_args+=(-w ${webseed_url})
+		mktorrent_args+=(-w $(gen_webseed))
 	fi
 }
 
