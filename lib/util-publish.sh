@@ -34,7 +34,6 @@ prepare_transfer(){
 
 sync_dir(){
 	prepare_transfer "$1"
-	local exists=false
 	if ${release} && ! ${exists};then
 		create_release
 		exists=true

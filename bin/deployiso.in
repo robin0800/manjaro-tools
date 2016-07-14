@@ -66,6 +66,7 @@ pretend=false
 release=false
 update=false
 verbose=false
+exists=false
 
 rsync_args=(-aP --progress -e ssh)
 
