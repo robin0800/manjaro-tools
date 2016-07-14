@@ -142,10 +142,13 @@ show_elapsed_time(){
 }
 
 set_remote_project(){
-	case "$1" in
-		'community'|'minimal') remote_project='manjaro-community' ;;
-		'official') remote_project='manjaro' ;;
-	esac
+# 	case "$1" in
+# 		'community') remote_project='manjarolinux-community' ;;
+# 		'minimal') remote_project='manjarolinux-minimal' ;;
+# 		'official') remote_project='manjarolinux' ;;
+# 		'sonar') remote_project='sonargnulinux' ;;
+# 	esac
+	remote_project='manjaro-testing'
 }
 
 lock() {

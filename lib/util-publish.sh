@@ -10,9 +10,10 @@
 # GNU General Public License for more details.
 
 create_release(){
-	msg2 "Create release (%s) ..." "${dist_release}"
+	msg "Create release (%s) ..." "${dist_release}"
 	rsync ${rsync_args[*]} /dev/null ${sf_url}/${dist_release}/
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
+	msg "Done (%s)" "${dist_release}"
 }
 
 get_edition(){
@@ -34,7 +35,6 @@ prepare_transfer(){
 
 sync_dir(){
 	prepare_transfer "$1"
-	${release_create} && create_release "$1"
 	msg "Start upload [%s] ..." "$1"
 	rsync ${rsync_args[*]} ${src_dir}/ ${sf_url}/${remote_dir}/
 	msg "Done upload [%s]" "$1"

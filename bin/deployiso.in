@@ -42,7 +42,7 @@ display_settings(){
 
 	msg "ARGS:"
 	msg2 "update: %s" "${update}"
-	msg2 "release_create: %s" "${release_create}"
+	msg2 "release: %s" "${release}"
 	msg2 "verbose: %s" "${verbose}"
 	msg2 "rsync_args: %s" "${rsync_args[*]}"
 
@@ -63,7 +63,7 @@ load_config "${USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}/ma
 run_dir=${cache_dir_iso}
 
 pretend=false
-release_create=false
+release=false
 update=false
 verbose=false
 
@@ -89,7 +89,7 @@ while getopts "${opts}" arg; do
 	case "${arg}" in
                 p) build_list_iso="$OPTARG" ;;
                 l) limit="$OPTARG" ;;
-                c) release_create=true ;;
+                c) release=true ;;
                 u) update=true; rsync_args+=(-u) ;;
                 v) verbose=true; rsync_args+=(-v --stats) ;;
 		q) pretend=true; rsync_args+=(-n) ;;
@@ -107,5 +107,7 @@ eval_build_list "${list_dir_iso}" "${build_list_iso}"
 rsync_args+=(--bwlimit=${limit})
 
 ${pretend} && display_settings && exit 1
+
+${release} && create_release
 
 run sync_dir "${build_list_iso}"
