@@ -11,7 +11,7 @@
 
 create_release(){
 	msg "Create release (%s) ..." "${dist_release}"
-	rsync ${rsync_args[*]} /dev/null ${sf_url}/${dist_release}/
+	rsync ${rsync_args[*]} /dev/null ${url}/${dist_release}/
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 	msg "Done (%s)" "${dist_release}"
 }
@@ -24,12 +24,17 @@ get_edition(){
 	echo ${path##*/}
 }
 
+connect(){
+	local home="/home/frs/project"
+	echo "${account},$1@frs.${host}:${home}/$1"
+}
+
 prepare_transfer(){
-	local edition=$(get_edition $1)
-	set_remote_project "${edition}"
-	sf_url=${remote_user},${remote_project}@frs.${remote_url}:${remote_target}/${remote_project}
-	remote_dir="${dist_release}/$1"
-	src_dir="${run_dir}/${edition}/${remote_dir}"
+	local edition=$(get_edition $1) project
+	project=$(get_project "${edition}")
+	url=$(connect "${project}")
+	target_dir="${dist_release}/$1"
+	src_dir="${run_dir}/${edition}/${target_dir}"
 }
 
 sync_dir(){
@@ -39,7 +44,7 @@ sync_dir(){
 		exists=true
 	fi
 	msg "Start upload [%s] ..." "$1"
-	rsync ${rsync_args[*]} ${src_dir}/ ${sf_url}/${remote_dir}/
+	rsync ${rsync_args[*]} ${src_dir}/ ${url}/${target_dir}/
 	msg "Done upload [%s]" "$1"
 	show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }

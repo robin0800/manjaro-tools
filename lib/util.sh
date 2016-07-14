@@ -141,14 +141,15 @@ show_elapsed_time(){
 	info "Time %s: %s minutes" "$1" "$(elapsed_time $2)"
 }
 
-set_remote_project(){
-# 	case "$1" in
-# 		'community') remote_project='manjarolinux-community' ;;
-# 		'minimal') remote_project='manjarolinux-minimal' ;;
-# 		'official') remote_project='manjarolinux' ;;
-# 		'sonar') remote_project='sonargnulinux' ;;
-# 	esac
-	remote_project='manjaro-testing'
+get_project(){
+	local project
+	case "$1" in
+		'community'|'minimal') project='manjarolinux-community' ;;
+		'official') project='manjarolinux' ;;
+		'sonar') project='sonargnulinux' ;;
+	esac
+	project='manjaro-testing'
+	echo ${project}
 }
 
 lock() {
@@ -237,9 +238,7 @@ init_common(){
 
 	[[ -z ${tmp_dir} ]] && tmp_dir='/tmp/manjaro-tools'
 
-	[[ -z ${remote_url} ]] && remote_url="sourceforge.net"
-
-	[[ -z ${remote_target} ]] && remote_target="/home/frs/project"
+	[[ -z ${host} ]] && host="sourceforge.net"
 }
 
 init_buildtree(){
@@ -326,7 +325,7 @@ init_buildiso(){
 
 init_deployiso(){
 
-	[[ -z ${remote_user} ]] && remote_user="[SetUser]"
+	[[ -z ${account} ]] && account="[SetUser]"
 
 	[[ -z ${limit} ]] && limit=100
 }
@@ -350,33 +349,6 @@ load_config(){
 	init_deployiso
 
 	return 0
-}
-
-reset_profile(){
-	unset displaymanager
-	unset autologin
-	unset multilib
-	unset pxe_boot
-	unset plymouth_boot
-	unset nonfree_xorg
-	unset efi_boot_loader
-	unset efi_part_size
-	unset hostname
-	unset username
-	unset plymouth_theme
-	unset password
-	unset addgroups
-	unset start_systemd
-	unset disable_systemd
-	unset start_openrc
-	unset disable_openrc
-	unset start_systemd_live
-	unset start_openrc_live
-	unset packages_custom
-	unset packages_mhwd
-	unset login_shell
-	unset tracker_url
-	unset piece_size
 }
 
 is_valid_bool(){

@@ -646,6 +646,33 @@ prepare_images(){
 	find ${log_dir} -maxdepth 1 -name "$name*.log" -delete
  }
 
+reset_profile(){
+	unset displaymanager
+	unset autologin
+	unset multilib
+	unset pxe_boot
+	unset plymouth_boot
+	unset nonfree_xorg
+	unset efi_boot_loader
+	unset efi_part_size
+	unset hostname
+	unset username
+	unset plymouth_theme
+	unset password
+	unset addgroups
+	unset start_systemd
+	unset disable_systemd
+	unset start_openrc
+	unset disable_openrc
+	unset start_systemd_live
+	unset start_openrc_live
+	unset packages_custom
+	unset packages_mhwd
+	unset login_shell
+	unset tracker_url
+	unset piece_size
+}
+
 make_profile(){
 	msg "Start building [%s]" "${profile}"
 	${clean_first} && chroot_clean "${work_dir}"
@@ -686,7 +713,7 @@ get_pacman_conf(){
 
 gen_webseed(){
 	local mirrors=('lweb' 'jaist' 'vorboss' 'netcologne') webseed url
-        url=${remote_url}/projects/${remote_project}/files/${dist_release}/${profile}/${iso_file}
+        url=${host}/projects/${project}/files/${dist_release}/${profile}/${iso_file}
 	for m in ${mirrors[@]};do
 		webseed=${webseed:-}${webseed:+,}"http://${m}.${url}"
 	done
@@ -716,7 +743,7 @@ load_profile(){
 
 	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url})
 
-	set_remote_project "${edition}"
+	project=$(get_project "${edition}")
 
 	if [[ "${edition}" == 'official' ]];then
 		mktorrent_args+=(-w $(gen_webseed))

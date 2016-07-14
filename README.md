@@ -134,7 +134,7 @@ overriding
 ################ deployiso ################
 
 # the server user
-# remote_user=[SetUser]
+# account=[SetUser]
 
 # set upload bandwidth limit in kB/s
 # limit=100

@@ -21,6 +21,8 @@
 # use pxe
 # pxe_boot="true"
 
+################ torrent ################
+
 # the torrent tracker urls, comma separated
 # tracker_url='udp://mirror.strits.dk:6969'
 

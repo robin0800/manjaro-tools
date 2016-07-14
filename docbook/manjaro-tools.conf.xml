@@ -120,16 +120,9 @@
 			</varlistentry>
 
 			<!--<varlistentry>
-				<term><varname>remote_url=</varname></term>
+				<term><varname>host=</varname></term>
 
 				<listitem><para>Default url to be used for upload.
-				</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
-				<term><varname>remote_target=</varname></term>
-
-				<listitem><para>Default server path to be used for upload.
 				</para></listitem>
 			</varlistentry>-->
 
@@ -298,7 +291,7 @@
 		<variablelist>
 
 			<varlistentry>
-				<term><varname>remote_user=</varname></term>
+				<term><varname>account=</varname></term>
 
 				<listitem><para>Default user to be used for upload.
 				</para></listitem>
