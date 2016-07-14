@@ -30,7 +30,7 @@ connect(){
 }
 
 prepare_transfer(){
-	local edition=$(get_edition $1) project
+	local edition=$(get_edition $1)
 	project=$(get_project "${edition}")
 	url=$(connect "${project}")
 	target_dir="${dist_release}/$1"
