@@ -148,7 +148,6 @@ get_project(){
 		'official') project='manjarolinux' ;;
 		'sonar') project='sonargnulinux' ;;
 	esac
-	project='manjaro-testing'
 	echo ${project}
 }
 
