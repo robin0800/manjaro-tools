@@ -712,10 +712,10 @@ get_pacman_conf(){
 }
 
 gen_webseed(){
-	local mirrors=('lweb' 'jaist' 'vorboss' 'netcologne') webseed url
+	local mirrors=('heanet' 'jaist' 'switch' 'netcologne' 'iweb' 'kent') webseed url
         url=${host}/projects/${project}/files/${dist_release}/${profile}/${iso_file}
 	for m in ${mirrors[@]};do
-		webseed=${webseed:-}${webseed:+,}"http://${m}.${url}"
+		webseed=${webseed:-}${webseed:+,}"http://${m}.dl.${url}"
 	done
 	echo ${webseed}
 }
