@@ -56,7 +56,7 @@ overriding
 # default target branch
 # target_branch=stable
 
-# default target arch: auto detect
+# default taget arch: auto detect
 # target_arch=$(uname -m)
 
 # cache dir where buildpkg, buildtree cache packages/pkgbuild, builiso iso files
@@ -88,25 +88,23 @@ overriding
 
 ################ buildiso ################
 
+# the name of the profiles directory
 # profile_repo='manjaro-tools-iso-profiles'
 
 # default iso build list; name without .list extension
 # build_list_iso=default
 
-# unset defaults to given value
+# the dist name; default: Manjaro
 # dist_name="Manjaro"
 
-# unset defaults to given value
+# the dist release; default: auto
 # dist_release=16.06
 
-# unset defaults to value sourced from /etc/lsb-release
+# the codename; defaults to value sourced from /etc/lsb-release
 # dist_codename="Daniella"
 
-# unset defaults to given value
+# the branding; default: auto
 # dist_branding="MJRO"
-
-# unset defaults to given value
-# iso_kernel="linux44"
 
 # iso publisher
 # iso_publisher="Manjaro Linux <http://www.manjaro.org>"
@@ -129,7 +127,7 @@ overriding
 
 # experimental; use overlayfs instead of aufs
 # requires minimum 4.0 kernel on the build host and on iso in profile.conf
-# use_overlayfs="true"
+# use_overlayfs="false"
 
 ################ deployiso ################
 
