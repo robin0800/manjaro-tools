@@ -712,8 +712,11 @@ get_pacman_conf(){
 }
 
 gen_webseed(){
-	local mirrors=('heanet' 'jaist' 'switch' 'netcologne' 'iweb' 'kent') webseed url
-        url=${host}/projects/${project}/${dist_release}/${profile}/${iso_file}
+	local webseed url project=$(get_project "${edition}")
+        url=${host}/project/${project}/${dist_release}/${profile}/${iso_file}
+
+        local mirrors=('heanet' 'jaist' 'netcologne' 'iweb' 'kent')
+
 	for m in ${mirrors[@]};do
 		webseed=${webseed:-}${webseed:+,}"http://${m}.dl.${url}"
 	done
@@ -741,13 +744,7 @@ load_profile(){
 	prepare_dir "${iso_dir}"
 	chown "${OWNER}:${OWNER}" "${iso_dir}"
 
-	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url})
-
-	project=$(get_project "${edition}")
-
-	if [[ "${edition}" == 'official' ]];then
-		mktorrent_args+=(-w $(gen_webseed))
-	fi
+	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed))
 }
 
 get_edition(){
