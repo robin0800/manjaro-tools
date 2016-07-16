@@ -606,7 +606,7 @@ compress_images(){
 	run_safe "make_iso"
 	make_checksum "${iso_file}"
 	${sign} && sign_iso "${iso_file}"
-	${is_torrent} && make_torrent
+	${torrent} && make_torrent
 	chown -R "${OWNER}:${OWNER}" "${iso_dir}"
 	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
