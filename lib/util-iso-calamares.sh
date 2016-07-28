@@ -9,34 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-write_calamares_branding_desc(){
-	local conf="$1/usr/share/calamares/branding/sonar/branding.desc"
-	if [[ -f "$conf" ]];then
-		echo '---' > "$conf"
-		echo "componentName:  sonar" >> "$conf"
-		echo '' >> $conf
-		echo 'strings:' >> $conf
-		echo "    productName:         ${dist_name} GNU Linux" >> "$conf"
-		echo "    shortProductName:    ${dist_name}" >> "$conf"
-		echo "    version:             ${dist_release}" >> "$conf"
-		echo "    shortVersion:        ${dist_release}" >> "$conf"
-		echo "    versionedName:       ${dist_name} GNU Linux  ${dist_release}" >> "$conf"
-		echo "    shortVersionedName:  ${dist_name} Linux ${dist_release}" >> "$conf"
-		echo "    bootloaderEntryName: ${dist_name}" >> "$conf"
-		echo '' >> $conf
-		echo 'images:' >> $conf
-		echo '    productLogo:         "squid.png"' >> "$conf"
-		echo '    productIcon:         "logo.png"' >> "$conf"
-		echo '    productWelcome:      "languages.png"' >> "$conf"
-		echo '' >> $conf
-		echo 'slideshow:               "show.qml"' >> "$conf"
-		echo 'style:' >> $conf
-		echo '   sidebarBackground:    "#292F34"' >> "$conf"
-		echo '   sidebarText:          "#FFFFFF"' >> "$conf"
-		echo '   sidebarTextSelect:    "#292F34"' >> "$conf"
-	fi
-}
-
 write_calamares_machineid_conf(){
 	local conf="$1/etc/calamares/modules/machineid.conf"
 	echo "systemd: false" > $conf
@@ -157,25 +129,103 @@ write_calamares_users_conf(){
 	echo "setRootPassword: true" >> "$conf"
 }
 
-brand_calamares_settings_conf(){
-	local conf="$1/usr/share/calamares/settings.conf"
-	if [[ -f $conf ]];then
-		if [[ -d $1/usr/share/calamares/branding/${iso_name}-${profile} ]];then
-			sed -i -e "s|^.*branding:.*|branding: ${iso_name}-${profile}|" "$conf"
-		elif [[ -d $1/usr/share/calamares/branding/${iso_name} ]];then
-			sed -i -e "s|^.*branding:.*|branding: ${iso_name}|" "$conf"
-		fi
+write_calamares_packages_conf(){
+	local conf="$1/etc/calamares/modules/packages.conf"
+	echo "---" > "$conf"
+	echo "backend: pacman" >> "$conf"
+}
+
+write_calamares_welcome_conf(){
+	local conf="$1/etc/calamares/modules/welcome.conf"
+	echo "---" > "$conf" >> "$conf"
+	echo "showSupportUrl:         true" >> "$conf"
+	echo "showKnownIssuesUrl:     true" >> "$conf"
+	echo "showReleaseNotesUrl:    true" >> "$conf"
+	echo '' >> "$conf"
+	echo "requirements:" >> "$conf"
+	echo "requiredStorage:    5.5" >> "$conf"
+	echo "requiredRam:        1.0" >> "$conf"
+	echo "check:" >> "$conf"
+	echo "	- storage" >> "$conf"
+	echo "	- ram" >> "$conf"
+	echo "	- power" >> "$conf"
+	echo "	- internet" >> "$conf"
+	echo "	- root" >> "$conf"
+	echo "required:" >> "$conf"
+	echo "	- storage" >> "$conf"
+	echo "	- ram" >> "$conf"
+	echo "	- root" >> "$conf"
+	${cal_netinstall} && echo "	- internet" >> "$conf"
+}
+
+write_calamares_settings_conf(){
+	local conf="$1/etc/calamares/settings.conf"
+	echo "---" > "$conf"
+	echo "modules-search: [ local ]" >> "$conf"
+	echo '' >> "$conf"
+	echo "instances:" >> "$conf"
+	echo '' >> "$conf"
+	echo "sequence:" >> "$conf"
+	echo "- show:" >> "$conf"
+	echo "	- welcome" >> "$conf"
+	${cal_netinstall} && echo "	- netinstall" >> "$conf"
+	echo "	- locale" >> "$conf"
+	echo "	- keyboard" >> "$conf"
+	echo "	- partition" >> "$conf"
+	echo "	- users" >> "$conf"
+	echo "	- summary" >> "$conf"
+	echo "- exec:" >> "$conf"
+	echo "	- partition" >> "$conf"
+	echo "	- mount" >> "$conf"
+	echo "	- unpackfs" >> "$conf"
+	if ${cal_netinstall};then
+		echo "	- networkcfg" >> "$conf"
+		echo "	- packages" >> "$conf"
 	fi
+	echo "	- machineid" >> "$conf"
+	echo "	- fstab" >> "$conf"
+	echo "	- locale" >> "$conf"
+	echo "	- keyboard" >> "$conf"
+	echo "	- localegen" >> "$conf"
+	echo "	- luksopenswaphookcfg" >> "$conf"
+	echo "	- luksbootkeyfile" >> "$conf"
+	echo "	- initcpiocfg" >> "$conf"
+	echo "	- initcpio" >> "$conf"
+	echo "	- users" >> "$conf"
+	echo "	- displaymanager" >> "$conf"
+	echo "	- hardwarecfg" >> "$conf"
+	echo "	- networkcfg" >> "$conf"
+	echo "	- hwclock" >> "$conf"
+	echo "	- services" >> "$conf"
+	echo "	- grubcfg" >> "$conf"
+	echo "	- bootloader" >> "$conf"
+	echo "	- postcfg" >> "$conf"
+	echo "	- umount" >> "$conf"
+	echo "	- show:" >> "$conf"
+	echo "	- finished" >> "$conf"
+	echo '' >> "$conf"
+	echo "branding: ${iso_name}" >> "$conf"
+	echo '' >> "$conf"
+	echo "prompt-install: false" >> "$conf"
+	echo '' >> "$conf"
+	echo "dont-chroot: false" >> "$conf"
 }
 
 configure_calamares(){
 	msg2 "Configuring Calamares ..."
 	mkdir -p $1/etc/calamares/modules
+	write_calamares_settings_conf "$1"
+
+	write_calamares_welcome_conf "$1"
+
+	write_calamares_packages_conf "$1"
+
 	write_calamares_bootloader_conf "$1"
+
 	write_calamares_unpack_conf "$1"
 	write_calamares_displaymanager_conf "$1"
 	write_calamares_initcpio_conf "$1"
-	brand_calamares_settings_conf "$1"
+
 	if [[ ${initsys} == 'openrc' ]];then
 		write_calamares_machineid_conf "$1"
 		write_calamares_finished_conf "$1"
@@ -185,54 +235,5 @@ configure_calamares(){
 
 	if [[ -f $1/usr/share/applications/calamares.desktop && -f $1/usr/bin/kdesu ]];then
 		sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
-	fi
-	if [[ "${edition}" == 'sonar' ]]; then
-		write_calamares_branding_desc "$1"
-	fi
-}
-
-write_cli_inst_conf(){
-	local conf=$1/profile.conf
-	echo '' >> ${conf}
-	echo '# profile image name' >> ${conf}
-	echo "profile=${profile}" >> ${conf}
-	echo '' >> ${conf}
-	echo '# iso_name' >> ${conf}
-	echo "iso_name=${iso_name}" >> ${conf}
-	echo '' >> ${conf}
-	echo '# kernel' >> ${conf}
-	echo "kernel=${kernel}" >> ${conf}
-}
-
-configure_cli_inst(){
-	msg2 "Configuring cli-installer ..."
-	local path=$1${DATADIR}
-	[[ ! -d $path ]] && mkdir -p $path
-
-	cp ${profile_conf} $path
-
-	write_cli_inst_conf "$path"
-}
-
-configure_thus(){
-	msg2 "Configuring Thus ..."
-	source "$1/etc/mkinitcpio.d/${kernel}.preset"
-	local conf="$1/etc/thus.conf"
-	echo "[distribution]" > "$conf"
-	echo "DISTRIBUTION_NAME = \"${dist_name} Linux\"" >> "$conf"
-	echo "DISTRIBUTION_VERSION = \"${dist_release}\"" >> "$conf"
-	echo "SHORT_NAME = \"${dist_name}\"" >> "$conf"
-	echo "[install]" >> "$conf"
-	echo "LIVE_MEDIA_SOURCE = \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
-	echo "LIVE_MEDIA_DESKTOP = \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
-	echo "LIVE_MEDIA_TYPE = \"squashfs\"" >> "$conf"
-	echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
-	echo "KERNEL = \"${kernel}\"" >> "$conf"
-	echo "VMLINUZ = \"$(echo ${ALL_kver} | sed s'|/boot/||')\"" >> "$conf"
-	echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
-	echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
-
-	if [[ -f $1/usr/share/applications/thus.desktop && -f $1/usr/bin/kdesu ]];then
-		sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
 	fi
 }

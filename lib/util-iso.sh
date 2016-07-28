@@ -671,6 +671,7 @@ reset_profile(){
 	unset login_shell
 	unset tracker_url
 	unset piece_size
+	unset cal_netinstall
 }
 
 make_profile(){

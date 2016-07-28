@@ -373,6 +373,9 @@ check_profile_vars(){
 	if ! is_valid_bool "${pxe_boot}";then
 		die "pxe_boot only accepts true/false value!"
 	fi
+	if ! is_valid_bool "${cal_netinstall}";then
+		die "cal_netinstall only accepts true/false value!"
+	fi
 }
 
 load_profile_config(){
@@ -438,6 +441,8 @@ load_profile_config(){
 	[[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
 
 	[[ -z ${piece_size} ]] && piece_size=21
+
+	[[ -z ${cal_netinstall} ]] && cal_netinstall='false'
 
 	check_profile_vars
 

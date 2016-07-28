@@ -407,8 +407,6 @@ configure_live_image(){
 	esac
 	configure_services_live "$1"
 	configure_calamares "$1"
-	configure_thus "$1"
-	configure_cli_inst "$1"
 	msg "Done configuring [live-image]"
 }
 
