@@ -63,10 +63,10 @@ add_svc_sd(){
 # $1: chroot
 configure_environment(){
 	case ${profile} in
-		cinnamon*|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce*)
+		cinnamon*|deepin*|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce*)
 			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 			if [[ -f "$1/usr/lib/qt/plugins/styles/libqgtk2style.so" ]];then
-				echo "QT_STYLE_OVERRIDE=gtk2" >> $1/etc/environment
+				sed -i 's|QT_STYLE_OVERRIDE=gtk|QT_STYLE_OVERRIDE=gtk2|g' $1/etc/environment
 			fi
 			if [[ -f "$1/usr/lib/qt/plugins/platformthemes/libqt5ct.so" ]];then
 				echo "QT_QPA_PLATFORMTHEME=qt5ct" >> $1/etc/environment
