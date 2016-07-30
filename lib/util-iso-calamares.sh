@@ -187,6 +187,8 @@ write_calamares_settings_conf(){
 		fi
 		echo "	- networkcfg" >> "$conf"
 		echo "	- packages" >> "$conf"
+	else
+		echo "	- unpackfs" >> "$conf"
 	fi
 	echo "	- machineid" >> "$conf"
 	echo "	- fstab" >> "$conf"
