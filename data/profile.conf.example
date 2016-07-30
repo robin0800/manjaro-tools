@@ -41,7 +41,7 @@
 # cal_netinstall="false"
 
 # configure calamares to use chrootcfg instead of unpackfs
-# cal_netunpackfs="true"
+# cal_unpackfs="true"
 
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant
