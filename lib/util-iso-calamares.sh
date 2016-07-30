@@ -109,9 +109,11 @@ write_calamares_unpack_conf(){
 	echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
-	echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
-	echo "        sourcefs: \"squashfs\"" >> "$conf"
-	echo "        destination: \"\"" >> "$conf"
+	if [[ -f /bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs ]];then
+		echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
+		echo "        sourcefs: \"squashfs\"" >> "$conf"
+		echo "        destination: \"\"" >> "$conf"
+	fi
 }
 
 write_calamares_users_conf(){
@@ -177,8 +179,12 @@ write_calamares_settings_conf(){
 	echo "- exec:" >> "$conf"
 	echo "	- partition" >> "$conf"
 	echo "	- mount" >> "$conf"
-	echo "	- unpackfs" >> "$conf"
 	if ${cal_netinstall};then
+		if ${cal_unpackfs};then
+			echo "	- unpackfs" >> "$conf"
+		else
+			echo "	- chrootcfg" >> "$conf"
+		fi
 		echo "	- networkcfg" >> "$conf"
 		echo "	- packages" >> "$conf"
 	fi

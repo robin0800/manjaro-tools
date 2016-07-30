@@ -376,6 +376,9 @@ check_profile_vars(){
 	if ! is_valid_bool "${cal_netinstall}";then
 		die "cal_netinstall only accepts true/false value!"
 	fi
+	if ! is_valid_bool "${cal_unpackfs}";then
+		die "cal_unpackfs only accepts true/false value!"
+	fi
 }
 
 load_profile_config(){
@@ -443,6 +446,8 @@ load_profile_config(){
 	[[ -z ${piece_size} ]] && piece_size=21
 
 	[[ -z ${cal_netinstall} ]] && cal_netinstall='false'
+
+	[[ -z ${cal_unpackfs} ]] && cal_netunpackfs='true'
 
 	check_profile_vars
 

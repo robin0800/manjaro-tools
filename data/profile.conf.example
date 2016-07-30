@@ -38,7 +38,10 @@
 # efi_part_size=31M
 
 # configure calamares for netinstall
-# cal_netinstall=false
+# cal_netinstall="false"
+
+# configure calamares to use chrootcfg instead of unpackfs
+# cal_netunpackfs="true"
 
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant
