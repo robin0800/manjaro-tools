@@ -232,7 +232,7 @@ write_settings_conf(){
 write_netinstall_conf(){
 	local conf="$1/etc/calamares/modules/netinstall.conf"
 	echo "---" > "$conf"
-	echo "groupsUrl: ${cal_grp_url}"
+	echo "groupsUrl: ${cal_grp_url}" >> "$conf"
 }
 
 configure_calamares(){
