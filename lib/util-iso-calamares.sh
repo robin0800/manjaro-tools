@@ -11,9 +11,15 @@
 
 write_calamares_machineid_conf(){
 	local conf="$1/etc/calamares/modules/machineid.conf"
-	echo "systemd: false" > $conf
-	echo "dbus: true" >> $conf
-	echo "symlink: true" >> $conf
+	if [[ ${initsys} == 'openrc' ]];then
+		echo "systemd: false" > $conf
+		echo "dbus: true" >> $conf
+		echo "symlink: true" >> $conf
+	else
+		echo "systemd: true" > $conf
+		echo "dbus: true" >> $conf
+		echo "symlink: true" >> $conf
+	fi
 }
 
 write_calamares_finished_conf(){
@@ -21,7 +27,11 @@ write_calamares_finished_conf(){
 	echo '---' > "$conf"
 	echo 'restartNowEnabled: true' >> "$conf"
 	echo 'restartNowChecked: false' >> "$conf"
-	echo 'restartNowCommand: "shutdown -r now"' >> "$conf"
+	if [[ ${initsys} == 'openrc' ]];then
+		echo 'restartNowCommand: "shutdown -r now"' >> "$conf"
+	else
+		echo 'restartNowCommand: "systemctl -i reboot"' >> "$conf"
+	fi
 }
 
 write_calamares_bootloader_conf(){
@@ -221,7 +231,9 @@ write_calamares_settings_conf(){
 
 configure_calamares(){
 	msg2 "Configuring Calamares ..."
+
 	mkdir -p $1/etc/calamares/modules
+
 	write_calamares_settings_conf "$1"
 
 	write_calamares_welcome_conf "$1"
@@ -231,17 +243,19 @@ configure_calamares(){
 	write_calamares_bootloader_conf "$1"
 
 	write_calamares_unpack_conf "$1"
+
 	write_calamares_displaymanager_conf "$1"
+
 	write_calamares_initcpio_conf "$1"
 
-	if [[ ${initsys} == 'openrc' ]];then
-		write_calamares_machineid_conf "$1"
-		write_calamares_finished_conf "$1"
-	fi
+	write_calamares_machineid_conf "$1"
+
+	write_calamares_finished_conf "$1"
+
 	write_calamares_services_conf "$1"
 	write_calamares_users_conf "$1"
 
-	if [[ -f $1/usr/share/applications/calamares.desktop && -f $1/usr/bin/kdesu ]];then
-		sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
-	fi
+# 	if [[ -f $1/usr/share/applications/calamares.desktop && -f $1/usr/bin/kdesu ]];then
+# 		sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/calamares.desktop
+# 	fi
 }

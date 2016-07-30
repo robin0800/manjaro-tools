@@ -447,7 +447,7 @@ load_profile_config(){
 
 	[[ -z ${cal_netinstall} ]] && cal_netinstall='false'
 
-	[[ -z ${cal_unpackfs} ]] && cal_netunpackfs='true'
+	[[ -z ${cal_unpackfs} ]] && cal_unpackfs='true'
 
 	check_profile_vars
 
