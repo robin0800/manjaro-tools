@@ -9,7 +9,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-write_calamares_machineid_conf(){
+write_machineid_conf(){
 	local conf="$1/etc/calamares/modules/machineid.conf"
 	if [[ ${initsys} == 'openrc' ]];then
 		echo "systemd: false" > $conf
@@ -22,7 +22,7 @@ write_calamares_machineid_conf(){
 	fi
 }
 
-write_calamares_finished_conf(){
+write_finished_conf(){
 	local conf="$1/etc/calamares/modules/finished.conf"
 	echo '---' > "$conf"
 	echo 'restartNowEnabled: true' >> "$conf"
@@ -34,7 +34,7 @@ write_calamares_finished_conf(){
 	fi
 }
 
-write_calamares_bootloader_conf(){
+write_bootloader_conf(){
 	source "$1/etc/mkinitcpio.d/${kernel}.preset"
 	local conf="$1/etc/calamares/modules/bootloader.conf"
 	echo '---' > "$conf"
@@ -51,7 +51,7 @@ write_calamares_bootloader_conf(){
 	echo '#efiBootloaderId: "dirname"' >> "$conf"
 }
 
-write_calamares_services_conf(){
+write_services_conf(){
 	local conf="$1/etc/calamares/modules/services.conf"
 	echo '---' >  "$conf"
 	echo '' >> "$conf"
@@ -92,7 +92,7 @@ write_calamares_services_conf(){
 	fi
 }
 
-write_calamares_displaymanager_conf(){
+write_displaymanager_conf(){
 	local conf="$1/etc/calamares/modules/displaymanager.conf"
 	echo "displaymanagers:" > "$conf"
 	echo "  - ${displaymanager}" >> "$conf"
@@ -106,13 +106,13 @@ write_calamares_displaymanager_conf(){
 	echo "basicSetup: false" >> "$conf"
 }
 
-write_calamares_initcpio_conf(){
+write_initcpio_conf(){
 	local conf="$1/etc/calamares/modules/initcpio.conf"
 	echo "---" > "$conf"
 	echo "kernel: ${kernel}" >> "$conf"
 }
 
-write_calamares_unpack_conf(){
+write_unpack_conf(){
 	local conf="$1/etc/calamares/modules/unpackfs.conf"
 	echo "---" > "$conf"
 	echo "unpack:" >> "$conf"
@@ -126,7 +126,7 @@ write_calamares_unpack_conf(){
 	fi
 }
 
-write_calamares_users_conf(){
+write_users_conf(){
 	local conf="$1/etc/calamares/modules/users.conf"
 	echo "---" > "$conf"
 	echo "userGroup:      users" >> "$conf"
@@ -141,13 +141,13 @@ write_calamares_users_conf(){
 	echo "setRootPassword: true" >> "$conf"
 }
 
-write_calamares_packages_conf(){
+write_packages_conf(){
 	local conf="$1/etc/calamares/modules/packages.conf"
 	echo "---" > "$conf"
 	echo "backend: pacman" >> "$conf"
 }
 
-write_calamares_welcome_conf(){
+write_welcome_conf(){
 	local conf="$1/etc/calamares/modules/welcome.conf"
 	echo "---" > "$conf" >> "$conf"
 	echo "showSupportUrl:         true" >> "$conf"
@@ -170,7 +170,7 @@ write_calamares_welcome_conf(){
 	${cal_netinstall} && echo "  - internet" >> "$conf"
 }
 
-write_calamares_settings_conf(){
+write_settings_conf(){
 	local conf="$1/etc/calamares/settings.conf"
 	echo "---" > "$conf"
 	echo "modules-search: [ local ]" >> "$conf"
@@ -229,29 +229,37 @@ write_calamares_settings_conf(){
 	echo "dont-chroot: false" >> "$conf"
 }
 
+write_netinstall_conf(){
+	local conf="$1/etc/calamares/modules/netinstall.conf"
+	echo "---" > "$conf"
+	echo "groupsUrl: ${cal_grp_url}"
+}
+
 configure_calamares(){
 	msg2 "Configuring Calamares ..."
 
 	mkdir -p $1/etc/calamares/modules
 
-	write_calamares_settings_conf "$1"
+	write_settings_conf "$1"
 
-	write_calamares_welcome_conf "$1"
+	write_welcome_conf "$1"
 
-	write_calamares_packages_conf "$1"
+	write_packages_conf "$1"
 
-	write_calamares_bootloader_conf "$1"
+	write_bootloader_conf "$1"
 
-	write_calamares_unpack_conf "$1"
+	write_unpack_conf "$1"
 
-	write_calamares_displaymanager_conf "$1"
+	write_displaymanager_conf "$1"
 
-	write_calamares_initcpio_conf "$1"
+	write_initcpio_conf "$1"
 
-	write_calamares_machineid_conf "$1"
+	write_machineid_conf "$1"
 
-	write_calamares_finished_conf "$1"
+	write_finished_conf "$1"
 
-	write_calamares_services_conf "$1"
-	write_calamares_users_conf "$1"
+	write_netinstall_conf "$1"
+
+	write_services_conf "$1"
+	write_users_conf "$1"
 }
