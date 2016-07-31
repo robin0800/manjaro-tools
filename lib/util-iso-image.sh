@@ -381,6 +381,7 @@ configure_custom_image(){
 	configure_plymouth "$1"
 	[[ ${displaymanager} != 'none' ]] && configure_displaymanager "$1"
 	configure_services "$1"
+	configure_environment "$1"
 	msg "Done configuring [%s-image]" "${profile}"
 }
 
@@ -390,7 +391,6 @@ configure_live_image(){
 	configure_user "$1"
 	configure_accountsservice "$1" "${username}"
 	configure_pamac_live "$1"
-	configure_environment "$1"
 	case ${initsys} in
 		'systemd')
 			configure_logind_live "$1"
