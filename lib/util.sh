@@ -449,7 +449,7 @@ load_profile_config(){
 
 	[[ -z ${cal_unpackfs} ]] && cal_unpackfs='true'
 
-	[[ -z ${cal_grp_url} ]] && cal_grp_url="https://raw.githubusercontent.com/calamares/calamares-manjaro/master/netinstall.yaml"
+	[[ -z ${cal_netgroups} ]] && cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master/netinstall.yaml"
 
 	check_profile_vars
 

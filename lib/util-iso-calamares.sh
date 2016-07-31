@@ -229,10 +229,24 @@ write_settings_conf(){
 	echo "dont-chroot: false" >> "$conf"
 }
 
+write_chrootcfg_conf(){
+	local conf="$1/etc/calamares/modules/chrootcfg.conf"
+	echo "---" > "$conf"
+	echo "requirements:" >> "$conf"
+	echo "    - name: /etc" >> "$conf"
+	echo "    - name: /var/log" >> "$conf"
+	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
+	echo "    - name: /var/lib/pacman" >> "$conf"
+	echo '' >> "$conf"
+	echo "kernel: ${kernel}" >> "$conf"
+	echo '' >> "$conf"
+	echo "defaultpkg: pacman" >> "$conf"
+}
+
 write_netinstall_conf(){
 	local conf="$1/etc/calamares/modules/netinstall.conf"
 	echo "---" > "$conf"
-	echo "groupsUrl: ${cal_grp_url}" >> "$conf"
+	echo "groupsUrl: ${cal_netgroups}" >> "$conf"
 }
 
 configure_calamares(){
@@ -259,6 +273,8 @@ configure_calamares(){
 	write_finished_conf "$1"
 
 	write_netinstall_conf "$1"
+
+	write_chrootcfg_conf "$1"
 
 	write_services_conf "$1"
 	write_users_conf "$1"
