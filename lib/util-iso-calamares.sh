@@ -195,6 +195,8 @@ write_settings_conf(){
 			echo "  - networkcfg" >> "$conf"
 			echo "  - packages" >> "$conf"
 		else
+			# take out networkcfg once a new PR has been merged
+			echo "  - networkcfg" >> "$conf"
 			echo "  - chrootcfg" >> "$conf"
 		fi
 	else
@@ -242,10 +244,11 @@ write_chrootcfg_conf(){
 	echo "packages:" >> "$conf"
 	echo "    - pacman" >> "$conf"
 	echo "    - ${kernel}" >> "$conf"
-	echo '' >> "$conf"
-	echo "keyrings:" >> "$conf"
-	echo "    - archlinux" >> "$conf"
-	echo "    - manjaro" >> "$conf"
+	# take out until a new PR has been merged
+# 	echo '' >> "$conf"
+# 	echo "keyrings:" >> "$conf"
+# 	echo "    - archlinux" >> "$conf"
+# 	echo "    - manjaro" >> "$conf"
 }
 
 write_netinstall_conf(){
