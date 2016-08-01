@@ -123,18 +123,10 @@ get_timer(){
 	echo $(date +%s)
 }
 
-get_timer_ms(){
-	echo $(date +%s%3N)
-}
 
 # $1: start timer
 elapsed_time(){
 	echo $(echo $1 $(get_timer) | awk '{ printf "%0.2f",($2-$1)/60 }')
-}
-
-# $1: start timer
-elapsed_time_ms(){
-	echo $(echo $1 $(get_timer_ms) | awk '{ printf "%0.3f",($2-$1)/1000 }')
 }
 
 show_elapsed_time(){
@@ -373,6 +365,12 @@ check_profile_vars(){
 	if ! is_valid_bool "${pxe_boot}";then
 		die "pxe_boot only accepts true/false value!"
 	fi
+	if ! is_valid_bool "${cal_netinstall}";then
+		die "cal_netinstall only accepts true/false value!"
+	fi
+	if ! is_valid_bool "${cal_unpackfs}";then
+		die "cal_unpackfs only accepts true/false value!"
+	fi
 }
 
 load_profile_config(){
@@ -438,6 +436,12 @@ load_profile_config(){
 	[[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
 
 	[[ -z ${piece_size} ]] && piece_size=21
+
+	[[ -z ${cal_netinstall} ]] && cal_netinstall='false'
+
+	[[ -z ${cal_unpackfs} ]] && cal_unpackfs='true'
+
+	[[ -z ${cal_netgroups} ]] && cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master/netinstall.yaml"
 
 	check_profile_vars
 

@@ -37,6 +37,15 @@
 # set uefi partition size
 # efi_part_size=31M
 
+# configure calamares for netinstall
+# cal_netinstall="false"
+
+# the default url for the netinstall.yaml
+# cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master/netinstall.yaml"
+
+# configure calamares to use chrootcfg instead of unpackfs
+# cal_unpackfs="true"
+
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant
 

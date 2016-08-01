@@ -561,6 +561,10 @@ check_profile(){
 	done
 
 	[[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
+
+	if ! ${cal_netinstall};then
+		cal_unpackfs="true"
+	fi
 }
 
 check_requirements(){
@@ -671,6 +675,8 @@ reset_profile(){
 	unset login_shell
 	unset tracker_url
 	unset piece_size
+	unset cal_netinstall
+	unset cal_unpackfs
 }
 
 make_profile(){

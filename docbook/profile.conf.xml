@@ -132,6 +132,31 @@
 			</varlistentry>
 
 			<varlistentry>
+				<term><varname>cal_netinstall=</varname></term>
+
+				<listitem><para>Accepts
+					<option>true</option> (the default)
+					<option>false</option>.</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><varname>cal_unpackfs=</varname></term>
+
+				<listitem><para>Accepts
+						<option>true</option> (the default)
+						<option>false</option>.</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><varname>cal_netgroups=</varname></term>
+
+				<listitem><para>Default url for the netinstall.yaml.
+				</para></listitem>
+			</varlistentry>
+
+			<varlistentry>
 				<term><varname>efi_boot_loader=</varname></term>
 
 				<listitem><para>Takes grub or gummibot. Configures

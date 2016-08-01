@@ -385,6 +385,23 @@ configure_custom_image(){
 	msg "Done configuring [%s-image]" "${profile}"
 }
 
+write_live_session_conf(){
+	msg2 "Configuring live session ..."
+	local path=$1${DATADIR}
+	[[ ! -d $path ]] && mkdir -p $path
+	local conf=$path/live.conf
+	echo '# live session configuration' > ${conf}
+	echo '' >> ${conf}
+	echo '# autologin' >> ${conf}
+	echo "autologin=${autologin}" >> ${conf}
+	echo '' >> ${conf}
+	echo '# live username' >> ${conf}
+	echo "username=${username}" >> ${conf}
+	echo '' >> ${conf}
+	echo '# live password' >> ${conf}
+	echo "password=${password}" >> ${conf}
+}
+
 configure_live_image(){
 	msg "Configuring [live-image]"
 	configure_hosts "$1"
@@ -404,7 +421,7 @@ configure_live_image(){
 			echo ${hostname} > $1/etc/hostname
 
 			msg2 "Disable systemd-gpt-auto-generator"
-			ln -sfv /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
+			ln -sf /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
 		;;
 		'openrc')
 			msg2 "Configuring hostname ..."
@@ -414,8 +431,7 @@ configure_live_image(){
 	esac
 	configure_services_live "$1"
 	configure_calamares "$1"
-	configure_thus "$1"
-	configure_cli_inst "$1"
+	write_live_session_conf "$1"
 	msg "Done configuring [live-image]"
 }
 
