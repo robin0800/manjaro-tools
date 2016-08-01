@@ -241,6 +241,10 @@ write_chrootcfg_conf(){
 	echo "packages:" >> "$conf"
 	echo "    - pacman" >> "$conf"
 	echo "    - ${kernel}" >> "$conf"
+	echo '' >> "$conf"
+	echo "keyrings:" >> "$conf"
+	echo "    - archlinux" >> "$conf"
+	echo "    - manjaro" >> "$conf"
 }
 
 write_netinstall_conf(){
