@@ -233,14 +233,14 @@ write_chrootcfg_conf(){
 	local conf="$1/etc/calamares/modules/chrootcfg.conf"
 	echo "---" > "$conf"
 	echo "requirements:" >> "$conf"
-	echo "    - name: /etc" >> "$conf"
-	echo "    - name: /var/log" >> "$conf"
-	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
-	echo "    - name: /var/lib/pacman" >> "$conf"
+	echo "    - directory: /etc" >> "$conf"
+	echo "    - directory: /var/log" >> "$conf"
+	echo "    - directory: /var/cache/pacman/pkg" >> "$conf"
+	echo "    - directory: /var/lib/pacman" >> "$conf"
 	echo '' >> "$conf"
-	echo "kernel: ${kernel}" >> "$conf"
-	echo '' >> "$conf"
-	echo "defaultpkg: pacman" >> "$conf"
+	echo "packages:" >> "$conf"
+	echo "    - pacman" >> "$conf"
+	echo "    - ${kernel}" >> "$conf"
 }
 
 write_netinstall_conf(){
