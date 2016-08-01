@@ -191,15 +191,15 @@ write_settings_conf(){
 	echo "  - mount" >> "$conf"
 	if ${cal_netinstall};then
 		if ${cal_unpackfs};then
-			echo "  - networkcfg" >> "$conf"
 			echo "  - unpackfs" >> "$conf"
+			echo "  - networkcfg" >> "$conf"
 			echo "  - packages" >> "$conf"
 		else
 			echo "  - chrootcfg" >> "$conf"
 		fi
 	else
-		echo "  - networkcfg" >> "$conf"
 		echo "  - unpackfs" >> "$conf"
+		echo "  - networkcfg" >> "$conf"
 	fi
 	echo "  - machineid" >> "$conf"
 	echo "  - fstab" >> "$conf"
