@@ -123,18 +123,10 @@ get_timer(){
 	echo $(date +%s)
 }
 
-get_timer_ms(){
-	echo $(date +%s%3N)
-}
 
 # $1: start timer
 elapsed_time(){
 	echo $(echo $1 $(get_timer) | awk '{ printf "%0.2f",($2-$1)/60 }')
-}
-
-# $1: start timer
-elapsed_time_ms(){
-	echo $(echo $1 $(get_timer_ms) | awk '{ printf "%0.3f",($2-$1)/1000 }')
 }
 
 show_elapsed_time(){
