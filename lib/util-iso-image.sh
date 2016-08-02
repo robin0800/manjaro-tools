@@ -298,8 +298,8 @@ configure_sysctl(){
 	msg2 "Configuring sysctl ..."
 	touch $1/etc/sysctl.conf
 	local conf=$1/etc/sysctl.d/100-manjaro.conf
-	echo '# Virtual memory setting (swap file or partition)' > ${conf}
-	echo 'vm.swappiness = 30' >> ${conf}
+# 	echo '# Virtual memory setting (swap file or partition)' > ${conf}
+# 	echo 'vm.swappiness = 30' >> ${conf}
 	echo '# Enable the SysRq key' >> ${conf}
 	echo 'kernel.sysrq = 1' >> ${conf}
 }
