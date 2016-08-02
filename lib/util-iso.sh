@@ -611,7 +611,7 @@ compress_images(){
 	make_checksum "${iso_file}"
 	${sign} && sign_iso "${iso_file}"
 	${torrent} && make_torrent
-	chown -R "${OWNER}:${OWNER}" "${iso_dir}"
+	chown -R "${OWNER}:$(id --group ${OWNER})" "${iso_dir}"
 	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
