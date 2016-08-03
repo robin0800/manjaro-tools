@@ -65,12 +65,13 @@ configure_environment(){
 	case ${profile} in
 		cinnamon*|deepin*|gnome|i3|lxde|mate|netbook|openbox|pantheon|xfce*)
 			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
-			if [[ -f "$1/usr/lib/qt/plugins/styles/libqgtk2style.so" ]];then
-				sed -i 's|QT_STYLE_OVERRIDE=gtk|QT_STYLE_OVERRIDE=gtk2|g' $1/etc/environment
-			fi
 			if [[ -f "$1/usr/lib/qt/plugins/platformthemes/libqt5ct.so" ]];then
-				echo "QT_QPA_PLATFORMTHEME=qt5ct" >> $1/etc/environment
 				sed -i '/QT_STYLE_OVERRIDE=gtk/d' $1/etc/environment
+				echo "QT_QPA_PLATFORMTHEME=qt5ct" >> $1/etc/environment
+			fi
+			if [[ -f "$1/usr/lib/qt/plugins/styles/libqgtk2style.so" ]];then
+				sed -i '/QT_STYLE_OVERRIDE=gtk/d' $1/etc/environment
+				echo "QT_STYLE_OVERRIDE=gtk2" >> $1/etc/environment
 			fi
 		;;
 	esac
@@ -297,8 +298,8 @@ configure_sysctl(){
 	msg2 "Configuring sysctl ..."
 	touch $1/etc/sysctl.conf
 	local conf=$1/etc/sysctl.d/100-manjaro.conf
-	echo '# Virtual memory setting (swap file or partition)' > ${conf}
-	echo 'vm.swappiness = 30' >> ${conf}
+# 	echo '# Virtual memory setting (swap file or partition)' > ${conf}
+# 	echo 'vm.swappiness = 30' >> ${conf}
 	echo '# Enable the SysRq key' >> ${conf}
 	echo 'kernel.sysrq = 1' >> ${conf}
 }

@@ -195,6 +195,8 @@ write_settings_conf(){
 			echo "  - networkcfg" >> "$conf"
 			echo "  - packages" >> "$conf"
 		else
+			# take out networkcfg once a new PR has been merged
+			echo "  - networkcfg" >> "$conf"
 			echo "  - chrootcfg" >> "$conf"
 		fi
 	else
@@ -233,19 +235,25 @@ write_settings_conf(){
 write_chrootcfg_conf(){
 	local conf="$1/etc/calamares/modules/chrootcfg.conf"
 	echo "---" > "$conf"
-	echo "requirements:" >> "$conf"
-	echo "    - directory: /etc" >> "$conf"
-	echo "    - directory: /var/log" >> "$conf"
-	echo "    - directory: /var/cache/pacman/pkg" >> "$conf"
-	echo "    - directory: /var/lib/pacman" >> "$conf"
+	echo "directories:" >> "$conf"
+	echo "    - name: /etc" >> "$conf"
+	echo "      mode: 755" >> "$conf"
+	echo "    - name: /var/log" >> "$conf"
+	echo "      mode: 755" >> "$conf"
+	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
+	echo "      mode: 755" >> "$conf"
+	echo "    - name: /var/lib/pacman" >> "$conf"
+	echo "      mode: 755" >> "$conf"
 	echo '' >> "$conf"
-	echo "packages:" >> "$conf"
+	echo "requirements:" >> "$conf"
 	echo "    - pacman" >> "$conf"
 	echo "    - ${kernel}" >> "$conf"
 	echo '' >> "$conf"
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
 	echo "    - manjaro" >> "$conf"
+	echo '' >> "$conf"
+	echo "branch: ${target_branch}" >> "$conf"
 }
 
 write_netinstall_conf(){
