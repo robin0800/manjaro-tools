@@ -67,7 +67,7 @@ configure_environment(){
 			echo "QT_STYLE_OVERRIDE=gtk" >> $1/etc/environment
 			if [[ -f "$1/usr/lib/qt/plugins/platformthemes/libqt5ct.so" ]];then
 				sed -i '/QT_STYLE_OVERRIDE=gtk/d' $1/etc/environment
-				echo "QT_STYLE_OVERRIDE=gtk2" >> $1/etc/environment
+				echo "QT_QPA_PLATFORMTHEME=qt5ct" >> $1/etc/environment
 			fi
 			if [[ -f "$1/usr/lib/qt/plugins/styles/libqgtk2style.so" ]];then
 				sed -i '/QT_STYLE_OVERRIDE=gtk/d' $1/etc/environment
