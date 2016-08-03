@@ -441,7 +441,7 @@ load_profile_config(){
 
 	[[ -z ${cal_unpackfs} ]] && cal_unpackfs='true'
 
-	[[ -z ${cal_netgroups} ]] && cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master/netinstall.yaml"
+	[[ -z ${cal_netgroups} ]] && cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master"
 
 	check_profile_vars
 

@@ -195,8 +195,6 @@ write_settings_conf(){
 			echo "  - networkcfg" >> "$conf"
 			echo "  - packages" >> "$conf"
 		else
-			# take out networkcfg once a new PR has been merged
-			echo "  - networkcfg" >> "$conf"
 			echo "  - chrootcfg" >> "$conf"
 		fi
 	else
@@ -233,21 +231,25 @@ write_settings_conf(){
 }
 
 write_chrootcfg_conf(){
-	local conf="$1/etc/calamares/modules/chrootcfg.conf"
+	local conf="$1/etc/calamares/modules/chrootcfg.conf" mode='"0o755"'
 	echo "---" > "$conf"
 	echo "directories:" >> "$conf"
 	echo "    - name: /etc" >> "$conf"
-	echo "      mode: 755" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/log" >> "$conf"
-	echo "      mode: 755" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
-	echo "      mode: 755" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/lib/pacman" >> "$conf"
-	echo "      mode: 755" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo '' >> "$conf"
 	echo "requirements:" >> "$conf"
 	echo "    - pacman" >> "$conf"
 	echo "    - ${kernel}" >> "$conf"
+	if [[ ${initsys} == 'openrc' ]]; then
+		echo "    - eudev-systemdcompat" >> "$conf"
+		echo "    - udev-openrc" >> "$conf"
+	fi
 	echo '' >> "$conf"
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
@@ -258,8 +260,10 @@ write_chrootcfg_conf(){
 
 write_netinstall_conf(){
 	local conf="$1/etc/calamares/modules/netinstall.conf"
+	local yaml="netinstall.yaml"
+	[[ ${initsys} == 'openrc' ]] && yaml="netinstall-${initsys}.yaml"
 	echo "---" > "$conf"
-	echo "groupsUrl: ${cal_netgroups}" >> "$conf"
+	echo "groupsUrl: ${cal_netgroups}/${yaml}" >> "$conf"
 }
 
 configure_calamares(){

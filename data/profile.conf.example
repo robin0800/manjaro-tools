@@ -41,7 +41,7 @@
 # cal_netinstall="false"
 
 # the default url for the netinstall.yaml
-# cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master/netinstall.yaml"
+# cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master"
 
 # configure calamares to use chrootcfg instead of unpackfs
 # cal_unpackfs="true"
