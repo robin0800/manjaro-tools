@@ -211,7 +211,11 @@ write_settings_conf(){
 	echo "  - hardwarecfg" >> "$conf"
 	echo "  - networkcfg" >> "$conf"
 	echo "  - hwclock" >> "$conf"
-	echo "  - services" >> "$conf"
+	if [[ ${initsys} == 'systemd' ]];then
+		echo "  - services" >> "$conf"
+	else
+		echo "  - servicescfg" >> "$conf"
+	fi
 	echo "  - grubcfg" >> "$conf"
 	echo "  - bootloader" >> "$conf"
 	echo "  - postcfg" >> "$conf"

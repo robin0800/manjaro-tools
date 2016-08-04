@@ -39,7 +39,6 @@ show_profile(){
 		msg2 "cal_unpackfs: %s" "${cal_unpackfs}"
 
 		msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
-		msg2 "efi_part_size: %s" "${efi_part_size}"
 
 		msg2 "hostname: %s" "${hostname}"
 		msg2 "username: %s" "${username}"

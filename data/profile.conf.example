@@ -34,9 +34,6 @@
 # possible values: grub;systemd-boot
 # efi_boot_loader="grub"
 
-# set uefi partition size
-# efi_part_size=31M
-
 # configure calamares for netinstall
 # cal_netinstall="false"
 
@@ -59,22 +56,22 @@
 # enable_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 # disable_openrc=()
 
-################# live-session #################
-
 # unset defaults to given value
 # hostname="manjaro"
-
-# unset defaults to given value
-# username="manjaro"
-
-# unset defaults to given value
-# password="manjaro"
 
 # the login shell
 # login_shell=/bin/bash
 
 # unset defaults to given values
 # addgroups="video,power,disk,storage,optical,network,lp,scanner,wheel"
+
+################# live-session #################
+
+# unset defaults to given value
+# username="manjaro"
+
+# unset defaults to given value
+# password="manjaro"
 
 # unset defaults to given values
 # names must match systemd service names

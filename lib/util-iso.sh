@@ -357,9 +357,9 @@ make_efi() {
 make_efiboot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [%s/iso/EFI]" "${iso_name}"
-		local path_iso="${work_dir}/iso"
+		local path_iso="${work_dir}/iso" size="31M"
 		mkdir -p ${path_iso}/EFI/miso
-		truncate -s ${efi_part_size} ${path_iso}/EFI/miso/${iso_name}.img
+		truncate -s ${size} ${path_iso}/EFI/miso/${iso_name}.img
 		mkfs.fat -n MISO_EFI ${path_iso}/EFI/miso/${iso_name}.img
 		mkdir -p ${work_dir}/efiboot
 		mount ${path_iso}/EFI/miso/${iso_name}.img ${work_dir}/efiboot
@@ -656,7 +656,6 @@ reset_profile(){
 	unset plymouth_boot
 	unset nonfree_xorg
 	unset efi_boot_loader
-	unset efi_part_size
 	unset hostname
 	unset username
 	unset plymouth_theme
