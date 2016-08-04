@@ -212,7 +212,6 @@ make_image_root() {
 
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		copy_overlay "${profile_dir}/root-overlay" "${path}"
-		configure_root_image "${path}"
 
 		reset_pac_conf "${path}"
 
@@ -235,7 +234,6 @@ make_image_custom() {
 		pacman -Qr "${path}" > "${path}/${profile}-image-pkgs.txt"
 		cp "${path}/${profile}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
 		[[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
-		configure_custom_image "${path}"
 
 		reset_pac_conf "${path}"
 

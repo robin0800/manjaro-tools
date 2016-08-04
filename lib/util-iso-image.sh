@@ -147,7 +147,8 @@ set_sddm_ck(){
 		name=${g##*/}
 		name=${name%%.*}
 		case ${name} in
-			'lightdm-deepin-greeter'|'lightdm-kde-greeter')
+			lightdm-gtk-greeter) break ;;
+			lightdm-*-greeter)
 				sed -i -e "s/^.*greeter-session=.*/greeter-session=${name}/" $1/etc/lightdm/lightdm.conf
 			;;
 		esac
@@ -280,11 +281,6 @@ configure_logind(){
 	local conf=$1/etc/systemd/logind.conf
 	sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
 	sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
-}
-
-configure_logind_live(){
-	msg2 "Configuring logind ..."
-	local conf=$1/etc/systemd/logind.conf
 	sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' "$conf"
 }
 
@@ -330,6 +326,9 @@ configure_services(){
 				set_xdm "$1"
 				add_svc_rc "$1" "xdm"
 			fi
+			for svc in ${enable_openrc_live[@]}; do
+				add_svc_rc "$1" "$svc"
+			done
 		;;
 		'systemd')
 			for svc in ${enable_systemd[@]}; do
@@ -338,52 +337,12 @@ configure_services(){
 			if [[ ${displaymanager} != "none" ]];then
 				add_svc_sd "$1" "$(get_svc_dm $1)"
 			fi
-		;;
-	esac
-	info "Done configuring [%s]" "${initsys}"
-}
-
-configure_services_live(){
-	info "Configuring [%s]" "${initsys}"
-	case ${initsys} in
-		'openrc')
-			for svc in ${enable_openrc_live[@]}; do
-				add_svc_rc "$1" "$svc"
-			done
-		;;
-		'systemd')
 			for svc in ${enable_systemd_live[@]}; do
 				add_svc_sd "$1" "$svc"
 			done
 		;;
 	esac
 	info "Done configuring [%s]" "${initsys}"
-}
-
-configure_root_image(){
-	msg "Configuring [root-image]"
-	configure_lsb "$1"
-	configure_mhwd "$1"
-
-	case ${initsys} in
-		'systemd')
-			configure_logind "$1"
-		;;
-		'openrc')
-			configure_sysctl "$1"
-			rm $1/etc/runlevels/boot/hwclock
-		;;
-	esac
-	msg "Done configuring [root-image]"
-}
-
-configure_custom_image(){
-	msg "Configuring [%s-image]" "${profile}"
-	configure_plymouth "$1"
-	[[ ${displaymanager} != 'none' ]] && configure_displaymanager "$1"
-	configure_services "$1"
-	configure_environment "$1"
-	msg "Done configuring [%s-image]" "${profile}"
 }
 
 write_live_session_conf(){
@@ -403,34 +362,47 @@ write_live_session_conf(){
 	echo "password=${password}" >> ${conf}
 }
 
+configure_hostname(){
+	msg2 "Configuring hostname ..."
+	case ${initsys} in
+		'systemd') echo ${hostname} > $1/etc/hostname ;;
+		'openrc') local hn='hostname="'${hostname}'"'; sed -i -e "s|^.*hostname=.*|${hn}|" $1/etc/conf.d/hostname ;;
+	esac
+}
+
+configure_system(){
+	case ${initsys} in
+		'systemd')
+			configure_journald "$1"
+			configure_logind "$1"
+
+			# Prevent some services to be started in the livecd
+			echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
+			| tee "${path}/etc/.updated" >"${path}/var/.updated"
+
+			msg2 "Disable systemd-gpt-auto-generator"
+			ln -sf /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
+		;;
+		'openrc')
+			configure_sysctl "$1"
+		;;
+	esac
+}
+
 configure_live_image(){
 	msg "Configuring [live-image]"
 	configure_hosts "$1"
 	configure_user "$1"
 	configure_accountsservice "$1" "${username}"
 	configure_pamac_live "$1"
-	case ${initsys} in
-		'systemd')
-			configure_logind_live "$1"
-			configure_journald "$1"
-
-			# Prevent some services to be started in the livecd
-			echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
-			| tee "${path}/etc/.updated" >"${path}/var/.updated"
-
-			msg2 "Configuring hostname ..."
-			echo ${hostname} > $1/etc/hostname
-
-			msg2 "Disable systemd-gpt-auto-generator"
-			ln -sf /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
-		;;
-		'openrc')
-			msg2 "Configuring hostname ..."
-			local _hostname='hostname="'${hostname}'"'
-			sed -i -e "s|^.*hostname=.*|${_hostname}|" $1/etc/conf.d/hostname
-		;;
-	esac
-	configure_services_live "$1"
+	configure_environment "$1"
+	configure_plymouth "$1"
+	configure_lsb "$1"
+	configure_mhwd "$1"
+	[[ ${displaymanager} != 'none' ]] && configure_displaymanager "$1"
+	configure_hostname "$1"
+	configure_system "$1"
+	configure_services "$1"
 	configure_calamares "$1"
 	write_live_session_conf "$1"
 	msg "Done configuring [live-image]"
