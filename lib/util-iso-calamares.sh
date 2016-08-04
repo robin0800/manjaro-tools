@@ -57,17 +57,19 @@ write_services_conf(){
 	echo '' >> "$conf"
 	if [[ ${initsys} == 'openrc' ]];then
 		echo 'services:' >> "$conf"
+		echo '    enabled:' >> "$conf"
 		for s in ${enable_openrc[@]};do
-			echo '    enabled:' >> "$conf"
-			echo '      - name: '"$s" >> "$conf"
+			echo "      - name: $s" >> "$conf"
 			echo '        runlevel: default' >> "$conf"
 		done
-		for s in ${disable_openrc[@]};do
+		if [[ -n ${disable_openrc[@]} ]];then
 			echo '    disabled:' >> "$conf"
-			echo '      - name: '"$s" >> "$conf"
-			echo '        runlevel: boot' >> "$conf"
-			echo '' >> "$conf"
-		done
+			for s in ${disable_openrc[@]};do
+				echo "      - name: $s" >> "$conf"
+				echo '        runlevel: default' >> "$conf"
+				echo '' >> "$conf"
+			done
+		fi
 	else
 		echo 'services:' > "$conf"
 		for s in ${enable_systemd[@]};do
