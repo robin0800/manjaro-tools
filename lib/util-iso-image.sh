@@ -135,45 +135,13 @@ configure_journald(){
 	sed -i 's/#\(Storage=\)auto/\1volatile/' "$conf"
 }
 
-configure_sysctl(){
-	msg2 "Configuring sysctl ..."
-	touch $1/etc/sysctl.conf
-	local conf=$1/etc/sysctl.d/100-manjaro.conf
-# 	echo '# Virtual memory setting (swap file or partition)' > ${conf}
-# 	echo 'vm.swappiness = 30' >> ${conf}
-	echo '# Enable the SysRq key' >> ${conf}
-	echo 'kernel.sysrq = 1' >> ${conf}
-}
-
-get_svc_dm(){
-	local service=${displaymanager}
-	if  [[ $service != "sddm" ]] || \
-		[[ $service != "lxdm" ]];then
-		if ${plymouth_boot}; then
-			local svc="systemd/system/$service-plymouth.service"
-			if [[ -f $1/etc/$svc ]] || \
-			[[ -f $1/usr/lib/$svc ]];then
-				service="$service-plymouth"
-			fi
-		fi
-	fi
-	echo $service
-}
-
 configure_services(){
 	info "Configuring [%s]" "${initsys}"
 	case ${initsys} in
 		'openrc')
 			for svc in ${enable_openrc[@]}; do
-
-				if [[ $svc == "xdm" ]];then
-					if [[ ${displaymanager} != "none" ]];then
-						set_xdm "$1"
-						add_svc_rc "$1" "xdm"
-					fi
-				else
-					add_svc_rc "$1" "$svc"
-				fi
+				[[ $svc == "xdm" ]] && set_xdm "$1"
+				add_svc_rc "$1" "$svc"
 			done
 			for svc in ${enable_openrc_live[@]}; do
 				add_svc_rc "$1" "$svc"
@@ -183,9 +151,6 @@ configure_services(){
 			for svc in ${enable_systemd[@]}; do
 				add_svc_sd "$1" "$svc"
 			done
-			if [[ ${displaymanager} != "none" ]];then
-				add_svc_sd "$1" "$(get_svc_dm $1)"
-			fi
 			for svc in ${enable_systemd_live[@]}; do
 				add_svc_sd "$1" "$svc"
 			done
@@ -278,7 +243,6 @@ configure_system(){
 			echo ${hostname} > $1/etc/hostname
 		;;
 		'openrc')
-			configure_sysctl "$1"
 			local hn='hostname="'${hostname}'"'
 			sed -i -e "s|^.*hostname=.*|${hn}|" $1/etc/conf.d/hostname
 		;;

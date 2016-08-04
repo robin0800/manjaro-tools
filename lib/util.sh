@@ -373,6 +373,15 @@ check_profile_vars(){
 	fi
 }
 
+get_svc(){
+	local service=${displaymanager}
+	if  [[ $service != "sddm" ]] || \
+		[[ $service != "lxdm" ]];then
+		${plymouth_boot} && service="$service-plymouth"
+	fi
+	echo $service
+}
+
 load_profile_config(){
 
 	[[ -f $1 ]] || return 1
@@ -429,6 +438,11 @@ load_profile_config(){
 
 	if [[ -z ${enable_openrc_live[@]} ]];then
 		enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+	fi
+
+	if [[ ${displaymanager} != "none" ]]; then
+		enable_openrc+=('xdm')
+		enable_systemd+=("$(get_svc)")
 	fi
 
 	[[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
