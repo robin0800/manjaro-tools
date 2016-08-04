@@ -77,6 +77,7 @@ LIBS_ISO = \
 
 SHARED_ISO = \
 	data/pacman-gfx.conf \
+	data/desktop.map \
 	data/profile.conf.example
 
 CPIOHOOKS = \

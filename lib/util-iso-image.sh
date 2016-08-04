@@ -190,6 +190,38 @@ configure_services(){
 	info "Done configuring [%s]" "${initsys}"
 }
 
+is_valid_de(){
+	if [[ ${default_desktop_executable} != "none" ]] && \
+	[[ ${default_desktop_file} != "none" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+load_desktop_map(){
+	local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g" \
+		file=${DATADIR}/desktop.map
+	local desktop_map=$(sed "$_com_rm" "$file" \
+			| sed "$_space" \
+			| sed "$_clean")
+        echo ${desktop_map}
+}
+
+detect_desktop_env(){
+	local xs=$1/usr/share/xsessions ex=$1/usr/bin key val map=( $(load_desktop_map) )
+	default_desktop_file="none"
+	default_desktop_executable="none"
+	for item in "${map[@]}";do
+		key=${item%:*}
+		val=${item#*:}
+		if [[ -f $xs/$key.desktop ]] && [[ -f $ex/$val ]];then
+			default_desktop_file="$key"
+			default_desktop_executable="$val"
+		fi
+	done
+}
+
 write_live_session_conf(){
 	msg2 "Configuring live session ..."
 	local path=$1${DATADIR}
@@ -214,6 +246,13 @@ write_live_session_conf(){
 	echo '' >> ${conf}
 	echo '# iso name' >> ${conf}
 	echo "iso_name=${iso_name}" >> ${conf}
+
+	echo '' >> ${conf}
+	echo '# default_desktop_file' >> ${conf}
+	echo "default_desktop_file=${default_desktop_file}" >> ${conf}
+	echo '' >> ${conf}
+	echo '# default_desktop_executable' >> ${conf}
+	echo "default_desktop_executable=${default_desktop_executable}" >> ${conf}
 }
 
 configure_hosts(){
@@ -245,6 +284,7 @@ configure_system(){
 
 configure_live_image(){
 	msg "Configuring [live-image]"
+	detect_desktop_env "$1"
 	configure_hosts "$1"
 	configure_plymouth "$1"
 	configure_lsb "$1"
