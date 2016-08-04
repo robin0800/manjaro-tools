@@ -413,24 +413,24 @@ load_profile_config(){
 		addgroups="video,power,disk,storage,optical,network,lp,scanner,wheel"
 	fi
 
-	if [[ -z ${start_systemd[@]} ]];then
-		start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+	if [[ -z ${enable_systemd[@]} ]];then
+		enable_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 	fi
 
 	[[ -z ${disable_systemd[@]} ]] && disable_systemd=('pacman-init')
 
-	if [[ -z ${start_openrc[@]} ]];then
-		start_openrc=('acpid' 'bluetooth' 'cgmanager' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+	if [[ -z ${enable_openrc[@]} ]];then
+		enable_openrc=('acpid' 'bluetooth' 'cgmanager' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 	fi
 
 	[[ -z ${disable_openrc[@]} ]] && disable_openrc=('pacman-init')
 
-	if [[ -z ${start_systemd_live[@]} ]];then
-		start_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+	if [[ -z ${enable_systemd_live[@]} ]];then
+		enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
 	fi
 
-	if [[ -z ${start_openrc_live[@]} ]];then
-		start_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+	if [[ -z ${enable_openrc_live[@]} ]];then
+		enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
 	fi
 
 	[[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'

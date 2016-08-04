@@ -51,11 +51,13 @@
 
 # unset defaults to given values
 # names must match systemd service names
-# start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+# enable_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+# disable_systemd=()
 
 # unset defaults to given values,
 # names must match openrc service names
-# start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+# enable_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+# disable_openrc=()
 
 ################# live-session #################
 
@@ -76,10 +78,10 @@
 
 # unset defaults to given values
 # names must match systemd service names
-# services in start_systemd array don't need to be listed here
-# start_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+# services in enable_systemd array don't need to be listed here
+# enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
 
 # unset defaults to given values,
 # names must match openrc service names
-# services in start_openrc array don't need to be listed here
-# start_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+# services in enable_openrc array don't need to be listed here
+# enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')

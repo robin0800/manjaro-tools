@@ -664,12 +664,12 @@ reset_profile(){
 	unset plymouth_theme
 	unset password
 	unset addgroups
-	unset start_systemd
+	unset enable_systemd
 	unset disable_systemd
-	unset start_openrc
+	unset enable_openrc
 	unset disable_openrc
-	unset start_systemd_live
-	unset start_openrc_live
+	unset enable_systemd_live
+	unset enable_openrc_live
 	unset packages_custom
 	unset packages_mhwd
 	unset login_shell

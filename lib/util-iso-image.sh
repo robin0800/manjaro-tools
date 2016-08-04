@@ -323,7 +323,7 @@ configure_services(){
 	info "Configuring [%s]" "${initsys}"
 	case ${initsys} in
 		'openrc')
-			for svc in ${start_openrc[@]}; do
+			for svc in ${enable_openrc[@]}; do
 				add_svc_rc "$1" "$svc"
 			done
 			if [[ ${displaymanager} != "none" ]];then
@@ -332,7 +332,7 @@ configure_services(){
 			fi
 		;;
 		'systemd')
-			for svc in ${start_systemd[@]}; do
+			for svc in ${enable_systemd[@]}; do
 				add_svc_sd "$1" "$svc"
 			done
 			if [[ ${displaymanager} != "none" ]];then
@@ -347,12 +347,12 @@ configure_services_live(){
 	info "Configuring [%s]" "${initsys}"
 	case ${initsys} in
 		'openrc')
-			for svc in ${start_openrc_live[@]}; do
+			for svc in ${enable_openrc_live[@]}; do
 				add_svc_rc "$1" "$svc"
 			done
 		;;
 		'systemd')
-			for svc in ${start_systemd_live[@]}; do
+			for svc in ${enable_systemd_live[@]}; do
 				add_svc_sd "$1" "$svc"
 			done
 		;;

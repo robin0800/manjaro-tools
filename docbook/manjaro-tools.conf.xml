@@ -266,8 +266,8 @@
 			<listitem><para>Takes <option>systemd</option> (the default)
 			or <option>openrc</option>. Selecting and option will change
 			how the hostname, the displaymanager and services will be configured.
-			For services also controls if buildiso will use start_systemd and
-			start_systemd_live or start_openrc and start_openrc_live to determine
+			For services also controls if buildiso will use enable_systemd and
+			enable_systemd_live or enable_openrc and enable_openrc_live to determine
 			the default services that will be enabled automatically.
 			</para></listitem>
 		</varlistentry>
