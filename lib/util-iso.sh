@@ -180,7 +180,7 @@ make_checksum(){
 gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
-	If ! ${cal_netinstall};then
+	if ! ${cal_netinstall};then
 		[[ -n ${profile} ]] && vars+=("${profile}")
 	else
 		if ${cal_unpackfs};then
