@@ -165,12 +165,16 @@ configure_services(){
 	case ${initsys} in
 		'openrc')
 			for svc in ${enable_openrc[@]}; do
-				add_svc_rc "$1" "$svc"
+
+				if [[ $svc == "xdm" ]];then
+					if [[ ${displaymanager} != "none" ]];then
+						set_xdm "$1"
+						add_svc_rc "$1" "xdm"
+					fi
+				else
+					add_svc_rc "$1" "$svc"
+				fi
 			done
-			if [[ ${displaymanager} != "none" ]];then
-				set_xdm "$1"
-				add_svc_rc "$1" "xdm"
-			fi
 			for svc in ${enable_openrc_live[@]}; do
 				add_svc_rc "$1" "$svc"
 			done

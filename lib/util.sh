@@ -421,7 +421,7 @@ load_profile_config(){
 		enable_openrc=('acpid' 'bluetooth' 'cgmanager' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 	fi
 
-	[[ -z ${disable_openrc[@]} ]] && disable_openrc=('pacman-init')
+	[[ -z ${disable_openrc[@]} ]] && disable_openrc=()
 
 	if [[ -z ${enable_systemd_live[@]} ]];then
 		enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
