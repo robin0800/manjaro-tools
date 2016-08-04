@@ -170,20 +170,23 @@ make_iso() {
 
 # $1: file
 make_checksum(){
-	cd ${iso_dir}
-		msg "Creating [%s] sum ..." "${iso_checksum}"
-		local cs=$(${iso_checksum}sum $1)
-		msg2 "%s sum: %s" "${iso_checksum}" "${cs}"
-		echo "${cs}" > $1.${iso_checksum}
-		msg "Done [%s] sum" "${iso_checksum}"
-	cd ..
+	msg "Creating [%s] sum ..." "${iso_checksum}"
+	local cs=$(${iso_checksum}sum ${iso_dir}/$1)
+	msg2 "%s sum: %s" "${iso_checksum}" "${cs}"
+	echo "${cs}" > ${iso_dir}/$1.${iso_checksum}
+	msg "Done [%s] sum" "${iso_checksum}"
 }
 
 gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
-	[[ -n ${profile} ]] && vars+=("${profile}")
-# 	[[ ${edition} == 'community' ]] && vars+=("${edition}")
+	If ! ${cal_netinstall};then
+		[[ -n ${profile} ]] && vars+=("${profile}")
+	else
+		if ${cal_unpackfs};then
+			[[ -n ${profile} ]] && vars+=("${profile}")
+		fi
+	fi
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
 	vars+=("${target_branch}")
