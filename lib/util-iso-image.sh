@@ -242,11 +242,10 @@ write_live_session_conf(){
 	echo "password=${password}" >> ${conf}
 	echo '' >> ${conf}
 	echo '# live group membership' >> ${conf}
-	echo "addgroups=${addgroups}" >> ${conf}
+	echo "addgroups='${addgroups}'" >> ${conf}
 	echo '' >> ${conf}
 	echo '# iso name' >> ${conf}
 	echo "iso_name=${iso_name}" >> ${conf}
-
 	echo '' >> ${conf}
 	echo '# default_desktop_file' >> ${conf}
 	echo "default_desktop_file=${default_desktop_file}" >> ${conf}
