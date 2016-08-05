@@ -168,7 +168,9 @@ write_welcome_conf(){
 	echo "  - storage" >> "$conf"
 	echo "  - ram" >> "$conf"
 	echo "  - root" >> "$conf"
-	${cal_netinstall} && echo "  - internet" >> "$conf"
+	if ${cal_netinstall};
+		echo "  - internet" >> "$conf"
+	fi
 }
 
 write_settings_conf(){
@@ -310,6 +312,8 @@ configure_calamares(){
 	write_packages_conf "$1"
 
 	write_bootloader_conf "$1"
+
+	write_mhwdcfg_conf "$1"
 
 	write_unpack_conf "$1"
 
