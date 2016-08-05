@@ -260,16 +260,6 @@ write_mhwdcfg_conf(){
 	fi
 	echo '' >> "$conf"
 	echo "repo_conf: /opt/live/pacman-gfx.conf" >> "$conf"
-
-	if ${cal_netinstall};then
-		if ${cal_unpackfs};then
-			echo "local_repo: true" >> "$conf"
-		else
-			echo "local_repo: false" >> "$conf"
-		fi
-	else
-		echo "local_repo: true" >> "$conf"
-	fi
 }
 
 write_chrootcfg_conf(){
