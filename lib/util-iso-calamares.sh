@@ -168,7 +168,7 @@ write_welcome_conf(){
 	echo "  - storage" >> "$conf"
 	echo "  - ram" >> "$conf"
 	echo "  - root" >> "$conf"
-	if ${cal_netinstall};
+	if ${cal_netinstall};then
 		echo "  - internet" >> "$conf"
 	fi
 }
