@@ -172,7 +172,7 @@ make_iso() {
 make_checksum(){
 	msg "Creating [%s] sum ..." "${iso_checksum}"
 	local cs=$(${iso_checksum}sum ${iso_dir}/$1)
-	msg2 "%s sum: %s" "${iso_checksum}" "${cs}"
+	msg2 "%s sum: %s" "${iso_checksum}" "${cs##*/}"
 	echo "${cs}" > ${iso_dir}/$1.${iso_checksum}
 	msg "Done [%s] sum" "${iso_checksum}"
 }

@@ -52,10 +52,10 @@ write_bootloader_conf(){
 }
 
 write_services_conf(){
-	local conf="$1/etc/calamares/modules/services.conf"
-	echo '---' >  "$conf"
-	echo '' >> "$conf"
 	if [[ ${initsys} == 'openrc' ]];then
+		local conf="$1/etc/calamares/modules/servicescfg.conf"
+		echo '---' >  "$conf"
+		echo '' >> "$conf"
 		echo 'services:' >> "$conf"
 		echo '    enabled:' >> "$conf"
 		for s in ${enable_openrc[@]};do
@@ -71,6 +71,9 @@ write_services_conf(){
 			done
 		fi
 	else
+		local conf="$1/etc/calamares/modules/services.conf"
+		echo '---' >  "$conf"
+		echo '' >> "$conf"
 		echo 'services:' > "$conf"
 		for s in ${enable_systemd[@]};do
 			echo '    - name: '"$s" >> "$conf"
@@ -210,7 +213,7 @@ write_settings_conf(){
 	echo "  - initcpio" >> "$conf"
 	echo "  - users" >> "$conf"
 	echo "  - displaymanager" >> "$conf"
-	echo "  - hardwarecfg" >> "$conf"
+	echo "  - mhwdcfg" >> "$conf"
 	echo "  - networkcfg" >> "$conf"
 	echo "  - hwclock" >> "$conf"
 	if [[ ${initsys} == 'systemd' ]];then
@@ -230,6 +233,43 @@ write_settings_conf(){
 	echo "prompt-install: false" >> "$conf"
 	echo '' >> "$conf"
 	echo "dont-chroot: false" >> "$conf"
+}
+
+write_mhwdcfg_conf(){
+	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
+	echo "---" > "$conf"
+	echo "bus_types:" >> "$conf"
+	echo "    - pci" >> "$conf"
+	echo "    - usb" >> "$conf"
+	echo '' >> "$conf"
+	echo "identifiers:" >> "$conf"
+	echo "    net:" >> "$conf"
+	echo "      - '0200'" >> "$conf"
+	echo "      - '0280'" >> "$conf"
+	echo "    vid:" >> "$conf"
+	echo "      - '0300'" >> "$conf"
+	echo '' >> "$conf"
+	if ${cal_netinstall};then
+		if ${cal_unpackfs};then
+			echo "local_repo: true" >> "$conf"
+		else
+			echo "local_repo: false" >> "$conf"
+		fi
+	else
+		echo "local_repo: true" >> "$conf"
+	fi
+	echo '' >> "$conf"
+	echo "repo_conf: /opt/live/pacman-gfx.conf" >> "$conf"
+
+	if ${cal_netinstall};then
+		if ${cal_unpackfs};then
+			echo "local_repo: true" >> "$conf"
+		else
+			echo "local_repo: false" >> "$conf"
+		fi
+	else
+		echo "local_repo: true" >> "$conf"
+	fi
 }
 
 write_chrootcfg_conf(){
