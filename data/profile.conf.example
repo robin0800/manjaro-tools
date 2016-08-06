@@ -34,14 +34,11 @@
 # possible values: grub;systemd-boot
 # efi_boot_loader="grub"
 
-# set uefi partition size
-# efi_part_size=31M
-
 # configure calamares for netinstall
 # cal_netinstall="false"
 
 # the default url for the netinstall.yaml
-# cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master/netinstall.yaml"
+# cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master"
 
 # configure calamares to use chrootcfg instead of unpackfs
 # cal_unpackfs="true"
@@ -51,22 +48,16 @@
 
 # unset defaults to given values
 # names must match systemd service names
-# start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+# enable_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+# disable_systemd=()
 
 # unset defaults to given values,
 # names must match openrc service names
-# start_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
-
-################# live-session #################
+# enable_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+# disable_openrc=()
 
 # unset defaults to given value
 # hostname="manjaro"
-
-# unset defaults to given value
-# username="manjaro"
-
-# unset defaults to given value
-# password="manjaro"
 
 # the login shell
 # login_shell=/bin/bash
@@ -74,12 +65,20 @@
 # unset defaults to given values
 # addgroups="video,power,disk,storage,optical,network,lp,scanner,wheel"
 
+################# live-session #################
+
+# unset defaults to given value
+# username="manjaro"
+
+# unset defaults to given value
+# password="manjaro"
+
 # unset defaults to given values
 # names must match systemd service names
-# services in start_systemd array don't need to be listed here
-# start_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+# services in enable_systemd array don't need to be listed here
+# enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
 
 # unset defaults to given values,
 # names must match openrc service names
-# services in start_openrc array don't need to be listed here
-# start_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+# services in enable_openrc array don't need to be listed here
+# enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')

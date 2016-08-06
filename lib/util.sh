@@ -373,6 +373,15 @@ check_profile_vars(){
 	fi
 }
 
+get_svc(){
+	local service=${displaymanager}
+	if  [[ $service != "sddm" ]] || \
+		[[ $service != "lxdm" ]];then
+		${plymouth_boot} && service="$service-plymouth"
+	fi
+	echo $service
+}
+
 load_profile_config(){
 
 	[[ -f $1 ]] || return 1
@@ -397,8 +406,6 @@ load_profile_config(){
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
-	[[ -z ${efi_part_size} ]] && efi_part_size="31M"
-
 	[[ -z ${hostname} ]] && hostname="manjaro"
 
 	[[ -z ${username} ]] && username="manjaro"
@@ -413,24 +420,29 @@ load_profile_config(){
 		addgroups="video,power,disk,storage,optical,network,lp,scanner,wheel"
 	fi
 
-	if [[ -z ${start_systemd[@]} ]];then
-		start_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+	if [[ -z ${enable_systemd[@]} ]];then
+		enable_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
 	fi
 
 	[[ -z ${disable_systemd[@]} ]] && disable_systemd=('pacman-init')
 
-	if [[ -z ${start_openrc[@]} ]];then
-		start_openrc=('acpid' 'bluetooth' 'cgmanager' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+	if [[ -z ${enable_openrc[@]} ]];then
+		enable_openrc=('acpid' 'bluetooth' 'cgmanager' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 	fi
 
-	[[ -z ${disable_openrc[@]} ]] && disable_openrc=('pacman-init')
+	[[ -z ${disable_openrc[@]} ]] && disable_openrc=()
 
-	if [[ -z ${start_systemd_live[@]} ]];then
-		start_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+	if [[ -z ${enable_systemd_live[@]} ]];then
+		enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
 	fi
 
-	if [[ -z ${start_openrc_live[@]} ]];then
-		start_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+	if [[ -z ${enable_openrc_live[@]} ]];then
+		enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+	fi
+
+	if [[ ${displaymanager} != "none" ]]; then
+		enable_openrc+=('xdm')
+		enable_systemd+=("$(get_svc)")
 	fi
 
 	[[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
@@ -441,7 +453,7 @@ load_profile_config(){
 
 	[[ -z ${cal_unpackfs} ]] && cal_unpackfs='true'
 
-	[[ -z ${cal_netgroups} ]] && cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master/netinstall.yaml"
+	[[ -z ${cal_netgroups} ]] && cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master"
 
 	check_profile_vars
 

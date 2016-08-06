@@ -165,16 +165,6 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>efi_part_size=</varname></term>
-
-				<listitem><para>Size in MiB of the fat partition where
-				the kernel is. This is useful if you add extra hooks
-				in the mkinitcpio.conf and it's to big to fit in the
-				partition. The default is "32M".
-				</para></listitem>
-			</varlistentry>
-
-			<varlistentry>
 				<term><varname>plymouth_theme=</varname></term>
 
 				<listitem><para>Takes the name of the plymouth
@@ -184,7 +174,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>start_systemd=</varname></term>
+				<term><varname>enable_systemd=</varname></term>
 
 				<listitem><para>Array of services that will be
 				enabled in systemd systems. It has to match
@@ -193,7 +183,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>start_openrc=</varname></term>
+				<term><varname>enable_openrc=</varname></term>
 
 				<listitem><para>Array of services that will be
 				enabled in openrc systems.
@@ -241,7 +231,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>start_systemd_live=</varname></term>
+				<term><varname>enable_systemd_live=</varname></term>
 
 				<listitem><para>Array of services that will be
 				enabled in the systemd live-cd. It has to match
@@ -250,7 +240,7 @@
 			</varlistentry>
 
 			<varlistentry>
-			<term><varname>start_openrc_live=</varname></term>
+			<term><varname>enable_openrc_live=</varname></term>
 
 			<listitem><para>Array of services that will be
 			enabled in the openrc live-cd.

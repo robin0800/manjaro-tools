@@ -52,29 +52,30 @@ write_bootloader_conf(){
 }
 
 write_services_conf(){
-	local conf="$1/etc/calamares/modules/services.conf"
-	echo '---' >  "$conf"
-	echo '' >> "$conf"
 	if [[ ${initsys} == 'openrc' ]];then
-		echo 'services:' >> "$conf"
-		for s in ${start_openrc[@]};do
-			echo '   - name: '"$s" >> "$conf"
-			echo '     mandatory: false' >> "$conf"
-			echo '' >> "$conf"
-		done
-		echo 'targets:' >> "$conf"
-		echo '    - name: "graphical"' >> "$conf"
-		echo '      mandatory: false' >> "$conf"
+		local conf="$1/etc/calamares/modules/servicescfg.conf"
+		echo '---' >  "$conf"
 		echo '' >> "$conf"
-		echo 'disable:' >> "$conf"
-		for s in ${disable_openrc[@]};do
-			echo '   - name: '"$s" >> "$conf"
-			echo '     mandatory: false' >> "$conf"
-			echo '' >> "$conf"
+		echo 'services:' >> "$conf"
+		echo '    enabled:' >> "$conf"
+		for s in ${enable_openrc[@]};do
+			echo "      - name: $s" >> "$conf"
+			echo '        runlevel: default' >> "$conf"
 		done
+		if [[ -n ${disable_openrc[@]} ]];then
+			echo '    disabled:' >> "$conf"
+			for s in ${disable_openrc[@]};do
+				echo "      - name: $s" >> "$conf"
+				echo '        runlevel: default' >> "$conf"
+				echo '' >> "$conf"
+			done
+		fi
 	else
+		local conf="$1/etc/calamares/modules/services.conf"
+		echo '---' >  "$conf"
+		echo '' >> "$conf"
 		echo 'services:' > "$conf"
-		for s in ${start_systemd[@]};do
+		for s in ${enable_systemd[@]};do
 			echo '    - name: '"$s" >> "$conf"
 			echo '      mandatory: false' >> "$conf"
 			echo '' >> "$conf"
@@ -119,7 +120,7 @@ write_unpack_conf(){
 	echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
-	if [[ -f /bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs ]];then
+	if ! ${cal_netinstall};then
 		echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
 		echo "        sourcefs: \"squashfs\"" >> "$conf"
 		echo "        destination: \"\"" >> "$conf"
@@ -167,7 +168,9 @@ write_welcome_conf(){
 	echo "  - storage" >> "$conf"
 	echo "  - ram" >> "$conf"
 	echo "  - root" >> "$conf"
-	${cal_netinstall} && echo "  - internet" >> "$conf"
+	if ${cal_netinstall};then
+		echo "  - internet" >> "$conf"
+	fi
 }
 
 write_settings_conf(){
@@ -195,8 +198,6 @@ write_settings_conf(){
 			echo "  - networkcfg" >> "$conf"
 			echo "  - packages" >> "$conf"
 		else
-			# take out networkcfg once a new PR has been merged
-			echo "  - networkcfg" >> "$conf"
 			echo "  - chrootcfg" >> "$conf"
 		fi
 	else
@@ -214,10 +215,14 @@ write_settings_conf(){
 	echo "  - initcpio" >> "$conf"
 	echo "  - users" >> "$conf"
 	echo "  - displaymanager" >> "$conf"
-	echo "  - hardwarecfg" >> "$conf"
+	echo "  - mhwdcfg" >> "$conf"
 	echo "  - networkcfg" >> "$conf"
 	echo "  - hwclock" >> "$conf"
-	echo "  - services" >> "$conf"
+	if [[ ${initsys} == 'systemd' ]];then
+		echo "  - services" >> "$conf"
+	else
+		echo "  - servicescfg" >> "$conf"
+	fi
 	echo "  - grubcfg" >> "$conf"
 	echo "  - bootloader" >> "$conf"
 	echo "  - postcfg" >> "$conf"
@@ -232,22 +237,53 @@ write_settings_conf(){
 	echo "dont-chroot: false" >> "$conf"
 }
 
+write_mhwdcfg_conf(){
+	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
+	echo "---" > "$conf"
+	echo "bus_types:" >> "$conf"
+	echo "    - pci" >> "$conf"
+	echo "    - usb" >> "$conf"
+	echo '' >> "$conf"
+	echo "identifiers:" >> "$conf"
+	echo "    net:" >> "$conf"
+	echo "      - '0200'" >> "$conf"
+	echo "      - '0280'" >> "$conf"
+	echo "    vid:" >> "$conf"
+	echo "      - '0300'" >> "$conf"
+	echo '' >> "$conf"
+	if ${cal_netinstall};then
+		if ${cal_unpackfs};then
+			echo "local_repo: true" >> "$conf"
+		else
+			echo "local_repo: false" >> "$conf"
+		fi
+	else
+		echo "local_repo: true" >> "$conf"
+	fi
+	echo '' >> "$conf"
+	echo "repo_conf: /opt/live/pacman-gfx.conf" >> "$conf"
+}
+
 write_chrootcfg_conf(){
-	local conf="$1/etc/calamares/modules/chrootcfg.conf"
+	local conf="$1/etc/calamares/modules/chrootcfg.conf" mode='"0o755"'
 	echo "---" > "$conf"
 	echo "directories:" >> "$conf"
 	echo "    - name: /etc" >> "$conf"
-	echo "      mode: 755" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/log" >> "$conf"
-	echo "      mode: 755" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
-	echo "      mode: 755" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/lib/pacman" >> "$conf"
-	echo "      mode: 755" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo '' >> "$conf"
 	echo "requirements:" >> "$conf"
 	echo "    - pacman" >> "$conf"
 	echo "    - ${kernel}" >> "$conf"
+	if [[ ${initsys} == 'openrc' ]]; then
+		echo "    - eudev-systemdcompat" >> "$conf"
+		echo "    - udev-openrc" >> "$conf"
+	fi
 	echo '' >> "$conf"
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
@@ -258,8 +294,10 @@ write_chrootcfg_conf(){
 
 write_netinstall_conf(){
 	local conf="$1/etc/calamares/modules/netinstall.conf"
+	local yaml="netinstall.yaml"
+	[[ ${initsys} == 'openrc' ]] && yaml="netinstall-${initsys}.yaml"
 	echo "---" > "$conf"
-	echo "groupsUrl: ${cal_netgroups}" >> "$conf"
+	echo "groupsUrl: ${cal_netgroups}/${yaml}" >> "$conf"
 }
 
 configure_calamares(){
@@ -274,6 +312,8 @@ configure_calamares(){
 	write_packages_conf "$1"
 
 	write_bootloader_conf "$1"
+
+	write_mhwdcfg_conf "$1"
 
 	write_unpack_conf "$1"
 

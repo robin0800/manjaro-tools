@@ -170,20 +170,23 @@ make_iso() {
 
 # $1: file
 make_checksum(){
-	cd ${iso_dir}
-		msg "Creating [%s] sum ..." "${iso_checksum}"
-		local cs=$(${iso_checksum}sum $1)
-		msg2 "%s sum: %s" "${iso_checksum}" "${cs}"
-		echo "${cs}" > $1.${iso_checksum}
-		msg "Done [%s] sum" "${iso_checksum}"
-	cd ..
+	msg "Creating [%s] sum ..." "${iso_checksum}"
+	local cs=$(${iso_checksum}sum ${iso_dir}/$1)
+	msg2 "%s sum: %s" "${iso_checksum}" "${cs##*/}"
+	echo "${cs}" > ${iso_dir}/$1.${iso_checksum}
+	msg "Done [%s] sum" "${iso_checksum}"
 }
 
 gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
-	[[ -n ${profile} ]] && vars+=("${profile}")
-# 	[[ ${edition} == 'community' ]] && vars+=("${edition}")
+	if ! ${cal_netinstall};then
+		[[ -n ${profile} ]] && vars+=("${profile}")
+	else
+		if ${cal_unpackfs};then
+			[[ -n ${profile} ]] && vars+=("${profile}")
+		fi
+	fi
 	[[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
 	vars+=("${dist_release}")
 	vars+=("${target_branch}")
@@ -212,7 +215,6 @@ make_image_root() {
 
 		pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
 		copy_overlay "${profile_dir}/root-overlay" "${path}"
-		configure_root_image "${path}"
 
 		reset_pac_conf "${path}"
 
@@ -235,7 +237,6 @@ make_image_custom() {
 		pacman -Qr "${path}" > "${path}/${profile}-image-pkgs.txt"
 		cp "${path}/${profile}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
 		[[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
-		configure_custom_image "${path}"
 
 		reset_pac_conf "${path}"
 
@@ -359,9 +360,9 @@ make_efi() {
 make_efiboot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [%s/iso/EFI]" "${iso_name}"
-		local path_iso="${work_dir}/iso"
+		local path_iso="${work_dir}/iso" size="31M"
 		mkdir -p ${path_iso}/EFI/miso
-		truncate -s ${efi_part_size} ${path_iso}/EFI/miso/${iso_name}.img
+		truncate -s ${size} ${path_iso}/EFI/miso/${iso_name}.img
 		mkfs.fat -n MISO_EFI ${path_iso}/EFI/miso/${iso_name}.img
 		mkdir -p ${work_dir}/efiboot
 		mount ${path_iso}/EFI/miso/${iso_name}.img ${work_dir}/efiboot
@@ -658,18 +659,17 @@ reset_profile(){
 	unset plymouth_boot
 	unset nonfree_xorg
 	unset efi_boot_loader
-	unset efi_part_size
 	unset hostname
 	unset username
 	unset plymouth_theme
 	unset password
 	unset addgroups
-	unset start_systemd
+	unset enable_systemd
 	unset disable_systemd
-	unset start_openrc
+	unset enable_openrc
 	unset disable_openrc
-	unset start_systemd_live
-	unset start_openrc_live
+	unset enable_systemd_live
+	unset enable_openrc_live
 	unset packages_custom
 	unset packages_mhwd
 	unset login_shell
