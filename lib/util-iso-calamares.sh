@@ -208,7 +208,7 @@ write_settings_conf(){
 	echo "  - fstab" >> "$conf"
 	echo "  - locale" >> "$conf"
 	echo "  - keyboard" >> "$conf"
-	echo "  - localegen" >> "$conf"
+	echo "  - localecfg" >> "$conf"
 	echo "  - luksopenswaphookcfg" >> "$conf"
 	echo "  - luksbootkeyfile" >> "$conf"
 	echo "  - initcpiocfg" >> "$conf"
