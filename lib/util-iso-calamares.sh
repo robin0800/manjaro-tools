@@ -267,29 +267,15 @@ write_mhwdcfg_conf(){
 write_chrootcfg_conf(){
 	local conf="$1/etc/calamares/modules/chrootcfg.conf" mode='"0o755"'
 	echo "---" > "$conf"
-	echo "directories:" >> "$conf"
-	echo "    - name: /etc" >> "$conf"
-	echo "      mode: ${mode}" >> "$conf"
-	echo "    - name: /var/log" >> "$conf"
-	echo "      mode: ${mode}" >> "$conf"
+	echo "requirements:" >> "$conf"
 	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
 	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/lib/pacman" >> "$conf"
 	echo "      mode: ${mode}" >> "$conf"
 	echo '' >> "$conf"
-	echo "requirements:" >> "$conf"
-	echo "    - pacman" >> "$conf"
-	echo "    - ${kernel}" >> "$conf"
-	if [[ ${initsys} == 'openrc' ]]; then
-		echo "    - eudev-systemdcompat" >> "$conf"
-		echo "    - udev-openrc" >> "$conf"
-	fi
-	echo '' >> "$conf"
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
 	echo "    - manjaro" >> "$conf"
-	echo '' >> "$conf"
-	echo "branch: ${target_branch}" >> "$conf"
 }
 
 write_netinstall_conf(){
