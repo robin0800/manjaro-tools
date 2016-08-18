@@ -248,7 +248,7 @@ write_mhwdcfg_conf(){
 	echo "    net:" >> "$conf"
 	echo "      - 200" >> "$conf"
 	echo "      - 280" >> "$conf"
-	echo "    vid:" >> "$conf"
+	echo "    video:" >> "$conf"
 	echo "      - 300" >> "$conf"
 	echo '' >> "$conf"
 	if ${nonfree_xorg};then
@@ -259,15 +259,15 @@ write_mhwdcfg_conf(){
 	echo '' >> "$conf"
 	if ${cal_netinstall};then
 		if ${cal_unpackfs};then
-			echo "local_repo: true" >> "$conf"
+			echo "local: true" >> "$conf"
 		else
-			echo "local_repo: false" >> "$conf"
+			echo "local: false" >> "$conf"
 		fi
 	else
-		echo "local_repo: true" >> "$conf"
+		echo "local: true" >> "$conf"
 	fi
 	echo '' >> "$conf"
-	echo "repo_conf: /opt/live/pacman-gfx.conf" >> "$conf"
+	echo "repo: /opt/live/pacman-gfx.conf" >> "$conf"
 }
 
 write_chrootcfg_conf(){
