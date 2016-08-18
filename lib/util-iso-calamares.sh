@@ -208,7 +208,7 @@ write_settings_conf(){
 	echo "  - fstab" >> "$conf"
 	echo "  - locale" >> "$conf"
 	echo "  - keyboard" >> "$conf"
-	echo "  - localegen" >> "$conf"
+	echo "  - localecfg" >> "$conf"
 	echo "  - luksopenswaphookcfg" >> "$conf"
 	echo "  - luksbootkeyfile" >> "$conf"
 	echo "  - initcpiocfg" >> "$conf"
@@ -240,56 +240,46 @@ write_settings_conf(){
 write_mhwdcfg_conf(){
 	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
 	echo "---" > "$conf"
-	echo "bus_types:" >> "$conf"
+	echo "bus:" >> "$conf"
 	echo "    - pci" >> "$conf"
 	echo "    - usb" >> "$conf"
 	echo '' >> "$conf"
-	echo "identifiers:" >> "$conf"
+	echo "identifier:" >> "$conf"
 	echo "    net:" >> "$conf"
-	echo "      - '0200'" >> "$conf"
-	echo "      - '0280'" >> "$conf"
-	echo "    vid:" >> "$conf"
-	echo "      - '0300'" >> "$conf"
+	echo "      - 200" >> "$conf"
+	echo "      - 280" >> "$conf"
+	echo "    video:" >> "$conf"
+	echo "      - 300" >> "$conf"
+	echo '' >> "$conf"
+	if ${nonfree_xorg};then
+		echo "driver: nonfree" >> "$conf"
+	else
+		echo "driver: free" >> "$conf"
+	fi
 	echo '' >> "$conf"
 	if ${cal_netinstall};then
 		if ${cal_unpackfs};then
-			echo "local_repo: true" >> "$conf"
+			echo "local: true" >> "$conf"
 		else
-			echo "local_repo: false" >> "$conf"
+			echo "local: false" >> "$conf"
 		fi
 	else
-		echo "local_repo: true" >> "$conf"
+		echo "local: true" >> "$conf"
 	fi
-	echo '' >> "$conf"
-	echo "repo_conf: /opt/live/pacman-gfx.conf" >> "$conf"
 }
 
 write_chrootcfg_conf(){
 	local conf="$1/etc/calamares/modules/chrootcfg.conf" mode='"0o755"'
 	echo "---" > "$conf"
-	echo "directories:" >> "$conf"
-	echo "    - name: /etc" >> "$conf"
-	echo "      mode: ${mode}" >> "$conf"
-	echo "    - name: /var/log" >> "$conf"
-	echo "      mode: ${mode}" >> "$conf"
+	echo "requirements:" >> "$conf"
 	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
 	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/lib/pacman" >> "$conf"
 	echo "      mode: ${mode}" >> "$conf"
 	echo '' >> "$conf"
-	echo "requirements:" >> "$conf"
-	echo "    - pacman" >> "$conf"
-	echo "    - ${kernel}" >> "$conf"
-	if [[ ${initsys} == 'openrc' ]]; then
-		echo "    - eudev-systemdcompat" >> "$conf"
-		echo "    - udev-openrc" >> "$conf"
-	fi
-	echo '' >> "$conf"
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
 	echo "    - manjaro" >> "$conf"
-	echo '' >> "$conf"
-	echo "branch: ${target_branch}" >> "$conf"
 }
 
 write_netinstall_conf(){

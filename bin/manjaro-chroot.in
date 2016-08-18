@@ -27,7 +27,7 @@ display_settings(){
 
 	msg "ARGS:"
 	msg2 "automount: %s" "${automount}"
-	msg2 "run_args: %s" "${run_args}"
+	msg2 "run_args: %s" "${run_args[*]}"
 
 	msg "PATHS:"
 	msg2 "chrootdir: %s" "${chrootdir}"
@@ -81,7 +81,7 @@ if ${automount};then
 else
 	chrootdir=$1
 	shift
-	run_args=$@
+	run_args="$@"
 
 	[[ -d ${chrootdir} ]] || die "Can't create chroot on non-directory %s" "${chrootdir}"
 
@@ -91,4 +91,4 @@ else
 	chroot_mount /etc/resolv.conf "${chrootdir}/etc/resolv.conf" --bind
 fi
 
-SHELL=/bin/sh unshare --fork --pid chroot "${chrootdir}" "${run_args}"
+SHELL=/bin/sh unshare --fork --pid chroot "${chrootdir}" ${run_args[*]}

@@ -321,10 +321,10 @@ clean_up_image(){
 		if [[ -d "$path" ]]; then
 			find "$path" -name 'initramfs*.img' -delete &> /dev/null
 		fi
-		path=$1/var/lib/pacman/sync
-		if [[ -d $path ]];then
-			find "$path" -type f -delete &> /dev/null
-		fi
+# 		path=$1/var/lib/pacman/sync
+# 		if [[ -d $path ]];then
+# 			find "$path" -type f -delete &> /dev/null
+# 		fi
 		path=$1/var/cache/pacman/pkg
 		if [[ -d $path ]]; then
 			find "$path" -type f -delete &> /dev/null
