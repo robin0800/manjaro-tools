@@ -266,8 +266,6 @@ write_mhwdcfg_conf(){
 	else
 		echo "local: true" >> "$conf"
 	fi
-	echo '' >> "$conf"
-	echo "repo: /opt/live/pacman-gfx.conf" >> "$conf"
 }
 
 write_chrootcfg_conf(){
