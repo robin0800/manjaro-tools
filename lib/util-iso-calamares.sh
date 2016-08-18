@@ -240,16 +240,22 @@ write_settings_conf(){
 write_mhwdcfg_conf(){
 	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
 	echo "---" > "$conf"
-	echo "bus_types:" >> "$conf"
+	echo "bus:" >> "$conf"
 	echo "    - pci" >> "$conf"
 	echo "    - usb" >> "$conf"
 	echo '' >> "$conf"
-	echo "identifiers:" >> "$conf"
+	echo "identifier:" >> "$conf"
 	echo "    net:" >> "$conf"
-	echo "      - '0200'" >> "$conf"
-	echo "      - '0280'" >> "$conf"
+	echo "      - 200" >> "$conf"
+	echo "      - 280" >> "$conf"
 	echo "    vid:" >> "$conf"
-	echo "      - '0300'" >> "$conf"
+	echo "      - 300" >> "$conf"
+	echo '' >> "$conf"
+	if ${nonfree_xorg};then
+		echo "driver: nonfree" >> "$conf"
+	else
+		echo "driver: free" >> "$conf"
+	fi
 	echo '' >> "$conf"
 	if ${cal_netinstall};then
 		if ${cal_unpackfs};then
