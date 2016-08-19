@@ -240,16 +240,16 @@ write_settings_conf(){
 write_mhwdcfg_conf(){
 	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
 	echo "---" > "$conf"
-	echo "bus:" >> "$conf"
-	echo "    - pci" >> "$conf"
-	echo "    - usb" >> "$conf"
-	echo '' >> "$conf"
 	echo "identifier:" >> "$conf"
 	echo "    net:" >> "$conf"
 	echo "      - 200" >> "$conf"
 	echo "      - 280" >> "$conf"
 	echo "    video:" >> "$conf"
 	echo "      - 300" >> "$conf"
+	echo '' >> "$conf"
+	echo "bus:" >> "$conf"
+	echo "    - pci" >> "$conf"
+	echo "    - usb" >> "$conf"
 	echo '' >> "$conf"
 	if ${nonfree_xorg};then
 		echo "driver: nonfree" >> "$conf"
@@ -266,6 +266,8 @@ write_mhwdcfg_conf(){
 	else
 		echo "local: true" >> "$conf"
 	fi
+	echo '' >> "$conf"
+	echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
 }
 
 write_chrootcfg_conf(){
@@ -280,12 +282,10 @@ write_chrootcfg_conf(){
 
 write_postcfg_conf(){
 	local conf="$1/etc/calamares/modules/postcfg.conf"
-	echo '' >> "$conf"
+	echo "---" > "$conf"
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
 	echo "    - manjaro" >> "$conf"
-	echo '' >> "$conf"
-	echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
 }
 
 write_netinstall_conf(){
@@ -294,6 +294,23 @@ write_netinstall_conf(){
 	[[ ${initsys} == 'openrc' ]] && yaml="netinstall-${initsys}.yaml"
 	echo "---" > "$conf"
 	echo "groupsUrl: ${netgroups}/${yaml}" >> "$conf"
+}
+
+write_grubcfg_conf(){
+	local conf="$1/etc/calamares/modules/grubcfg.conf"
+	echo "---" > "$conf"
+	echo "overwrite: false" >> "$conf"
+	echo '' >> "$conf"
+	echo "defaults:" >> "$conf"
+	echo "    GRUB_TIMEOUT: 5" >> "$conf"
+	echo '    GRUB_DEFAULT: "saved"' >> "$conf"
+	echo "    GRUB_DISABLE_SUBMENU: true" >> "$conf"
+	echo '    GRUB_TERMINAL_OUTPUT: "console"' >> "$conf"
+	echo "    GRUB_DISABLE_RECOVERY: true" >> "$conf"
+	if ${plymouth_boot};then
+		echo '' >> "$conf"
+		echo "plymouth_theme: ${plymouth_theme}"
+	fi
 }
 
 configure_calamares(){
@@ -326,6 +343,8 @@ configure_calamares(){
 	write_chrootcfg_conf "$1"
 
 	write_postcfg_conf "$1"
+	
+	write_grubcfg_conf "$1"
 
 	write_services_conf "$1"
 	write_users_conf "$1"
