@@ -10,11 +10,13 @@
 # GNU General Public License for more details.
 
 copy_overlay(){
-	msg2 "Copying [%s] ..." "${1##*/}"
-	if [[ -L $1 ]];then
-		cp -a --no-preserve=ownership $1/* $2
-	else
-		cp -LR $1/* $2
+	if [[ -e $1 ]];then
+		msg2 "Copying [%s] ..." "${1##*/}"
+		if [[ -L $1 ]];then
+			cp -a --no-preserve=ownership $1/* $2
+		else
+			cp -LR $1/* $2
+		fi
 	fi
 }
 
