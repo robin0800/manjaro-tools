@@ -120,7 +120,7 @@ write_unpack_conf(){
 	echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
-	if ! ${cal_netinstall};then
+	if ! ${netinstall};then
 		echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
 		echo "        sourcefs: \"squashfs\"" >> "$conf"
 		echo "        destination: \"\"" >> "$conf"
@@ -168,7 +168,7 @@ write_welcome_conf(){
 	echo "  - storage" >> "$conf"
 	echo "  - ram" >> "$conf"
 	echo "  - root" >> "$conf"
-	if ${cal_netinstall};then
+	if ${netinstall};then
 		echo "  - internet" >> "$conf"
 	fi
 }
@@ -183,7 +183,7 @@ write_settings_conf(){
 	echo "sequence:" >> "$conf"
 	echo "- show:" >> "$conf"
 	echo "  - welcome" >> "$conf"
-	${cal_netinstall} && echo "  - netinstall" >> "$conf"
+	${netinstall} && echo "  - netinstall" >> "$conf"
 	echo "  - locale" >> "$conf"
 	echo "  - keyboard" >> "$conf"
 	echo "  - partition" >> "$conf"
@@ -192,8 +192,8 @@ write_settings_conf(){
 	echo "- exec:" >> "$conf"
 	echo "  - partition" >> "$conf"
 	echo "  - mount" >> "$conf"
-	if ${cal_netinstall};then
-		if ${cal_unpackfs};then
+	if ${netinstall};then
+		if ${unpackfs};then
 			echo "  - unpackfs" >> "$conf"
 			echo "  - networkcfg" >> "$conf"
 			echo "  - packages" >> "$conf"
@@ -257,8 +257,8 @@ write_mhwdcfg_conf(){
 		echo "driver: free" >> "$conf"
 	fi
 	echo '' >> "$conf"
-	if ${cal_netinstall};then
-		if ${cal_unpackfs};then
+	if ${netinstall};then
+		if ${unpackfs};then
 			echo "local: true" >> "$conf"
 		else
 			echo "local: false" >> "$conf"
@@ -287,7 +287,7 @@ write_netinstall_conf(){
 	local yaml="netinstall.yaml"
 	[[ ${initsys} == 'openrc' ]] && yaml="netinstall-${initsys}.yaml"
 	echo "---" > "$conf"
-	echo "groupsUrl: ${cal_netgroups}/${yaml}" >> "$conf"
+	echo "groupsUrl: ${netgroups}/${yaml}" >> "$conf"
 }
 
 configure_calamares(){

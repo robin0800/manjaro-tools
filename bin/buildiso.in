@@ -34,8 +34,8 @@ show_profile(){
 
 		[[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
 
-		msg2 "cal_netinstall: %s" "${cal_netinstall}"
-		msg2 "cal_unpackfs: %s" "${cal_unpackfs}"
+		msg2 "netinstall: %s" "${netinstall}"
+		msg2 "unpackfs: %s" "${unpackfs}"
 
 		msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
 

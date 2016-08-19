@@ -132,7 +132,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>cal_netinstall=</varname></term>
+				<term><varname>netinstall=</varname></term>
 
 				<listitem><para>Accepts
 					<option>true</option> (the default)
@@ -141,7 +141,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>cal_unpackfs=</varname></term>
+				<term><varname>unpackfs=</varname></term>
 
 				<listitem><para>Accepts
 						<option>true</option> (the default)
@@ -150,7 +150,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>cal_netgroups=</varname></term>
+				<term><varname>netgroups=</varname></term>
 
 				<listitem><para>Default url for the netinstall.yaml.
 				</para></listitem>

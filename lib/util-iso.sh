@@ -180,10 +180,10 @@ make_checksum(){
 gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
-	if ! ${cal_netinstall};then
+	if ! ${netinstall};then
 		[[ -n ${profile} ]] && vars+=("${profile}")
 	else
-		if ${cal_unpackfs};then
+		if ${unpackfs};then
 			[[ -n ${profile} ]] && vars+=("${profile}")
 		fi
 	fi
@@ -563,8 +563,8 @@ check_profile(){
 
 	[[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
 
-	if ! ${cal_netinstall};then
-		cal_unpackfs="true"
+	if ! ${netinstall};then
+		unpackfs="true"
 	fi
 }
 
@@ -675,8 +675,8 @@ reset_profile(){
 	unset login_shell
 	unset tracker_url
 	unset piece_size
-	unset cal_netinstall
-	unset cal_unpackfs
+	unset netinstall
+	unset unpackfs
 }
 
 make_profile(){
