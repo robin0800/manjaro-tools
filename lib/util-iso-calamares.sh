@@ -276,10 +276,16 @@ write_chrootcfg_conf(){
 	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/lib/pacman" >> "$conf"
 	echo "      mode: ${mode}" >> "$conf"
+}
+
+write_postcfg_conf(){
+	local conf="$1/etc/calamares/modules/postcfg.conf"
 	echo '' >> "$conf"
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
 	echo "    - manjaro" >> "$conf"
+	echo '' >> "$conf"
+	echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
 }
 
 write_netinstall_conf(){
@@ -318,6 +324,8 @@ configure_calamares(){
 	write_netinstall_conf "$1"
 
 	write_chrootcfg_conf "$1"
+
+	write_postcfg_conf "$1"
 
 	write_services_conf "$1"
 	write_users_conf "$1"

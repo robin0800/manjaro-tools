@@ -312,6 +312,8 @@ init_buildiso(){
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
 
 	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
+
+	mhwd_repo="/opt/pkg"
 }
 
 init_deployiso(){

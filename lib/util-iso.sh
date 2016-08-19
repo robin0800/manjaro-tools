@@ -285,7 +285,7 @@ make_image_mhwd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [drivers repository] (mhwd-image)"
 		local path="${work_dir}/mhwd-image"
-		mkdir -p ${path}/opt/live/pkgs
+		mkdir -p ${path}${mhwd_repo}
 
 		mount_image_select "${path}"
 
@@ -295,10 +295,10 @@ make_image_mhwd() {
 
 		if [[ -n "${packages_cleanup}" ]]; then
 			for mhwd_clean in ${packages_cleanup}; do
-				rm ${path}/opt/live/pkgs/${mhwd_clean}
+				rm ${path}${mhwd_repo}/${mhwd_clean}
 			done
 		fi
-		cp ${DATADIR}/pacman-gfx.conf ${path}/opt/live
+		cp ${DATADIR}/pacman-mhwd.conf ${path}/opt
 		make_repo "${path}"
 		configure_mhwd_drivers "${path}"
 
