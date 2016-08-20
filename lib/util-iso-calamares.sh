@@ -199,6 +199,7 @@ write_settings_conf(){
 			echo "  - packages" >> "$conf"
 		else
 			echo "  - chrootcfg" >> "$conf"
+			echo "  - networkcfg" >> "$conf"
 		fi
 	else
 		echo "  - unpackfs" >> "$conf"
@@ -216,7 +217,6 @@ write_settings_conf(){
 	echo "  - users" >> "$conf"
 	echo "  - displaymanager" >> "$conf"
 	echo "  - mhwdcfg" >> "$conf"
-	echo "  - networkcfg" >> "$conf"
 	echo "  - hwclock" >> "$conf"
 	if [[ ${initsys} == 'systemd' ]];then
 		echo "  - services" >> "$conf"
@@ -274,10 +274,16 @@ write_chrootcfg_conf(){
 	local conf="$1/etc/calamares/modules/chrootcfg.conf" mode='"0o755"'
 	echo "---" > "$conf"
 	echo "requirements:" >> "$conf"
+	echo "    - name: /etc" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
 	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/lib/pacman" >> "$conf"
 	echo "      mode: ${mode}" >> "$conf"
+	echo '' >> "$conf"
+	echo "keyrings:" >> "$conf"
+	echo "    - archlinux" >> "$conf"
+	echo "    - manjaro" >> "$conf"
 }
 
 write_postcfg_conf(){
