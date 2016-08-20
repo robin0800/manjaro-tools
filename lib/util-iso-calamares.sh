@@ -294,17 +294,24 @@ write_postcfg_conf(){
 	echo "    - manjaro" >> "$conf"
 }
 
-write_netinstall_conf(){
-	local conf="$1/etc/calamares/modules/netinstall.conf"
+get_yaml(){
+	local args=() ext="yaml" yaml
 	if ${unpackfs};then
-		local yaml="netinstall-hybrid.yaml"
-		[[ ${initsys} == 'openrc' ]] && yaml="netinstall-hybrid-${initsys}.yaml"
+		args+=("hybrid")
 	else
-		local yaml="netinstall.yaml"
-		[[ ${initsys} == 'openrc' ]] && yaml="netinstall-${initsys}.yaml"
+		args+=('netinstall')
 	fi
+	[[ ${initsys} == 'openrc' ]] && args+=("${initsys}")
+	[[ ${edition} == 'sonar' ]] && args+=("${edition}")
+	for arg in ${args[@]};do
+		yaml=${yaml:-}${yaml:+-}${arg}
+	done
+	echo "${yaml}.${ext}"
+}
+
+write_netinstall_conf(){
 	echo "---" > "$conf"
-	echo "groupsUrl: ${netgroups}/${yaml}" >> "$conf"
+	echo "groupsUrl: ${netgroups}/$(get_yaml)" >> "$conf"
 }
 
 write_grubcfg_conf(){
