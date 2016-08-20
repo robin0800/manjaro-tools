@@ -120,11 +120,11 @@ write_unpack_conf(){
 	echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
-	if ! ${netinstall};then
+# 	if ! ${netinstall};then
 		echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
 		echo "        sourcefs: \"squashfs\"" >> "$conf"
 		echo "        destination: \"\"" >> "$conf"
-	fi
+# 	fi
 }
 
 write_users_conf(){
