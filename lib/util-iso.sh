@@ -677,6 +677,7 @@ reset_profile(){
 	unset piece_size
 	unset netinstall
 	unset unpackfs
+	unset netgroups
 }
 
 make_profile(){

@@ -356,7 +356,7 @@ configure_calamares(){
 
 	write_finished_conf "$1"
 
-	${netinstall} && write_netinstall_conf "$1"
+	write_netinstall_conf "$1"
 
 	write_chrootcfg_conf "$1"
 
