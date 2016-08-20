@@ -455,7 +455,7 @@ load_profile_config(){
 
 	[[ -z ${unpackfs} ]] && unpackfs='true'
 
-	[[ -z ${netgroups} ]] && netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master"
+	[[ -z ${netgroups} ]] && netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
 
 	check_profile_vars
 
