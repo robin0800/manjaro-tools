@@ -296,8 +296,13 @@ write_postcfg_conf(){
 
 write_netinstall_conf(){
 	local conf="$1/etc/calamares/modules/netinstall.conf"
-	local yaml="netinstall.yaml"
-	[[ ${initsys} == 'openrc' ]] && yaml="netinstall-${initsys}.yaml"
+	if ${unpackfs};then
+		local yaml="netinstall-hybrid.yaml"
+		[[ ${initsys} == 'openrc' ]] && yaml="netinstall-hybrid-${initsys}.yaml"
+	else
+		local yaml="netinstall.yaml"
+		[[ ${initsys} == 'openrc' ]] && yaml="netinstall-${initsys}.yaml"
+	fi
 	echo "---" > "$conf"
 	echo "groupsUrl: ${netgroups}/${yaml}" >> "$conf"
 }
@@ -344,12 +349,12 @@ configure_calamares(){
 
 	write_finished_conf "$1"
 
-	write_netinstall_conf "$1"
+	${netinstall} && write_netinstall_conf "$1"
 
 	write_chrootcfg_conf "$1"
 
 	write_postcfg_conf "$1"
-	
+
 	write_grubcfg_conf "$1"
 
 	write_services_conf "$1"
