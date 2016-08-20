@@ -358,8 +358,8 @@ check_profile_vars(){
 	if ! is_valid_bool "${multilib}";then
 		die "multilib only accepts true/false value!"
 	fi
-	if ! is_valid_bool "${nonfree_xorg}";then
-		die "nonfree_xorg only accepts true/false value!"
+	if ! is_valid_bool "${nonfree_mhwd}";then
+		die "nonfree_mhwd only accepts true/false value!"
 	fi
 	if ! is_valid_bool "${plymouth_boot}";then
 		die "plymouth_boot only accepts true/false value!"
@@ -404,7 +404,7 @@ load_profile_config(){
 	[[ -z ${plymouth_boot} ]] && plymouth_boot="true"
 	[[ ${initsys} == 'openrc' ]] && plymouth_boot="false"
 
-	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
+	[[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 

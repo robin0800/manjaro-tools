@@ -442,7 +442,7 @@ load_pkgs(){
 		_multi="s|>multilib.*||g"
 		_nonfree_multi="s|>nonfree_multilib.*||g"
 		_nonfree_x86_64="s|>nonfree_x86_64.*||g"
-		if ${nonfree_xorg};then
+		if ${nonfree_mhwd};then
 			_nonfree_default="s|>nonfree_default||g"
 			_nonfree_i686="s|>nonfree_i686||g"
 
@@ -456,7 +456,7 @@ load_pkgs(){
 		_nonfree_i686="s|>nonfree_i686.*||g"
 		if ${multilib};then
 			_multi="s|>multilib||g"
-			if ${nonfree_xorg};then
+			if ${nonfree_mhwd};then
 				_nonfree_default="s|>nonfree_default||g"
 				_nonfree_x86_64="s|>nonfree_x86_64||g"
 				_nonfree_multi="s|>nonfree_multilib||g"
@@ -467,7 +467,7 @@ load_pkgs(){
 			fi
 		else
 			_multi="s|>multilib.*||g"
-			if ${nonfree_xorg};then
+			if ${nonfree_mhwd};then
 				_nonfree_default="s|>nonfree_default||g"
 				_nonfree_x86_64="s|>nonfree_x86_64||g"
 				_nonfree_multi="s|>nonfree_multilib.*||g"
@@ -657,7 +657,7 @@ reset_profile(){
 	unset multilib
 	unset pxe_boot
 	unset plymouth_boot
-	unset nonfree_xorg
+	unset nonfree_mhwd
 	unset efi_boot_loader
 	unset hostname
 	unset username

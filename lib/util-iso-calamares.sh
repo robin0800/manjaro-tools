@@ -251,7 +251,7 @@ write_mhwdcfg_conf(){
 	echo "    - pci" >> "$conf"
 	echo "    - usb" >> "$conf"
 	echo '' >> "$conf"
-	if ${nonfree_xorg};then
+	if ${nonfree_mhwd};then
 		echo "driver: nonfree" >> "$conf"
 	else
 		echo "driver: free" >> "$conf"
