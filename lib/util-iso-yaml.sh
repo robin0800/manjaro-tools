@@ -19,7 +19,7 @@ check_yaml(){
 
 get_preset(){
 	local p=${tmp_dir}/${kernel}.preset kvmaj kvmin
-	cp ${DATADIR}/linux ${tmp_dir}/$p
+	cp ${DATADIR}/linux.preset ${tmp_dir}/$p
 	digit=${kernel##linux}
 	kvmaj=${digit:0:1}
 	kvmin=${digit:1}
