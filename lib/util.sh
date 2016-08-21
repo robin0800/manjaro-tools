@@ -435,11 +435,11 @@ load_profile_config(){
 	[[ -z ${disable_openrc[@]} ]] && disable_openrc=()
 
 	if [[ -z ${enable_systemd_live[@]} ]];then
-		enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+		enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
 	fi
 
 	if [[ -z ${enable_openrc_live[@]} ]];then
-		enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+		enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
 	fi
 
 	if [[ ${displaymanager} != "none" ]]; then
