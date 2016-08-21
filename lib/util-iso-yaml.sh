@@ -29,7 +29,7 @@ write_netgroup_yaml(){
 	check_yaml "$2"
 }
 
-prepare_profile(){
+prepare_check(){
 	profile=$1
 	edition=$(get_edition ${profile})
 	profile_dir=${run_dir}/${edition}/${profile}
@@ -37,9 +37,19 @@ prepare_profile(){
 	load_profile_config "${profile_dir}/profile.conf"
 
 	yaml_dir=${cache_dir_netinstall}/${profile}
+	work_dir=${chroots_iso}/${profile}/${target_arch}
 
 	prepare_dir "${yaml_dir}"
 	chown "${OWNER}:${OWNER}" "${yaml_dir}"
+
+	#load_pkgs "${profile_dir}/Packages-Root"
+	#yaml="${yaml_dir}/root-${target_arch}-${initsys}.yaml"
+	#write_netgroup_yaml "$1" "${yaml}"
+	if [[ -f "${packages_custom}" ]]; then
+		load_pkgs "${packages_custom}"
+		yaml="${yaml_dir}/desktop-${target_arch}-${initsys}.yaml"
+		write_netgroup_yaml "$1" "${yaml}"
+	fi
 }
 
 write_calamares_yaml(){
@@ -50,15 +60,8 @@ write_calamares_yaml(){
 }
 
 make_profile_yaml(){
-	prepare_profile "$1"
-	load_pkgs "${profile_dir}/Packages-Root"
-	yaml=${yaml_dir}/root-${target_arch}-${initsys}.yaml
-	write_netgroup_yaml "$1" "${yaml}"
-	if [[ -f "${packages_custom}" ]]; then
-		load_pkgs "${packages_custom}"
-		yaml=${yaml_dir}/desktop-${target_arch}-${initsys}.yaml
-		write_netgroup_yaml "$1" "${yaml}"
-	fi
+	prepare_check "$1"
+
 	${calamares} && write_calamares_yaml "$1"
 	user_own "${yaml_dir}"
 	reset_profile

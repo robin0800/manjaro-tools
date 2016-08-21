@@ -35,7 +35,7 @@ write_finished_conf(){
 }
 
 write_bootloader_conf(){
-	source "$1/etc/mkinitcpio.d/${kernel}.preset"
+	source "$2.preset"
 	local conf="$1/etc/calamares/modules/bootloader.conf"
 	echo '---' > "$conf"
 	echo "efiBootLoader: \"${efi_boot_loader}\"" >> "$conf"
@@ -343,7 +343,7 @@ configure_calamares(){
 
 	write_packages_conf "$1"
 
-	write_bootloader_conf "$1"
+	write_bootloader_conf "$1" "$2"
 
 	write_mhwdcfg_conf "$1"
 
