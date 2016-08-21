@@ -563,7 +563,7 @@ check_profile(){
 
 	[[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
 
-	if ! ${netinstall};then
+	if ! ${netinstall} && ! ${unpackfs};then
 		unpackfs="true"
 	fi
 }
@@ -612,7 +612,7 @@ compress_images(){
 	make_checksum "${iso_file}"
 	${sign} && sign_iso "${iso_file}"
 	${torrent} && make_torrent
-	chown -R "${OWNER}:$(id --group ${OWNER})" "${iso_dir}"
+	user_own "${iso_dir}"
 	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 

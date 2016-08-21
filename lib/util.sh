@@ -457,13 +457,13 @@ load_profile_config(){
 
 	[[ -z ${netgroups} ]] && netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
 
-	if ! ${unpackfs} && ! ${netinstall};then
-		netinstall='true'
-	fi
-
 	check_profile_vars
 
 	return 0
+}
+
+user_own(){
+	chown -R "${OWNER}:$(id --group ${OWNER})" "$1"
 }
 
 clean_dir(){
