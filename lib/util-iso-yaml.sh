@@ -59,7 +59,6 @@ prepare_check(){
 	load_profile_config "${profile_dir}/profile.conf"
 
 	yaml_dir=${cache_dir_netinstall}/${profile}/${target_arch}
-	work_dir=${chroots_iso}/${profile}/${target_arch}
 
 	prepare_dir "${yaml_dir}"
 	chown "${OWNER}:${OWNER}" "${yaml_dir}"
