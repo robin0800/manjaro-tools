@@ -58,7 +58,7 @@ prepare_check(){
 	check_profile
 	load_profile_config "${profile_dir}/profile.conf"
 
-	yaml_dir=${cache_dir_netinstall}/${profile}
+	yaml_dir=${cache_dir_netinstall}/${profile}/${target_arch}
 	work_dir=${chroots_iso}/${profile}/${target_arch}
 
 	prepare_dir "${yaml_dir}"
