@@ -328,7 +328,7 @@ write_grubcfg_conf(){
 	echo "    GRUB_DISABLE_RECOVERY: true" >> "$conf"
 	if ${plymouth_boot};then
 		echo '' >> "$conf"
-		echo "plymouth_theme: ${plymouth_theme}"
+		echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
 	fi
 }
 
