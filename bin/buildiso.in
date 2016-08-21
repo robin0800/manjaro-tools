@@ -27,15 +27,16 @@ show_profile(){
 		msg2 "iso_dir: %s" "${iso_dir}"
 		msg2 "iso_file: %s" "${iso_file}"
 		msg2 "autologin: %s" "${autologin}"
-		msg2 "nonfree_xorg: %s" "${nonfree_xorg}"
+		msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
 		msg2 "pxe_boot: %s" "${pxe_boot}"
 		msg2 "plymouth_boot: %s" "${plymouth_boot}"
 		${plymouth_boot} && msg2 "plymouth_theme: %s" "${plymouth_theme}"
 
 		[[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
 
-		msg2 "cal_netinstall: %s" "${cal_netinstall}"
-		msg2 "cal_unpackfs: %s" "${cal_unpackfs}"
+		msg2 "netinstall: %s" "${netinstall}"
+		${netinstall} && msg2 "netgroups: %s" "$(get_yaml)"
+		msg2 "unpackfs: %s" "${unpackfs}"
 
 		msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
 

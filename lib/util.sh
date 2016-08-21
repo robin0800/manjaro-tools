@@ -312,6 +312,8 @@ init_buildiso(){
 	[[ -z ${use_overlayfs} ]] && use_overlayfs='true'
 
 	[[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
+
+	mhwd_repo="/opt/pkg"
 }
 
 init_deployiso(){
@@ -356,8 +358,8 @@ check_profile_vars(){
 	if ! is_valid_bool "${multilib}";then
 		die "multilib only accepts true/false value!"
 	fi
-	if ! is_valid_bool "${nonfree_xorg}";then
-		die "nonfree_xorg only accepts true/false value!"
+	if ! is_valid_bool "${nonfree_mhwd}";then
+		die "nonfree_mhwd only accepts true/false value!"
 	fi
 	if ! is_valid_bool "${plymouth_boot}";then
 		die "plymouth_boot only accepts true/false value!"
@@ -365,11 +367,11 @@ check_profile_vars(){
 	if ! is_valid_bool "${pxe_boot}";then
 		die "pxe_boot only accepts true/false value!"
 	fi
-	if ! is_valid_bool "${cal_netinstall}";then
-		die "cal_netinstall only accepts true/false value!"
+	if ! is_valid_bool "${netinstall}";then
+		die "netinstall only accepts true/false value!"
 	fi
-	if ! is_valid_bool "${cal_unpackfs}";then
-		die "cal_unpackfs only accepts true/false value!"
+	if ! is_valid_bool "${unpackfs}";then
+		die "unpackfs only accepts true/false value!"
 	fi
 }
 
@@ -402,7 +404,7 @@ load_profile_config(){
 	[[ -z ${plymouth_boot} ]] && plymouth_boot="true"
 	[[ ${initsys} == 'openrc' ]] && plymouth_boot="false"
 
-	[[ -z ${nonfree_xorg} ]] && nonfree_xorg="true"
+	[[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
 
 	[[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
@@ -449,11 +451,15 @@ load_profile_config(){
 
 	[[ -z ${piece_size} ]] && piece_size=21
 
-	[[ -z ${cal_netinstall} ]] && cal_netinstall='false'
+	[[ -z ${netinstall} ]] && netinstall='false'
 
-	[[ -z ${cal_unpackfs} ]] && cal_unpackfs='true'
+	[[ -z ${unpackfs} ]] && unpackfs='true'
 
-	[[ -z ${cal_netgroups} ]] && cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master"
+	[[ -z ${netgroups} ]] && netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
+
+	if ! ${unpackfs} && ! ${netinstall};then
+		netinstall='true'
+	fi
 
 	check_profile_vars
 

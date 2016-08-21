@@ -120,7 +120,7 @@ write_unpack_conf(){
 	echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
 	echo "        sourcefs: \"squashfs\"" >> "$conf"
 	echo "        destination: \"\"" >> "$conf"
-	if ! ${cal_netinstall};then
+	if [[ -f "${packages_custom}" ]] ; then
 		echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
 		echo "        sourcefs: \"squashfs\"" >> "$conf"
 		echo "        destination: \"\"" >> "$conf"
@@ -168,7 +168,7 @@ write_welcome_conf(){
 	echo "  - storage" >> "$conf"
 	echo "  - ram" >> "$conf"
 	echo "  - root" >> "$conf"
-	if ${cal_netinstall};then
+	if ${netinstall};then
 		echo "  - internet" >> "$conf"
 	fi
 }
@@ -183,7 +183,7 @@ write_settings_conf(){
 	echo "sequence:" >> "$conf"
 	echo "- show:" >> "$conf"
 	echo "  - welcome" >> "$conf"
-	${cal_netinstall} && echo "  - netinstall" >> "$conf"
+	${netinstall} && echo "  - netinstall" >> "$conf"
 	echo "  - locale" >> "$conf"
 	echo "  - keyboard" >> "$conf"
 	echo "  - partition" >> "$conf"
@@ -192,13 +192,14 @@ write_settings_conf(){
 	echo "- exec:" >> "$conf"
 	echo "  - partition" >> "$conf"
 	echo "  - mount" >> "$conf"
-	if ${cal_netinstall};then
-		if ${cal_unpackfs};then
+	if ${netinstall};then
+		if ${unpackfs};then
 			echo "  - unpackfs" >> "$conf"
 			echo "  - networkcfg" >> "$conf"
 			echo "  - packages" >> "$conf"
 		else
 			echo "  - chrootcfg" >> "$conf"
+			echo "  - networkcfg" >> "$conf"
 		fi
 	else
 		echo "  - unpackfs" >> "$conf"
@@ -216,7 +217,6 @@ write_settings_conf(){
 	echo "  - users" >> "$conf"
 	echo "  - displaymanager" >> "$conf"
 	echo "  - mhwdcfg" >> "$conf"
-	echo "  - networkcfg" >> "$conf"
 	echo "  - hwclock" >> "$conf"
 	if [[ ${initsys} == 'systemd' ]];then
 		echo "  - services" >> "$conf"
@@ -240,10 +240,6 @@ write_settings_conf(){
 write_mhwdcfg_conf(){
 	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
 	echo "---" > "$conf"
-	echo "bus:" >> "$conf"
-	echo "    - pci" >> "$conf"
-	echo "    - usb" >> "$conf"
-	echo '' >> "$conf"
 	echo "identifier:" >> "$conf"
 	echo "    net:" >> "$conf"
 	echo "      - 200" >> "$conf"
@@ -251,14 +247,18 @@ write_mhwdcfg_conf(){
 	echo "    video:" >> "$conf"
 	echo "      - 300" >> "$conf"
 	echo '' >> "$conf"
-	if ${nonfree_xorg};then
+	echo "bus:" >> "$conf"
+	echo "    - pci" >> "$conf"
+	echo "    - usb" >> "$conf"
+	echo '' >> "$conf"
+	if ${nonfree_mhwd};then
 		echo "driver: nonfree" >> "$conf"
 	else
 		echo "driver: free" >> "$conf"
 	fi
 	echo '' >> "$conf"
-	if ${cal_netinstall};then
-		if ${cal_unpackfs};then
+	if ${netinstall};then
+		if ${unpackfs};then
 			echo "local: true" >> "$conf"
 		else
 			echo "local: false" >> "$conf"
@@ -266,12 +266,16 @@ write_mhwdcfg_conf(){
 	else
 		echo "local: true" >> "$conf"
 	fi
+	echo '' >> "$conf"
+	echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
 }
 
 write_chrootcfg_conf(){
 	local conf="$1/etc/calamares/modules/chrootcfg.conf" mode='"0o755"'
 	echo "---" > "$conf"
 	echo "requirements:" >> "$conf"
+	echo "    - name: /etc" >> "$conf"
+	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
 	echo "      mode: ${mode}" >> "$conf"
 	echo "    - name: /var/lib/pacman" >> "$conf"
@@ -282,12 +286,50 @@ write_chrootcfg_conf(){
 	echo "    - manjaro" >> "$conf"
 }
 
+write_postcfg_conf(){
+	local conf="$1/etc/calamares/modules/postcfg.conf"
+	echo "---" > "$conf"
+	echo "keyrings:" >> "$conf"
+	echo "    - archlinux" >> "$conf"
+	echo "    - manjaro" >> "$conf"
+}
+
+get_yaml(){
+	local args=() ext="yaml" yaml
+	if ${unpackfs};then
+		args+=("hybrid")
+	else
+		args+=('netinstall')
+	fi
+	[[ ${initsys} == 'openrc' ]] && args+=("${initsys}")
+	[[ ${edition} == 'sonar' ]] && args+=("${edition}")
+	for arg in ${args[@]};do
+		yaml=${yaml:-}${yaml:+-}${arg}
+	done
+	echo "${yaml}.${ext}"
+}
+
 write_netinstall_conf(){
 	local conf="$1/etc/calamares/modules/netinstall.conf"
-	local yaml="netinstall.yaml"
-	[[ ${initsys} == 'openrc' ]] && yaml="netinstall-${initsys}.yaml"
 	echo "---" > "$conf"
-	echo "groupsUrl: ${cal_netgroups}/${yaml}" >> "$conf"
+	echo "groupsUrl: ${netgroups}/$(get_yaml)" >> "$conf"
+}
+
+write_grubcfg_conf(){
+	local conf="$1/etc/calamares/modules/grubcfg.conf"
+	echo "---" > "$conf"
+	echo "overwrite: false" >> "$conf"
+	echo '' >> "$conf"
+	echo "defaults:" >> "$conf"
+	echo "    GRUB_TIMEOUT: 5" >> "$conf"
+	echo '    GRUB_DEFAULT: "saved"' >> "$conf"
+	echo "    GRUB_DISABLE_SUBMENU: true" >> "$conf"
+	echo '    GRUB_TERMINAL_OUTPUT: "console"' >> "$conf"
+	echo "    GRUB_DISABLE_RECOVERY: true" >> "$conf"
+	if ${plymouth_boot};then
+		echo '' >> "$conf"
+		echo "plymouth_theme: ${plymouth_theme}"
+	fi
 }
 
 configure_calamares(){
@@ -315,9 +357,13 @@ configure_calamares(){
 
 	write_finished_conf "$1"
 
-	write_netinstall_conf "$1"
+	${netinstall} && write_netinstall_conf "$1"
 
 	write_chrootcfg_conf "$1"
+
+	write_postcfg_conf "$1"
+
+	write_grubcfg_conf "$1"
 
 	write_services_conf "$1"
 	write_users_conf "$1"

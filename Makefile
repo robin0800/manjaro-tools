@@ -76,7 +76,7 @@ LIBS_ISO = \
 	lib/util-publish.sh
 
 SHARED_ISO = \
-	data/pacman-gfx.conf \
+	data/pacman-mhwd.conf \
 	data/desktop.map \
 	data/profile.conf.example
 

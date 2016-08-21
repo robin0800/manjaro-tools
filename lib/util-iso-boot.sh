@@ -227,7 +227,7 @@ write_isolinux_cfg(){
 	echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free ${boot_args[@]} showopts" >> ${conf}
 
 	echo '' >> ${conf}
-	if ${nonfree_xorg};then
+	if ${nonfree_mhwd};then
 		echo "label nonfree" >> ${conf}
 		echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
 		echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree ${boot_args[@]} showopts" >> ${conf}
@@ -255,7 +255,7 @@ write_isolinux_msg(){
 	echo '' >> ${conf}
 	echo "Available boot options:" >> ${conf}
 	echo "start                    - Start ${dist_name} Live System" >> ${conf}
-	if ${nonfree_xorg};then
+	if ${nonfree_mhwd};then
 		echo "nonfree                  - Start with proprietary drivers" >> ${conf}
 	fi
 	echo "harddisk                 - Boot from local hard disk" >> ${conf}

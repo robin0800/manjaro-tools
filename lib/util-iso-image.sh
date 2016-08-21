@@ -10,11 +10,13 @@
 # GNU General Public License for more details.
 
 copy_overlay(){
-	msg2 "Copying [%s] ..." "${1##*/}"
-	if [[ -L $1 ]];then
-		cp -a --no-preserve=ownership $1/* $2
-	else
-		cp -LR $1/* $2
+	if [[ -e $1 ]];then
+		msg2 "Copying [%s] ..." "${1##*/}"
+		if [[ -L $1 ]];then
+			cp -a --no-preserve=ownership $1/* $2
+		else
+			cp -LR $1/* $2
+		fi
 	fi
 }
 
@@ -48,9 +50,8 @@ set_xdm(){
 	fi
 }
 
-# $1: chroot
 configure_mhwd_drivers(){
-	local path=$1/opt/live/pkgs/ \
+	local path=$1${mhwd_repo}/ \
         drv_path=$1/var/lib/mhwd/db/pci/graphic_drivers
 	info "Configuring mwwd db ..."
 	if  [ -z "$(ls $path | grep catalyst-utils 2> /dev/null)" ]; then
@@ -101,8 +102,6 @@ chroot_clean(){
 	rm -rf --one-file-system "$1"
 }
 
-
-# $1: chroot
 configure_lsb(){
 	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
 	if [ -e $1/etc/lsb-release ] ; then
@@ -264,11 +263,9 @@ configure_live_image(){
 }
 
 make_repo(){
-	repo-add $1/opt/live/pkgs/gfx-pkgs.db.tar.gz $1/opt/live/pkgs/*pkg*z
+	repo-add $1${mhwd_repo}/mhwd.db.tar.gz $1${mhwd_repo}/*pkg*z
 }
 
-# $1: work dir
-# $2: pkglist
 copy_from_cache(){
 	local list="${tmp_dir}"/mhwd-cache.list
 	chroot-run \
@@ -287,11 +284,9 @@ copy_from_cache(){
 	sed -i "s/.*\///" "$list"
 
 	msg2 "Copying mhwd package cache ..."
-	rsync -v --files-from="$list" /var/cache/pacman/pkg "$1/opt/live/pkgs"
+	rsync -v --files-from="$list" /var/cache/pacman/pkg "$1${mhwd_repo}"
 }
 
-# $1: image path
-# $2: packages
 chroot_create(){
 	[[ "${1##*/}" == "root-image" ]] && local flag="-L"
 	setarch "${target_arch}" \

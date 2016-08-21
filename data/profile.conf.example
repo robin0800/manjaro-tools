@@ -13,7 +13,7 @@
 # multilib="true"
 
 # nonfree xorg drivers
-# nonfree_xorg="true"
+# nonfree_mhwd="true"
 
 # use plymouth
 # plymouth_boot="true"
@@ -35,13 +35,13 @@
 # efi_boot_loader="grub"
 
 # configure calamares for netinstall
-# cal_netinstall="false"
+# netinstall="false"
 
 # the default url for the netinstall.yaml
-# cal_netgroups="https://raw.githubusercontent.com/calamares/calamares-manjaro/master"
+# netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
 
 # configure calamares to use chrootcfg instead of unpackfs
-# cal_unpackfs="true"
+# unpackfs="true"
 
 # unset defaults to given value
 # plymouth_theme=manjaro-elegant

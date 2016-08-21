@@ -180,10 +180,10 @@ make_checksum(){
 gen_iso_fn(){
 	local vars=() name
 	vars+=("${iso_name}")
-	if ! ${cal_netinstall};then
+	if ! ${netinstall};then
 		[[ -n ${profile} ]] && vars+=("${profile}")
 	else
-		if ${cal_unpackfs};then
+		if ${unpackfs};then
 			[[ -n ${profile} ]] && vars+=("${profile}")
 		fi
 	fi
@@ -285,7 +285,7 @@ make_image_mhwd() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [drivers repository] (mhwd-image)"
 		local path="${work_dir}/mhwd-image"
-		mkdir -p ${path}/opt/live/pkgs
+		mkdir -p ${path}${mhwd_repo}
 
 		mount_image_select "${path}"
 
@@ -295,10 +295,10 @@ make_image_mhwd() {
 
 		if [[ -n "${packages_cleanup}" ]]; then
 			for mhwd_clean in ${packages_cleanup}; do
-				rm ${path}/opt/live/pkgs/${mhwd_clean}
+				rm ${path}${mhwd_repo}/${mhwd_clean}
 			done
 		fi
-		cp ${DATADIR}/pacman-gfx.conf ${path}/opt/live
+		cp ${DATADIR}/pacman-mhwd.conf ${path}/opt
 		make_repo "${path}"
 		configure_mhwd_drivers "${path}"
 
@@ -442,7 +442,7 @@ load_pkgs(){
 		_multi="s|>multilib.*||g"
 		_nonfree_multi="s|>nonfree_multilib.*||g"
 		_nonfree_x86_64="s|>nonfree_x86_64.*||g"
-		if ${nonfree_xorg};then
+		if ${nonfree_mhwd};then
 			_nonfree_default="s|>nonfree_default||g"
 			_nonfree_i686="s|>nonfree_i686||g"
 
@@ -456,7 +456,7 @@ load_pkgs(){
 		_nonfree_i686="s|>nonfree_i686.*||g"
 		if ${multilib};then
 			_multi="s|>multilib||g"
-			if ${nonfree_xorg};then
+			if ${nonfree_mhwd};then
 				_nonfree_default="s|>nonfree_default||g"
 				_nonfree_x86_64="s|>nonfree_x86_64||g"
 				_nonfree_multi="s|>nonfree_multilib||g"
@@ -467,7 +467,7 @@ load_pkgs(){
 			fi
 		else
 			_multi="s|>multilib.*||g"
-			if ${nonfree_xorg};then
+			if ${nonfree_mhwd};then
 				_nonfree_default="s|>nonfree_default||g"
 				_nonfree_x86_64="s|>nonfree_x86_64||g"
 				_nonfree_multi="s|>nonfree_multilib.*||g"
@@ -563,8 +563,8 @@ check_profile(){
 
 	[[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
 
-	if ! ${cal_netinstall};then
-		cal_unpackfs="true"
+	if ! ${netinstall};then
+		unpackfs="true"
 	fi
 }
 
@@ -657,7 +657,7 @@ reset_profile(){
 	unset multilib
 	unset pxe_boot
 	unset plymouth_boot
-	unset nonfree_xorg
+	unset nonfree_mhwd
 	unset efi_boot_loader
 	unset hostname
 	unset username
@@ -675,8 +675,9 @@ reset_profile(){
 	unset login_shell
 	unset tracker_url
 	unset piece_size
-	unset cal_netinstall
-	unset cal_unpackfs
+	unset netinstall
+	unset unpackfs
+	unset netgroups
 }
 
 make_profile(){
