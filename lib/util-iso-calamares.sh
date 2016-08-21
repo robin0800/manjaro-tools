@@ -35,8 +35,8 @@ write_finished_conf(){
 }
 
 write_bootloader_conf(){
-	source "$2.preset"
 	local conf="$1/etc/calamares/modules/bootloader.conf"
+	source "$2.preset"
 	echo '---' > "$conf"
 	echo "efiBootLoader: \"${efi_boot_loader}\"" >> "$conf"
 	echo "kernel: \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
