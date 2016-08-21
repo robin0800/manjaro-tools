@@ -17,6 +17,28 @@ check_yaml(){
 	[[ $? -ne 0 ]] && error "yaml error: %s [msg: %s]"  "$1"
 }
 
+get_preset(){
+	local p=${tmp_dir}/${kernel}.preset kvmaj kvmin
+	cp ${DATADIR}/linux ${tmp_dir}/$p
+	digit=${kernel##linux}
+	kvmaj=${digit:0:1}
+	kvmin=${digit:1}
+
+	sed -e "s|@kvmaj@|$kvmaj|g" \
+	    -e "s|@kvmin@|$kvmin|g" \
+	    -e "s|@arch@|${target_arch}|g"\
+	    -i $p
+
+	echo $p
+}
+
+write_calamares_yaml(){
+	configure_calamares "${yaml_dir}" "$(get_preset)"
+	for conf in "${yaml_dir}"/etc/calamares/modules/*.conf "${yaml_dir}"/etc/calamares/settings.conf; do
+		check_yaml "$conf"
+	done
+}
+
 write_netgroup_yaml(){
 	echo "- name: '$1'" > "$2"
 	echo "  description: '$1'" >> "$2"
@@ -43,28 +65,20 @@ prepare_check(){
 	chown "${OWNER}:${OWNER}" "${yaml_dir}"
 }
 
-write_calamares_yaml(){
-	local preset=${work_dir}/root-image/etc/mkinitcpio.d/${kernel}
-	[[ -f ${preset}.preset ]] || die "The profile needs to be built at least one time!"
-	configure_calamares "${yaml_dir}" "${preset}"
-	for conf in "${yaml_dir}"/etc/calamares/modules/*.conf "${yaml_dir}"/etc/calamares/settings.conf; do
-		check_yaml "$conf"
-	done
+gen_fn(){
+	echo ${yaml_dir}/$1-${target_arch}-${initsys}.yaml
 }
 
 make_profile_yaml(){
 	prepare_check "$1"
 	load_pkgs "${profile_dir}/Packages-Root"
-	yaml="${yaml_dir}/Packages-Root-${target_arch}-${initsys}.yaml"
-	write_netgroup_yaml "$1" "${yaml}"
+	write_netgroup_yaml "$1" "$(gen_fn "Packages-Root")"
 	if [[ -f "${packages_custom}" ]]; then
 		load_pkgs "${packages_custom}"
-		yaml="${yaml_dir}/${packages_custom##*/}-${target_arch}-${initsys}.yaml"
-		write_netgroup_yaml "$1" "${yaml}"
+		write_netgroup_yaml "$1" "$(gen_fn "${packages_custom##*/}")"
 	fi
 	${calamares} && write_calamares_yaml "$1"
 	user_own "${yaml_dir}"
 	reset_profile
-	unset yaml
 	unset yaml_dir
 }

@@ -80,6 +80,7 @@ LIBS_ISO = \
 SHARED_ISO = \
 	data/pacman-mhwd.conf \
 	data/desktop.map \
+	data/linux.preset \
 	data/profile.conf.example
 
 CPIOHOOKS = \
