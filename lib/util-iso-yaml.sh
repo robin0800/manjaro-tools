@@ -41,15 +41,6 @@ prepare_check(){
 
 	prepare_dir "${yaml_dir}"
 	chown "${OWNER}:${OWNER}" "${yaml_dir}"
-
-	load_pkgs "${profile_dir}/Packages-Root"
-	yaml="${yaml_dir}/Packages-Root-${target_arch}-${initsys}.yaml"
-	write_netgroup_yaml "$1" "${yaml}"
-	if [[ -f "${packages_custom}" ]]; then
-		load_pkgs "${packages_custom}"
-		yaml="${yaml_dir}/${packages_custom##*/}-${target_arch}-${initsys}.yaml"
-		write_netgroup_yaml "$1" "${yaml}"
-	fi
 }
 
 write_calamares_yaml(){
@@ -63,7 +54,14 @@ write_calamares_yaml(){
 
 make_profile_yaml(){
 	prepare_check "$1"
-
+	load_pkgs "${profile_dir}/Packages-Root"
+	yaml="${yaml_dir}/Packages-Root-${target_arch}-${initsys}.yaml"
+	write_netgroup_yaml "$1" "${yaml}"
+	if [[ -f "${packages_custom}" ]]; then
+		load_pkgs "${packages_custom}"
+		yaml="${yaml_dir}/${packages_custom##*/}-${target_arch}-${initsys}.yaml"
+		write_netgroup_yaml "$1" "${yaml}"
+	fi
 	${calamares} && write_calamares_yaml "$1"
 	user_own "${yaml_dir}"
 	reset_profile
