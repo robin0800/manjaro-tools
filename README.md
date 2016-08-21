@@ -264,7 +264,7 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 
 check-yaml can be used to write profile package lists to yaml.
 It is also possible to generate calamares conf file as buildiso would do.
-yaml files are used by calamares netinstall option.
+yaml files are used by calamares netinstall option from a specified url(netgroups).
 
 ~~~
 $ check-yaml -h
@@ -288,7 +288,7 @@ check-yaml -p xfce -a i686 -c
 * for x86_64
 
 ~~~
-buildiso -p xfce -c
+check-yaml -p xfce -c
 ~~~
 
 ####Special parameters
