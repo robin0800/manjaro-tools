@@ -260,8 +260,43 @@ The branch can be defined also in manjaro-tools.conf, but a manual parameter wil
 ######* -z
 * Use this to sqfs compress the chroots if you previously used -x.
 
+###4. check-yaml
 
-###4. buildtree
+check-yaml can be used to write profile package lists to yaml.
+It is also possible to generate calamares conf file as buildiso would do.
+yaml files are used by calamares netinstall option.
+
+~~~
+$ check-yaml -h
+Usage: check-yaml [options]
+    -p <profile>       Buildset or profile [default: default]
+    -a <arch>          Arch [default: x86_64]
+    -k <name>          Kernel to use[default: linux44]
+    -i <name>          Init system to use [default: systemd]
+    -c                 Check also calamares yaml files generated for the profile
+    -q                 Query settings
+    -h                 This help
+~~~
+######* build xfce iso profile for both arches and branch testing on x86_64 build system
+
+* i686 (buildsystem is x86_64)
+
+~~~
+check-yaml -p xfce -a i686 -c
+~~~
+
+* for x86_64
+
+~~~
+buildiso -p xfce -c
+~~~
+
+####Special parameters
+
+######* -c
+* generate calamares module and settings conf files per profile
+
+###5. buildtree
 
 buildtree is a little tools to sync arch abs and manjaro PKGBUILD git repos.
 
@@ -283,7 +318,7 @@ Usage: buildtree [options]
 buildtree -as
 ~~~
 
-###5. manjaro-chroot
+###6. manjaro-chroot
 
 manjaro-chroot is a little tool to quickly chroot into a second system installed on the host.
 If the automount option is enabled, manjaro-chroot will detect installed systems with os-prober, and pops up a list with linux systems to select from.
@@ -316,7 +351,7 @@ manjaro-chroot -a
 manjaro-chroot /mnt /bin/bash
 ~~~
 
-###6. deployiso
+###7. deployiso
 
 deployiso is a script to upload a specific iso or a buiildset to SF.
 It needs to be run inside the iso-profiles directory.
