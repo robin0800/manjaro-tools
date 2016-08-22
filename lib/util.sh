@@ -457,7 +457,7 @@ load_profile_config(){
 
 	[[ -z ${netgroups} ]] && netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
 
-	[[ -z ${smb_workgroup} ]] && smb_workgroup='Manjaro'
+	[[ -z ${smb_workgroup} ]] && smb_workgroup=''
 
 	check_profile_vars
 
