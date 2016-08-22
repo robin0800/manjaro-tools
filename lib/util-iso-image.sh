@@ -84,24 +84,6 @@ configure_mhwd_drivers(){
 	fi
 }
 
-chroot_clean(){
-	msg "Cleaning up ..."
-	for image in "$1"/*-image; do
-		[[ -d ${image} ]] || continue
-		local name=${image##*/}
-		if [[ $name != "mhwd-image" ]];then
-			msg2 "Deleting chroot [%s] ..." "$name"
-			lock 9 "${image}.lock" "Locking chroot '${image}'"
-			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
-				{ type -P btrfs && btrfs subvolume delete "${image}"; } #&> /dev/null
-			fi
-		rm -rf --one-file-system "${image}"
-		fi
-	done
-	exec 9>&-
-	rm -rf --one-file-system "$1"
-}
-
 configure_lsb(){
 	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
 	if [ -e $1/etc/lsb-release ] ; then
@@ -291,8 +273,27 @@ copy_from_cache(){
 }
 
 chroot_create(){
+    [[ "${1##*/}" == "root-image" ]] && local flag="-L"
 	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} $@
+}
+
+chroot_clean(){
+	msg "Cleaning up ..."
+	for image in "$1"/*-image; do
+		[[ -d ${image} ]] || continue
+		local name=${image##*/}
+		if [[ $name != "mhwd-image" ]];then
+			msg2 "Deleting chroot [%s] ..." "$name"
+			lock 9 "${image}.lock" "Locking chroot '${image}'"
+			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
+				{ type -P btrfs && btrfs subvolume delete "${image}"; } #&> /dev/null
+			fi
+		rm -rf --one-file-system "${image}"
+		fi
+	done
+	exec 9>&-
+	rm -rf --one-file-system "$1"
 }
 
 clean_up_image(){
@@ -308,12 +309,9 @@ clean_up_image(){
 		if [[ -d $path ]];then
 			find "$path" -mindepth 0 -delete &> /dev/null
 		fi
-        else
-
-		[[ -f "$1/etc/locale.gen.bak" ]] && \
-			mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
-		[[ -f "$1/etc/locale.conf.bak" ]] && \
-			mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
+    else
+		[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
+		[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
 		path=$1/boot
 		if [[ -d "$path" ]]; then
 			find "$path" -name 'initramfs*.img' -delete &> /dev/null
