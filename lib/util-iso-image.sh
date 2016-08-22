@@ -291,7 +291,6 @@ copy_from_cache(){
 }
 
 chroot_create(){
-	[[ "${1##*/}" == "root-image" ]] && local flag="-L"
 	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} $@
 }
