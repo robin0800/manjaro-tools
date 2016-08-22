@@ -292,6 +292,9 @@ write_postcfg_conf(){
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
 	echo "    - manjaro" >> "$conf"
+	echo "" >> "$conf"
+	echo "samba:" >> "$conf"
+	echo "    - workgroup:  ${smb_workgroup}" >> "$conf"
 }
 
 get_yaml(){

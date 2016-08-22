@@ -220,6 +220,9 @@ write_live_session_conf(){
 	echo '' >> ${conf}
 	echo '# default_desktop_executable' >> ${conf}
 	echo "default_desktop_executable=${default_desktop_executable}" >> ${conf}
+	echo '' >> ${conf}
+	echo '# samba workgroup' >> ${conf}
+	echo "smb_workgrp=${smb_workgroup}" >> ${conf}
 }
 
 configure_hosts(){
