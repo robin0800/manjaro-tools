@@ -14,7 +14,8 @@ import ${LIBDIR}/util-iso-calamares.sh
 
 check_yaml(){
 	result=$(python -c 'import yaml,sys;yaml.safe_load(sys.stdin)' < $1)
-	[[ $? -ne 0 ]] && error "yaml error: %s [msg: %s]"  "$1"
+	info "Checking validity ..."
+	[[ $? -ne 0 ]] && error "yaml error: %s [msg: %s]"  "$1" "${result}"
 }
 
 get_preset(){
@@ -40,6 +41,7 @@ write_calamares_yaml(){
 }
 
 write_netgroup_yaml(){
+	msg2 "Writing [%s] ..." "${2##*/}"
 	echo "- name: '$1'" > "$2"
 	echo "  description: '$1'" >> "$2"
 	echo "  selected: false" >> "$2"
