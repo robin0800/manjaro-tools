@@ -11,6 +11,7 @@
 
 write_machineid_conf(){
 	local conf="$1/etc/calamares/modules/machineid.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	if [[ ${initsys} == 'openrc' ]];then
 		echo "systemd: false" > $conf
 		echo "dbus: true" >> $conf
@@ -23,6 +24,7 @@ write_machineid_conf(){
 }
 
 write_finished_conf(){
+	msg2 "Writing [%s] ..." "finished.conf"
 	local conf="$1/etc/calamares/modules/finished.conf"
 	echo '---' > "$conf"
 	echo 'restartNowEnabled: true' >> "$conf"
@@ -36,6 +38,7 @@ write_finished_conf(){
 
 write_bootloader_conf(){
 	local conf="$1/etc/calamares/modules/bootloader.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	source "$2"
 	echo '---' > "$conf"
 	echo "efiBootLoader: \"${efi_boot_loader}\"" >> "$conf"
@@ -54,6 +57,7 @@ write_bootloader_conf(){
 write_services_conf(){
 	if [[ ${initsys} == 'openrc' ]];then
 		local conf="$1/etc/calamares/modules/servicescfg.conf"
+		msg2 "Writing [%s] ..." "${conf##*/}"
 		echo '---' >  "$conf"
 		echo '' >> "$conf"
 		echo 'services:' >> "$conf"
@@ -72,6 +76,7 @@ write_services_conf(){
 		fi
 	else
 		local conf="$1/etc/calamares/modules/services.conf"
+		msg2 "Writing [%s] ..." "${conf##*/}"
 		echo '---' >  "$conf"
 		echo '' >> "$conf"
 		echo 'services:' > "$conf"
@@ -95,6 +100,7 @@ write_services_conf(){
 
 write_displaymanager_conf(){
 	local conf="$1/etc/calamares/modules/displaymanager.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "displaymanagers:" > "$conf"
 	echo "  - ${displaymanager}" >> "$conf"
 	echo '' >> "$conf"
@@ -109,12 +115,14 @@ write_displaymanager_conf(){
 
 write_initcpio_conf(){
 	local conf="$1/etc/calamares/modules/initcpio.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "kernel: ${kernel}" >> "$conf"
 }
 
 write_unpack_conf(){
 	local conf="$1/etc/calamares/modules/unpackfs.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "unpack:" >> "$conf"
 	echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
@@ -129,6 +137,7 @@ write_unpack_conf(){
 
 write_users_conf(){
 	local conf="$1/etc/calamares/modules/users.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "userGroup:      users" >> "$conf"
 	echo "defaultGroups:" >> "$conf"
@@ -144,12 +153,14 @@ write_users_conf(){
 
 write_packages_conf(){
 	local conf="$1/etc/calamares/modules/packages.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "backend: pacman" >> "$conf"
 }
 
 write_welcome_conf(){
 	local conf="$1/etc/calamares/modules/welcome.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf" >> "$conf"
 	echo "showSupportUrl:         true" >> "$conf"
 	echo "showKnownIssuesUrl:     true" >> "$conf"
@@ -175,6 +186,7 @@ write_welcome_conf(){
 
 write_settings_conf(){
 	local conf="$1/etc/calamares/settings.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "modules-search: [ local ]" >> "$conf"
 	echo '' >> "$conf"
@@ -239,6 +251,7 @@ write_settings_conf(){
 
 write_mhwdcfg_conf(){
 	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "identifier:" >> "$conf"
 	echo "    net:" >> "$conf"
@@ -272,6 +285,7 @@ write_mhwdcfg_conf(){
 
 write_chrootcfg_conf(){
 	local conf="$1/etc/calamares/modules/chrootcfg.conf" mode='"0o755"'
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "requirements:" >> "$conf"
 	echo "    - name: /etc" >> "$conf"
@@ -288,6 +302,7 @@ write_chrootcfg_conf(){
 
 write_postcfg_conf(){
 	local conf="$1/etc/calamares/modules/postcfg.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "keyrings:" >> "$conf"
 	echo "    - archlinux" >> "$conf"
@@ -314,12 +329,14 @@ get_yaml(){
 
 write_netinstall_conf(){
 	local conf="$1/etc/calamares/modules/netinstall.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "groupsUrl: ${netgroups}/$(get_yaml)" >> "$conf"
 }
 
 write_grubcfg_conf(){
 	local conf="$1/etc/calamares/modules/grubcfg.conf"
+	msg2 "Writing [%s] ..." "${conf##*/}"
 	echo "---" > "$conf"
 	echo "overwrite: false" >> "$conf"
 	echo '' >> "$conf"

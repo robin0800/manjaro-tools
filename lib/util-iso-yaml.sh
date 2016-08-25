@@ -12,11 +12,11 @@
 import ${LIBDIR}/util-iso.sh
 import ${LIBDIR}/util-iso-calamares.sh
 
-check_yaml(){
-	result=$(python -c 'import yaml,sys;yaml.safe_load(sys.stdin)' < $1)
-	info "Checking validity ..."
-	[[ $? -ne 0 ]] && error "yaml error: %s [msg: %s]"  "$1" "${result}"
-}
+# check_yaml(){
+# 	result=$(python -c 'import yaml,sys;yaml.safe_load(sys.stdin)' < $1)
+# 	msg2 "Checking validity [%s] ..." "${1##*/}"
+# 	[[ $? -ne 0 ]] && error "yaml error: %s [msg: %s]"  "$1" "${result}"
+# }
 
 get_preset(){
 	local p=${tmp_dir}/${kernel}.preset kvmaj kvmin
@@ -35,9 +35,9 @@ get_preset(){
 
 write_calamares_yaml(){
 	configure_calamares "${yaml_dir}" "$(get_preset)"
-	for conf in "${yaml_dir}"/etc/calamares/modules/*.conf "${yaml_dir}"/etc/calamares/settings.conf; do
-		check_yaml "$conf"
-	done
+# 	for conf in "${yaml_dir}"/etc/calamares/modules/*.conf "${yaml_dir}"/etc/calamares/settings.conf; do
+# 		check_yaml "$conf"
+# 	done
 }
 
 write_netgroup_yaml(){
@@ -50,7 +50,7 @@ write_netgroup_yaml(){
 	for p in ${packages[@]};do
 		echo "       - $p" >> "$2"
 	done
-	check_yaml "$2"
+# 	check_yaml "$2"
 }
 
 prepare_check(){
