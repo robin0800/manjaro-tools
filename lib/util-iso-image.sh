@@ -173,10 +173,10 @@ detect_desktop_env(){
 }
 
 write_live_session_conf(){
-	msg2 "Configuring live session ..."
 	local path=$1${DATADIR}
 	[[ ! -d $path ]] && mkdir -p $path
 	local conf=$path/live.conf
+	msg2 "Writing %s" "${conf##*/}"
 	echo '# live session configuration' > ${conf}
 	echo '' >> ${conf}
 	echo '# autologin' >> ${conf}

@@ -41,7 +41,7 @@ write_calamares_yaml(){
 }
 
 write_netgroup_yaml(){
-	msg2 "Writing [%s] ..." "${2##*/}"
+	msg2 "Writing %s ..." "${2##*/}"
 	echo "- name: '$1'" > "$2"
 	echo "  description: '$1'" >> "$2"
 	echo "  selected: false" >> "$2"
