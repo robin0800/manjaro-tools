@@ -173,7 +173,7 @@ detect_desktop_env(){
 }
 
 write_live_session_conf(){
-	local path=$1${DATADIR}
+	local path=$1${SYSCONFDIR}
 	[[ ! -d $path ]] && mkdir -p $path
 	local conf=$path/live.conf
 	msg2 "Writing %s" "${conf##*/}"
