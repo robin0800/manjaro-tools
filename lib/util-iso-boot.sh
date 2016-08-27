@@ -193,7 +193,7 @@ copy_isolinux_bin(){
 gen_boot_args(){
 	local args=(quiet)
 	if ${plymouth_boot};then
-		[[ ${initsys} == 'systemd' ]] && args+=(splash)
+		args+=(splash)
 	fi
 	echo ${args[@]}
 }
