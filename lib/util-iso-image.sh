@@ -84,24 +84,6 @@ configure_mhwd_drivers(){
 	fi
 }
 
-chroot_clean(){
-	msg "Cleaning up ..."
-	for image in "$1"/*-image; do
-		[[ -d ${image} ]] || continue
-		local name=${image##*/}
-		if [[ $name != "mhwd-image" ]];then
-			msg2 "Deleting chroot [%s] ..." "$name"
-			lock 9 "${image}.lock" "Locking chroot '${image}'"
-			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
-				{ type -P btrfs && btrfs subvolume delete "${image}"; } #&> /dev/null
-			fi
-		rm -rf --one-file-system "${image}"
-		fi
-	done
-	exec 9>&-
-	rm -rf --one-file-system "$1"
-}
-
 configure_lsb(){
 	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
 	if [ -e $1/etc/lsb-release ] ; then
@@ -191,10 +173,10 @@ detect_desktop_env(){
 }
 
 write_live_session_conf(){
-	msg2 "Configuring live session ..."
-	local path=$1${DATADIR}
+	local path=$1${SYSCONFDIR}
 	[[ ! -d $path ]] && mkdir -p $path
 	local conf=$path/live.conf
+	msg2 "Writing %s" "${conf##*/}"
 	echo '# live session configuration' > ${conf}
 	echo '' >> ${conf}
 	echo '# autologin' >> ${conf}
@@ -220,6 +202,9 @@ write_live_session_conf(){
 	echo '' >> ${conf}
 	echo '# default_desktop_executable' >> ${conf}
 	echo "default_desktop_executable=${default_desktop_executable}" >> ${conf}
+	echo '' >> ${conf}
+	echo '# samba workgroup' >> ${conf}
+	echo "smb_workgroup=${smb_workgroup}" >> ${conf}
 }
 
 configure_hosts(){
@@ -257,7 +242,7 @@ configure_live_image(){
 	configure_mhwd "$1"
 	configure_system "$1"
 	configure_services "$1"
-	configure_calamares "$1"
+	configure_calamares "$1" "$1/etc/mkinitcpio.d/${kernel}.preset"
 	write_live_session_conf "$1"
 	msg "Done configuring [live-image]"
 }
@@ -288,9 +273,27 @@ copy_from_cache(){
 }
 
 chroot_create(){
-	[[ "${1##*/}" == "root-image" ]] && local flag="-L"
+    [[ "${1##*/}" == "root-image" ]] && local flag="-L"
 	setarch "${target_arch}" \
 		mkchroot ${mkchroot_args[*]} ${flag} $@
+}
+
+chroot_clean(){
+	msg "Cleaning up ..."
+	for image in "$1"/*-image; do
+		[[ -d ${image} ]] || continue
+		local name=${image##*/}
+		if [[ $name != "mhwd-image" ]];then
+			msg2 "Deleting chroot [%s] ..." "$name"
+			lock 9 "${image}.lock" "Locking chroot '${image}'"
+			if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
+				{ type -P btrfs && btrfs subvolume delete "${image}"; } #&> /dev/null
+			fi
+		rm -rf --one-file-system "${image}"
+		fi
+	done
+	exec 9>&-
+	rm -rf --one-file-system "$1"
 }
 
 clean_up_image(){
@@ -306,20 +309,17 @@ clean_up_image(){
 		if [[ -d $path ]];then
 			find "$path" -mindepth 0 -delete &> /dev/null
 		fi
-        else
-
-		[[ -f "$1/etc/locale.gen.bak" ]] && \
-			mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
-		[[ -f "$1/etc/locale.conf.bak" ]] && \
-			mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
+    else
+		[[ -f "$1/etc/locale.gen.bak" ]] && mv "$1/etc/locale.gen.bak" "$1/etc/locale.gen"
+		[[ -f "$1/etc/locale.conf.bak" ]] && mv "$1/etc/locale.conf.bak" "$1/etc/locale.conf"
 		path=$1/boot
 		if [[ -d "$path" ]]; then
 			find "$path" -name 'initramfs*.img' -delete &> /dev/null
 		fi
-# 		path=$1/var/lib/pacman/sync
-# 		if [[ -d $path ]];then
-# 			find "$path" -type f -delete &> /dev/null
-# 		fi
+		path=$1/var/lib/pacman/sync
+		if [[ -d $path ]];then
+			find "$path" -type f -delete &> /dev/null
+		fi
 		path=$1/var/cache/pacman/pkg
 		if [[ -d $path ]]; then
 			find "$path" -type f -delete &> /dev/null

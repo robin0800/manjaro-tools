@@ -45,6 +45,7 @@ show_profile(){
 		msg2 "password: %s" "${password}"
 		msg2 "login_shell: %s" "${login_shell}"
 		msg2 "addgroups: %s" "${addgroups}"
+		[[ -n ${smb_workgroup} ]] && msg2 "smb_workgroup: %s" "${smb_workgroup}"
 
 		if [[ ${initsys} == 'systemd' ]];then
 			msg2 "enable_systemd: %s" "${enable_systemd[*]}"

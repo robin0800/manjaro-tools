@@ -111,7 +111,7 @@ if ${build_locales};then
 	info "Using build locales ..."
 	mv "$working_dir/etc/locale.gen" "$working_dir/etc/locale.gen.bak"
 	mv "$working_dir/etc/locale.conf" "$working_dir/etc/locale.conf.bak"
-	printf '%s.UTF-8 UTF-8\n' en_US de_DE > "$working_dir/etc/locale.gen"
+	printf '%s.UTF-8 UTF-8\n' en_US > "$working_dir/etc/locale.gen"
 	printf 'LANG=%s.UTF-8\n' en_US > "$working_dir/etc/locale.conf"
 	printf 'LC_MESSAGES=C\n' >> "$working_dir/etc/locale.conf"
 fi

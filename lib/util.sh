@@ -402,7 +402,7 @@ load_profile_config(){
 	[[ -z ${pxe_boot} ]] && pxe_boot="true"
 
 	[[ -z ${plymouth_boot} ]] && plymouth_boot="true"
-	[[ ${initsys} == 'openrc' ]] && plymouth_boot="false"
+# 	[[ ${initsys} == 'openrc' ]] && plymouth_boot="false"
 
 	[[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
 
@@ -435,11 +435,11 @@ load_profile_config(){
 	[[ -z ${disable_openrc[@]} ]] && disable_openrc=()
 
 	if [[ -z ${enable_systemd_live[@]} ]];then
-		enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+		enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
 	fi
 
 	if [[ -z ${enable_openrc_live[@]} ]];then
-		enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init')
+		enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
 	fi
 
 	if [[ ${displaymanager} != "none" ]]; then
@@ -457,13 +457,15 @@ load_profile_config(){
 
 	[[ -z ${netgroups} ]] && netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
 
-	if ! ${unpackfs} && ! ${netinstall};then
-		netinstall='true'
-	fi
+	[[ -z ${smb_workgroup} ]] && smb_workgroup=''
 
 	check_profile_vars
 
 	return 0
+}
+
+user_own(){
+	chown -R "${OWNER}:$(id --group ${OWNER})" "$1"
 }
 
 clean_dir(){

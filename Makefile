@@ -64,7 +64,8 @@ LIST_ISO = \
 BIN_ISO = \
 	bin/buildiso \
 	bin/testiso \
-	bin/deployiso
+	bin/deployiso \
+	bin/check-yaml
 
 LIBS_ISO = \
 	lib/util-iso.sh \
@@ -73,11 +74,13 @@ LIBS_ISO = \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
 	lib/util-iso-boot.sh \
-	lib/util-publish.sh
+	lib/util-publish.sh \
+	lib/util-iso-yaml.sh
 
 SHARED_ISO = \
 	data/pacman-mhwd.conf \
 	data/desktop.map \
+	data/linux.preset \
 	data/profile.conf.example
 
 CPIOHOOKS = \
