@@ -749,7 +749,7 @@ load_profile(){
 	iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
 
 	prepare_dir "${iso_dir}"
-	chown "${OWNER}:${OWNER}" "${iso_dir}"
+	chown "${OWNER}:$(id --group ${OWNER})" "${iso_dir}"
 
 	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed))
 }
