@@ -237,6 +237,7 @@ write_settings_conf(){
 	fi
 	echo "  - grubcfg" >> "$conf"
 	echo "  - bootloader" >> "$conf"
+	echo "  - plymouthcfg" >> "$conf"
 	echo "  - postcfg" >> "$conf"
 	echo "  - umount" >> "$conf"
 	echo "- show:" >> "$conf"
@@ -346,10 +347,13 @@ write_grubcfg_conf(){
 	echo "    GRUB_DISABLE_SUBMENU: true" >> "$conf"
 	echo '    GRUB_TERMINAL_OUTPUT: "console"' >> "$conf"
 	echo "    GRUB_DISABLE_RECOVERY: true" >> "$conf"
-	if ${plymouth_boot};then
-		echo '' >> "$conf"
-		echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
-	fi
+}
+
+write_plymouthcfg_conf(){
+	local conf="$1/etc/calamares/modules/plymouthcfg.conf"
+	msg2 "Writing %s ..." "${conf##*/}"
+	echo "---" > "$conf"
+    echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
 }
 
 configure_calamares(){
@@ -378,6 +382,8 @@ configure_calamares(){
 	write_finished_conf "$1"
 
 	${netinstall} && write_netinstall_conf "$1"
+
+	${plymouth_boot} && write_plymouthcfg_conf "$1"
 
 	write_chrootcfg_conf "$1"
 
