@@ -320,6 +320,7 @@ make_image_boot() {
 		mkdir -p ${path}
 
 		mount_image_select "${path}"
+		configure_plymouth "${path}"
 
 		copy_initcpio "${profile_dir}" "${path}"
 

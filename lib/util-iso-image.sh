@@ -237,7 +237,6 @@ configure_live_image(){
 	msg "Configuring [live-image]"
 	detect_desktop_env "$1"
 	configure_hosts "$1"
-	configure_plymouth "$1"
 	configure_lsb "$1"
 	configure_mhwd "$1"
 	configure_system "$1"
