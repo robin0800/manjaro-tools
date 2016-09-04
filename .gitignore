@@ -3,4 +3,4 @@
 *.tar.xz
 .kateproject.d
 data/misc
--project
+.project
