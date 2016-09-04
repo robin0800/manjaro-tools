@@ -224,6 +224,7 @@ write_settings_conf(){
 	echo "  - localecfg" >> "$conf"
 	echo "  - luksopenswaphookcfg" >> "$conf"
 	echo "  - luksbootkeyfile" >> "$conf"
+	echo "  - plymouthcfg" >> "$conf"
 	echo "  - initcpiocfg" >> "$conf"
 	echo "  - initcpio" >> "$conf"
 	echo "  - users" >> "$conf"
@@ -237,7 +238,6 @@ write_settings_conf(){
 	fi
 	echo "  - grubcfg" >> "$conf"
 	echo "  - bootloader" >> "$conf"
-	echo "  - plymouthcfg" >> "$conf"
 	echo "  - postcfg" >> "$conf"
 	echo "  - umount" >> "$conf"
 	echo "- show:" >> "$conf"
