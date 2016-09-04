@@ -353,7 +353,7 @@ write_plymouthcfg_conf(){
 	local conf="$1/etc/calamares/modules/plymouthcfg.conf"
 	msg2 "Writing %s ..." "${conf##*/}"
 	echo "---" > "$conf"
-    echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
+	echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
 }
 
 configure_calamares(){
