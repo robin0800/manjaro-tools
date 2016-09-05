@@ -356,12 +356,24 @@ write_plymouthcfg_conf(){
 	echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
 }
 
+write_locale_conf(){
+	local conf="$1/etc/calamares/modules/locale.conf"
+	msg2 "Writing %s ..." "${conf##*/}"
+	echo "---" > "$conf"
+	echo "region: America" >> "$conf"
+	echo "zone: New_York" >> "$conf"
+	echo "localeGenPath: /etc/locale.gen" >> "$conf"
+	echo "geoipUrl: freegeoip.net" >> "$conf"
+}
+
 configure_calamares(){
 	info "Configuring [Calamares]"
 
 	mkdir -p $1/etc/calamares/modules
 
 	write_settings_conf "$1"
+
+	write_locale_conf "$1"
 
 	write_welcome_conf "$1"
 
