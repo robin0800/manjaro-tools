@@ -98,10 +98,10 @@ overriding
 # dist_name="Manjaro"
 
 # the dist release; default: auto
-# dist_release=16.06
+# dist_release=16.10
 
 # the codename; defaults to value sourced from /etc/lsb-release
-# dist_codename="Daniella"
+# dist_codename="Fringilla"
 
 # the branding; default: auto
 # dist_branding="MJRO"
