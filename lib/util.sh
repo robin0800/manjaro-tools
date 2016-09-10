@@ -377,10 +377,10 @@ check_profile_vars(){
 
 get_svc(){
 	local service=${displaymanager}
-	if  [[ $service != "sddm" ]] || \
-		[[ $service != "lxdm" ]];then
-		${plymouth_boot} && service="$service-plymouth"
-	fi
+	case $service in
+		'sddm'|'lxdm') service="$service" ;;
+		*) ${plymouth_boot} && service="$service-plymouth" ;;
+	esac
 	echo $service
 }
 

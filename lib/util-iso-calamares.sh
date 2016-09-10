@@ -224,6 +224,7 @@ write_settings_conf(){
 	echo "  - localecfg" >> "$conf"
 	echo "  - luksopenswaphookcfg" >> "$conf"
 	echo "  - luksbootkeyfile" >> "$conf"
+	${plymouth_boot} && echo "  - plymouthcfg" >> "$conf"
 	echo "  - initcpiocfg" >> "$conf"
 	echo "  - initcpio" >> "$conf"
 	echo "  - users" >> "$conf"
@@ -346,10 +347,23 @@ write_grubcfg_conf(){
 	echo "    GRUB_DISABLE_SUBMENU: true" >> "$conf"
 	echo '    GRUB_TERMINAL_OUTPUT: "console"' >> "$conf"
 	echo "    GRUB_DISABLE_RECOVERY: true" >> "$conf"
-	if ${plymouth_boot};then
-		echo '' >> "$conf"
-		echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
-	fi
+}
+
+write_plymouthcfg_conf(){
+	local conf="$1/etc/calamares/modules/plymouthcfg.conf"
+	msg2 "Writing %s ..." "${conf##*/}"
+	echo "---" > "$conf"
+	echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
+}
+
+write_locale_conf(){
+	local conf="$1/etc/calamares/modules/locale.conf"
+	msg2 "Writing %s ..." "${conf##*/}"
+	echo "---" > "$conf"
+	echo "region: America" >> "$conf"
+	echo "zone: New_York" >> "$conf"
+	echo "localeGenPath: /etc/locale.gen" >> "$conf"
+	echo "geoipUrl: freegeoip.net" >> "$conf"
 }
 
 configure_calamares(){
@@ -358,6 +372,8 @@ configure_calamares(){
 	mkdir -p $1/etc/calamares/modules
 
 	write_settings_conf "$1"
+
+	write_locale_conf "$1"
 
 	write_welcome_conf "$1"
 
@@ -378,6 +394,8 @@ configure_calamares(){
 	write_finished_conf "$1"
 
 	${netinstall} && write_netinstall_conf "$1"
+
+	${plymouth_boot} && write_plymouthcfg_conf "$1"
 
 	write_chrootcfg_conf "$1"
 

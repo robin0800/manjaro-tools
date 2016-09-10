@@ -320,6 +320,7 @@ make_image_boot() {
 		mkdir -p ${path}
 
 		mount_image_select "${path}"
+		configure_plymouth "${path}"
 
 		copy_initcpio "${profile_dir}" "${path}"
 
@@ -749,7 +750,7 @@ load_profile(){
 	iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
 
 	prepare_dir "${iso_dir}"
-	chown "${OWNER}:${OWNER}" "${iso_dir}"
+	chown "${OWNER}:$(id --group ${OWNER})" "${iso_dir}"
 
 	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed))
 }
