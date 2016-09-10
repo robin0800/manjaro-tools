@@ -224,7 +224,7 @@ write_settings_conf(){
 	echo "  - localecfg" >> "$conf"
 	echo "  - luksopenswaphookcfg" >> "$conf"
 	echo "  - luksbootkeyfile" >> "$conf"
-	echo "  - plymouthcfg" >> "$conf"
+	${plymouth_boot} && echo "  - plymouthcfg" >> "$conf"
 	echo "  - initcpiocfg" >> "$conf"
 	echo "  - initcpio" >> "$conf"
 	echo "  - users" >> "$conf"
