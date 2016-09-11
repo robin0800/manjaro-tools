@@ -457,6 +457,8 @@ load_profile_config(){
 
 	[[ -z ${netgroups} ]] && netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
 
+	[[ -z ${geoip} ]] && geoip='true'
+
 	[[ -z ${smb_workgroup} ]] && smb_workgroup=''
 
 	check_profile_vars

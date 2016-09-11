@@ -254,16 +254,17 @@ write_mhwdcfg_conf(){
 	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
 	msg2 "Writing %s ..." "${conf##*/}"
 	echo "---" > "$conf"
+	echo "bus:" >> "$conf"
+	echo "    - pci" >> "$conf"
+	echo '' >> "$conf"
 	echo "identifier:" >> "$conf"
 	echo "    net:" >> "$conf"
 	echo "      - 200" >> "$conf"
 	echo "      - 280" >> "$conf"
 	echo "    video:" >> "$conf"
 	echo "      - 300" >> "$conf"
-	echo '' >> "$conf"
-	echo "bus:" >> "$conf"
-	echo "    - pci" >> "$conf"
-	echo "    - usb" >> "$conf"
+	echo "      - 302" >> "$conf"
+	echo "      - 380" >> "$conf"
 	echo '' >> "$conf"
 	if ${nonfree_mhwd};then
 		echo "driver: nonfree" >> "$conf"
@@ -335,19 +336,19 @@ write_netinstall_conf(){
 	echo "groupsUrl: ${netgroups}/$(get_yaml)" >> "$conf"
 }
 
-write_grubcfg_conf(){
-	local conf="$1/etc/calamares/modules/grubcfg.conf"
-	msg2 "Writing %s ..." "${conf##*/}"
-	echo "---" > "$conf"
-	echo "overwrite: false" >> "$conf"
-	echo '' >> "$conf"
-	echo "defaults:" >> "$conf"
-	echo "    GRUB_TIMEOUT: 5" >> "$conf"
-	echo '    GRUB_DEFAULT: "saved"' >> "$conf"
-	echo "    GRUB_DISABLE_SUBMENU: true" >> "$conf"
-	echo '    GRUB_TERMINAL_OUTPUT: "console"' >> "$conf"
-	echo "    GRUB_DISABLE_RECOVERY: true" >> "$conf"
-}
+# write_grubcfg_conf(){
+# 	local conf="$1/etc/calamares/modules/grubcfg.conf"
+# 	msg2 "Writing %s ..." "${conf##*/}"
+# 	echo "---" > "$conf"
+# 	echo "overwrite: false" >> "$conf"
+# 	echo '' >> "$conf"
+# 	echo "defaults:" >> "$conf"
+# 	echo "    GRUB_TIMEOUT: 5" >> "$conf"
+# 	echo '    GRUB_DEFAULT: "saved"' >> "$conf"
+# 	echo "    GRUB_DISABLE_SUBMENU: true" >> "$conf"
+# 	echo '    GRUB_TERMINAL_OUTPUT: "console"' >> "$conf"
+# 	echo "    GRUB_DISABLE_RECOVERY: true" >> "$conf"
+# }
 
 write_plymouthcfg_conf(){
 	local conf="$1/etc/calamares/modules/plymouthcfg.conf"
@@ -363,7 +364,7 @@ write_locale_conf(){
 	echo "region: America" >> "$conf"
 	echo "zone: New_York" >> "$conf"
 	echo "localeGenPath: /etc/locale.gen" >> "$conf"
-	echo "geoipUrl: freegeoip.net" >> "$conf"
+	${geoip} && echo "geoipUrl: freegeoip.net" >> "$conf"
 }
 
 configure_calamares(){
@@ -401,7 +402,7 @@ configure_calamares(){
 
 	write_postcfg_conf "$1"
 
-	write_grubcfg_conf "$1"
+# 	write_grubcfg_conf "$1"
 
 	write_services_conf "$1"
 	write_users_conf "$1"
