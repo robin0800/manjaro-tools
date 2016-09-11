@@ -336,20 +336,6 @@ write_netinstall_conf(){
 	echo "groupsUrl: ${netgroups}/$(get_yaml)" >> "$conf"
 }
 
-# write_grubcfg_conf(){
-# 	local conf="$1/etc/calamares/modules/grubcfg.conf"
-# 	msg2 "Writing %s ..." "${conf##*/}"
-# 	echo "---" > "$conf"
-# 	echo "overwrite: false" >> "$conf"
-# 	echo '' >> "$conf"
-# 	echo "defaults:" >> "$conf"
-# 	echo "    GRUB_TIMEOUT: 5" >> "$conf"
-# 	echo '    GRUB_DEFAULT: "saved"' >> "$conf"
-# 	echo "    GRUB_DISABLE_SUBMENU: true" >> "$conf"
-# 	echo '    GRUB_TERMINAL_OUTPUT: "console"' >> "$conf"
-# 	echo "    GRUB_DISABLE_RECOVERY: true" >> "$conf"
-# }
-
 write_plymouthcfg_conf(){
 	local conf="$1/etc/calamares/modules/plymouthcfg.conf"
 	msg2 "Writing %s ..." "${conf##*/}"
@@ -401,8 +387,6 @@ configure_calamares(){
 	write_chrootcfg_conf "$1"
 
 	write_postcfg_conf "$1"
-
-# 	write_grubcfg_conf "$1"
 
 	write_services_conf "$1"
 	write_users_conf "$1"
