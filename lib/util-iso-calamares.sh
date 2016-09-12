@@ -285,23 +285,6 @@ write_mhwdcfg_conf(){
 	echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
 }
 
-write_chrootcfg_conf(){
-	local conf="$1/etc/calamares/modules/chrootcfg.conf" mode='"0o755"'
-	msg2 "Writing %s ..." "${conf##*/}"
-	echo "---" > "$conf"
-	echo "requirements:" >> "$conf"
-	echo "    - name: /etc" >> "$conf"
-	echo "      mode: ${mode}" >> "$conf"
-	echo "    - name: /var/cache/pacman/pkg" >> "$conf"
-	echo "      mode: ${mode}" >> "$conf"
-	echo "    - name: /var/lib/pacman" >> "$conf"
-	echo "      mode: ${mode}" >> "$conf"
-	echo '' >> "$conf"
-	echo "keyrings:" >> "$conf"
-	echo "    - archlinux" >> "$conf"
-	echo "    - manjaro" >> "$conf"
-}
-
 write_postcfg_conf(){
 	local conf="$1/etc/calamares/modules/postcfg.conf"
 	msg2 "Writing %s ..." "${conf##*/}"
@@ -384,11 +367,10 @@ configure_calamares(){
 
 	${plymouth_boot} && write_plymouthcfg_conf "$1"
 
-	write_chrootcfg_conf "$1"
-
 	write_postcfg_conf "$1"
 
 	write_services_conf "$1"
+
 	write_users_conf "$1"
 
 	info "Done configuring [Calamares]"
