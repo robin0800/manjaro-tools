@@ -19,7 +19,7 @@ import ${LIBDIR}/util-iso-calamares.sh
 # }
 
 get_preset(){
-	local p=${tmp_dir}/${kernel}.preset kvmaj kvmin
+	local p=${tmp_dir}/${kernel}.preset kvmaj kvmin digit
 	cp ${DATADIR}/linux.preset $p
 	digit=${kernel##linux}
 	kvmaj=${digit:0:1}

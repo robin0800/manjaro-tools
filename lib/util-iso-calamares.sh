@@ -10,30 +10,23 @@
 # GNU General Public License for more details.
 
 write_machineid_conf(){
-	local conf="$1/etc/calamares/modules/machineid.conf"
+	local conf="$1/etc/calamares/modules/machineid.conf" switch='false'
 	msg2 "Writing %s ..." "${conf##*/}"
-	if [[ ${initsys} == 'openrc' ]];then
-		echo "systemd: false" > $conf
-		echo "dbus: true" >> $conf
-		echo "symlink: true" >> $conf
-	else
-		echo "systemd: true" > $conf
-		echo "dbus: true" >> $conf
-		echo "symlink: true" >> $conf
-	fi
+	echo '---' > "$conf"
+	[[ ${initsys} == 'systemd' ]] && switch='true'
+	echo "systemd: ${switch}" >> $conf
+	echo "dbus: true" >> $conf
+	echo "symlink: true" >> $conf
 }
 
 write_finished_conf(){
 	msg2 "Writing %s ..." "finished.conf"
-	local conf="$1/etc/calamares/modules/finished.conf"
+	local conf="$1/etc/calamares/modules/finished.conf" cmd="shutdown -r now"
 	echo '---' > "$conf"
 	echo 'restartNowEnabled: true' >> "$conf"
 	echo 'restartNowChecked: false' >> "$conf"
-	if [[ ${initsys} == 'openrc' ]];then
-		echo 'restartNowCommand: "shutdown -r now"' >> "$conf"
-	else
-		echo 'restartNowCommand: "systemctl -i reboot"' >> "$conf"
-	fi
+	[[ ${initsys} == 'systemd' ]] && cmd="systemctl -i reboot"
+	echo "restartNowCommand: \"${cmd}\"" >> "$conf"
 }
 
 write_bootloader_conf(){
@@ -42,9 +35,9 @@ write_bootloader_conf(){
 	source "$2"
 	echo '---' > "$conf"
 	echo "efiBootLoader: \"${efi_boot_loader}\"" >> "$conf"
-	echo "kernel: \"$(echo ${ALL_kver} | sed s'|/boot||')\"" >> "$conf"
-	echo "img: \"$(echo ${default_image} | sed s'|/boot||')\"" >> "$conf"
-	echo "fallback: \"$(echo ${fallback_image} | sed s'|/boot||')\"" >> "$conf"
+	echo "kernel: \"${ALL_kver#*/boot}\"" >> "$conf"
+	echo "img: \"${default_image#*/boot}\"" >> "$conf"
+	echo "fallback: \"${fallback_image#*/boot}\"" >> "$conf"
 	echo 'timeout: "10"' >> "$conf"
 	echo "kernelLine: \", with ${kernel}\"" >> "$conf"
 	echo "fallbackKernelLine: \", with ${kernel} (fallback initramfs)\"" >> "$conf"
@@ -54,48 +47,48 @@ write_bootloader_conf(){
 	echo '#efiBootloaderId: "dirname"' >> "$conf"
 }
 
-write_services_conf(){
-	if [[ ${initsys} == 'openrc' ]];then
-		local conf="$1/etc/calamares/modules/servicescfg.conf"
-		msg2 "Writing %s ..." "${conf##*/}"
-		echo '---' >  "$conf"
-		echo '' >> "$conf"
-		echo 'services:' >> "$conf"
-		echo '    enabled:' >> "$conf"
-		for s in ${enable_openrc[@]};do
+write_servicescfg_conf(){
+	local conf="$1/etc/calamares/modules/servicescfg.conf"
+	msg2 "Writing %s ..." "${conf##*/}"
+	echo '---' >  "$conf"
+	echo '' >> "$conf"
+	echo 'services:' >> "$conf"
+	echo '    enabled:' >> "$conf"
+	for s in ${enable_openrc[@]};do
+		echo "      - name: $s" >> "$conf"
+		echo '        runlevel: default' >> "$conf"
+	done
+	if [[ -n ${disable_openrc[@]} ]];then
+		echo '    disabled:' >> "$conf"
+		for s in ${disable_openrc[@]};do
 			echo "      - name: $s" >> "$conf"
 			echo '        runlevel: default' >> "$conf"
-		done
-		if [[ -n ${disable_openrc[@]} ]];then
-			echo '    disabled:' >> "$conf"
-			for s in ${disable_openrc[@]};do
-				echo "      - name: $s" >> "$conf"
-				echo '        runlevel: default' >> "$conf"
-				echo '' >> "$conf"
-			done
-		fi
-	else
-		local conf="$1/etc/calamares/modules/services.conf"
-		msg2 "Writing %s ..." "${conf##*/}"
-		echo '---' >  "$conf"
-		echo '' >> "$conf"
-		echo 'services:' > "$conf"
-		for s in ${enable_systemd[@]};do
-			echo '    - name: '"$s" >> "$conf"
-			echo '      mandatory: false' >> "$conf"
-			echo '' >> "$conf"
-		done
-		echo 'targets:' >> "$conf"
-		echo '    - name: "graphical"' >> "$conf"
-		echo '      mandatory: true' >> "$conf"
-		echo '' >> "$conf"
-		echo 'disable:' >> "$conf"
-		for s in ${disable_systemd[@]};do
-			echo '    - name: '"$s" >> "$conf"
-			echo '      mandatory: false' >> "$conf"
 			echo '' >> "$conf"
 		done
 	fi
+}
+
+write_services_conf(){
+	local conf="$1/etc/calamares/modules/services.conf"
+	msg2 "Writing %s ..." "${conf##*/}"
+	echo '---' >  "$conf"
+	echo '' >> "$conf"
+	echo 'services:' > "$conf"
+	for s in ${enable_systemd[@]};do
+		echo "    - name: $s" >> "$conf"
+		echo '      mandatory: false' >> "$conf"
+		echo '' >> "$conf"
+	done
+	echo 'targets:' >> "$conf"
+	echo '    - name: "graphical"' >> "$conf"
+	echo '      mandatory: true' >> "$conf"
+	echo '' >> "$conf"
+	echo 'disable:' >> "$conf"
+	for s in ${disable_systemd[@]};do
+		echo "    - name: $s" >> "$conf"
+		echo '      mandatory: false' >> "$conf"
+		echo '' >> "$conf"
+	done
 }
 
 write_displaymanager_conf(){
@@ -184,72 +177,6 @@ write_welcome_conf(){
 	fi
 }
 
-write_settings_conf(){
-	local conf="$1/etc/calamares/settings.conf"
-	msg2 "Writing %s ..." "${conf##*/}"
-	echo "---" > "$conf"
-	echo "modules-search: [ local ]" >> "$conf"
-	echo '' >> "$conf"
-	echo "instances:" >> "$conf"
-	echo '' >> "$conf"
-	echo "sequence:" >> "$conf"
-	echo "- show:" >> "$conf"
-	echo "  - welcome" >> "$conf"
-	${netinstall} && echo "  - netinstall" >> "$conf"
-	echo "  - locale" >> "$conf"
-	echo "  - keyboard" >> "$conf"
-	echo "  - partition" >> "$conf"
-	echo "  - users" >> "$conf"
-	echo "  - summary" >> "$conf"
-	echo "- exec:" >> "$conf"
-	echo "  - partition" >> "$conf"
-	echo "  - mount" >> "$conf"
-	if ${netinstall};then
-		if ${unpackfs};then
-			echo "  - unpackfs" >> "$conf"
-			echo "  - networkcfg" >> "$conf"
-			echo "  - packages" >> "$conf"
-		else
-			echo "  - chrootcfg" >> "$conf"
-			echo "  - networkcfg" >> "$conf"
-		fi
-	else
-		echo "  - unpackfs" >> "$conf"
-		echo "  - networkcfg" >> "$conf"
-	fi
-	echo "  - machineid" >> "$conf"
-	echo "  - fstab" >> "$conf"
-	echo "  - locale" >> "$conf"
-	echo "  - keyboard" >> "$conf"
-	echo "  - localecfg" >> "$conf"
-	echo "  - luksopenswaphookcfg" >> "$conf"
-	echo "  - luksbootkeyfile" >> "$conf"
-	${plymouth_boot} && echo "  - plymouthcfg" >> "$conf"
-	echo "  - initcpiocfg" >> "$conf"
-	echo "  - initcpio" >> "$conf"
-	echo "  - users" >> "$conf"
-	echo "  - displaymanager" >> "$conf"
-	echo "  - mhwdcfg" >> "$conf"
-	echo "  - hwclock" >> "$conf"
-	if [[ ${initsys} == 'systemd' ]];then
-		echo "  - services" >> "$conf"
-	else
-		echo "  - servicescfg" >> "$conf"
-	fi
-	echo "  - grubcfg" >> "$conf"
-	echo "  - bootloader" >> "$conf"
-	echo "  - postcfg" >> "$conf"
-	echo "  - umount" >> "$conf"
-	echo "- show:" >> "$conf"
-	echo "  - finished" >> "$conf"
-	echo '' >> "$conf"
-	echo "branding: ${iso_name}" >> "$conf"
-	echo '' >> "$conf"
-	echo "prompt-install: false" >> "$conf"
-	echo '' >> "$conf"
-	echo "dont-chroot: false" >> "$conf"
-}
-
 write_mhwdcfg_conf(){
 	local conf="$1/etc/calamares/modules/mhwdcfg.conf"
 	msg2 "Writing %s ..." "${conf##*/}"
@@ -333,7 +260,74 @@ write_locale_conf(){
 	echo "region: America" >> "$conf"
 	echo "zone: New_York" >> "$conf"
 	echo "localeGenPath: /etc/locale.gen" >> "$conf"
-	${geoip} && echo "geoipUrl: freegeoip.net" >> "$conf"
+	if ${geoip};then
+		echo "geoipUrl: freegeoip.net" >> "$conf"
+	fi
+}
+
+write_settings_conf(){
+	local conf="$1/etc/calamares/settings.conf"
+	msg2 "Writing %s ..." "${conf##*/}"
+	echo "---" > "$conf"
+	echo "modules-search: [ local ]" >> "$conf"
+	echo '' >> "$conf"
+	echo "instances:" >> "$conf"
+	echo '' >> "$conf"
+	echo "sequence:" >> "$conf"
+	echo "- show:" >> "$conf"
+	echo "  - welcome" >> "$conf"
+	${netinstall} && echo "  - netinstall" >> "$conf"
+	echo "  - locale" >> "$conf"
+	echo "  - keyboard" >> "$conf"
+	echo "  - partition" >> "$conf"
+	echo "  - users" >> "$conf"
+	echo "  - summary" >> "$conf"
+	echo "- exec:" >> "$conf"
+	echo "  - partition" >> "$conf"
+	echo "  - mount" >> "$conf"
+	if ${netinstall};then
+		if ${unpackfs};then
+			echo "  - unpackfs" >> "$conf"
+			echo "  - networkcfg" >> "$conf"
+			echo "  - packages" >> "$conf"
+		else
+			echo "  - chrootcfg" >> "$conf"
+			echo "  - networkcfg" >> "$conf"
+		fi
+	else
+		echo "  - unpackfs" >> "$conf"
+		echo "  - networkcfg" >> "$conf"
+	fi
+	echo "  - machineid" >> "$conf"
+	echo "  - fstab" >> "$conf"
+	echo "  - locale" >> "$conf"
+	echo "  - keyboard" >> "$conf"
+	echo "  - localecfg" >> "$conf"
+	echo "  - luksopenswaphookcfg" >> "$conf"
+	echo "  - luksbootkeyfile" >> "$conf"
+	echo "  - plymouthcfg" >> "$conf"
+	echo "  - initcpiocfg" >> "$conf"
+	echo "  - initcpio" >> "$conf"
+	echo "  - users" >> "$conf"
+	echo "  - displaymanager" >> "$conf"
+	echo "  - mhwdcfg" >> "$conf"
+	echo "  - hwclock" >> "$conf"
+	case ${initsys} in
+		'systemd') echo "  - services" >> "$conf" ;;
+		'openrc') echo "  - servicescfg" >> "$conf" ;;
+	esac
+	echo "  - grubcfg" >> "$conf"
+	echo "  - bootloader" >> "$conf"
+	echo "  - postcfg" >> "$conf"
+	echo "  - umount" >> "$conf"
+	echo "- show:" >> "$conf"
+	echo "  - finished" >> "$conf"
+	echo '' >> "$conf"
+	echo "branding: ${iso_name}" >> "$conf"
+	echo '' >> "$conf"
+	echo "prompt-install: false" >> "$conf"
+	echo '' >> "$conf"
+	echo "dont-chroot: false" >> "$conf"
 }
 
 configure_calamares(){
@@ -347,7 +341,10 @@ configure_calamares(){
 
 	write_welcome_conf "$1"
 
-	write_packages_conf "$1"
+	if ${netinstall};then
+		write_netinstall_conf "$1"
+		write_packages_conf "$1"
+	fi
 
 	write_bootloader_conf "$1" "$2"
 
@@ -363,13 +360,14 @@ configure_calamares(){
 
 	write_finished_conf "$1"
 
-	${netinstall} && write_netinstall_conf "$1"
-
-	${plymouth_boot} && write_plymouthcfg_conf "$1"
+	write_plymouthcfg_conf "$1"
 
 	write_postcfg_conf "$1"
 
-	write_services_conf "$1"
+	case ${initsys} in
+		'systemd') write_services_conf "$1" ;;
+		'openrc') write_servicescfg_conf "$1" ;;
+	esac
 
 	write_users_conf "$1"
 
