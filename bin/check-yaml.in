@@ -93,6 +93,7 @@ load_run_dir "${profile_repo}"
 
 calamares=false
 pretend=false
+group=false
 cache_dir_netinstall="${cache_dir}/netinstall"
 
 usage() {
@@ -111,7 +112,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:i:k:cqh'
+opts='p:a:i:k:gcqh'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
@@ -120,6 +121,7 @@ while getopts "${opts}" arg; do
 		i) initsys="$OPTARG" ;;
 		k) kernel="$OPTARG" ;;
 		c) calamares=true ;;
+		g) group=true ;;
 		q) pretend=true ;;
 		h|?) usage 0 ;;
 		*) echo "invalid argument '${arg}'"; usage 1 ;;
@@ -135,5 +137,7 @@ prepare_dir "${tmp_dir}"
 eval_build_list "${list_dir_iso}" "${build_list_iso}"
 
 ${pretend} && display_settings && exit 1
+
+${group} && write_pacman_group_yaml "${build_list_iso}" && exit 0
 
 run make_profile_yaml "${build_list_iso}"

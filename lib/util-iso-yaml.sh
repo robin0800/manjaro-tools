@@ -53,6 +53,11 @@ write_netgroup_yaml(){
 # 	check_yaml "$2"
 }
 
+write_pacman_group_yaml(){
+	packages=$(pacman -Sgq "$1")
+	write_netgroup_yaml "$1" "${cache_dir_netinstall}/$1.yaml"
+}
+
 prepare_check(){
 	profile=$1
 	edition=$(get_edition ${profile})
