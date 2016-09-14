@@ -467,8 +467,11 @@ load_profile_config(){
 }
 
 user_own(){
-	local flag=$1
-	chown $flag "${OWNER}:$(id --group ${OWNER})" "$2"
+	chown "${OWNER}:$(id --group ${OWNER})" "$2"
+}
+
+user_rown(){
+	chown -R "${OWNER}:$(id --group ${OWNER})" "$1"
 }
 
 clean_dir(){

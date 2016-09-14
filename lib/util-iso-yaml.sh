@@ -85,8 +85,7 @@ make_profile_yaml(){
 		write_netgroup_yaml "$1" "$(gen_fn "${packages_custom##*/}")"
 	fi
 	${calamares} && write_calamares_yaml "$1"
-	user_own "${cache_dir_netinstall}/$1"
-	user_own -R "${yaml_dir}"
+	user_rown "${cache_dir_netinstall}/$1"
 	reset_profile
 	unset yaml_dir
 }
