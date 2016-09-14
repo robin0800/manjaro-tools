@@ -467,7 +467,7 @@ load_profile_config(){
 }
 
 user_own(){
-	chown "${OWNER}:$(id --group ${OWNER})" "$2"
+	chown "${OWNER}:$(id --group ${OWNER})" "$1"
 }
 
 user_rown(){
