@@ -151,7 +151,7 @@ eval_build_list "${list_dir_pkg}" "${build_list_pkg}"
 
 prepare_dir "${pkg_dir}"
 
-chown ${OWNER}:$(id --group ${OWNER}) "${pkg_dir}"
+user_own "${pkg_dir}"
 
 init_base_devel
 

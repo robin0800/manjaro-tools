@@ -613,7 +613,7 @@ compress_images(){
 	make_checksum "${iso_file}"
 	${sign} && sign_iso "${iso_file}"
 	${torrent} && make_torrent
-	user_own "${iso_dir}"
+	user_own -R "${iso_dir}"
 	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
@@ -751,7 +751,7 @@ load_profile(){
 	iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
 
 	prepare_dir "${iso_dir}"
-	chown "${OWNER}:$(id --group ${OWNER})" "${iso_dir}"
+	user_own "${iso_dir}"
 
 	mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed))
 }

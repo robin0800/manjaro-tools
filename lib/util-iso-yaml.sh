@@ -56,6 +56,7 @@ write_netgroup_yaml(){
 write_pacman_group_yaml(){
 	packages=$(pacman -Sgq "$1")
 	write_netgroup_yaml "$1" "${cache_dir_netinstall}/$1.yaml"
+	user_own "${cache_dir_netinstall}/$1.yaml"
 }
 
 prepare_check(){
@@ -68,7 +69,7 @@ prepare_check(){
 	yaml_dir=${cache_dir_netinstall}/${profile}/${target_arch}
 
 	prepare_dir "${yaml_dir}"
-	chown "${OWNER}:${OWNER}" "${yaml_dir}"
+	user_own "${yaml_dir}"
 }
 
 gen_fn(){
@@ -84,7 +85,8 @@ make_profile_yaml(){
 		write_netgroup_yaml "$1" "$(gen_fn "${packages_custom##*/}")"
 	fi
 	${calamares} && write_calamares_yaml "$1"
-	user_own "${yaml_dir}"
+	user_own "${cache_dir_netinstall}/$1"
+	user_own -R "${yaml_dir}"
 	reset_profile
 	unset yaml_dir
 }
