@@ -231,7 +231,7 @@ get_yaml(){
 	else
 		args+=('netinstall')
 	fi
-	[[ ${initsys} == 'openrc' ]] && args+=("${initsys}")
+	args+=("${initsys}")
 	[[ ${edition} == 'sonar' ]] && args+=("${edition}")
 	for arg in ${args[@]};do
 		yaml=${yaml:-}${yaml:+-}${arg}
@@ -257,11 +257,12 @@ write_locale_conf(){
 	local conf="$1/etc/calamares/modules/locale.conf"
 	msg2 "Writing %s ..." "${conf##*/}"
 	echo "---" > "$conf"
-	echo "region: America" >> "$conf"
-	echo "zone: New_York" >> "$conf"
 	echo "localeGenPath: /etc/locale.gen" >> "$conf"
 	if ${geoip};then
-		echo "geoipUrl: freegeoip.net" >> "$conf"
+        echo "geoipUrl: freegeoip.net" >> "$conf"
+	else
+		echo "region: Europe" >> "$conf"
+        echo "zone: London" >> "$conf"
 	fi
 }
 
