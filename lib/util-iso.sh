@@ -613,7 +613,7 @@ compress_images(){
 	make_checksum "${iso_file}"
 	${sign} && sign_iso "${iso_file}"
 	${torrent} && make_torrent
-	user_rown "${iso_dir}"
+	user_own "${iso_dir}" "-R"
 	show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
