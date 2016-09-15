@@ -21,65 +21,65 @@ import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-iso-yaml.sh
 
 show_profile(){
-	prepare_check "$1"
-	msg2 "yaml_dir: %s" "${yaml_dir}"
-	msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
-	msg2 "autologin: %s" "${autologin}"
-	msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
-	msg2 "pxe_boot: %s" "${pxe_boot}"
-	msg2 "plymouth_boot: %s" "${plymouth_boot}"
-	${plymouth_boot} && msg2 "plymouth_theme: %s" "${plymouth_theme}"
+    prepare_check "$1"
+    msg2 "yaml_dir: %s" "${yaml_dir}"
+    msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
+    msg2 "autologin: %s" "${autologin}"
+    msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
+    msg2 "pxe_boot: %s" "${pxe_boot}"
+    msg2 "plymouth_boot: %s" "${plymouth_boot}"
+    ${plymouth_boot} && msg2 "plymouth_theme: %s" "${plymouth_theme}"
 
-	[[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
+    [[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
 
-	msg2 "netinstall: %s" "${netinstall}"
-	${netinstall} && msg2 "netgroups: %s" "$(get_yaml)"
-	msg2 "unpackfs: %s" "${unpackfs}"
+    msg2 "netinstall: %s" "${netinstall}"
+    ${netinstall} && msg2 "netgroups: %s" "$(get_yaml)"
+    msg2 "unpackfs: %s" "${unpackfs}"
 
-	msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
+    msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
 
-	msg2 "hostname: %s" "${hostname}"
-	msg2 "username: %s" "${username}"
-	msg2 "password: %s" "${password}"
-	msg2 "login_shell: %s" "${login_shell}"
-	msg2 "addgroups: %s" "${addgroups}"
+    msg2 "hostname: %s" "${hostname}"
+    msg2 "username: %s" "${username}"
+    msg2 "password: %s" "${password}"
+    msg2 "login_shell: %s" "${login_shell}"
+    msg2 "addgroups: %s" "${addgroups}"
 
-	if [[ ${initsys} == 'systemd' ]];then
-		msg2 "enable_systemd: %s" "${enable_systemd[*]}"
-		msg2 "enable_systemd_live: %s" "${enable_systemd_live[*]}"
-		[[ -n ${disable_systemd[*]} ]] && msg2 "disable_systemd: %s" "${disable_systemd[*]}"
-	else
-		msg2 "enable_openrc: %s" "${enable_openrc[*]}"
-		msg2 "enable_openrc_live: %s" "${enable_openrc_live[*]}"
-		[[ -n ${disable_openrc[*]} ]] && msg2 "disable_openrc: %s" "${disable_openrc[*]}"
-	fi
+    if [[ ${initsys} == 'systemd' ]];then
+        msg2 "enable_systemd: %s" "${enable_systemd[*]}"
+        msg2 "enable_systemd_live: %s" "${enable_systemd_live[*]}"
+        [[ -n ${disable_systemd[*]} ]] && msg2 "disable_systemd: %s" "${disable_systemd[*]}"
+    else
+        msg2 "enable_openrc: %s" "${enable_openrc[*]}"
+        msg2 "enable_openrc_live: %s" "${enable_openrc_live[*]}"
+        [[ -n ${disable_openrc[*]} ]] && msg2 "disable_openrc: %s" "${disable_openrc[*]}"
+    fi
 
-	reset_profile
-	unset yaml_dir
+    reset_profile
+    unset yaml_dir
 }
 
 display_settings(){
-	show_version
-	show_config
+    show_version
+    show_config
 
-	msg "PROFILE:"
-	msg2 "list_dir_iso: %s" "${list_dir_iso}"
-	msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
-	msg2 "build_list_iso: %s" "${build_list_iso}"
-	msg2 "is_build_list: %s" "${is_build_list}"
-	msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
-	${verbose} && msg2 "run_dir: %s" "${run_dir}"
+    msg "PROFILE:"
+    msg2 "list_dir_iso: %s" "${list_dir_iso}"
+    msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
+    msg2 "build_list_iso: %s" "${build_list_iso}"
+    msg2 "is_build_list: %s" "${is_build_list}"
+    msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
+    ${verbose} && msg2 "run_dir: %s" "${run_dir}"
 
-	msg "OPTIONS:"
-	msg2 "arch: %s" "${target_arch}"
-	msg2 "initsys: %s" "${initsys}"
-	msg2 "kernel: %s" "${kernel}"
+    msg "OPTIONS:"
+    msg2 "arch: %s" "${target_arch}"
+    msg2 "initsys: %s" "${initsys}"
+    msg2 "kernel: %s" "${kernel}"
 
-	msg "ARGS:"
-	msg2 "calamares: %s" "${calamares}"
+    msg "ARGS:"
+    msg2 "calamares: %s" "${calamares}"
 
-	msg "CHECK QUEUE:"
-	run show_profile "${build_list_iso}"
+    msg "CHECK QUEUE:"
+    run show_profile "${build_list_iso}"
 }
 
 load_user_info
@@ -97,17 +97,17 @@ group=false
 cache_dir_netinstall="${cache_dir}/netinstall"
 
 usage() {
-	echo "Usage: ${0##*/} [options]"
-	echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
-	echo "    -a <arch>          Arch [default: ${target_arch}]"
-	echo "    -k <name>          Kernel to use[default: ${kernel}]"
-	echo "    -i <name>          Init system to use [default: ${initsys}]"
-	echo '    -c                 Check also calamares yaml files generated for the profile'
-	echo '    -q                 Query settings'
-	echo '    -h                 This help'
-	echo ''
-	echo ''
-	exit $1
+    echo "Usage: ${0##*/} [options]"
+    echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
+    echo "    -a <arch>          Arch [default: ${target_arch}]"
+    echo "    -k <name>          Kernel to use[default: ${kernel}]"
+    echo "    -i <name>          Init system to use [default: ${initsys}]"
+    echo '    -c                 Check also calamares yaml files generated for the profile'
+    echo '    -q                 Query settings'
+    echo '    -h                 This help'
+    echo ''
+    echo ''
+    exit $1
 }
 
 orig_argv=("$@")
@@ -115,17 +115,17 @@ orig_argv=("$@")
 opts='p:a:i:k:gcqh'
 
 while getopts "${opts}" arg; do
-	case "${arg}" in
-		p) build_list_iso="$OPTARG" ;;
-		a) target_arch="$OPTARG" ;;
-		i) initsys="$OPTARG" ;;
-		k) kernel="$OPTARG" ;;
-		c) calamares=true ;;
-		g) group=true ;;
-		q) pretend=true ;;
-		h|?) usage 0 ;;
-		*) echo "invalid argument '${arg}'"; usage 1 ;;
-	esac
+    case "${arg}" in
+        p) build_list_iso="$OPTARG" ;;
+        a) target_arch="$OPTARG" ;;
+        i) initsys="$OPTARG" ;;
+        k) kernel="$OPTARG" ;;
+        c) calamares=true ;;
+        g) group=true ;;
+        q) pretend=true ;;
+        h|?) usage 0 ;;
+        *) echo "invalid argument '${arg}'"; usage 1 ;;
+    esac
 done
 
 shift $(($OPTIND - 1))

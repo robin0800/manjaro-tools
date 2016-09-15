@@ -19,74 +19,74 @@ import ${LIBDIR}/util-iso-calamares.sh
 # }
 
 get_preset(){
-	local p=${tmp_dir}/${kernel}.preset kvmaj kvmin digit
-	cp ${DATADIR}/linux.preset $p
-	digit=${kernel##linux}
-	kvmaj=${digit:0:1}
-	kvmin=${digit:1}
+    local p=${tmp_dir}/${kernel}.preset kvmaj kvmin digit
+    cp ${DATADIR}/linux.preset $p
+    digit=${kernel##linux}
+    kvmaj=${digit:0:1}
+    kvmin=${digit:1}
 
-	sed -e "s|@kvmaj@|$kvmaj|g" \
-	    -e "s|@kvmin@|$kvmin|g" \
-	    -e "s|@arch@|${target_arch}|g"\
-	    -i $p
+    sed -e "s|@kvmaj@|$kvmaj|g" \
+        -e "s|@kvmin@|$kvmin|g" \
+        -e "s|@arch@|${target_arch}|g"\
+        -i $p
 
-	echo $p
+    echo $p
 }
 
 write_calamares_yaml(){
-	configure_calamares "${yaml_dir}" "$(get_preset)"
+    configure_calamares "${yaml_dir}" "$(get_preset)"
 # 	for conf in "${yaml_dir}"/etc/calamares/modules/*.conf "${yaml_dir}"/etc/calamares/settings.conf; do
 # 		check_yaml "$conf"
 # 	done
 }
 
 write_netgroup_yaml(){
-	msg2 "Writing %s ..." "${2##*/}"
-	echo "- name: '$1'" > "$2"
-	echo "  description: '$1'" >> "$2"
-	echo "  selected: false" >> "$2"
-	echo "  hidden: false" >> "$2"
-	echo "  packages:" >> "$2"
-	for p in ${packages[@]};do
-		echo "       - $p" >> "$2"
-	done
+    msg2 "Writing %s ..." "${2##*/}"
+    echo "- name: '$1'" > "$2"
+    echo "  description: '$1'" >> "$2"
+    echo "  selected: false" >> "$2"
+    echo "  hidden: false" >> "$2"
+    echo "  packages:" >> "$2"
+    for p in ${packages[@]};do
+        echo "       - $p" >> "$2"
+    done
 # 	check_yaml "$2"
 }
 
 write_pacman_group_yaml(){
-	packages=$(pacman -Sgq "$1")
-	prepare_dir "${cache_dir_netinstall}/pacman"
-	write_netgroup_yaml "$1" "${cache_dir_netinstall}/pacman/$1.yaml"
-	user_own "${cache_dir_netinstall}/pacman" "-R"
+    packages=$(pacman -Sgq "$1")
+    prepare_dir "${cache_dir_netinstall}/pacman"
+    write_netgroup_yaml "$1" "${cache_dir_netinstall}/pacman/$1.yaml"
+    user_own "${cache_dir_netinstall}/pacman" "-R"
 }
 
 prepare_check(){
-	profile=$1
-	edition=$(get_edition ${profile})
-	profile_dir=${run_dir}/${edition}/${profile}
-	check_profile
-	load_profile_config "${profile_dir}/profile.conf"
+    profile=$1
+    edition=$(get_edition ${profile})
+    profile_dir=${run_dir}/${edition}/${profile}
+    check_profile
+    load_profile_config "${profile_dir}/profile.conf"
 
-	yaml_dir=${cache_dir_netinstall}/${profile}/${target_arch}
+    yaml_dir=${cache_dir_netinstall}/${profile}/${target_arch}
 
-	prepare_dir "${yaml_dir}"
-	user_own "${yaml_dir}"
+    prepare_dir "${yaml_dir}"
+    user_own "${yaml_dir}"
 }
 
 gen_fn(){
-	echo ${yaml_dir}/$1-${target_arch}-${initsys}.yaml
+    echo ${yaml_dir}/$1-${target_arch}-${initsys}.yaml
 }
 
 make_profile_yaml(){
-	prepare_check "$1"
-	load_pkgs "${profile_dir}/Packages-Root"
-	write_netgroup_yaml "$1" "$(gen_fn "Packages-Root")"
-	if [[ -f "${packages_custom}" ]]; then
-		load_pkgs "${packages_custom}"
-		write_netgroup_yaml "$1" "$(gen_fn "${packages_custom##*/}")"
-	fi
-	${calamares} && write_calamares_yaml "$1"
-	user_own "${cache_dir_netinstall}/$1" "-R"
-	reset_profile
-	unset yaml_dir
+    prepare_check "$1"
+    load_pkgs "${profile_dir}/Packages-Root"
+    write_netgroup_yaml "$1" "$(gen_fn "Packages-Root")"
+    if [[ -f "${packages_custom}" ]]; then
+        load_pkgs "${packages_custom}"
+        write_netgroup_yaml "$1" "$(gen_fn "${packages_custom##*/}")"
+    fi
+    ${calamares} && write_calamares_yaml "$1"
+    user_own "${cache_dir_netinstall}/$1" "-R"
+    reset_profile
+    unset yaml_dir
 }

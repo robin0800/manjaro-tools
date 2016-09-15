@@ -72,14 +72,14 @@ orig_argv=("$@")
 
 while getopts 'hcur:I:l:nT' arg; do
     case "$arg" in
-	c) clean_first=true ;;
-	u) update_first=true ;;
-	r) passeddir="$OPTARG" ;;
-	I) install_pkgs+=("$OPTARG") ;;
-	l) copy="$OPTARG" ;;
-	n) run_namcap=true; makepkg_args+=(-i) ;;
-	T) temp_chroot=true; copy+="-$$" ;;
-	h|*) usage ;;
+    c) clean_first=true ;;
+    u) update_first=true ;;
+    r) passeddir="$OPTARG" ;;
+    I) install_pkgs+=("$OPTARG") ;;
+    l) copy="$OPTARG" ;;
+    n) run_namcap=true; makepkg_args+=(-i) ;;
+    T) temp_chroot=true; copy+="-$$" ;;
+    h|*) usage ;;
     esac
 done
 
@@ -96,9 +96,9 @@ chrootdir=$(readlink -e "$passeddir")
 chroottype=$(stat -f -c %T "$chrootdir")
 
 if [[ ${copy:0:1} = / ]]; then
-	copydir=$copy
+    copydir=$copy
 else
-	copydir="$chrootdir/$copy"
+    copydir="$chrootdir/$copy"
 fi
 
 # Pass all arguments after -- right to makepkg
@@ -107,10 +107,10 @@ makepkg_args+=("${@:$OPTIND}")
 # See if -R was passed to makepkg
 for arg in "${@:OPTIND}"; do
     case ${arg%%=*} in
-	-*R*|--repackage)
-	    repack=true
-	    break 2
-	;;
+    -*R*|--repackage)
+        repack=true
+        break 2
+    ;;
     esac
 done
 
@@ -119,174 +119,174 @@ load_user_info
 # {{{ functions
 
 create_chroot() {
-	# Lock the chroot we want to use. We'll keep this lock until we exit.
-	lock 9 "$copydir.lock" "Locking chroot copy [$copy]"
+    # Lock the chroot we want to use. We'll keep this lock until we exit.
+    lock 9 "$copydir.lock" "Locking chroot copy [$copy]"
 
-	if [[ ! -d $copydir ]] || $clean_first; then
-		# Get a read lock on the root chroot to make
-		# sure we don't clone a half-updated chroot
-		slock 8 "$chrootdir/root.lock" "Locking clean chroot"
+    if [[ ! -d $copydir ]] || $clean_first; then
+        # Get a read lock on the root chroot to make
+        # sure we don't clone a half-updated chroot
+        slock 8 "$chrootdir/root.lock" "Locking clean chroot"
 
-		stat_busy "Creating clean working copy [$copy]"
-		if [[ "$chroottype" == btrfs ]] && ! mountpoint -q "$copydir"; then
-			if [[ -d $copydir ]]; then
-				btrfs subvolume delete "$copydir" >/dev/null ||
-					die "Unable to delete subvolume %s" "$copydir"
-			fi
-			btrfs subvolume snapshot "$chrootdir/root" "$copydir" >/dev/null ||
-				die "Unable to create subvolume %s" "$copydir"
-		else
-			mkdir -p "$copydir"
-			rsync -a --delete -q -W -x "$chrootdir/root/" "$copydir"
-		fi
-		stat_done
+        stat_busy "Creating clean working copy [$copy]"
+        if [[ "$chroottype" == btrfs ]] && ! mountpoint -q "$copydir"; then
+            if [[ -d $copydir ]]; then
+                btrfs subvolume delete "$copydir" >/dev/null ||
+                    die "Unable to delete subvolume %s" "$copydir"
+            fi
+            btrfs subvolume snapshot "$chrootdir/root" "$copydir" >/dev/null ||
+                die "Unable to create subvolume %s" "$copydir"
+        else
+            mkdir -p "$copydir"
+            rsync -a --delete -q -W -x "$chrootdir/root/" "$copydir"
+        fi
+        stat_done
 
-		# Drop the read lock again
-		exec 8>&-
-	fi
+        # Drop the read lock again
+        exec 8>&-
+    fi
 
-	# Update mtime
-	touch "$copydir"
+    # Update mtime
+    touch "$copydir"
 }
 
 clean_temporary() {
-	stat_busy "Removing temporary copy [$copy]"
-	if [[ "$chroottype" == btrfs ]] && ! mountpoint -q "$copydir"; then
-		btrfs subvolume delete "$copydir" >/dev/null ||
-			die "Unable to delete subvolume %s" "$copydir"
-	else
-		# avoid change of filesystem in case of an umount failure
-		rm --recursive --force --one-file-system "$copydir" ||
-			die "Unable to delete %s" "$copydir"
-	fi
+    stat_busy "Removing temporary copy [$copy]"
+    if [[ "$chroottype" == btrfs ]] && ! mountpoint -q "$copydir"; then
+        btrfs subvolume delete "$copydir" >/dev/null ||
+            die "Unable to delete subvolume %s" "$copydir"
+    else
+        # avoid change of filesystem in case of an umount failure
+        rm --recursive --force --one-file-system "$copydir" ||
+            die "Unable to delete %s" "$copydir"
+    fi
 
-	# remove lock file
-	rm -f "$copydir.lock"
-	stat_done
+    # remove lock file
+    rm -f "$copydir.lock"
+    stat_done
 }
 
 install_packages() {
-	local -a pkgnames
-	local ret
+    local -a pkgnames
+    local ret
 
-	pkgnames=("${install_pkgs[@]##*/}")
+    pkgnames=("${install_pkgs[@]##*/}")
 
-	cp -- "${install_pkgs[@]}" "$copydir/root/"
+    cp -- "${install_pkgs[@]}" "$copydir/root/"
 
-	chroot-run "$copydir" \
-			pacman -U --noconfirm -- "${pkgnames[@]/#//root/}"
-	ret=$?
-	rm -- "${pkgnames[@]/#/$copydir/root/}"
+    chroot-run "$copydir" \
+            pacman -U --noconfirm -- "${pkgnames[@]/#//root/}"
+    ret=$?
+    rm -- "${pkgnames[@]/#/$copydir/root/}"
 
-	# If there is no PKGBUILD we are done
-	[[ -f PKGBUILD ]] || exit $ret
+    # If there is no PKGBUILD we are done
+    [[ -f PKGBUILD ]] || exit $ret
 }
 
 prepare_chroot() {
-	$repack || rm -rf "$copydir/build"
+    $repack || rm -rf "$copydir/build"
 
-	local builduser_uid="${SUDO_UID:-$UID}"
-	local builduser_gid="$(id -g "$builduser_uid")"
-	local install="install -o $builduser_uid -g $builduser_gid"
-	local x
+    local builduser_uid="${SUDO_UID:-$UID}"
+    local builduser_gid="$(id -g "$builduser_uid")"
+    local install="install -o $builduser_uid -g $builduser_gid"
+    local x
 
-	# We can't use useradd without chrooting, otherwise it invokes PAM modules
-	# which we might not be able to load (i.e. when building i686 packages on
-	# an x86_64 host).
-	sed -e '/^builduser:/d' -i "$copydir"/etc/{passwd,group}
-	printf >>"$copydir/etc/group"  'builduser:x:%d:\n' $builduser_gid
-	printf >>"$copydir/etc/passwd" 'builduser:x:%d:%d:builduser:/build:/bin/bash\n' $builduser_uid $builduser_gid
+    # We can't use useradd without chrooting, otherwise it invokes PAM modules
+    # which we might not be able to load (i.e. when building i686 packages on
+    # an x86_64 host).
+    sed -e '/^builduser:/d' -i "$copydir"/etc/{passwd,group}
+    printf >>"$copydir/etc/group"  'builduser:x:%d:\n' $builduser_gid
+    printf >>"$copydir/etc/passwd" 'builduser:x:%d:%d:builduser:/build:/bin/bash\n' $builduser_uid $builduser_gid
 
-	$install -d "$copydir"/{build,build/.gnupg,startdir,{pkg,srcpkg,src,log}dest}
+    $install -d "$copydir"/{build,build/.gnupg,startdir,{pkg,srcpkg,src,log}dest}
 
-	for x in .gnupg/pubring.{kbx,gpg}; do
-		[[ -r $USER_HOME/$x ]] || continue
-		$install -m 644 "$USER_HOME/$x" "$copydir/build/$x"
-	done
+    for x in .gnupg/pubring.{kbx,gpg}; do
+        [[ -r $USER_HOME/$x ]] || continue
+        $install -m 644 "$USER_HOME/$x" "$copydir/build/$x"
+    done
 
-	sed -e '/^MAKEFLAGS=/d' -e '/^PACKAGER=/d' -i "$copydir/etc/makepkg.conf"
-	for x in BUILDDIR=/build PKGDEST=/pkgdest SRCPKGDEST=/srcpkgdest SRCDEST=/srcdest LOGDEST=/logdest \
-		"MAKEFLAGS='$MAKEFLAGS'" "PACKAGER='$PACKAGER'"
-	do
-		grep -q "^$x" "$copydir/etc/makepkg.conf" && continue
-		echo "$x" >>"$copydir/etc/makepkg.conf"
-	done
+    sed -e '/^MAKEFLAGS=/d' -e '/^PACKAGER=/d' -i "$copydir/etc/makepkg.conf"
+    for x in BUILDDIR=/build PKGDEST=/pkgdest SRCPKGDEST=/srcpkgdest SRCDEST=/srcdest LOGDEST=/logdest \
+        "MAKEFLAGS='$MAKEFLAGS'" "PACKAGER='$PACKAGER'"
+    do
+        grep -q "^$x" "$copydir/etc/makepkg.conf" && continue
+        echo "$x" >>"$copydir/etc/makepkg.conf"
+    done
 
-	cat > "$copydir/etc/sudoers.d/builduser-pacman" <<EOF
+    cat > "$copydir/etc/sudoers.d/builduser-pacman" <<EOF
 Defaults env_keep += "HOME"
 builduser ALL = NOPASSWD: /usr/bin/pacman
 EOF
-	chmod 440 "$copydir/etc/sudoers.d/builduser-pacman"
+    chmod 440 "$copydir/etc/sudoers.d/builduser-pacman"
 
-	# This is a little gross, but this way the script is recreated every time in the
-	# working copy
-	{
-		printf '#!/bin/bash\n'
-		declare -f _chrootbuild
-		printf '_chrootbuild'
-		printf ' %q' "${makepkg_args[@]}"
-		printf ' || exit\n'
+    # This is a little gross, but this way the script is recreated every time in the
+    # working copy
+    {
+        printf '#!/bin/bash\n'
+        declare -f _chrootbuild
+        printf '_chrootbuild'
+        printf ' %q' "${makepkg_args[@]}"
+        printf ' || exit\n'
 
-		if $run_namcap; then
-			declare -f _chrootnamcap
-			printf '_chrootnamcap || exit\n'
-		fi
-	} >"$copydir/chrootbuild"
-	chmod +x "$copydir/chrootbuild"
+        if $run_namcap; then
+            declare -f _chrootnamcap
+            printf '_chrootnamcap || exit\n'
+        fi
+    } >"$copydir/chrootbuild"
+    chmod +x "$copydir/chrootbuild"
 }
 
 # These functions aren't run in makechrootpkg,
 # so no global variables
 _chrootbuild() {
-	. /etc/profile
-	export HOME=/build
-	cd /startdir
-	sudo -u builduser makepkg "$@"
+    . /etc/profile
+    export HOME=/build
+    cd /startdir
+    sudo -u builduser makepkg "$@"
 }
 
 _chrootnamcap() {
-	pacman -S --needed --noconfirm namcap
-	for pkgfile in /startdir/PKGBUILD /pkgdest/*; do
-		echo "Checking ${pkgfile##*/}"
-		sudo -u builduser namcap "$pkgfile" 2>&1 | tee "/logdest/${pkgfile##*/}-namcap.log"
-	done
+    pacman -S --needed --noconfirm namcap
+    for pkgfile in /startdir/PKGBUILD /pkgdest/*; do
+        echo "Checking ${pkgfile##*/}"
+        sudo -u builduser namcap "$pkgfile" 2>&1 | tee "/logdest/${pkgfile##*/}-namcap.log"
+    done
 }
 
 download_sources() {
-	local builddir="$(mktemp -d)"
-	chmod 1777 "$builddir"
+    local builddir="$(mktemp -d)"
+    chmod 1777 "$builddir"
 
-	# Ensure sources are downloaded
-	if [[ -n $SUDO_USER ]]; then
-		sudo -u $SUDO_USER env SRCDEST="$SRCDEST" BUILDDIR="$builddir" \
-			makepkg --config="$copydir/etc/makepkg.conf" --verifysource -o
-	else
-		( export SRCDEST BUILDDIR="$builddir"
-			makepkg --asroot --config="$copydir/etc/makepkg.conf" --verifysource -o
-		)
-	fi
-	(( $? != 0 )) && die "Could not download sources."
+    # Ensure sources are downloaded
+    if [[ -n $SUDO_USER ]]; then
+        sudo -u $SUDO_USER env SRCDEST="$SRCDEST" BUILDDIR="$builddir" \
+            makepkg --config="$copydir/etc/makepkg.conf" --verifysource -o
+    else
+        ( export SRCDEST BUILDDIR="$builddir"
+            makepkg --asroot --config="$copydir/etc/makepkg.conf" --verifysource -o
+        )
+    fi
+    (( $? != 0 )) && die "Could not download sources."
 
-	# Clean up garbage from verifysource
-	rm -rf $builddir
+    # Clean up garbage from verifysource
+    rm -rf $builddir
 }
 
 move_products() {
-	for pkgfile in "$copydir"/pkgdest/*; do
-		chown "$src_owner" "$pkgfile"
-		mv "$pkgfile" "$PKGDEST"
-	done
+    for pkgfile in "$copydir"/pkgdest/*; do
+        chown "$src_owner" "$pkgfile"
+        mv "$pkgfile" "$PKGDEST"
+    done
 
-	for l in "$copydir"/logdest/*; do
-		[[ $l == */logpipe.* ]] && continue
-		chown "$src_owner" "$l"
-		mv "$l" "$LOGDEST"
-	done
+    for l in "$copydir"/logdest/*; do
+        [[ $l == */logpipe.* ]] && continue
+        chown "$src_owner" "$l"
+        mv "$l" "$LOGDEST"
+    done
 
-	for s in "$copydir"/srcpkgdest/*; do
-		chown "$src_owner" "$s"
-		mv "$s" "$SRCPKGDEST"
-	done
+    for s in "$copydir"/srcpkgdest/*; do
+        chown "$src_owner" "$s"
+        mv "$s" "$SRCPKGDEST"
+    done
 }
 # }}}
 
@@ -303,10 +303,10 @@ load_vars "$USER_HOME/.makepkg.conf" || load_vars /etc/makepkg.conf
 create_chroot
 
 $update_first && chroot-run \
-		  -r "${mountargs_ro}" \
-		  -w "${mountargs_rw}" \
-		  "$copydir" \
-		  pacman -Syu --noconfirm
+        -r "${mountargs_ro}" \
+        -w "${mountargs_rw}" \
+        "$copydir" \
+        pacman -Syu --noconfirm
 
 [[ -n ${install_pkgs[*]} ]] && install_packages
 
@@ -317,22 +317,22 @@ prepare_chroot
 mountargs_rw="${PWD}:/startdir,${SRCDEST}:/srcdest"
 
 if chroot-run -r "${mountargs_ro}" \
-	      -w "${mountargs_rw}" \
-	      "$copydir" \
-	      /chrootbuild; then
-	move_products
+        -w "${mountargs_rw}" \
+        "$copydir" \
+        /chrootbuild; then
+    move_products
 else
-	(( ret += 1 ))
+    (( ret += 1 ))
 fi
 
 $temp_chroot && clean_temporary
 
 if (( ret != 0 )); then
-	if $temp_chroot; then
-		die "Build failed"
-	else
-		die "Build failed, check %s/build" "$copydir"
-	fi
+    if $temp_chroot; then
+        die "Build failed"
+    else
+        die "Build failed, check %s/build" "$copydir"
+    fi
 else
-	true
+    true
 fi
