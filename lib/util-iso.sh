@@ -361,7 +361,7 @@ make_efi() {
 make_efiboot() {
 	if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
 		msg "Prepare [%s/iso/EFI]" "${iso_name}"
-		local path_iso="${work_dir}/iso" size="32M"
+		local path_iso="${work_dir}/iso" size="31M"
 		mkdir -p ${path_iso}/EFI/miso
 		truncate -s ${size} ${path_iso}/EFI/miso/${iso_name}.img
 		mkfs.fat -n MISO_EFI ${path_iso}/EFI/miso/${iso_name}.img
