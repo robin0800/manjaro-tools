@@ -12,32 +12,16 @@
 import ${LIBDIR}/util-iso.sh
 import ${LIBDIR}/util-iso-calamares.sh
 
-# check_yaml(){
-# 	result=$(python -c 'import yaml,sys;yaml.safe_load(sys.stdin)' < $1)
-# 	msg2 "Checking validity [%s] ..." "${1##*/}"
-# 	[[ $? -ne 0 ]] && error "yaml error: %s [msg: %s]"  "$1" "${result}"
-# }
-
-get_preset(){
-    local p=${tmp_dir}/${kernel}.preset kvmaj kvmin digit
-    cp ${DATADIR}/linux.preset $p
-    digit=${kernel##linux}
-    kvmaj=${digit:0:1}
-    kvmin=${digit:1}
-
-    sed -e "s|@kvmaj@|$kvmaj|g" \
-        -e "s|@kvmin@|$kvmin|g" \
-        -e "s|@arch@|${target_arch}|g"\
-        -i $p
-
-    echo $p
+check_yaml(){
+	msg2 "Checking validity [%s] ..." "${1##*/}"
+# 	pykwalify -c data -s schema
 }
 
 write_calamares_yaml(){
-    configure_calamares "${yaml_dir}" "$(get_preset)"
-# 	for conf in "${yaml_dir}"/etc/calamares/modules/*.conf "${yaml_dir}"/etc/calamares/settings.conf; do
-# 		check_yaml "$conf"
-# 	done
+    configure_calamares "${yaml_dir}"
+	for conf in "${yaml_dir}"/etc/calamares/modules/*.conf "${yaml_dir}"/etc/calamares/settings.conf; do
+		check_yaml "$conf"
+	done
 }
 
 write_netgroup_yaml(){
@@ -50,13 +34,14 @@ write_netgroup_yaml(){
     for p in ${packages[@]};do
         echo "       - $p" >> "$2"
     done
-# 	check_yaml "$2"
+	check_yaml "$2"
 }
 
 write_pacman_group_yaml(){
     packages=$(pacman -Sgq "$1")
     prepare_dir "${cache_dir_netinstall}/pacman"
     write_netgroup_yaml "$1" "${cache_dir_netinstall}/pacman/$1.yaml"
+    check_yaml "${cache_dir_netinstall}/pacman/$1.yaml"
     user_own "${cache_dir_netinstall}/pacman" "-R"
 }
 

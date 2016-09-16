@@ -29,10 +29,24 @@ write_finished_conf(){
     echo "restartNowCommand: \"${cmd}\"" >> "$conf"
 }
 
+get_preset(){
+    local p=${tmp_dir}/${kernel}.preset kvmaj kvmin digit
+    cp ${DATADIR}/linux.preset $p
+    digit=${kernel##linux}
+    kvmaj=${digit:0:1}
+    kvmin=${digit:1}
+
+    sed -e "s|@kvmaj@|$kvmaj|g" \
+        -e "s|@kvmin@|$kvmin|g" \
+        -e "s|@arch@|${target_arch}|g"\
+        -i $p
+    echo $p
+}
+
 write_bootloader_conf(){
     local conf="${modules_dir}/bootloader.conf"
     msg2 "Writing %s ..." "${conf##*/}"
-    source "$1"
+    source "$(get_preset)"
     echo '---' > "$conf"
     echo "efiBootLoader: \"${efi_boot_loader}\"" >> "$conf"
     echo "kernel: \"${ALL_kver#*/boot}\"" >> "$conf"
@@ -349,7 +363,7 @@ configure_calamares(){
         write_packages_conf
     fi
 
-    write_bootloader_conf "$2"
+    write_bootloader_conf
 
     write_mhwdcfg_conf
 

@@ -241,7 +241,7 @@ configure_live_image(){
     configure_mhwd "$1"
     configure_system "$1"
     configure_services "$1"
-    configure_calamares "$1" "$1/etc/mkinitcpio.d/${kernel}.preset"
+    configure_calamares "$1"
     write_live_session_conf "$1"
     msg "Done configuring [live-image]"
 }
