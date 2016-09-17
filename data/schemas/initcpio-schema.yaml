@@ -1,0 +1,5 @@
+%YAML 1.2
+---
+type: map
+mapping:
+  kernel: { type: str, required: yes }
