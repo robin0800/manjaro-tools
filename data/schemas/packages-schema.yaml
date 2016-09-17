@@ -1,0 +1,26 @@
+%YAML 1.2
+---
+type: map
+mapping:
+    "backend": { type: str, required: yes }
+    "operations":
+        type: seq
+        sequence:
+            - type: map
+              mapping:
+                "install":
+                    type: seq
+                    sequence:
+                      - type: str
+            - type: map
+              mapping:
+                 "remove":
+                    type: seq
+                    sequence:
+                      - type: str
+            - type: map
+              mapping:
+                 "localInstall":
+                    type: seq
+                    sequence:
+                      - type: str
