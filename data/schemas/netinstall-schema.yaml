@@ -1,0 +1,5 @@
+%YAML 1.2
+---
+type: map
+mapping:
+    groupsUrl: { type: str, required: yes }
