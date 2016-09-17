@@ -1,4 +1,4 @@
-Version=0.13.0
+Version=0.13.7
 
 PREFIX = /usr/local
 SYSCONFDIR = /etc
@@ -64,8 +64,7 @@ LIST_ISO = \
 BIN_ISO = \
 	bin/buildiso \
 	bin/testiso \
-	bin/deployiso \
-	bin/check-yaml
+	bin/deployiso
 
 LIBS_ISO = \
 	lib/util-iso.sh \
@@ -74,8 +73,7 @@ LIBS_ISO = \
 	lib/util-iso-image.sh \
 	lib/util-iso-calamares.sh \
 	lib/util-iso-boot.sh \
-	lib/util-publish.sh \
-	lib/util-iso-yaml.sh
+	lib/util-publish.sh
 
 SHARED_ISO = \
 	data/pacman-mhwd.conf \
@@ -106,7 +104,43 @@ MAN_XML = \
 	manjaro-tools.conf.xml \
 	profile.conf.xml
 
-all: $(BIN_BASE) $(BIN_PKG) $(BIN_ISO) doc
+BIN_YAML = \
+	bin/check-yaml
+
+LIBS_YAML = \
+	lib/util-iso-yaml.sh
+
+SHARED_YAML = \
+	data/schemas/bootloader.schema.yaml \
+	data/schemas/chrootcfg.schema.yaml \
+	data/schemas/displaymanager.schema.yaml \
+	data/schemas/finished.schema.yaml \
+	data/schemas/fstab.schema.yaml \
+	data/schemas/grubcfg.schema.yaml \
+	data/schemas/initcpio.schema.yaml \
+	data/schemas/keyboard.schema.yaml \
+	data/schemas/license.schema.yaml \
+	data/schemas/locale.schema.yaml \
+	data/schemas/luksopenswaphookcfg.schema.yaml \
+	data/schemas/machineid.schema.yaml \
+	data/schemas/mhwdcfg.schema.yaml \
+	data/schemas/mount.schema.yaml \
+	data/schemas/netgroups.schema.yaml \
+	data/schemas/netinstall.schema.yaml \
+	data/schemas/packages.schema.yaml \
+	data/schemas/partition.schema.yaml \
+	data/schemas/plymouthcfg.schema.yaml \
+	data/schemas/postcfg.schema.yaml \
+	data/schemas/removeuser.schema.yaml \
+	data/schemas/services.schema.yaml \
+	data/schemas/servicescfg.schema.yaml \
+	data/schemas/settings.schema.yaml \
+	data/schemas/umount.schema.yaml \
+	data/schemas/unpackfs.schema.yaml \
+	data/schemas/users.schema.yaml \
+	data/schemas/welcome.schema.yaml
+
+all: $(BIN_BASE) $(BIN_PKG) $(BIN_ISO) $(BIN_YAML) doc
 
 edit = sed -e "s|@datadir[@]|$(DESTDIR)$(PREFIX)/share/manjaro-tools|g" \
 	-e "s|@sysconfdir[@]|$(DESTDIR)$(SYSCONFDIR)/manjaro-tools|g" \
@@ -190,6 +224,16 @@ install_iso:
 	gzip -c man/manjaro-tools.conf.5 > $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
 	gzip -c man/profile.conf.5 > $(DESTDIR)$(PREFIX)/share/man/man5/profile.conf.5.gz
 
+install_yaml:
+	install -dm0755 $(DESTDIR)$(PREFIX)/bin
+	install -m0755 ${BIN_YAML} $(DESTDIR)$(PREFIX)/bin
+
+	install -dm0755 $(DESTDIR)$(PREFIX)/lib/manjaro-tools
+	install -m0644 ${LIBS_YAML} $(DESTDIR)$(PREFIX)/lib/manjaro-tools
+
+	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas
+	install -m0644 ${SHARED_YAML} $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas
+
 uninstall_base:
 	for f in ${SYSCONF}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/$$f; done
 	for f in ${BIN_BASE}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
@@ -210,6 +254,7 @@ uninstall_iso:
 	for f in ${LIST_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/iso.list.d/$$f; done
 	for f in ${BIN_ISO}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${SHARED_ISO}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
+
 	for f in ${LIBS_ISO}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
 	for f in ${CPIOHOOKS}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/hooks/$$f; done
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
@@ -218,9 +263,14 @@ uninstall_iso:
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/profile.conf.5.gz
 
-install: install_base install_pkg install_iso
+uninstall_yaml:
+	for f in ${BIN_YAML}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
+	for f in ${LIBS_YAML}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
+	for f in ${SHARED_YAML}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas/$$f; done
 
-uninstall: uninstall_base uninstall_pkg uninstall_iso
+install: install_base install_pkg install_iso install_yaml
+
+uninstall: uninstall_base uninstall_pkg uninstall_iso uninstall_yaml
 
 dist:
 	git archive --format=tar --prefix=manjaro-tools-$(Version)/ $(Version) | gzip -9 > manjaro-tools-$(Version).tar.gz
