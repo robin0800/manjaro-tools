@@ -1,0 +1,21 @@
+%YAML 1.2
+---
+type: map
+mapping:
+    "services":
+        type: map
+        mapping:
+            "enable":
+                type: seq
+                sequence:
+                    - type: map
+                      mapping:
+                          "name": { type: str }  
+                          "runlevel": { type: str }
+            "disable":
+                type: seq
+                sequence:
+                    - type: map
+                      mapping:
+                          "name": { type: str }  
+                          "runlevel": { type: str }                              
