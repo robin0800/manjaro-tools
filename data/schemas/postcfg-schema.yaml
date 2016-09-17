@@ -1,0 +1,8 @@
+%YAML 1.2
+---
+type: map
+mapping:
+    keyrings:
+        type: seq
+        sequence:
+            - { type: str }
