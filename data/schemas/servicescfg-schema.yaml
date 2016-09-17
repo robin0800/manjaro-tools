@@ -10,11 +10,11 @@ mapping:
                     - type: map
                       mapping:
                           "name": { type: str }
-                          "runlevel": { type: str }
+                          "runlevel": { type: str, enum: [default, sysinit, boot, shutdown, nonetwork] }
             "disable":
                 type: seq
                 sequence:
                     - type: map
                       mapping:
                           "name": { type: str }
-                          "runlevel": { type: str }
+                          "runlevel": { type: str, enum: [default, sysinit, boot, shutdown, nonetwork] }
