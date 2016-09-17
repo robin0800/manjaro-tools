@@ -1,4 +1,3 @@
-%YAML 1.2
 ---
 type: map
 mapping:
@@ -10,12 +9,12 @@ mapping:
                 sequence:
                     - type: map
                       mapping:
-                          "name": { type: str }  
+                          "name": { type: str }
                           "runlevel": { type: str }
             "disable":
                 type: seq
                 sequence:
                     - type: map
                       mapping:
-                          "name": { type: str }  
-                          "runlevel": { type: str }                              
+                          "name": { type: str }
+                          "runlevel": { type: str }
