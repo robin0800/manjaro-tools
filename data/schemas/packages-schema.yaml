@@ -2,7 +2,7 @@
 ---
 type: map
 mapping:
-    "backend": { type: str, required: yes }
+    "backend": { type: str, required: yes, enum: [packagekit, zypp, yum, dnf, urpmi, apt, pacman, portage, entropy] }
     "operations":
         type: seq
         sequence:

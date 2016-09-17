@@ -4,7 +4,7 @@ mapping:
     "displaymanagers":
         type: seq
         sequence:
-          - { type: str, required: yes }
+          - { type: str, required: yes, enum: [slim, sddm, lightdm, gdm, mdm, lxdm, kdm] }
     "defaultDesktopEnvironment":
         type: map
         mapping:
