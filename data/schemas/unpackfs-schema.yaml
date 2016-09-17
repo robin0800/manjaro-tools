@@ -1,0 +1,12 @@
+%YAML 1.2
+---
+type: map
+mapping
+    unpack:
+        type: seq
+        sequence:
+          - type: map
+            mapping:
+              source: { type: str }
+              sourcefs: { type: str }
+              destination: { type: str }
