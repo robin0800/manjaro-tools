@@ -1,0 +1,6 @@
+%YAML 1.2
+---
+type: map
+mapping:
+    xOrgConfFileName: { type: str, required: yes }
+    convertedKeymapPath: { type: str, required: yes }
