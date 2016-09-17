@@ -1,41 +1,34 @@
 %YAML 1.2
 ---
-type: map
-mapping:
-    "modules-search":
-        type: seq
-        sequence:
+"modules-search":
+    type: str
+    required: yes
+
+instances:
+    - type: map
+      mapping:
+        "id": { type: str }
+        "module": { type: str }
+        "config": { type: str }
+      
+sequence:
+    - type: map
+      mapping:
+        "show":
+          type: seq
+          sequence:
+            - type: str
+        "exec":
+          type: seq
+          sequence:
+            - type: str
+        "show":
+          type: seq
+          sequence:
             - type: str
 
-    "instances":
-        type: seq
-        sequence:
-            - type: map
-              mapping:
-                "id": { type: str }
-                "module": { type: str }
-                "config": { type: str }
+"branding": { type: str, required: yes }
 
-    "sequence":
-        type: seq
-        sequence:
-            - type: map
-              mapping:
-                "show":
-                    type: seq
-                    sequence:
-                        - type: str
-                "exec":
-                    type: seq
-                    sequence:
-                        - type: str
-                "show":
-                    type: seq
-                    sequence:
-                        - type: str
+"prompt-install": { type: bool, required: yes, default: false }
 
-    "branding": { type: str }
-
-    "prompt-install": { type: bool }
-
-    "dont-chroot": { type: bool }
+"dont-chroot": { type: bool, required: yes, default: false }
