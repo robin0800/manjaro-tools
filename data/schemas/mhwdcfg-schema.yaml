@@ -11,14 +11,11 @@ mapping:
             "net":
                 type: seq
                 sequence:
-                  - type: int
+                    - type: int
             "video":
                 type: seq
                 sequence:
                     - type: int
-
     "driver": { type: str, required: yes }
-
     "local": { type: bool, default: true, required: yes }
-
     "repo": { type: str, required: yes }
