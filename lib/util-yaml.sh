@@ -426,20 +426,21 @@ configure_calamares(){
 
 check_yaml(){
     msg2 "Checking validity [%s] ..." "${1##*/}"
-    local name=${1##*/} data schema
+    local name=${1##*/} data=$1 schema
     case ${name##*.} in
         yaml)
             name=netgroups
-            data=$1
+#             data=$1
         ;;
         conf)
             name=${name%.conf}
-            data=${tmp_dir}/$name.yaml
-            cp $1 $data
+#             data=${tmp_dir}/$name.yaml
+#             cp $1 $data
         ;;
     esac
     schema=${DATADIR}/schemas/$name.schema.yaml
-    pykwalify -d $data -s $schema
+#     pykwalify -d $data -s $schema
+    kwalify -lf $schema $data
 }
 
 write_calamares_yaml(){
