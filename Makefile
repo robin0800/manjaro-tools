@@ -23,6 +23,8 @@ LIBS_BASE = \
 SHARED_BASE = \
 	data/pacman-default.conf \
 	data/pacman-multilib.conf \
+	data/desktop.map \
+	data/linux.preset \
 	data/pacman-mirrors.conf
 
 LIST_PKG = \
@@ -76,8 +78,6 @@ LIBS_ISO = \
 
 SHARED_ISO = \
 	data/pacman-mhwd.conf \
-	data/desktop.map \
-	data/linux.preset \
 	data/profile.conf.example
 
 CPIOHOOKS = \
