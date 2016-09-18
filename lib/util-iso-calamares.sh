@@ -132,13 +132,13 @@ write_unpack_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "unpack:" >> "$conf"
-    echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
-    echo "        sourcefs: \"squashfs\"" >> "$conf"
-    echo "        destination: \"\"" >> "$conf"
+    echo "    - source: \"/bootmnt/${iso_name}/${target_arch}/root-image.sqfs\"" >> "$conf"
+    echo "      sourcefs: \"squashfs\"" >> "$conf"
+    echo "      destination: \"\"" >> "$conf"
     if [[ -f "${packages_custom}" ]] ; then
-        echo "    -   source: \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
-        echo "        sourcefs: \"squashfs\"" >> "$conf"
-        echo "        destination: \"\"" >> "$conf"
+        echo "    - source: \"/bootmnt/${iso_name}/${target_arch}/${profile}-image.sqfs\"" >> "$conf"
+        echo "      sourcefs: \"squashfs\"" >> "$conf"
+        echo "      destination: \"\"" >> "$conf"
     fi
 }
 
@@ -146,7 +146,6 @@ write_users_conf(){
     local conf="${modules_dir}/users.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
-    echo "userGroup:      users" >> "$conf"
     echo "defaultGroups:" >> "$conf"
     local IFS=','
     for g in ${addgroups[@]};do
@@ -233,9 +232,11 @@ write_postcfg_conf(){
     echo "keyrings:" >> "$conf"
     echo "    - archlinux" >> "$conf"
     echo "    - manjaro" >> "$conf"
-    echo "" >> "$conf"
-    echo "samba:" >> "$conf"
-    echo "    - workgroup:  ${smb_workgroup}" >> "$conf"
+    if [[ -n ${smb_workgroup}]];then
+        echo "" >> "$conf"
+        echo "samba:" >> "$conf"
+        echo "    - workgroup:  ${smb_workgroup}" >> "$conf"
+    fi
 }
 
 get_yaml(){

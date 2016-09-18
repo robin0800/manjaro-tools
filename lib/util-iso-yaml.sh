@@ -14,19 +14,20 @@ import ${LIBDIR}/util-iso-calamares.sh
 
 check_yaml(){
     msg2 "Checking validity [%s] ..." "${1##*/}"
-    local name=${1##*/} file
+    local name=${1##*/} data schema
     case ${name##*.} in
         yaml)
             name=${name%.yaml}
-            file=$1
+            data=$1
         ;;
         conf)
             name=${name%.conf}
-            file=${tmp_dir}/$name.yaml
-            cp -v $1 $file
+            data=${tmp_dir}/$name.yaml
+            cp $1 $data
         ;;
     esac
-    pykwalify -d $file -s ${DATADIR}/schemas/$name.schema.yaml
+    schema=${DATADIR}/schemas/$name.schema.yaml
+    pykwalify -d $data -s $schema
 }
 
 write_calamares_yaml(){
