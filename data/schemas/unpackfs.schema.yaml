@@ -1,6 +1,6 @@
 ---
 type: map
-mapping
+mapping:
     "unpack":
         type: seq
         sequence:
