@@ -20,39 +20,39 @@ import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-publish.sh
 
 show_profile(){
-	prepare_transfer "$1"
-	info "Profile: [$1]"
-	msg2 "project: %s" "${project}"
-	msg2 "src_dir: ${src_dir}"
-	msg2 "target_dir: ${target_dir}"
+    prepare_transfer "$1"
+    info "Profile: [$1]"
+    msg2 "project: %s" "${project}"
+    msg2 "src_dir: ${src_dir}"
+    msg2 "target_dir: ${target_dir}"
 }
 
 display_settings(){
-	show_version
-	show_config
+    show_version
+    show_config
 
-	msg "PROFILE:"
-	msg2 "list_dir_iso: %s" "${list_dir_iso}"
-	msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
-	msg2 "build_list_iso: %s" "${build_list_iso}"
-	msg2 "is_build_list: %s" "${is_build_list}"
+    msg "PROFILE:"
+    msg2 "list_dir_iso: %s" "${list_dir_iso}"
+    msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
+    msg2 "build_list_iso: %s" "${build_list_iso}"
+    msg2 "is_build_list: %s" "${is_build_list}"
 
-	msg "OPTIONS:"
-	msg2 "limit: %s kB/s" "${limit}"
-	msg2 "dist_release: %s" "${dist_release}"
+    msg "OPTIONS:"
+    msg2 "limit: %s kB/s" "${limit}"
+    msg2 "dist_release: %s" "${dist_release}"
 
-	msg "ARGS:"
-	msg2 "update: %s" "${update}"
-	msg2 "release: %s" "${release}"
-	msg2 "verbose: %s" "${verbose}"
-	msg2 "rsync_args: %s" "${rsync_args[*]}"
+    msg "ARGS:"
+    msg2 "update: %s" "${update}"
+    msg2 "release: %s" "${release}"
+    msg2 "verbose: %s" "${verbose}"
+    msg2 "rsync_args: %s" "${rsync_args[*]}"
 
-	msg "REMOTE:"
-	msg2 "account: %s" "${account}"
-	msg2 "host: %s" "${host}"
+    msg "REMOTE:"
+    msg2 "account: %s" "${account}"
+    msg2 "host: %s" "${host}"
 
-	msg "UPLOAD QUEUE:"
-	run show_profile "${build_list_iso}"
+    msg "UPLOAD QUEUE:"
+    run show_profile "${build_list_iso}"
 }
 
 load_user_info
@@ -70,32 +70,32 @@ exists=false
 rsync_args=(-aP --progress -e ssh)
 
 usage() {
-	echo "Usage: ${0##*/} [options]"
-	echo "    -p                 Source folder to upload [default:${build_list_iso}]"
-	echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
-	echo '    -c                 Create new remote release directory'
-	echo '    -u                 Update remote directory'
-	echo '    -q                 Query settings and pretend upload'
-	echo '    -v                 Verbose output'
-	echo '    -h                 This help'
-	echo ''
-	echo ''
-	exit $1
+    echo "Usage: ${0##*/} [options]"
+    echo "    -p                 Source folder to upload [default:${build_list_iso}]"
+    echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
+    echo '    -c                 Create new remote release directory'
+    echo '    -u                 Update remote directory'
+    echo '    -q                 Query settings and pretend upload'
+    echo '    -v                 Verbose output'
+    echo '    -h                 This help'
+    echo ''
+    echo ''
+    exit $1
 }
 
 opts='p:l:cuvqh'
 
 while getopts "${opts}" arg; do
-	case "${arg}" in
+    case "${arg}" in
                 p) build_list_iso="$OPTARG" ;;
                 l) limit="$OPTARG" ;;
                 c) release=true ;;
                 u) update=true; rsync_args+=(-u) ;;
                 v) verbose=true; rsync_args+=(-v --stats) ;;
-		q) pretend=true; rsync_args+=(-n) ;;
-		h|?) usage 0 ;;
-		*) echo "invalid argument '${arg}'"; usage 1 ;;
-	esac
+        q) pretend=true; rsync_args+=(-n) ;;
+        h|?) usage 0 ;;
+        *) echo "invalid argument '${arg}'"; usage 1 ;;
+    esac
 done
 
 shift $(($OPTIND - 1))

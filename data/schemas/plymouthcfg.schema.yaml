@@ -1,0 +1,4 @@
+---
+type: map
+mapping:
+    plymouth_theme: { type: str }

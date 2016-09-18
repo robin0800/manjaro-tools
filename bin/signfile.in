@@ -21,8 +21,8 @@ load_vars "$HOME/.makepkg.conf"
 load_vars /etc/makepkg.conf
 
 if [ ! -e "$1" ]; then
-	error "%s does not exist!" "$1"
-	exit 1
+    error "%s does not exist!" "$1"
+    exit 1
 fi
 
 msg2 "Signing [%s] with key %s" "${1##*/}" "${GPGKEY}..."

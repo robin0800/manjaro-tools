@@ -157,6 +157,15 @@
 			</varlistentry>
 
 			<varlistentry>
+				<term><varname>geoip=</varname></term>
+
+				<listitem><para>Accepts
+						<option>true</option> (the default)
+						<option>false</option>.</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
 				<term><varname>efi_boot_loader=</varname></term>
 
 				<listitem><para>Takes grub or gummibot. Configures

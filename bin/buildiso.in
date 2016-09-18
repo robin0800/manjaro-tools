@@ -20,92 +20,93 @@ SYSCONFDIR='@sysconfdir@'
 import ${LIBDIR}/util.sh
 
 show_profile(){
-	prepare_profile "$1"
-	msg2 "pacman_conf: %s" "${pacman_conf}"
-	if ${verbose};then
-		msg2 "work_dir: %s" "${work_dir}"
-		msg2 "iso_dir: %s" "${iso_dir}"
-		msg2 "iso_file: %s" "${iso_file}"
-		msg2 "autologin: %s" "${autologin}"
-		msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
-		msg2 "pxe_boot: %s" "${pxe_boot}"
-		msg2 "plymouth_boot: %s" "${plymouth_boot}"
-		${plymouth_boot} && msg2 "plymouth_theme: %s" "${plymouth_theme}"
+    prepare_profile "$1"
+    msg2 "pacman_conf: %s" "${pacman_conf}"
+    if ${verbose};then
+        msg2 "work_dir: %s" "${work_dir}"
+        msg2 "iso_dir: %s" "${iso_dir}"
+        msg2 "iso_file: %s" "${iso_file}"
+        msg2 "autologin: %s" "${autologin}"
+        msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
+        msg2 "pxe_boot: %s" "${pxe_boot}"
+        msg2 "plymouth_boot: %s" "${plymouth_boot}"
+        ${plymouth_boot} && msg2 "plymouth_theme: %s" "${plymouth_theme}"
 
-		[[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
+        [[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
 
-		msg2 "netinstall: %s" "${netinstall}"
-		${netinstall} && msg2 "netgroups: %s" "$(get_yaml)"
-		msg2 "unpackfs: %s" "${unpackfs}"
+        msg2 "netinstall: %s" "${netinstall}"
+        ${netinstall} && msg2 "netgroups: %s" "$(get_yaml)"
+        msg2 "unpackfs: %s" "${unpackfs}"
+        msg2 "geoip: %s" "${geoip}"
 
-		msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
+        msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
 
-		msg2 "hostname: %s" "${hostname}"
-		msg2 "username: %s" "${username}"
-		msg2 "password: %s" "${password}"
-		msg2 "login_shell: %s" "${login_shell}"
-		msg2 "addgroups: %s" "${addgroups}"
-		[[ -n ${smb_workgroup} ]] && msg2 "smb_workgroup: %s" "${smb_workgroup}"
+        msg2 "hostname: %s" "${hostname}"
+        msg2 "username: %s" "${username}"
+        msg2 "password: %s" "${password}"
+        msg2 "login_shell: %s" "${login_shell}"
+        msg2 "addgroups: %s" "${addgroups}"
+        [[ -n ${smb_workgroup} ]] && msg2 "smb_workgroup: %s" "${smb_workgroup}"
 
-		if [[ ${initsys} == 'systemd' ]];then
-			msg2 "enable_systemd: %s" "${enable_systemd[*]}"
-			msg2 "enable_systemd_live: %s" "${enable_systemd_live[*]}"
-			[[ -n ${disable_systemd[*]} ]] && msg2 "disable_systemd: %s" "${disable_systemd[*]}"
-		else
-			msg2 "enable_openrc: %s" "${enable_openrc[*]}"
-			msg2 "enable_openrc_live: %s" "${enable_openrc_live[*]}"
-			[[ -n ${disable_openrc[*]} ]] && msg2 "disable_openrc: %s" "${disable_openrc[*]}"
-		fi
-		if ${torrent};then
-			msg2 "tracker_url: %s" "${tracker_url}"
-			msg2 "piece_size: %s" "${piece_size}"
-		fi
-	fi
-	reset_profile
+        if [[ ${initsys} == 'systemd' ]];then
+            msg2 "enable_systemd: %s" "${enable_systemd[*]}"
+            msg2 "enable_systemd_live: %s" "${enable_systemd_live[*]}"
+            [[ -n ${disable_systemd[*]} ]] && msg2 "disable_systemd: %s" "${disable_systemd[*]}"
+        else
+            msg2 "enable_openrc: %s" "${enable_openrc[*]}"
+            msg2 "enable_openrc_live: %s" "${enable_openrc_live[*]}"
+            [[ -n ${disable_openrc[*]} ]] && msg2 "disable_openrc: %s" "${disable_openrc[*]}"
+        fi
+        if ${torrent};then
+            msg2 "tracker_url: %s" "${tracker_url}"
+            msg2 "piece_size: %s" "${piece_size}"
+        fi
+    fi
+    reset_profile
 }
 
 display_settings(){
-	show_version
-	show_config
+    show_version
+    show_config
 
-	msg "PROFILE:"
-	msg2 "list_dir_iso: %s" "${list_dir_iso}"
-	msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
-	msg2 "build_list_iso: %s" "${build_list_iso}"
-	msg2 "is_build_list: %s" "${is_build_list}"
-	msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
-	${verbose} && msg2 "run_dir: %s" "${run_dir}"
+    msg "PROFILE:"
+    msg2 "list_dir_iso: %s" "${list_dir_iso}"
+    msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
+    msg2 "build_list_iso: %s" "${build_list_iso}"
+    msg2 "is_build_list: %s" "${is_build_list}"
+    msg2 "build_mirror: %s" "${build_mirror}/${target_branch}"
+    ${verbose} && msg2 "run_dir: %s" "${run_dir}"
 
-	msg "OPTIONS:"
-	msg2 "arch: %s" "${target_arch}"
-	msg2 "branch: %s" "${target_branch}"
-	msg2 "chroots_iso: %s" "${chroots_iso}"
-	msg2 "initsys: %s" "${initsys}"
-	msg2 "kernel: %s" "${kernel}"
+    msg "OPTIONS:"
+    msg2 "arch: %s" "${target_arch}"
+    msg2 "branch: %s" "${target_branch}"
+    msg2 "chroots_iso: %s" "${chroots_iso}"
+    msg2 "initsys: %s" "${initsys}"
+    msg2 "kernel: %s" "${kernel}"
 
-	msg "ARGS:"
-	msg2 "clean_first: %s" "${clean_first}"
-	msg2 "images_only: %s" "${images_only}"
-	msg2 "iso_only: %s" "${iso_only}"
-	msg2 "sign: %s" "${sign}"
-	msg2 "torrent: %s" "${torrent}"
+    msg "ARGS:"
+    msg2 "clean_first: %s" "${clean_first}"
+    msg2 "images_only: %s" "${images_only}"
+    msg2 "iso_only: %s" "${iso_only}"
+    msg2 "sign: %s" "${sign}"
+    msg2 "torrent: %s" "${torrent}"
 
-	msg "DIST SETTINGS:"
-	msg2 "dist_name: %s" "${dist_name}"
-	msg2 "dist_release: %s" "${dist_release}"
-	msg2 "dist_codename: %s" "${dist_codename}"
+    msg "DIST SETTINGS:"
+    msg2 "dist_name: %s" "${dist_name}"
+    msg2 "dist_release: %s" "${dist_release}"
+    msg2 "dist_codename: %s" "${dist_codename}"
 
-	msg "ISO SETTINGS:"
-	msg2 "iso_label: %s" "${iso_label}"
-	msg2 "iso_publisher: %s" "${iso_publisher}"
-	msg2 "iso_app_id: %s" "${iso_app_id}"
-	msg2 "iso_compression: %s" "${iso_compression}"
-	msg2 "iso_checksum: %s" "${iso_checksum}"
-	msg2 "use_overlayfs: %s" "${use_overlayfs}"
-	${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
+    msg "ISO SETTINGS:"
+    msg2 "iso_label: %s" "${iso_label}"
+    msg2 "iso_publisher: %s" "${iso_publisher}"
+    msg2 "iso_app_id: %s" "${iso_app_id}"
+    msg2 "iso_compression: %s" "${iso_compression}"
+    msg2 "iso_checksum: %s" "${iso_checksum}"
+    msg2 "use_overlayfs: %s" "${use_overlayfs}"
+    ${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
 
-	msg "BUILD QUEUE:"
-	run show_profile "${build_list_iso}"
+    msg "BUILD QUEUE:"
+    run show_profile "${build_list_iso}"
 }
 
 load_user_info
@@ -126,30 +127,30 @@ sign=false
 torrent=false
 
 usage() {
-	echo "Usage: ${0##*/} [options]"
-	echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
-	echo "    -a <arch>          Arch [default: ${target_arch}]"
-	echo "    -b <branch>        Branch [default: ${target_branch}]"
-	echo '    -r <dir>           Chroots directory'
-	echo "                       [default: ${chroots_iso}]"
-	echo '    -t <dir>           Target directory'
-	echo "                       [default: ${cache_dir_iso}]"
-	echo '    -k <name>          Kernel to use'
-	echo "                       [default: ${kernel}]"
-	echo '    -i <name>          Init system to use'
-	echo "                       [default: ${initsys}]"
-	echo '    -s                 Sign the iso'
-	echo '    -c                 Disable clean work dir'
-	echo '    -x                 Build images only'
-	echo '    -z                 Generate iso only'
-	echo '                       Requires pre built images (-x)'
-	echo '    -w                 Create iso torrent'
-	echo '    -v                 Verbose output to log file, show profile detail (-q)'
-	echo '    -q                 Query settings and pretend build'
-	echo '    -h                 This help'
-	echo ''
-	echo ''
-	exit $1
+    echo "Usage: ${0##*/} [options]"
+    echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
+    echo "    -a <arch>          Arch [default: ${target_arch}]"
+    echo "    -b <branch>        Branch [default: ${target_branch}]"
+    echo '    -r <dir>           Chroots directory'
+    echo "                       [default: ${chroots_iso}]"
+    echo '    -t <dir>           Target directory'
+    echo "                       [default: ${cache_dir_iso}]"
+    echo '    -k <name>          Kernel to use'
+    echo "                       [default: ${kernel}]"
+    echo '    -i <name>          Init system to use'
+    echo "                       [default: ${initsys}]"
+    echo '    -s                 Sign the iso'
+    echo '    -c                 Disable clean work dir'
+    echo '    -x                 Build images only'
+    echo '    -z                 Generate iso only'
+    echo '                       Requires pre built images (-x)'
+    echo '    -w                 Create iso torrent'
+    echo '    -v                 Verbose output to log file, show profile detail (-q)'
+    echo '    -q                 Query settings and pretend build'
+    echo '    -h                 This help'
+    echo ''
+    echo ''
+    exit $1
 }
 
 orig_argv=("$@")
@@ -157,24 +158,24 @@ orig_argv=("$@")
 opts='p:a:b:r:t:k:i:czxswvqh'
 
 while getopts "${opts}" arg; do
-	case "${arg}" in
-		p) build_list_iso="$OPTARG" ;;
-		a) target_arch="$OPTARG" ;;
-		b) target_branch="$OPTARG" ;;
-		r) chroots_iso="$OPTARG" ;;
-		t) cache_dir_iso="$OPTARG" ;;
-		k) kernel="$OPTARG" ;;
-		i) initsys="$OPTARG" ;;
-		s) sign=true ;;
-		c) clean_first=false ;;
-		x) images_only=true ;;
-		z) iso_only=true ;;
-		w) torrent=true ;;
-		v) verbose=true ;;
-		q) pretend=true ;;
-		h|?) usage 0 ;;
-		*) echo "invalid argument '${arg}'"; usage 1 ;;
-	esac
+    case "${arg}" in
+        p) build_list_iso="$OPTARG" ;;
+        a) target_arch="$OPTARG" ;;
+        b) target_branch="$OPTARG" ;;
+        r) chroots_iso="$OPTARG" ;;
+        t) cache_dir_iso="$OPTARG" ;;
+        k) kernel="$OPTARG" ;;
+        i) initsys="$OPTARG" ;;
+        s) sign=true ;;
+        c) clean_first=false ;;
+        x) images_only=true ;;
+        z) iso_only=true ;;
+        w) torrent=true ;;
+        v) verbose=true ;;
+        q) pretend=true ;;
+        h|?) usage 0 ;;
+        *) echo "invalid argument '${arg}'"; usage 1 ;;
+    esac
 done
 
 shift $(($OPTIND - 1))
@@ -194,7 +195,7 @@ import ${LIBDIR}/util-iso.sh
 check_requirements
 
 for sig in TERM HUP QUIT; do
-	trap "trap_exit $sig \"$(gettext "%s signal caught. Exiting...")\" \"$sig\"" "$sig"
+    trap "trap_exit $sig \"$(gettext "%s signal caught. Exiting...")\" \"$sig\"" "$sig"
 done
 trap 'trap_exit INT "$(gettext "Aborted by user! Exiting...")"' INT
 trap 'trap_exit USR1 "$(gettext "An unknown error has occurred. Exiting...")"' ERR
