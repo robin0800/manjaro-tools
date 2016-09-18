@@ -466,6 +466,13 @@ load_profile_config(){
     return 0
 }
 
+get_edition(){
+    local result=$(find ${run_dir} -maxdepth 2 -name "$1") path
+    [[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
+    path=${result%/*}
+    echo ${path##*/}
+}
+
 reset_profile(){
     unset displaymanager
     unset autologin

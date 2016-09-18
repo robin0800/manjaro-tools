@@ -572,13 +572,6 @@ load_profile(){
     mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed))
 }
 
-get_edition(){
-    local result=$(find ${run_dir} -maxdepth 2 -name "$1") path
-    [[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
-    path=${result%/*}
-    echo ${path##*/}
-}
-
 prepare_profile(){
     profile=$1
     edition=$(get_edition ${profile})
