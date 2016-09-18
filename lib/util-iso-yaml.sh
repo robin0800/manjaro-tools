@@ -17,7 +17,7 @@ check_yaml(){
     local name=${1##*/} data schema
     case ${name##*.} in
         yaml)
-            name=${name%.yaml}
+            name=netgroups
             data=$1
         ;;
         conf)
