@@ -15,7 +15,7 @@ import ${LIBDIR}/util-iso-calamares.sh
 check_yaml(){
     msg2 "Checking validity [%s] ..." "${1##*/}"
     local name=${1##*/} file
-    case ${name##*.}
+    case ${name##*.} in
         yaml)
             name=${name%.yaml}
             file=$1
