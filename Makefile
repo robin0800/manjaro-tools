@@ -71,7 +71,6 @@ LIBS_ISO = \
 	lib/util-iso-aufs.sh \
 	lib/util-iso-overlayfs.sh \
 	lib/util-iso-image.sh \
-	lib/util-iso-calamares.sh \
 	lib/util-iso-boot.sh \
 	lib/util-publish.sh
 

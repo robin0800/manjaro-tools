@@ -11,7 +11,7 @@
 
 import ${LIBDIR}/util-iso-image.sh
 import ${LIBDIR}/util-iso-boot.sh
-import ${LIBDIR}/util-iso-calamares.sh
+import ${LIBDIR}/util-iso-yaml.sh
 
 error_function() {
     if [[ -p $logpipe ]]; then
