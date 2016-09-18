@@ -466,6 +466,190 @@ load_profile_config(){
     return 0
 }
 
+reset_profile(){
+    unset displaymanager
+    unset autologin
+    unset multilib
+    unset pxe_boot
+    unset plymouth_boot
+    unset nonfree_mhwd
+    unset efi_boot_loader
+    unset hostname
+    unset username
+    unset plymouth_theme
+    unset password
+    unset addgroups
+    unset enable_systemd
+    unset disable_systemd
+    unset enable_openrc
+    unset disable_openrc
+    unset enable_systemd_live
+    unset enable_openrc_live
+    unset packages_custom
+    unset packages_mhwd
+    unset login_shell
+    unset tracker_url
+    unset piece_size
+    unset netinstall
+    unset unpackfs
+    unset netgroups
+    unset geoip
+}
+
+check_profile(){
+    local keyfiles=("${profile_dir}/mkinitcpio.conf"
+            "${profile_dir}/Packages-Root"
+            "${profile_dir}/Packages-Live")
+
+    local keydirs=("${profile_dir}/root-overlay"
+            "${profile_dir}/live-overlay")
+
+    local has_keyfiles=false has_keydirs=false
+    for f in ${keyfiles[@]}; do
+        if [[ -f $f ]];then
+            has_keyfiles=true
+        else
+            has_keyfiles=false
+            break
+        fi
+    done
+    for d in ${keydirs[@]}; do
+        if [[ -d $d ]];then
+            has_keydirs=true
+        else
+            has_keydirs=false
+            break
+        fi
+    done
+    if ! ${has_keyfiles} && ! ${has_keydirs};then
+        die "Profile [%s] sanity check failed!" "${profile_dir}"
+    fi
+
+    local files=$(ls ${profile_dir}/Packages*)
+    for f in ${files[@]};do
+        case $f in
+            ${profile_dir}/Packages-Root|${profile_dir}/Packages-Live|${profile_dir}/Packages-Mhwd) continue ;;
+            *) packages_custom="$f" ;;
+        esac
+    done
+
+    [[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
+
+    if ! ${netinstall} && ! ${unpackfs};then
+        unpackfs="true"
+    fi
+}
+
+get_shared_list(){
+    local path
+    case ${edition} in
+        sonar|netrunner) path=${run_dir}/shared/${edition}/Packages-Desktop ;;
+        *) path=${run_dir}/shared/manjaro/Packages-Desktop ;;
+    esac
+    echo $path
+}
+
+# $1: file name
+load_pkgs(){
+    info "Loading Packages: [%s] ..." "${1##*/}"
+
+    local _init _init_rm _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64
+
+    if [[ ${initsys} == 'openrc' ]];then
+        _init="s|>openrc||g"
+        _init_rm="s|>systemd.*||g"
+    else
+        _init="s|>systemd||g"
+        _init_rm="s|>openrc.*||g"
+    fi
+    if [[ "${target_arch}" == "i686" ]]; then
+        _arch="s|>i686||g"
+        _arch_rm="s|>x86_64.*||g"
+        _multi="s|>multilib.*||g"
+        _nonfree_multi="s|>nonfree_multilib.*||g"
+        _nonfree_x86_64="s|>nonfree_x86_64.*||g"
+        if ${nonfree_mhwd};then
+            _nonfree_default="s|>nonfree_default||g"
+            _nonfree_i686="s|>nonfree_i686||g"
+
+        else
+            _nonfree_default="s|>nonfree_default.*||g"
+            _nonfree_i686="s|>nonfree_i686.*||g"
+        fi
+    else
+        _arch="s|>x86_64||g"
+        _arch_rm="s|>i686.*||g"
+        _nonfree_i686="s|>nonfree_i686.*||g"
+        if ${multilib};then
+            _multi="s|>multilib||g"
+            if ${nonfree_mhwd};then
+                _nonfree_default="s|>nonfree_default||g"
+                _nonfree_x86_64="s|>nonfree_x86_64||g"
+                _nonfree_multi="s|>nonfree_multilib||g"
+            else
+                _nonfree_default="s|>nonfree_default.*||g"
+                _nonfree_multi="s|>nonfree_multilib.*||g"
+                _nonfree_x86_64="s|>nonfree_x86_64.*||g"
+            fi
+        else
+            _multi="s|>multilib.*||g"
+            if ${nonfree_mhwd};then
+                _nonfree_default="s|>nonfree_default||g"
+                _nonfree_x86_64="s|>nonfree_x86_64||g"
+                _nonfree_multi="s|>nonfree_multilib.*||g"
+            else
+                _nonfree_default="s|>nonfree_default.*||g"
+                _nonfree_x86_64="s|>nonfree_x86_64.*||g"
+                _nonfree_multi="s|>nonfree_multilib.*||g"
+            fi
+        fi
+    fi
+    local _blacklist="s|>blacklist.*||g" \
+        _kernel="s|KERNEL|$kernel|g" \
+        _used_kernel=${kernel:5:2} \
+        _space="s| ||g" \
+        _clean=':a;N;$!ba;s/\n/ /g' \
+        _com_rm="s|#.*||g" \
+        _purge="s|>cleanup.*||g" \
+        _purge_rm="s|>cleanup||g"
+
+    local list="$1"
+
+    if [[ "$list" == "${packages_custom}" ]];then
+        sort -u $(get_shared_list) ${packages_custom} > ${tmp_dir}/packages-desktop.list
+        list=${tmp_dir}/packages-desktop.list
+    fi
+
+    packages=$(sed "$_com_rm" "$list" \
+            | sed "$_space" \
+            | sed "$_blacklist" \
+            | sed "$_purge" \
+            | sed "$_init" \
+            | sed "$_init_rm" \
+            | sed "$_arch" \
+            | sed "$_arch_rm" \
+            | sed "$_nonfree_default" \
+            | sed "$_multi" \
+            | sed "$_nonfree_i686" \
+            | sed "$_nonfree_x86_64" \
+            | sed "$_nonfree_multi" \
+            | sed "$_kernel" \
+            | sed "$_clean")
+
+    if [[ $1 == "${packages_mhwd}" ]]; then
+
+        local  _used_kernel=${kernel:5:2}
+                [[ ${_used_kernel} < "42" ]] && local _amd="s|xf86-video-amdgpu||g"
+
+        packages_cleanup=$(sed "$_com_rm" "$1" \
+            | grep cleanup \
+            | sed "$_purge_rm" \
+            | sed "$_kernel" \
+            | sed "$_clean" \
+            | sed "$_amd")
+    fi
+}
+
 user_own(){
     local flag=$2
     chown ${flag} "${OWNER}:$(id --group ${OWNER})" "$1"

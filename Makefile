@@ -107,7 +107,7 @@ BIN_YAML = \
 	bin/check-yaml
 
 LIBS_YAML = \
-	lib/util-iso-yaml.sh
+	lib/util-yaml.sh
 
 SHARED_YAML = \
 	data/schemas/bootloader.schema.yaml \

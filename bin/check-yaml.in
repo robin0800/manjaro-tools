@@ -18,8 +18,7 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 
 import ${LIBDIR}/util.sh
-import ${LIBDIR}/util-iso.sh
-import ${LIBDIR}/util-iso-yaml.sh
+import ${LIBDIR}/util-yaml.sh
 
 show_profile(){
     prepare_check "$1"
@@ -105,6 +104,7 @@ usage() {
     echo "    -k <name>          Kernel to use[default: ${kernel}]"
     echo "    -i <name>          Init system to use [default: ${initsys}]"
     echo '    -c                 Check also calamares yaml files generated for the profile'
+    echo '    -g                 Enable pacman group accepted for -p'
     echo '    -v                 Validate by schema'
     echo '    -q                 Query settings'
     echo '    -h                 This help'
