@@ -4,13 +4,13 @@ mapping:
     "mountOptions":
         type: map
         mapping:
-            "default": { type: str, required: yes }
-            "btrfs": { type: str, required: yes }
+            "default": { type: str, required: true }
+            "btrfs": { type: str, required: true }
     "ssdExtraMountOptions":
         type: map
         mapping:
-            "ext4": { type: str, required: yes }
-            "jfs": { type: str, required: yes }
-            "xfs": { type: str, required: yes }
-            "swap": { type: str, required: yes }
-            "btrfs": { type: str, required: yes }
+            "ext4": { type: str, required: true }
+            "jfs": { type: str, required: true }
+            "xfs": { type: str, required: true }
+            "swap": { type: str, required: true }
+            "btrfs": { type: str, required: true }

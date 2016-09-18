@@ -2,12 +2,12 @@
 type: map
 mapping:
     "defaultGroups":
-        required: yes
+        required: true
         type: seq
         sequence:
             - { type: str }
-    "autologinGroup": { type: str, required: yes }
+    "autologinGroup": { type: str, required: true }
     "doAutologin": { type: bool, default: true }
-    "sudoersGroup": { type: str, required: yes }
-    "setRootPassword": { type: bool, default: true, required: yes }
+    "sudoersGroup": { type: str, required: true }
+    "setRootPassword": { type: bool, default: true }
     "doReusePassword": { type: bool, default: true }

@@ -2,22 +2,24 @@
 type: map
 mapping:
   "modules-search":
-      type: seq
-      required: yes
-      sequence:
+    type: seq
+    required: true
+    sequence:
         - type: str
+
   "instances":
       type: seq
-      required: yes
+      required: true
       sequence:
         - type: map
           mapping:
             "id": { type: str }
             "module": { type: str }
             "config": { type: str }
+
   "sequence":
       type: seq
-      required: yes
+      required: true
       sequence:
           - type: map
             mapping:
@@ -26,50 +28,53 @@ mapping:
                 sequence:
                   - type: map
                     mapping:
-                        "welcome": { type: str, required: yes }
-                        "locale": { type: str, required: yes }
-                        "keyboard": { type: str, required: yes }
-                        "partition": { type: str, required: yes }
-                        "users": { type: str, required: yes }
-                        "summary": { type: str, required: yes }
+                        "welcome": { type: str, required: true }
+                        "locale": { type: str, required: true }
+                        "keyboard": { type: str, required: true }
+                        "partition": { type: str, required: true }
+                        "users": { type: str, required: true }
+                        "summary": { type: str, required: true }
                         "netinstall": { type: str }
               "exec":
                 type: seq
                 sequence:
                   - type: map
                     mapping:
-                        "partition": { type: str, required: yes }
-                        "mount": { type: str, required: yes }
+                        "partition": { type: str, required: true }
+                        "mount": { type: str, required: true }
                         "unpackfs": { type: str }
                         "chrootcfg": { type: str }
                         "packages": { type: str }
-                        "machineid": { type: str, required: yes }
-                        "fstab": { type: str, required: yes }
-                        "locale": { type: str, required: yes }
-                        "keyboard": { type: str, required: yes }
-                        "localecfg": { type: str, required: yes }
+                        "machineid": { type: str, required: true }
+                        "fstab": { type: str, required: true }
+                        "locale": { type: str, required: true }
+                        "keyboard": { type: str, required: true }
+                        "localecfg": { type: str, required: true }
                         "luksopenswaphookcfg": { type: str }
                         "luksbootkeyfile": { type: str }
                         "plymouthcfg": { type: str }
-                        "initcpiocfg": { type: str, required: yes }
-                        "initcpio": { type: str, required: yes }
-                        "users": { type: str, required: yes }
-                        "displaymanager": { type: str, required: yes }
+                        "initcpiocfg": { type: str, required: true }
+                        "initcpio": { type: str, required: true }
+                        "users": { type: str, required: true }
+                        "displaymanager": { type: str, required: true }
                         "mhwdcfg": { type: str }
-                        "networkcfg": { type: str, required: yes }
-                        "hwclock": { type: str, required: yes }
+                        "networkcfg": { type: str, required: true }
+                        "hwclock": { type: str, required: true }
                         "services": { type: str }
                         "servicescfg": { type: str }
-                        "grubcfg": { type: str, required: yes }
-                        "bootloader": { type: str, required: yes }
-                        "postcfg": { type: str, required: yes }
-                        "umount": { type: str, required: yes }
+                        "grubcfg": { type: str, required: true }
+                        "bootloader": { type: str, required: true }
+                        "postcfg": { type: str, required: true }
+                        "umount": { type: str, required: true }
               "show":
                 type: seq
                 sequence:
                   - type: map
                     mapping:
-                        "finished": { type: str, required: yes }
-  "branding": { type: str, required: yes }
-  "prompt-install": { type: bool, required: yes, default: false }
-  "dont-chroot": { type: bool, required: yes, default: false }
+                        "finished": { type: str, required: true }
+
+  "branding": { type: str, required: true }
+
+  "prompt-install": { type: bool, default: false }
+
+  "dont-chroot": { type: bool, default: false }

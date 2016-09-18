@@ -3,12 +3,12 @@ type: seq
 sequence:
   - type: map
     mapping:
-      "name": { type: str, required: yes }
-      "description": { type: str, required: yes }
+      "name": { type: str, required: true }
+      "description": { type: str, required: true }
       "selected": { type: bool, default: false }
       "hidden": { type: bool, default: false }
       "packages":
             type: seq
-            required: yes
+            required: true
             sequence:
                 - type: str

@@ -1,15 +1,15 @@
 ---
 type: map
 mapping:
-    efiBootLoader: { type: str, required: yes }
-    kernel:  { type: str, required: yes }
-    img:  { type: str, required: yes }
-    fallback:  { type: str, required: yes }
-    timeout:  { type: str, required: yes }
+    efiBootLoader: { type: str, required: true }
+    kernel:  { type: str, required: true }
+    img:  { type: str, required: true }
+    fallback:  { type: str, required: true }
+    timeout:  { type: str, required: true }
     bootloaderEntryName:  { type: str }
-    kernelLine:  { type: str, required: yes }
-    fallbackKernelLine:  { type: str, required: yes }
-    grubInstall:  { type: str, required: yes }
-    grubMkconfig:  { type: str, required: yes }
-    grubCfg:  { type: str, required: yes }
+    kernelLine:  { type: str, required: true }
+    fallbackKernelLine:  { type: str, required: true }
+    grubInstall:  { type: str, required: true }
+    grubMkconfig:  { type: str, required: true }
+    grubCfg:  { type: str, required: true }
     efiBootloaderId:  { type: str }

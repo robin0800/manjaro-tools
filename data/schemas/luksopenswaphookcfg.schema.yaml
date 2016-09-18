@@ -1,4 +1,4 @@
 ---
 type: map
 mapping:
-    "configFilePath": { type: str, required: yes }
+    "configFilePath": { type: str, required: true }

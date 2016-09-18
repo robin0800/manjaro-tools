@@ -6,16 +6,16 @@ mapping:
         sequence:
             - type: map
               mapping:
-                  "device": { type: str, required: yes }
+                  "device": { type: str, required: true }
                   "fs": { type: str }
-                  "mountPoint": { type: str, required: yes }
+                  "mountPoint": { type: str, required: true }
                   "options": { type: str }
     "extraMountsEfi":
         type: seq
         sequence:
             - type: map
               mapping:
-                  "device": { type: str, required: yes }
+                  "device": { type: str, required: true }
                   "fs": { type: str }
-                  "mountPoint": { type: str, required: yes }
+                  "mountPoint": { type: str, required: true }
                   "options": { type: str }
