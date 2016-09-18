@@ -473,6 +473,15 @@ get_edition(){
     echo ${path##*/}
 }
 
+is_valid_de(){
+    if [[ ${default_desktop_executable} != "none" ]] && \
+    [[ ${default_desktop_file} != "none" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 reset_profile(){
     unset displaymanager
     unset autologin
