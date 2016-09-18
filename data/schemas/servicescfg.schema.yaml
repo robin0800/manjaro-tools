@@ -4,14 +4,14 @@ mapping:
     "services":
         type: map
         mapping:
-            "enable":
+            "enabled":
                 type: seq
                 sequence:
                     - type: map
                       mapping:
                           "name": { type: str }
                           "runlevel": { type: str, enum: [default, sysinit, boot, shutdown, nonetwork] }
-            "disable":
+            "disabled":
                 type: seq
                 sequence:
                     - type: map

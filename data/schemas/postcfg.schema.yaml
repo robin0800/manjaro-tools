@@ -1,7 +1,13 @@
 ---
 type: map
 mapping:
-    keyrings:
+    "keyrings":
         type: seq
         sequence:
             - { type: str }
+    "samba":
+        type: seq
+        sequence:
+            - type: map
+              mapping:
+                  "workgroup": { type: str }

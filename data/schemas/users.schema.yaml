@@ -7,7 +7,7 @@ mapping:
         sequence:
             - { type: str }
     "autologinGroup": { type: str, required: yes }
-    "doAutologin": { type: bool, default: true, required: yes }
+    "doAutologin": { type: bool, default: true }
     "sudoersGroup": { type: str, required: yes }
     "setRootPassword": { type: bool, default: true, required: yes }
-    "doReusePassword": { type: bool, default: true, required: yes }
+    "doReusePassword": { type: bool, default: true }

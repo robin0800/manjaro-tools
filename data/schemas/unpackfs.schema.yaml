@@ -1,11 +1,11 @@
 ---
 type: map
 mapping
-    unpack:
+    "unpack":
         type: seq
         sequence:
           - type: map
             mapping:
-              source: { type: str }
-              sourcefs: { type: str }
-              destination: { type: str }
+                "source": { type: str }
+                "sourcefs": { type: str }
+                "destination": { type: str }
