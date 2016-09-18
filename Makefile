@@ -23,8 +23,6 @@ LIBS_BASE = \
 SHARED_BASE = \
 	data/pacman-default.conf \
 	data/pacman-multilib.conf \
-	data/desktop.map \
-	data/linux.preset \
 	data/pacman-mirrors.conf
 
 LIST_PKG = \
@@ -111,6 +109,10 @@ LIBS_YAML = \
 	lib/util-yaml.sh
 
 SHARED_YAML = \
+	data/desktop.map \
+	data/linux.preset
+
+SCHEMAS = \
 	data/schemas/bootloader.schema.yaml \
 	data/schemas/chrootcfg.schema.yaml \
 	data/schemas/displaymanager.schema.yaml \
@@ -231,8 +233,11 @@ install_yaml:
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/manjaro-tools
 	install -m0644 ${LIBS_YAML} $(DESTDIR)$(PREFIX)/lib/manjaro-tools
 
+	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
+	install -m0644 ${SHARED_YAML} $(DESTDIR)$(PREFIX)/share/manjaro-tools
+
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas
-	install -m0644 ${SHARED_YAML} $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas
+	install -m0644 ${SCHEMAS} $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/man/man1
 	gzip -c man/check-yaml.1 > $(DESTDIR)$(PREFIX)/share/man/man1/check-yaml.1.gz
@@ -269,7 +274,8 @@ uninstall_iso:
 uninstall_yaml:
 	for f in ${BIN_YAML}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${LIBS_YAML}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
-	for f in ${SHARED_YAML}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas/$$f; done
+	for f in ${SCHEMAS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas/$$f; done
+	for f in ${SHARED_YAML}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/check-yaml.1.gz
 
 install: install_base install_pkg install_iso install_yaml

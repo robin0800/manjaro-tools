@@ -473,38 +473,6 @@ get_edition(){
     echo ${path##*/}
 }
 
-load_desktop_map(){
-    local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g" \
-        file=${DATADIR}/desktop.map
-    local desktop_map=$(sed "$_com_rm" "$file" \
-            | sed "$_space" \
-            | sed "$_clean")
-    echo ${desktop_map}
-}
-
-detect_desktop_env(){
-    local xs=$1/usr/share/xsessions ex=$1/usr/bin key val map=( $(load_desktop_map) )
-    default_desktop_file="none"
-    default_desktop_executable="none"
-    for item in "${map[@]}";do
-        key=${item%:*}
-        val=${item#*:}
-        if [[ -f $xs/$key.desktop ]] && [[ -f $ex/$val ]];then
-            default_desktop_file="$key"
-            default_desktop_executable="$val"
-        fi
-    done
-}
-
-is_valid_de(){
-    if [[ ${default_desktop_executable} != "none" ]] && \
-    [[ ${default_desktop_file} != "none" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
 reset_profile(){
     unset displaymanager
     unset autologin
