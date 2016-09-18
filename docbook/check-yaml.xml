@@ -57,9 +57,9 @@
 	<refsect1>
 		<title>Description</title>
 
-		<para><command>check-yaml</command> is used to generate and validate yaml files used by calamares. </para>
+		<para><command>check-yaml</command> is used to generate and validate yaml files used by calamares.</para>
 
-		<para>check-yaml is a script to generate and validate yaml files by yaml schemas. Buildiso generates these files also, but check-yaml is a standalone version without the need to build the entire iso.<para>
+		<para>check-yaml is a script to generate and validate yaml files by yaml schemas. Buildiso generates these files also, but check-yaml is a standalone version without the need to build the entire iso.</para>
 
 	</refsect1>
 
