@@ -270,9 +270,9 @@ yaml files are used by calamares netinstall option from a specified url(netgroup
 $ check-yaml -h
 Usage: check-yaml [options]
     -p <profile>       Buildset or profile [default: default]
-    -a <arch>          Arch [default: x86_64]
+    -a <arch>          Arch [default: auto]
     -k <name>          Kernel to use[default: linux44]
-    -i <name>          Init system to use [default: openrc]
+    -i <name>          Init system to use [default: systemd]
     -c                 Check also calamares yaml files generated for the profile
     -g                 Enable pacman group accepted for -p
     -v                 Validate by schema
@@ -296,7 +296,7 @@ check-yaml -p xfce -c
 * for a kdebase pacman group with validation
 
 ~~~
-check-yaml -p kdebase -v
+check-yaml -p kdebase -gv
 ~~~
 
 ####Special parameters
