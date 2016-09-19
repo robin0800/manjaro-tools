@@ -13,21 +13,9 @@ mapping:
             required: true
             type: seq
             sequence:
-                - type: map
-                  mapping:
-                    "storage": { type: str, required: true }
-                    "ram": { type: str, required: true }
-                    "power": { type: str, required: true }
-                    "internet": { type: str, required: true }
-                    "root": { type: str, required: true }
+                - { type: str, enum: [storage, ram, power, internet, root] }
         "required":
             required: true
             type: seq
             sequence:
-                - type: map
-                  mapping:
-                    "storage": { type: str, required: true }
-                    "ram": { type: str, required: true }
-                    "power": { type: str }
-                    "internet": { type: str }
-                    "root": { type: str, required: true }
+                - { type: str, enum: [storage, ram, power, internet, root] }

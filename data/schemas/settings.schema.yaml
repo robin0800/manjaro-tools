@@ -1,80 +1,31 @@
 ---
 type: map
 mapping:
-  "modules-search":
-    type: seq
-    required: true
-    sequence:
-        - type: str
-
-  "instances":
-      type: seq
-      required: true
-      sequence:
-        - type: map
-          mapping:
-            "id": { type: str }
-            "module": { type: str }
-            "config": { type: str }
-
-  "sequence":
-      type: seq
-      required: true
-      sequence:
+    "modules-search":
+        type: seq
+        sequence:
+            - { type: str }
+    "instances":
+        type: seq
+        sequence:
           - type: map
             mapping:
-              "show":
-                type: seq
-                sequence:
-                  - type: map
-                    mapping:
-                        "welcome": { type: str, required: true }
-                        "locale": { type: str, required: true }
-                        "keyboard": { type: str, required: true }
-                        "partition": { type: str, required: true }
-                        "users": { type: str, required: true }
-                        "summary": { type: str, required: true }
-                        "netinstall": { type: str }
-              "exec":
-                type: seq
-                sequence:
-                  - type: map
-                    mapping:
-                        "partition": { type: str, required: true }
-                        "mount": { type: str, required: true }
-                        "unpackfs": { type: str }
-                        "chrootcfg": { type: str }
-                        "packages": { type: str }
-                        "machineid": { type: str, required: true }
-                        "fstab": { type: str, required: true }
-                        "locale": { type: str, required: true }
-                        "keyboard": { type: str, required: true }
-                        "localecfg": { type: str, required: true }
-                        "luksopenswaphookcfg": { type: str }
-                        "luksbootkeyfile": { type: str }
-                        "plymouthcfg": { type: str }
-                        "initcpiocfg": { type: str, required: true }
-                        "initcpio": { type: str, required: true }
-                        "users": { type: str, required: true }
-                        "displaymanager": { type: str, required: true }
-                        "mhwdcfg": { type: str }
-                        "networkcfg": { type: str, required: true }
-                        "hwclock": { type: str, required: true }
-                        "services": { type: str }
-                        "servicescfg": { type: str }
-                        "grubcfg": { type: str, required: true }
-                        "bootloader": { type: str, required: true }
-                        "postcfg": { type: str, required: true }
-                        "umount": { type: str, required: true }
-              "show":
-                type: seq
-                sequence:
-                  - type: map
-                    mapping:
-                        "finished": { type: str, required: true }
-
-  "branding": { type: str, required: true }
-
-  "prompt-install": { type: bool, default: false }
-
-  "dont-chroot": { type: bool, default: false }
+                "id": { type: str }
+                "module": { type: str }
+                "config": { type: str }
+    "sequence":
+        type: seq
+        sequence:
+          - type: map
+            mapping:
+                "show":
+                    type: seq
+                    sequence:
+                      - { type: str, enum: [welcome, netinstall, locale, keyboard, partition, users, summary, finished] }
+                "exec":
+                    type: seq
+                    sequence:
+                        - { type: str, enum: [partition, mount, chrootcfg, unpackfs, networkcfg, machineid, fstab, locale, keyboard, localecfg, luksopenswaphookcfg, luksbootkeyfile, plymouthcfg, initcpiocfg, initcpio, users, displaymanager, mhwdcfg, hwclock, servicescfg, services, grubcfg, bootloader, postcfg, umount, packages, removeuser, dracut] }
+    "branding": { type: str, required: true }
+    "prompt-install": { type: bool, default: false }
+    "dont-chroot": { type: bool, default: false }
