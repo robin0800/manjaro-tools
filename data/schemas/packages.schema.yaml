@@ -10,12 +10,12 @@ mapping:
                 "install":
                     type: seq
                     sequence:
-                        - { type: str }
+                        - { type: text }
                 "remove":
                     type: seq
                     sequence:
-                        - { type: str }
+                        - { type: text }
                 "localInstall":
                     type: seq
                     sequence:
-                        - { type: str }
+                        - { type: text }

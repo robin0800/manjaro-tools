@@ -11,4 +11,4 @@ sequence:
             type: seq
             required: true
             sequence:
-                - type: str
+                - { type: text }

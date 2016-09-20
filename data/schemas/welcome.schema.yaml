@@ -13,9 +13,9 @@ mapping:
             required: true
             type: seq
             sequence:
-                - { type: str, enum: [storage, ram, power, internet, root] }
+                - { type: str, enum: [storage, ram, power, internet, root], unique: true }
         "required":
             required: true
             type: seq
             sequence:
-                - { type: str, enum: [storage, ram, power, internet, root] }
+                - { type: str, enum: [storage, ram, power, internet, root], unique: true }
