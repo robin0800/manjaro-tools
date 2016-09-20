@@ -140,7 +140,8 @@ write_services_conf(){
 write_displaymanager_conf(){
     local conf="${modules_dir}/displaymanager.conf"
     msg2 "Writing %s ..." "${conf##*/}"
-    echo "displaymanagers:" > "$conf"
+    echo "---" > "$conf"
+    echo "displaymanagers:" >> "$conf"
     echo "  - ${displaymanager}" >> "$conf"
     echo '' >> "$conf"
     if $(is_valid_de); then
@@ -327,11 +328,11 @@ write_settings_conf(){
     echo "sequence:" >> "$conf"
     echo "    - show:" >> "$conf"
     echo "        - welcome" >> "$conf"
-    ${netinstall} && echo "        - netinstall" >> "$conf"
     echo "        - locale" >> "$conf"
     echo "        - keyboard" >> "$conf"
     echo "        - partition" >> "$conf"
     echo "        - users" >> "$conf"
+    ${netinstall} && echo "        - netinstall" >> "$conf"
     echo "        - summary" >> "$conf"
     echo "    - exec:" >> "$conf"
     echo "        - partition" >> "$conf"
@@ -458,7 +459,8 @@ write_calamares_yaml(){
 
 write_netgroup_yaml(){
     msg2 "Writing %s ..." "${2##*/}"
-    echo "- name: '$1'" > "$2"
+    echo "---" > "$2"
+    echo "- name: '$1'" >> "$2"
     echo "  description: '$1'" >> "$2"
     echo "  selected: false" >> "$2"
     echo "  hidden: false" >> "$2"
