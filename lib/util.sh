@@ -456,7 +456,8 @@ load_profile_config(){
     [[ -z ${unpackfs} ]] && unpackfs='true'
 
     #[[ -z ${netgroups} ]] && -- needs to be hardcoded for now, until a standard has been established 
-    netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
+    # will be unlocked again after everything has been established.
+    netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinst"
 
     [[ -z ${geoip} ]] && geoip='true'
 
