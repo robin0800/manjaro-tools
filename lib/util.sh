@@ -455,8 +455,7 @@ load_profile_config(){
 
     [[ -z ${unpackfs} ]] && unpackfs='true'
 
-    #[[ -z ${netgroups} ]] &&
-    netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
+    [[ -z ${netgroups} ]] && netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinstall"
 
     [[ -z ${geoip} ]] && geoip='true'
 
