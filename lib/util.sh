@@ -373,6 +373,9 @@ check_profile_vars(){
     if ! is_valid_bool "${unpackfs}";then
         die "unpackfs only accepts true/false value!"
     fi
+    if ! is_valid_bool "${geoip}";then
+        die "geoip only accepts true/false value!"
+    fi
 }
 
 get_svc(){
