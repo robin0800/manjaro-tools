@@ -139,30 +139,28 @@ write_services_conf(){
 
 write_displaymanager_conf(){
     local conf="${modules_dir}/displaymanager.conf"
-    if ${unpackfs} && ! ${netinstall};then
-        msg2 "Writing %s ..." "${conf##*/}"
-        echo "---" > "$conf"
-        if ${unpackfs}; then
-            echo "displaymanagers:" >> "$conf"
-            echo "  - ${displaymanager}" >> "$conf"
-            echo '' >> "$conf"
-            if $(is_valid_de); then
-                echo "defaultDesktopEnvironment:" >> "$conf"
-                echo "    executable: \"${default_desktop_executable}\"" >> "$conf"
-                echo "    desktopFile: \"${default_desktop_file}\"" >> "$conf"
-            fi
-        else
-            echo "displaymanagers:" >> "$conf"
-            echo "  - lightdm" >> "$conf"
-            echo "  - gdm" >> "$conf"
-            echo "  - mdm" >> "$conf"
-            echo "  - sddm" >> "$conf"
-            echo "  - lxdm" >> "$conf"
-            echo "  - silm" >> "$conf"
-        fi
+    msg2 "Writing %s ..." "${conf##*/}"
+    echo "---" > "$conf"
+    if ${unpackfs}; then
+        echo "displaymanagers:" >> "$conf"
+        echo "  - ${displaymanager}" >> "$conf"
         echo '' >> "$conf"
-        echo "basicSetup: false" >> "$conf"
+        if $(is_valid_de); then
+            echo "defaultDesktopEnvironment:" >> "$conf"
+            echo "    executable: \"${default_desktop_executable}\"" >> "$conf"
+            echo "    desktopFile: \"${default_desktop_file}\"" >> "$conf"
+        fi
+    else
+        echo "displaymanagers:" >> "$conf"
+        echo "  - lightdm" >> "$conf"
+        echo "  - gdm" >> "$conf"
+        echo "  - mdm" >> "$conf"
+        echo "  - sddm" >> "$conf"
+        echo "  - lxdm" >> "$conf"
+        echo "  - slim" >> "$conf"
     fi
+    echo '' >> "$conf"
+    echo "basicSetup: false" >> "$conf"
 }
 
 write_initcpio_conf(){
