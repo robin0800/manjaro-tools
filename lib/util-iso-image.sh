@@ -165,12 +165,6 @@ write_live_session_conf(){
     echo '# iso name' >> ${conf}
     echo "iso_name=${iso_name}" >> ${conf}
     echo '' >> ${conf}
-    echo '# default_desktop_file' >> ${conf}
-    echo "default_desktop_file=${default_desktop_file}" >> ${conf}
-    echo '' >> ${conf}
-    echo '# default_desktop_executable' >> ${conf}
-    echo "default_desktop_executable=${default_desktop_executable}" >> ${conf}
-    echo '' >> ${conf}
     echo '# samba workgroup' >> ${conf}
     echo "smb_workgroup=${smb_workgroup}" >> ${conf}
 }
@@ -203,7 +197,6 @@ configure_system(){
 
 configure_live_image(){
     msg "Configuring [live-image]"
-    detect_desktop_env "$1"
     configure_hosts "$1"
     configure_lsb "$1"
     configure_mhwd "$1"

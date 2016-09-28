@@ -9,38 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-load_desktop_map(){
-    local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g" \
-        file=${DATADIR}/desktop.map
-    local desktop_map=$(sed "$_com_rm" "$file" \
-            | sed "$_space" \
-            | sed "$_clean")
-    echo ${desktop_map}
-}
-
-detect_desktop_env(){
-    local xs=$1/usr/share/xsessions ex=$1/usr/bin key val map=( $(load_desktop_map) )
-    default_desktop_file="none"
-    default_desktop_executable="none"
-    for item in "${map[@]}";do
-        key=${item%:*}
-        val=${item#*:}
-        if [[ -f $xs/$key.desktop ]] && [[ -f $ex/$val ]];then
-            default_desktop_file="$key"
-            default_desktop_executable="$val"
-        fi
-    done
-}
-
-is_valid_de(){
-    if [[ ${default_desktop_executable} != "none" ]] && \
-    [[ ${default_desktop_file} != "none" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
 write_machineid_conf(){
     local conf="${modules_dir}/machineid.conf" switch='false'
     msg2 "Writing %s ..." "${conf##*/}"
@@ -141,24 +109,13 @@ write_displaymanager_conf(){
     local conf="${modules_dir}/displaymanager.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
-    if ${chrootcfg}; then
-        echo "displaymanagers:" >> "$conf"
-        echo "  - lightdm" >> "$conf"
-        echo "  - gdm" >> "$conf"
-        echo "  - mdm" >> "$conf"
-        echo "  - sddm" >> "$conf"
-        echo "  - lxdm" >> "$conf"
-        echo "  - slim" >> "$conf"
-    else
-        echo "displaymanagers:" >> "$conf"
-        echo "  - ${displaymanager}" >> "$conf"
-        echo '' >> "$conf"
-        if $(is_valid_de); then
-            echo "defaultDesktopEnvironment:" >> "$conf"
-            echo "    executable: \"${default_desktop_executable}\"" >> "$conf"
-            echo "    desktopFile: \"${default_desktop_file}\"" >> "$conf"
-        fi
-    fi
+    echo "displaymanagers:" >> "$conf"
+    echo "  - lightdm" >> "$conf"
+    echo "  - gdm" >> "$conf"
+    echo "  - mdm" >> "$conf"
+    echo "  - sddm" >> "$conf"
+    echo "  - lxdm" >> "$conf"
+    echo "  - slim" >> "$conf"
     echo '' >> "$conf"
     echo "basicSetup: false" >> "$conf"
 }
@@ -394,7 +351,7 @@ configure_calamares(){
     modules_dir=$1/etc/calamares/modules
 
     mkdir -p ${modules_dir}
-
+        
     write_settings_conf "$1"
 
     write_locale_conf
