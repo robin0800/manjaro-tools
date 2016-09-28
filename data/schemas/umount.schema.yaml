@@ -1,5 +1,5 @@
 ---
 type: map
 mapping:
-    "scrLog": { type: str }
+    "srcLog": { type: str }
     "destLog": { type: str }

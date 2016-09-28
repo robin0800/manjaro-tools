@@ -9,6 +9,38 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+load_desktop_map(){
+    local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g" \
+        file=${DATADIR}/desktop.map
+    local desktop_map=$(sed "$_com_rm" "$file" \
+            | sed "$_space" \
+            | sed "$_clean")
+    echo ${desktop_map}
+}
+
+detect_desktop_env(){
+    local xs=$1/usr/share/xsessions ex=$1/usr/bin key val map=( $(load_desktop_map) )
+    default_desktop_file="none"
+    default_desktop_executable="none"
+    for item in "${map[@]}";do
+        key=${item%:*}
+        val=${item#*:}
+        if [[ -f $xs/$key.desktop ]] && [[ -f $ex/$val ]];then
+            default_desktop_file="$key"
+            default_desktop_executable="$val"
+        fi
+    done
+}
+
+is_valid_de(){
+    if [[ ${default_desktop_executable} != "none" ]] && \
+    [[ ${default_desktop_file} != "none" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 write_machineid_conf(){
     local conf="${modules_dir}/machineid.conf" switch='false'
     msg2 "Writing %s ..." "${conf##*/}"
@@ -108,13 +140,24 @@ write_services_conf(){
 write_displaymanager_conf(){
     local conf="${modules_dir}/displaymanager.conf"
     msg2 "Writing %s ..." "${conf##*/}"
-    echo "displaymanagers:" > "$conf"
-    echo "  - ${displaymanager}" >> "$conf"
-    echo '' >> "$conf"
-    if $(is_valid_de); then
-        echo "defaultDesktopEnvironment:" >> "$conf"
-        echo "    executable: \"${default_desktop_executable}\"" >> "$conf"
-        echo "    desktopFile: \"${default_desktop_file}\"" >> "$conf"
+    echo "---" > "$conf"
+    if ${chrootcfg}; then
+        echo "displaymanagers:" >> "$conf"
+        echo "  - lightdm" >> "$conf"
+        echo "  - gdm" >> "$conf"
+        echo "  - mdm" >> "$conf"
+        echo "  - sddm" >> "$conf"
+        echo "  - lxdm" >> "$conf"
+        echo "  - slim" >> "$conf"
+    else
+        echo "displaymanagers:" >> "$conf"
+        echo "  - ${displaymanager}" >> "$conf"
+        echo '' >> "$conf"
+        if $(is_valid_de); then
+            echo "defaultDesktopEnvironment:" >> "$conf"
+            echo "    executable: \"${default_desktop_executable}\"" >> "$conf"
+            echo "    desktopFile: \"${default_desktop_file}\"" >> "$conf"
+        fi
     fi
     echo '' >> "$conf"
     echo "basicSetup: false" >> "$conf"
@@ -212,14 +255,10 @@ write_mhwdcfg_conf(){
         echo "driver: free" >> "$conf"
     fi
     echo '' >> "$conf"
-    if ${netinstall};then
-        if ${unpackfs};then
-            echo "local: true" >> "$conf"
-        else
+    if ${chrootcfg};then
             echo "local: false" >> "$conf"
-        fi
     else
-        echo "local: true" >> "$conf"
+            echo "local: true" >> "$conf"
     fi
     echo '' >> "$conf"
     echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
@@ -241,10 +280,10 @@ write_postcfg_conf(){
 
 get_yaml(){
     local args=() ext="yaml" yaml
-    if ${unpackfs};then
-        args+=("hybrid")
-    else
+    if ${chrootcfg};then
         args+=('netinstall')
+    else
+        args+=("hybrid")
     fi
     args+=("${initsys}")
     [[ ${edition} == 'sonar' ]] && args+=("${edition}")
@@ -288,56 +327,59 @@ write_settings_conf(){
     echo "modules-search: [ local ]" >> "$conf"
     echo '' >> "$conf"
     echo "instances:" >> "$conf"
+    echo '#    - id: owncloud' >> "$conf"
+    echo '#      module: webview' >> "$conf"
+    echo '#      config: owncloud.conf' >> "$conf"
     echo '' >> "$conf"
     echo "sequence:" >> "$conf"
-    echo "- show:" >> "$conf"
-    echo "  - welcome" >> "$conf"
-    ${netinstall} && echo "  - netinstall" >> "$conf"
-    echo "  - locale" >> "$conf"
-    echo "  - keyboard" >> "$conf"
-    echo "  - partition" >> "$conf"
-    echo "  - users" >> "$conf"
-    echo "  - summary" >> "$conf"
-    echo "- exec:" >> "$conf"
-    echo "  - partition" >> "$conf"
-    echo "  - mount" >> "$conf"
+    echo "    - show:" >> "$conf"
+    echo "        - welcome" >> "$conf"
+    echo "        - locale" >> "$conf"
+    echo "        - keyboard" >> "$conf"
+    echo "        - partition" >> "$conf"
+    echo "        - users" >> "$conf"
+    ${netinstall} && echo "        - netinstall" >> "$conf"
+    echo "        - summary" >> "$conf"
+    echo "    - exec:" >> "$conf"
+    echo "        - partition" >> "$conf"
+    echo "        - mount" >> "$conf"
     if ${netinstall};then
-        if ${unpackfs};then
-            echo "  - unpackfs" >> "$conf"
-            echo "  - networkcfg" >> "$conf"
-            echo "  - packages" >> "$conf"
+        if ${chrootcfg}; then
+            echo "        - chrootcfg" >> "$conf"
+            echo "        - networkcfg" >> "$conf"
         else
-            echo "  - chrootcfg" >> "$conf"
-            echo "  - networkcfg" >> "$conf"
+            echo "        - unpackfs" >> "$conf"
+            echo "        - networkcfg" >> "$conf"
+            echo "        - packages" >> "$conf"
         fi
     else
-        echo "  - unpackfs" >> "$conf"
-        echo "  - networkcfg" >> "$conf"
+        echo "        - unpackfs" >> "$conf"
+        echo "        - networkcfg" >> "$conf"
     fi
-    echo "  - machineid" >> "$conf"
-    echo "  - fstab" >> "$conf"
-    echo "  - locale" >> "$conf"
-    echo "  - keyboard" >> "$conf"
-    echo "  - localecfg" >> "$conf"
-    echo "  - luksopenswaphookcfg" >> "$conf"
-    echo "  - luksbootkeyfile" >> "$conf"
-    echo "  - plymouthcfg" >> "$conf"
-    echo "  - initcpiocfg" >> "$conf"
-    echo "  - initcpio" >> "$conf"
-    echo "  - users" >> "$conf"
-    echo "  - displaymanager" >> "$conf"
-    echo "  - mhwdcfg" >> "$conf"
-    echo "  - hwclock" >> "$conf"
+    echo "        - machineid" >> "$conf"
+    echo "        - fstab" >> "$conf"
+    echo "        - locale" >> "$conf"
+    echo "        - keyboard" >> "$conf"
+    echo "        - localecfg" >> "$conf"
+    echo "        - luksopenswaphookcfg" >> "$conf"
+    echo "        - luksbootkeyfile" >> "$conf"
+    echo "        - plymouthcfg" >> "$conf"
+    echo "        - initcpiocfg" >> "$conf"
+    echo "        - initcpio" >> "$conf"
+    echo "        - users" >> "$conf"
+    echo "        - displaymanager" >> "$conf"
+    echo "        - mhwdcfg" >> "$conf"
+    echo "        - hwclock" >> "$conf"
     case ${initsys} in
-        'systemd') echo "  - services" >> "$conf" ;;
-        'openrc') echo "  - servicescfg" >> "$conf" ;;
+        'systemd') echo "        - services" >> "$conf" ;;
+        'openrc')  echo "        - servicescfg" >> "$conf" ;;
     esac
-    echo "  - grubcfg" >> "$conf"
-    echo "  - bootloader" >> "$conf"
-    echo "  - postcfg" >> "$conf"
-    echo "  - umount" >> "$conf"
-    echo "- show:" >> "$conf"
-    echo "  - finished" >> "$conf"
+    echo "        - grubcfg" >> "$conf"
+    echo "        - bootloader" >> "$conf"
+    echo "        - postcfg" >> "$conf"
+    echo "        - umount" >> "$conf"
+    echo "    - show:" >> "$conf"
+    echo "        - finished" >> "$conf"
     echo '' >> "$conf"
     echo "branding: ${iso_name}" >> "$conf"
     echo '' >> "$conf"
@@ -361,7 +403,9 @@ configure_calamares(){
 
     if ${netinstall};then
         write_netinstall_conf
-        write_packages_conf
+        if ! ${chrootcfg}; then
+            write_packages_conf
+        fi
     fi
 
     write_bootloader_conf
@@ -394,20 +438,21 @@ configure_calamares(){
 
 check_yaml(){
     msg2 "Checking validity [%s] ..." "${1##*/}"
-    local name=${1##*/} data schema
+    local name=${1##*/} data=$1 schema
     case ${name##*.} in
         yaml)
             name=netgroups
-            data=$1
+#             data=$1
         ;;
         conf)
             name=${name%.conf}
-            data=${tmp_dir}/$name.yaml
-            cp $1 $data
+#             data=${tmp_dir}/$name.yaml
+#             cp $1 $data
         ;;
     esac
     schema=${DATADIR}/schemas/$name.schema.yaml
-    pykwalify -d $data -s $schema
+#     pykwalify -d $data -s $schema
+    kwalify -lf $schema $data
 }
 
 write_calamares_yaml(){
@@ -422,7 +467,8 @@ write_calamares_yaml(){
 
 write_netgroup_yaml(){
     msg2 "Writing %s ..." "${2##*/}"
-    echo "- name: '$1'" > "$2"
+    echo "---" > "$2"
+    echo "- name: '$1'" >> "$2"
     echo "  description: '$1'" >> "$2"
     echo "  selected: false" >> "$2"
     echo "  hidden: false" >> "$2"

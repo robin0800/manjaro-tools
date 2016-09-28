@@ -16,6 +16,6 @@ mapping:
                 type: seq
                 sequence:
                     - type: int
-    "driver": { type: str, required: yes }
-    "local": { type: bool, default: true, required: yes }
-    "repo": { type: str, required: yes }
+    "driver": { type: str, required: true }
+    "local": { type: bool, default: true }
+    "repo": { type: str, required: true }

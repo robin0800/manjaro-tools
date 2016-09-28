@@ -4,10 +4,10 @@ mapping:
     "displaymanagers":
         type: seq
         sequence:
-          - { type: str, required: yes, enum: [slim, sddm, lightdm, gdm, mdm, lxdm, kdm] }
+          - { type: str, required: true, enum: [slim, sddm, lightdm, gdm, mdm, lxdm, kdm] }
     "defaultDesktopEnvironment":
         type: map
         mapping:
             "executable": { type: str }
             "desktopFile": { type: str }
-    "basicSetup": { type: bool, default: false, required: yes }
+    "basicSetup": { type: bool, default: false }

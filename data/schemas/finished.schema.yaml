@@ -1,6 +1,6 @@
 ---
 type: map
 mapping:
-    "restartNowEnabled": { type: bool, default: true, required: yes }
-    "restartNowChecked": { type: bool, default: false, required: yes }
-    "restartNowCommand": { type: str, required: yes }
+    "restartNowEnabled": { type: bool, default: true }
+    "restartNowChecked": { type: bool, default: false }
+    "restartNowCommand": { type: str, required: true }

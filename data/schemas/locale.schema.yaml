@@ -3,5 +3,5 @@ type: map
 mapping:
     "region": { type: str }
     "zone": { type: str }
-    "localeGenPath": { type: str, required: yes }
+    "localeGenPath": { type: str, required: true }
     "geoipUrl": { type: str }

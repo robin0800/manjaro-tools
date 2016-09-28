@@ -1,4 +1,4 @@
 ---
 type: map
 mapping:
-    "username": { type: str, required: yes }
+    "username": { type: str, required: true }

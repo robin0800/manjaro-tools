@@ -1,7 +1,7 @@
 ---
 type: map
 mapping:
-    "backend": { type: str, required: yes, enum: [packagekit, zypp, yum, dnf, urpmi, apt, pacman, portage, entropy] }
+    "backend": { type: str, required: true, enum: [packagekit, zypp, yum, dnf, urpmi, apt, pacman, portage, entropy] }
     "operations":
         type: seq
         sequence:
@@ -10,16 +10,12 @@ mapping:
                 "install":
                     type: seq
                     sequence:
-                      - type: str
-            - type: map
-              mapping:
-                 "remove":
+                        - { type: text }
+                "remove":
                     type: seq
                     sequence:
-                      - type: str
-            - type: map
-              mapping:
-                 "localInstall":
+                        - { type: text }
+                "localInstall":
                     type: seq
                     sequence:
-                      - type: str
+                        - { type: text }
