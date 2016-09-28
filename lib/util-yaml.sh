@@ -351,6 +351,7 @@ write_settings_conf(){
             echo "        - unpackfs" >> "$conf"
             echo "        - networkcfg" >> "$conf"
             echo "        - packages" >> "$conf"
+        fi
     else
         echo "        - unpackfs" >> "$conf"
         echo "        - networkcfg" >> "$conf"
