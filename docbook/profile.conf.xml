@@ -141,7 +141,7 @@
 			</varlistentry>
 
 			<varlistentry>
-				<term><varname>unpackfs=</varname></term>
+				<term><varname>chrootcfg=</varname></term>
 
 				<listitem><para>Accepts
 						<option>true</option> (the default)

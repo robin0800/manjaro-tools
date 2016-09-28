@@ -141,7 +141,15 @@ write_displaymanager_conf(){
     local conf="${modules_dir}/displaymanager.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
-    if ${unpackfs}; then
+    if ${chrootcfg}; then
+        echo "displaymanagers:" >> "$conf"
+        echo "  - lightdm" >> "$conf"
+        echo "  - gdm" >> "$conf"
+        echo "  - mdm" >> "$conf"
+        echo "  - sddm" >> "$conf"
+        echo "  - lxdm" >> "$conf"
+        echo "  - slim" >> "$conf"
+    else
         echo "displaymanagers:" >> "$conf"
         echo "  - ${displaymanager}" >> "$conf"
         echo '' >> "$conf"
@@ -150,14 +158,6 @@ write_displaymanager_conf(){
             echo "    executable: \"${default_desktop_executable}\"" >> "$conf"
             echo "    desktopFile: \"${default_desktop_file}\"" >> "$conf"
         fi
-    else
-        echo "displaymanagers:" >> "$conf"
-        echo "  - lightdm" >> "$conf"
-        echo "  - gdm" >> "$conf"
-        echo "  - mdm" >> "$conf"
-        echo "  - sddm" >> "$conf"
-        echo "  - lxdm" >> "$conf"
-        echo "  - slim" >> "$conf"
     fi
     echo '' >> "$conf"
     echo "basicSetup: false" >> "$conf"
@@ -255,14 +255,10 @@ write_mhwdcfg_conf(){
         echo "driver: free" >> "$conf"
     fi
     echo '' >> "$conf"
-    if ${netinstall};then
-        if ${unpackfs};then
-            echo "local: true" >> "$conf"
-        else
+    if ${chrootcfg};then
             echo "local: false" >> "$conf"
-        fi
     else
-        echo "local: true" >> "$conf"
+            echo "local: true" >> "$conf"
     fi
     echo '' >> "$conf"
     echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
@@ -284,10 +280,10 @@ write_postcfg_conf(){
 
 get_yaml(){
     local args=() ext="yaml" yaml
-    if ${unpackfs};then
-        args+=("hybrid")
-    else
+    if ${chrootcfg};then
         args+=('netinstall')
+    else
+        args+=("hybrid")
     fi
     args+=("${initsys}")
     [[ ${edition} == 'sonar' ]] && args+=("${edition}")
@@ -348,14 +344,13 @@ write_settings_conf(){
     echo "        - partition" >> "$conf"
     echo "        - mount" >> "$conf"
     if ${netinstall};then
-        if ${unpackfs};then
+        if ${chrootcfg}; then
+            echo "        - chrootcfg" >> "$conf"
+            echo "        - networkcfg" >> "$conf"
+        else
             echo "        - unpackfs" >> "$conf"
             echo "        - networkcfg" >> "$conf"
             echo "        - packages" >> "$conf"
-        else
-            echo "        - chrootcfg" >> "$conf"
-            echo "        - networkcfg" >> "$conf"
-        fi
     else
         echo "        - unpackfs" >> "$conf"
         echo "        - networkcfg" >> "$conf"
@@ -407,7 +402,9 @@ configure_calamares(){
 
     if ${netinstall};then
         write_netinstall_conf
-        write_packages_conf
+        if ! ${chrootcfg}; then
+            write_packages_conf
+        fi
     fi
 
     write_bootloader_conf

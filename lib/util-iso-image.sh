@@ -201,6 +201,19 @@ configure_system(){
     esac
 }
 
+configure_live_image(){
+    msg "Configuring [live-image]"
+    detect_desktop_env "$1"
+    configure_hosts "$1"
+    configure_lsb "$1"
+    configure_mhwd "$1"
+    configure_system "$1"
+    configure_services "$1"
+    configure_calamares "$1"
+    write_live_session_conf "$1"
+    msg "Done configuring [live-image]"
+}
+
 make_repo(){
     repo-add $1${mhwd_repo}/mhwd.db.tar.gz $1${mhwd_repo}/*pkg*z
 }
