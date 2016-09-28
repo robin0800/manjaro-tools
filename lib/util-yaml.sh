@@ -206,17 +206,13 @@ write_mhwdcfg_conf(){
     echo "      - 302" >> "$conf"
     echo "      - 380" >> "$conf"
     echo '' >> "$conf"
-    if ${nonfree_mhwd};then
-        echo "driver: nonfree" >> "$conf"
-    else
-        echo "driver: free" >> "$conf"
-    fi
+    local drv="free"
+    ${nonfree_mhwd} && drv="nonfree"
+    echo "driver: ${drv}" >> "$conf"
     echo '' >> "$conf"
-    if ${chrootcfg};then
-            echo "local: false" >> "$conf"
-    else
-            echo "local: true" >> "$conf"
-    fi
+    local switch='true'
+    ${chrootcfg} && switch='false'
+    echo "local: ${switch}" >> "$conf"
     echo '' >> "$conf"
     echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
 }

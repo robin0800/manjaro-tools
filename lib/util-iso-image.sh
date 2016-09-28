@@ -161,12 +161,11 @@ write_live_session_conf(){
     echo '' >> ${conf}
     echo '# live group membership' >> ${conf}
     echo "addgroups='${addgroups}'" >> ${conf}
-    echo '' >> ${conf}
-    echo '# iso name' >> ${conf}
-    echo "iso_name=${iso_name}" >> ${conf}
-    echo '' >> ${conf}
-    echo '# samba workgroup' >> ${conf}
-    echo "smb_workgroup=${smb_workgroup}" >> ${conf}
+    if [[ -n ${smb_workgroup} ]];then
+        echo '' >> ${conf}
+        echo '# samba workgroup' >> ${conf}
+        echo "smb_workgroup=${smb_workgroup}" >> ${conf}
+    fi
 }
 
 configure_hosts(){
