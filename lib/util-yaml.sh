@@ -279,19 +279,16 @@ write_settings_conf(){
     echo "---" > "$conf"
     echo "modules-search: [ local ]" >> "$conf"
     echo '' >> "$conf"
-    echo "instances:" >> "$conf"
-    echo '#    - id: owncloud' >> "$conf"
-    echo '#      module: webview' >> "$conf"
-    echo '#      config: owncloud.conf' >> "$conf"
-    echo '' >> "$conf"
     echo "sequence:" >> "$conf"
     echo "    - show:" >> "$conf"
-    echo "        - welcome" >> "$conf"
-    echo "        - locale" >> "$conf"
+    echo "        - welcome" >> "$conf" && write_welcome_conf
+    echo "        - locale" >> "$conf" && write_locale_conf
     echo "        - keyboard" >> "$conf"
     echo "        - partition" >> "$conf"
-    echo "        - users" >> "$conf"
-    ${netinstall} && echo "        - netinstall" >> "$conf"
+    echo "        - users" >> "$conf" && write_users_conf
+    if ${netinstall};then
+        echo "        - netinstall" >> "$conf" && write_netinstall_conf
+    fi
     echo "        - summary" >> "$conf"
     echo "    - exec:" >> "$conf"
     echo "        - partition" >> "$conf"
@@ -301,38 +298,38 @@ write_settings_conf(){
             echo "        - chrootcfg" >> "$conf"
             echo "        - networkcfg" >> "$conf"
         else
-            echo "        - unpackfs" >> "$conf"
+            echo "        - unpackfs" >> "$conf" && write_unpack_conf
             echo "        - networkcfg" >> "$conf"
-            echo "        - packages" >> "$conf"
+            echo "        - packages" >> "$conf" && write_packages_conf
         fi
     else
-        echo "        - unpackfs" >> "$conf"
+        echo "        - unpackfs" >> "$conf" && write_unpack_conf
         echo "        - networkcfg" >> "$conf"
     fi
-    echo "        - machineid" >> "$conf"
+    echo "        - machineid" >> "$conf" && write_machineid_conf
     echo "        - fstab" >> "$conf"
     echo "        - locale" >> "$conf"
     echo "        - keyboard" >> "$conf"
     echo "        - localecfg" >> "$conf"
     echo "        - luksopenswaphookcfg" >> "$conf"
     echo "        - luksbootkeyfile" >> "$conf"
-    echo "        - plymouthcfg" >> "$conf"
+    echo "        - plymouthcfg" >> "$conf" && write_plymouthcfg_conf
     echo "        - initcpiocfg" >> "$conf"
-    echo "        - initcpio" >> "$conf"
+    echo "        - initcpio" >> "$conf" && write_initcpio_conf
     echo "        - users" >> "$conf"
-    echo "        - displaymanager" >> "$conf"
-    echo "        - mhwdcfg" >> "$conf"
+    echo "        - displaymanager" >> "$conf" && write_displaymanager_conf
+    echo "        - mhwdcfg" >> "$conf" && write_mhwdcfg_conf
     echo "        - hwclock" >> "$conf"
     case ${initsys} in
-        'systemd') echo "        - services" >> "$conf" ;;
-        'openrc')  echo "        - servicescfg" >> "$conf" ;;
+        'systemd') echo "        - services" >> "$conf" && write_services_conf ;;
+        'openrc') echo "        - servicescfg" >> "$conf" && write_servicescfg_conf ;;
     esac
     echo "        - grubcfg" >> "$conf"
-    echo "        - bootloader" >> "$conf"
-    echo "        - postcfg" >> "$conf"
+    echo "        - bootloader" >> "$conf" && write_bootloader_conf
+    echo "        - postcfg" >> "$conf" && write_postcfg_conf
     echo "        - umount" >> "$conf"
     echo "    - show:" >> "$conf"
-    echo "        - finished" >> "$conf"
+    echo "        - finished" >> "$conf" && write_finished_conf
     echo '' >> "$conf"
     echo "branding: ${iso_name}" >> "$conf"
     echo '' >> "$conf"
@@ -343,49 +340,9 @@ write_settings_conf(){
 
 configure_calamares(){
     info "Configuring [Calamares]"
-
     modules_dir=$1/etc/calamares/modules
-
-    mkdir -p ${modules_dir}
-        
+    prepare_dir "${modules_dir}"
     write_settings_conf "$1"
-
-    write_locale_conf
-
-    write_welcome_conf
-
-    if ${netinstall};then
-        write_netinstall_conf
-        if ! ${chrootcfg}; then
-            write_packages_conf
-        fi
-    fi
-
-    write_bootloader_conf
-
-    write_mhwdcfg_conf
-
-    write_unpack_conf
-
-    write_displaymanager_conf
-
-    write_initcpio_conf
-
-    write_machineid_conf
-
-    write_finished_conf
-
-    write_plymouthcfg_conf
-
-    write_postcfg_conf
-
-    case ${initsys} in
-        'systemd') write_services_conf ;;
-        'openrc') write_servicescfg_conf ;;
-    esac
-
-    write_users_conf
-
     info "Done configuring [Calamares]"
 }
 
