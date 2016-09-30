@@ -109,38 +109,7 @@ LIBS_YAML = \
 	lib/util-yaml.sh
 
 SHARED_YAML = \
-	data/desktop.map \
 	data/linux.preset
-
-SCHEMAS = \
-	data/schemas/bootloader.schema.yaml \
-	data/schemas/chrootcfg.schema.yaml \
-	data/schemas/displaymanager.schema.yaml \
-	data/schemas/finished.schema.yaml \
-	data/schemas/fstab.schema.yaml \
-	data/schemas/grubcfg.schema.yaml \
-	data/schemas/initcpio.schema.yaml \
-	data/schemas/keyboard.schema.yaml \
-	data/schemas/license.schema.yaml \
-	data/schemas/locale.schema.yaml \
-	data/schemas/luksopenswaphookcfg.schema.yaml \
-	data/schemas/machineid.schema.yaml \
-	data/schemas/mhwdcfg.schema.yaml \
-	data/schemas/mount.schema.yaml \
-	data/schemas/netgroups.schema.yaml \
-	data/schemas/netinstall.schema.yaml \
-	data/schemas/packages.schema.yaml \
-	data/schemas/partition.schema.yaml \
-	data/schemas/plymouthcfg.schema.yaml \
-	data/schemas/postcfg.schema.yaml \
-	data/schemas/removeuser.schema.yaml \
-	data/schemas/services.schema.yaml \
-	data/schemas/servicescfg.schema.yaml \
-	data/schemas/settings.schema.yaml \
-	data/schemas/umount.schema.yaml \
-	data/schemas/unpackfs.schema.yaml \
-	data/schemas/users.schema.yaml \
-	data/schemas/welcome.schema.yaml
 
 all: $(BIN_BASE) $(BIN_PKG) $(BIN_ISO) $(BIN_YAML) doc
 
@@ -236,9 +205,6 @@ install_yaml:
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -m0644 ${SHARED_YAML} $(DESTDIR)$(PREFIX)/share/manjaro-tools
 
-	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas
-	install -m0644 ${SCHEMAS} $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas
-
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/man/man1
 	gzip -c man/check-yaml.1 > $(DESTDIR)$(PREFIX)/share/man/man1/check-yaml.1.gz
 
@@ -274,7 +240,6 @@ uninstall_iso:
 uninstall_yaml:
 	for f in ${BIN_YAML}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${LIBS_YAML}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
-	for f in ${SCHEMAS}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/schemas/$$f; done
 	for f in ${SHARED_YAML}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/check-yaml.1.gz
 
