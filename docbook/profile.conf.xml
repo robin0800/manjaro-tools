@@ -94,8 +94,8 @@
 				<term><varname>netinstall=</varname></term>
 
 				<listitem><para>Accepts
-					<option>true</option> (the default)
-					<option>false</option>.</para>
+					<option>false</option> (the default)
+					<option>true</option>.</para>
 				</listitem>
 			</varlistentry>
 
@@ -103,8 +103,8 @@
 				<term><varname>chrootcfg=</varname></term>
 
 				<listitem><para>Accepts
-						<option>true</option> (the default)
-						<option>false</option>.</para>
+                    <option>false</option> (the default)
+                    <option>true</option>.</para>
 				</listitem>
 			</varlistentry>
 
@@ -119,8 +119,8 @@
 				<term><varname>geoip=</varname></term>
 
 				<listitem><para>Accepts
-						<option>true</option> (the default)
-						<option>false</option>.</para>
+                    <option>true</option> (the default)
+                    <option>false</option>.</para>
 				</listitem>
 			</varlistentry>
 
