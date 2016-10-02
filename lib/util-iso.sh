@@ -336,7 +336,7 @@ make_efi() {
         write_efi_shell_conf "${path_iso}/loader/entries" "v1"
         write_efi_shell_conf "${path_iso}/loader/entries" "v2"
         write_usb_efi_loader_conf "${path_iso}/loader/entries" "${path_iso}" "no"
-        write_usb_efi_loader_conf "${path_iso}/loader/entries" "${path_iso}" "yes"
+        ${nonfree_mhwd} && write_usb_efi_loader_conf "${path_iso}/loader/entries" "${path_iso}" "yes"
         copy_efi_shells "${work_dir}/live-image" "${path_iso}/EFI"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/boot/EFI]" "${iso_name}"
@@ -361,10 +361,10 @@ make_efiboot() {
         local efi_loader=${work_dir}/efiboot/loader
         mkdir -p ${efi_loader}/entries
         write_loader_conf "${efi_loader}"
-        write_efi_shellv1_conf "${efi_loader}/entries"
-        write_efi_shellv2_conf "${efi_loader}/entries"
+        write_efi_shell_conf "${efi_loader}/entries" "v1"
+        write_efi_shell_conf "${efi_loader}/entries" "v2"
         write_dvd_efi_loader_conf "${efi_loader}/entries" "${path_iso}" "no"
-        write_dvd_efi_loader_conf "${efi_loader}/entries" "${path_iso}" "yes"
+        ${nonfree_mhwd} && write_dvd_efi_loader_conf "${efi_loader}/entries" "${path_iso}" "yes"
         copy_efi_shells "${work_dir}/live-image" "${path_efi}"
         umount ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
