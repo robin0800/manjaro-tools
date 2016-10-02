@@ -329,16 +329,15 @@ make_efi() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [%s/boot/EFI]" "${iso_name}"
         local path_iso="${work_dir}/iso"
-        local path_efi="${path_iso}/EFI"
-        mkdir -p ${path_efi}/boot
-        copy_efi_loaders "${work_dir}/live-image" "${path_efi}/boot"
+        mkdir -p ${path_iso}/EFI/boot
+        copy_efi_loaders "${work_dir}/live-image" "${path_iso}/EFI/boot"
         mkdir -p ${path_iso}/loader/entries
         write_loader_conf "${path_iso}/loader"
-        write_efi_shellv1_conf "${path_iso}/loader/entries"
-        write_efi_shellv2_conf "${path_iso}/loader/entries"
-        write_usb_conf "${path_iso}/loader/entries" "${path_iso}"
-        write_usb_nonfree_conf "${path_iso}/loader/entries" "${path_iso}"
-        copy_efi_shells "${work_dir}/live-image" "${path_efi}"
+        write_efi_shell_conf "${path_iso}/loader/entries" "v1"
+        write_efi_shell_conf "${path_iso}/loader/entries" "v2"
+        write_usb_efi_loader_conf "${path_iso}/loader/entries" "${path_iso}" "no"
+        write_usb_efi_loader_conf "${path_iso}/loader/entries" "${path_iso}" "yes"
+        copy_efi_shells "${work_dir}/live-image" "${path_iso}/EFI"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/boot/EFI]" "${iso_name}"
     fi
@@ -364,8 +363,8 @@ make_efiboot() {
         write_loader_conf "${efi_loader}"
         write_efi_shellv1_conf "${efi_loader}/entries"
         write_efi_shellv2_conf "${efi_loader}/entries"
-        write_dvd_conf "${efi_loader}/entries" "${path_iso}"
-        write_dvd_nonfree_conf "${efi_loader}/entries" "${path_iso}"
+        write_dvd_efi_loader_conf "${efi_loader}/entries" "${path_iso}" "no"
+        write_dvd_efi_loader_conf "${efi_loader}/entries" "${path_iso}" "yes"
         copy_efi_shells "${work_dir}/live-image" "${path_efi}"
         umount ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
