@@ -356,14 +356,15 @@ make_efiboot() {
         msg "Prepare [%s/iso/EFI]" "${iso_name}"
 
         mkdir -p ${work_dir}/iso/EFI/miso
-        mkdir -p ${work_dir}/efiboot/EFI/{miso,boot}
-        mkdir -p ${work_dir}/efiboot/loader/entries
         
         truncate -s 31M ${work_dir}/iso/EFI/miso/${iso_name}.img
         mkfs.fat -n MISO_EFI ${work_dir}/iso/EFI/miso/${iso_name}.img
         
         mount ${work_dir}/iso/EFI/miso/${iso_name}.img ${work_dir}/efiboot
-                
+        
+        mkdir -p ${work_dir}/efiboot/EFI/{miso,boot}
+        mkdir -p ${work_dir}/efiboot/loader/entries
+        
         copy_boot_images "${work_dir}/iso/${iso_name}/boot" "${work_dir}/efiboot/EFI/miso"
         
         copy_preloader_efi "${work_dir}/live-image" "${work_dir}/efiboot/EFI/boot"
