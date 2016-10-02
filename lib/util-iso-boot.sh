@@ -88,7 +88,7 @@ write_loader_conf(){
     local conf=$1/${fn}
     msg2 "Writing %s ..." "${fn}"
     echo 'timeout 3' > ${conf}
-    echo "default ${iso_name}-${target_arch}" >> ${conf}
+    echo "default ${iso_name}-${target_arch}-free" >> ${conf}
 }
 
 write_efi_shell_conf(){
@@ -100,38 +100,34 @@ write_efi_shell_conf(){
 }
 
 write_usb_efi_loader_conf(){
-    local fn=${iso_name}-${target_arch}-nonfree.conf
-    local conf=$1/${fn} path=$2
+    local drv='free' switch="$3"
+    [[ ${switch} == 'yes' ]] && drv='nonfree'
+    local fn=${iso_name}-${target_arch}-${drv}.conf
+    local conf=$1/${fn} path="$2"
     msg2 "Writing %s ..." "${fn}"
-    echo "title   ${dist_name} Linux ${target_arch} UEFI USB (nonfree)" > ${conf}
+    echo "title   ${dist_name} Linux ${target_arch} UEFI USB (${drv})" > ${conf}
     echo "linux   /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
     if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
         msg2 "Using intel_ucode.img ..."
         echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
     fi
     echo "initrd  /${iso_name}/boot/${target_arch}/${iso_name}.img" >> ${conf}
-    local drv='free' switch="$3"
-    if [[ ${switch} == 'yes' ]];then
-        drv='nonfree'
-    fi
     echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=${drv} nonfree=${switch}" >> ${conf}
 }
 
 write_dvd_efi_loader_conf(){
-    local fn=${iso_name}-${target_arch}-nonfree.conf
-    local conf=$1/${fn} path=$2
+    local drv='free' switch="$3"
+    [[ ${switch} == 'yes' ]] && drv='nonfree'
+    local fn=${iso_name}-${target_arch}-${drv}.conf
+    local conf=$1/${fn} path="$2"
     msg2 "Writing %s ..." "${fn}"
-    echo "title   ${dist_name} Linux ${target_arch} UEFI DVD (nonfree)" > ${conf}
+    echo "title   ${dist_name} Linux ${target_arch} UEFI DVD (${drv})" > ${conf}
     echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
     if [[ -f ${path}/${iso_name}/boot/intel_ucode.img ]] ; then
         msg2 "Using intel_ucode.img ..."
         echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
     fi
     echo "initrd  /EFI/miso/${iso_name}.img" >> ${conf}
-    local drv='free' switch="$3"
-    if [[ ${switch} == 'yes' ]];then
-        drv='nonfree'
-    fi
     echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=${drv} nonfree=${switch}" >> ${conf}
 }
 
