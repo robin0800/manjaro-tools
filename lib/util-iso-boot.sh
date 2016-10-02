@@ -164,30 +164,19 @@ write_usb_nonfree_conf(){
 }
 
 copy_isolinux_bin(){
-    if [[ -e $1/usr/lib/syslinux/bios ]]; then
-        msg2 "Copying isolinux bios binaries ..."
-        cp $1/usr/lib/syslinux/bios/isolinux.bin $2
-        cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2
-        cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2
-        cp $1/usr/lib/syslinux/bios/gfxboot.c32 $2
-        cp $1/usr/lib/syslinux/bios/whichsys.c32 $2
-        cp $1/usr/lib/syslinux/bios/mboot.c32 $2
-        cp $1/usr/lib/syslinux/bios/hdt.c32 $2
-        cp $1/usr/lib/syslinux/bios/chain.c32 $2
-        cp $1/usr/lib/syslinux/bios/libcom32.c32 $2
-        cp $1/usr/lib/syslinux/bios/libmenu.c32 $2
-        cp $1/usr/lib/syslinux/bios/libutil.c32 $2
-        cp $1/usr/lib/syslinux/bios/libgpl.c32 $2
-    else
-        msg2 "Copying isolinux binaries ..."
-        cp $1/usr/lib/syslinux/isolinux.bin $2
-        cp $1/usr/lib/syslinux/isohdpfx.bin $2
-        cp $1/usr/lib/syslinux/gfxboot.c32 $2
-        cp $1/usr/lib/syslinux/whichsys.c32 $2
-        cp $1/usr/lib/syslinux/mboot.c32 $2
-        cp $1/usr/lib/syslinux/hdt.c32 $2
-        cp $1/usr/lib/syslinux/chain.c32 $2
-    fi
+    msg2 "Copying isolinux bios binaries ..."
+    cp $1/usr/lib/syslinux/bios/isolinux.bin $2
+    cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2
+    cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2
+    cp $1/usr/lib/syslinux/bios/gfxboot.c32 $2
+    cp $1/usr/lib/syslinux/bios/whichsys.c32 $2
+    cp $1/usr/lib/syslinux/bios/mboot.c32 $2
+    cp $1/usr/lib/syslinux/bios/hdt.c32 $2
+    cp $1/usr/lib/syslinux/bios/chain.c32 $2
+    cp $1/usr/lib/syslinux/bios/libcom32.c32 $2
+    cp $1/usr/lib/syslinux/bios/libmenu.c32 $2
+    cp $1/usr/lib/syslinux/bios/libutil.c32 $2
+    cp $1/usr/lib/syslinux/bios/libgpl.c32 $2
 }
 
 gen_boot_args(){
