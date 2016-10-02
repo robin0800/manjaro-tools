@@ -20,6 +20,14 @@ copy_efi_shells(){
     fi
 }
 
+write_efi_shell_conf(){
+    local fn=uefi-shell-$2-${target_arch}.conf
+    local conf=$1/${fn}
+    msg2 "Writing %s ..." "${fn}"
+    echo "title  UEFI Shell ${target_arch} $2" > ${conf}
+    echo "efi    /EFI/shellx64_$2.efi" >> ${conf}
+}
+
 set_mkinicpio_hooks(){
     if ! ${pxe_boot};then
         msg2 "Removing pxe hooks"
@@ -61,11 +69,8 @@ copy_efi_loaders(){
     msg2 "Copying efi loaders ..."
     cp $1/usr/share/efitools/efi/PreLoader.efi $2/bootx64.efi
     cp $1/usr/share/efitools/efi/HashTool.efi $2/
-    if [[ -f $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi ]] ; then
-        cp $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi $2/loader.efi
-    else
-        cp $1/usr/share/efitools/efi/Loader.efi $2/loader.efi
-    fi
+#     cp $1/usr/share/efitools/efi/Loader.efi $2/loader.efi
+    cp $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi $2/loader.efi
 }
 
 copy_boot_images(){
@@ -91,19 +96,11 @@ write_loader_conf(){
     echo "default ${iso_name}-${target_arch}-free" >> ${conf}
 }
 
-write_efi_shell_conf(){
-    local fn=uefi-shell-$2-${target_arch}.conf
-    local conf=$1/${fn}
-    msg2 "Writing %s ..." "${fn}"
-    echo "title  UEFI Shell ${target_arch} $2" > ${conf}
-    echo "efi    /EFI/shellx64_$2.efi" >> ${conf}
-}
-
 write_usb_efi_loader_conf(){
-    local drv='free' switch="$3"
+    local drv='free' switch="$2"
     [[ ${switch} == 'yes' ]] && drv='nonfree'
     local fn=${iso_name}-${target_arch}-${drv}.conf
-    local conf=$1/${fn} path="$2"
+    local conf=$1/iso/loader/entries/${fn} path="$1/iso"
     msg2 "Writing %s ..." "${fn}"
     echo "title   ${dist_name} Linux ${target_arch} UEFI USB (${drv})" > ${conf}
     echo "linux   /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
@@ -116,10 +113,10 @@ write_usb_efi_loader_conf(){
 }
 
 write_dvd_efi_loader_conf(){
-    local drv='free' switch="$3"
+    local drv='free' switch="$2"
     [[ ${switch} == 'yes' ]] && drv='nonfree'
     local fn=${iso_name}-${target_arch}-${drv}.conf
-    local conf=$1/${fn} path="$2"
+    local conf=$1/efiboot/loader/entries/${fn} path="$1/iso"
     msg2 "Writing %s ..." "${fn}"
     echo "title   ${dist_name} Linux ${target_arch} UEFI DVD (${drv})" > ${conf}
     echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
