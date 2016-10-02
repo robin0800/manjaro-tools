@@ -332,7 +332,9 @@ make_efi() {
         mkdir -p ${work_dir}/iso/EFI/boot
         mkdir -p ${work_dir}/iso/loader/entries
         
-        copy_efi_loaders "${work_dir}/live-image" "${work_dir}/iso/EFI/boot"
+        copy_preloader_efi "${work_dir}/live-image" "${work_dir}/iso/EFI/boot"
+        copy_loader_efi "${work_dir}/root-image" "${work_dir}/iso/EFI/boot"
+        
         write_loader_conf "${work_dir}/iso/loader"
         write_usb_efi_loader_conf "${work_dir}" "no"
         if ${nonfree_mhwd};then
@@ -364,7 +366,9 @@ make_efiboot() {
                 
         copy_boot_images "${work_dir}/iso/${iso_name}/boot" "${work_dir}/efiboot/EFI/miso"
         
-        copy_efi_loaders "${work_dir}/live-image" "${work_dir}/efiboot/EFI/boot"
+        copy_preloader_efi "${work_dir}/live-image" "${work_dir}/efiboot/EFI/boot"
+        copy_loader_efi "${work_dir}/root-image" "${work_dir}/efiboot/EFI/boot"
+        
         write_loader_conf "${work_dir}/efiboot/loader"
         write_dvd_efi_loader_conf "${work_dir}" "no"
         if ${nonfree_mhwd};then
