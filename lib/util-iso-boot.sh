@@ -9,25 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-copy_efi_shells(){
-    if [[ -f $1${DATADIR}/efi_shell/shellx64_v1.efi ]];then
-        msg2 "Copying shellx64_v1.efi ..."
-        cp $1${DATADIR}/efi_shell/shellx64_v1.efi $2/
-    fi
-    if [[ -f $1${DATADIR}/efi_shell/shellx64_v2.efi ]];then
-        msg2 "Copying shellx64_v2.efi ..."
-        cp $1${DATADIR}/efi_shell/shellx64_v2.efi $2/
-    fi
-}
-
-write_efi_shell_conf(){
-    local fn=uefi-shell-$2-${target_arch}.conf
-    local conf=$1/${fn}
-    msg2 "Writing %s ..." "${fn}"
-    echo "title  UEFI Shell ${target_arch} $2" > ${conf}
-    echo "efi    /EFI/shellx64_$2.efi" >> ${conf}
-}
-
 set_mkinicpio_hooks(){
     if ! ${pxe_boot};then
         msg2 "Removing pxe hooks"
@@ -99,6 +80,14 @@ write_loader_conf(){
     echo "default ${iso_name}-${target_arch}-free" >> ${conf}
 }
 
+gen_boot_args(){
+    local args=(quiet)
+    if ${plymouth_boot};then
+        args+=(splash)
+    fi
+    echo ${args[@]}
+}
+
 write_usb_efi_loader_conf(){
     local drv='free' switch="$2"
     [[ ${switch} == 'yes' ]] && drv='nonfree'
@@ -112,7 +101,7 @@ write_usb_efi_loader_conf(){
         echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
     fi
     echo "initrd  /${iso_name}/boot/${target_arch}/${iso_name}.img" >> ${conf}
-    echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=${drv} nonfree=${switch}" >> ${conf}
+    echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=${drv} nonfree=${switch} $(gen_boot_args)" >> ${conf}
 }
 
 write_dvd_efi_loader_conf(){
@@ -128,31 +117,17 @@ write_dvd_efi_loader_conf(){
         echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
     fi
     echo "initrd  /EFI/miso/${iso_name}.img" >> ${conf}
-    echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=${drv} nonfree=${switch}" >> ${conf}
+    echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=${drv} nonfree=${switch} $(gen_boot_args)" >> ${conf}
 }
 
 copy_isolinux_bin(){
-    msg2 "Copying isolinux bios binaries ..."
-    cp $1/usr/lib/syslinux/bios/isolinux.bin $2
-    cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2
-    cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2
-    cp $1/usr/lib/syslinux/bios/gfxboot.c32 $2
-    cp $1/usr/lib/syslinux/bios/whichsys.c32 $2
-    cp $1/usr/lib/syslinux/bios/mboot.c32 $2
-    cp $1/usr/lib/syslinux/bios/hdt.c32 $2
-    cp $1/usr/lib/syslinux/bios/chain.c32 $2
-    cp $1/usr/lib/syslinux/bios/libcom32.c32 $2
-    cp $1/usr/lib/syslinux/bios/libmenu.c32 $2
-    cp $1/usr/lib/syslinux/bios/libutil.c32 $2
-    cp $1/usr/lib/syslinux/bios/libgpl.c32 $2
+    msg2 "Copying isolinux bios binaries ..." 
+    cp $1/usr/lib/syslinux/bios/{{isolinux,isohdpfx}.bin,{ldlinux,gfxboot,whichsys,mboot,hdt,chain,libcom32,libmenu,libutil,libgpl}.c32} $2
 }
 
-gen_boot_args(){
-    local args=(quiet)
-    if ${plymouth_boot};then
-        args+=(splash)
-    fi
-    echo ${args[@]}
+copy_syslinux_efi(){
+    msg2 "Copying syslinux efi binaries ..."
+    cp $1/usr/lib/syslinux/efi64/{syslinux.efi,ldlinux.e64,{menu,libcom32,libutil}.c32} $2
 }
 
 gen_initrd_arg(){
@@ -178,16 +153,15 @@ write_isolinux_cfg(){
     echo "label start" >> ${conf}
     echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
 
-    local boot_args=($(gen_boot_args))
     local initrd_arg=$(gen_initrd_arg $path)
 
-    echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free ${boot_args[@]} showopts" >> ${conf}
+    echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free $(gen_boot_args) showopts" >> ${conf}
 
     echo '' >> ${conf}
     if ${nonfree_mhwd};then
         echo "label nonfree" >> ${conf}
         echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
-        echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree ${boot_args[@]} showopts" >> ${conf}
+        echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree $(gen_boot_args) showopts" >> ${conf}
         echo '' >> ${conf}
     fi
     echo "label harddisk" >> ${conf}

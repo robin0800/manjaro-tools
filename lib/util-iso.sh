@@ -341,10 +341,6 @@ make_efi() {
             write_usb_efi_loader_conf "${work_dir}" "yes"
         fi
         
-#         write_efi_shell_conf "${work_dir}/iso/loader/entries" "v1"
-#         write_efi_shell_conf "${work_dir}/iso/loader/entries" "v2"        
-#         copy_efi_shells "${work_dir}/live-image" "${work_dir}/iso/EFI"
-
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/boot/EFI]" "${iso_name}"
     fi
@@ -375,10 +371,6 @@ make_efiboot() {
         if ${nonfree_mhwd};then
             write_dvd_efi_loader_conf "${work_dir}" "yes"
         fi
-            
-#         write_efi_shell_conf "${work_dir}/efiboot/loader/entries" "v1"
-#         write_efi_shell_conf "${work_dir}/efiboot/loader/entries" "v2"       
-#         copy_efi_shells "${work_dir}/live-image" "${work_dir}/efiboot/EFI"
 
         umount ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
