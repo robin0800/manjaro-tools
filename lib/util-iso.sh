@@ -356,12 +356,14 @@ make_efiboot() {
         truncate -s 31M ${work_dir}/iso/EFI/miso/${iso_name}.img
         mkfs.fat -n MISO_EFI ${work_dir}/iso/EFI/miso/${iso_name}.img
         
+        mkdir -p ${work_dir}/efiboot
         mount ${work_dir}/iso/EFI/miso/${iso_name}.img ${work_dir}/efiboot
         
         mkdir -p ${work_dir}/efiboot/EFI/{miso,boot}
-        mkdir -p ${work_dir}/efiboot/loader/entries
-        
+
         copy_boot_images "${work_dir}/iso/${iso_name}/boot" "${work_dir}/efiboot/EFI/miso"
+
+        mkdir -p ${work_dir}/efiboot/loader/entries
         
         copy_preloader_efi "${work_dir}/live-image" "${work_dir}/efiboot/EFI/boot"
         copy_loader_efi "${work_dir}/root-image" "${work_dir}/efiboot/EFI/boot"
@@ -371,6 +373,9 @@ make_efiboot() {
         if ${nonfree_mhwd};then
             write_dvd_efi_loader_conf "${work_dir}" "yes"
         fi
+
+#         copy_syslinux_efi "${work_dir}/live-image" "${work_dir}/efiboot/EFI/boot"
+        
 
         umount ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
