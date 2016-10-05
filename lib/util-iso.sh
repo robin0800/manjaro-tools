@@ -330,9 +330,10 @@ make_efi() {
         msg "Prepare [%s/boot/EFI]" "${iso_name}"
 
         mkdir -p ${work_dir}/iso/EFI/boot
-        mkdir -p ${work_dir}/iso/loader/entries
         
         copy_preloader_efi "${work_dir}/live-image" "${work_dir}/iso/EFI/boot"
+        
+        mkdir -p ${work_dir}/iso/loader/entries
         copy_loader_efi "${work_dir}/root-image" "${work_dir}/iso/EFI/boot"
         
         write_loader_conf "${work_dir}/iso/loader"
@@ -342,8 +343,7 @@ make_efi() {
         fi
         
 #         copy_syslinux_efi "${work_dir}/live-image" "${work_dir}/iso/EFI/boot"
-#         copy_syslinux_bg "${work_dir}/live-image" "${work_dir}/iso/EFI/boot"
-#         write_syslinux_cfg "${work_dir}/iso/EFI/boot" "${work_dir}/iso/${iso_name}/boot"
+#         write_syslinux_cfg "${work_dir}/iso/EFI/boot" "usb"
         
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/boot/EFI]" "${iso_name}"
@@ -379,8 +379,7 @@ make_efiboot() {
         fi
 
 #         copy_syslinux_efi "${work_dir}/live-image" "${work_dir}/efiboot/EFI/boot"
-#         copy_syslinux_bg "${work_dir}/live-image" "${work_dir}/efiboot/EFI/boot"
-#         write_syslinux_cfg "${work_dir}/efiboot/EFI/boot" "${work_dir}/iso/${iso_name}/boot"
+#         write_syslinux_cfg "${work_dir}/efiboot/EFI/boot" "dvd"
 
         umount ${work_dir}/efiboot
         

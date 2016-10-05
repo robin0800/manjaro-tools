@@ -137,6 +137,7 @@ copy_syslinux_efi(){
     msg2 "Copying syslinux efi binaries ..."
     cp $1/usr/lib/syslinux/efi64/{ldlinux.e64,*.c32} $2
     cp $1/usr/lib/syslinux/efi64/syslinux.efi $2/bootx64.efi
+    cp ${DATADIR}/isolinux/back800x600.jpg $2/splash.jpg
 }
 
 gen_initrd_arg(){
@@ -148,12 +149,9 @@ gen_initrd_arg(){
     echo $arg
 }
 
-copy_syslinux_bg(){
-    cp $1/usr/share/backhrounds/andromeda.png $2/splash.jpg
-}
-
 write_syslinux_cfg(){
     local conf=$1/syslinux.cfg
+    msg2 "Writing %s ..." "syslinux.cfg"
     echo "DEFAULT free" > $conf
     echo "PROMPT 1" >> $conf
     echo "TIMEOUT 200" >> $conf
@@ -174,19 +172,22 @@ write_syslinux_cfg(){
     echo "MENU COLOR msg07        37;40   #90ffffff #a0000000 std" >> $conf
     echo "MENU COLOR tabmsg       31;40   #30ffffff #00000000 std" >> $conf
     echo "" >> $conf
-    local initrd_arg=$(gen_initrd_arg $2)
     echo "LABEL free" >> $conf
     echo "    MENU LABEL ${dist_name} Linux ${target_arch}" >> $conf
-    echo "    LINUX ../${iso_name}.efi" >> $conf
-    echo "    APPEND ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free $(gen_boot_args) showopts" >> $conf
-    echo "    INITRD ../${iso_name}.img" >> $conf
+    case $2 in
+        usb)
+            echo "    LINUX /EFI/miso/${iso_name}.efi" >> $conf
+            echo "    INITRD /EFI/miso/${iso_name}.img" >> $conf
+        ;;
+        dvd)
+            echo "    LINUX /${iso_name}/boot/${target_arch}/${iso_name}" >> $conf
+            echo "    INITRD /${iso_name}/boot/${target_arch}/${iso_name}.img" >> $conf
+        ;;
+    esac
     if ${nonfree_mhwd};then
-        echo "" >> $conf
-        echo "LABEL nonfree" >> $conf
-        echo "    MENU LABEL ${dist_name} Linux ${target_arch}" >> $conf
-        echo "    LINUX ../${iso_name}.efi" >> $conf
-        echo "    APPEND ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free $(gen_boot_args) showopts" >> $conf
-        echo "    INITRD ../${iso_name}.img" >> $conf
+        echo "    APPEND misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo nonfree=yes overlay=nonfree $(gen_boot_args)" >> $conf
+    else
+        echo "    APPEND misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo nonfree=no overlay=nonfree $(gen_boot_args)" >> $conf
     fi
     echo "" >> $conf
     echo "LABEL hdt" >> $conf
@@ -203,9 +204,8 @@ write_syslinux_cfg(){
 }
 
 write_isolinux_cfg(){
-    local fn=isolinux.cfg
-    local conf=$1/iso/isolinux/${fn}
-    msg2 "Writing %s ..." "${fn}"
+    local conf=$1/iso/isolinux/isolinux.cfg
+    msg2 "Writing %s ..." "isolinux.cfg"
     echo "default start" > ${conf}
     echo "implicit 1" >> ${conf}
     echo "display isolinux.msg" >> ${conf}
@@ -239,9 +239,8 @@ write_isolinux_cfg(){
 }
 
 write_isolinux_msg(){
-    local fn=isolinux.msg
-    local conf=$1/iso/isolinux/${fn}
-    msg2 "Writing %s ..." "${fn}"
+    local conf=$1/iso/isolinux/isolinux.msg
+    msg2 "Writing %s ..." "isolinux.msg"
     echo "Welcome to ${dist_name} Linux!" > ${conf}
     echo '' >> ${conf}
     echo "To start the system enter 'start' and press <return>" >> ${conf}
