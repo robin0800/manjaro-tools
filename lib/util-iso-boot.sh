@@ -71,8 +71,8 @@ copy_ucode(){
 
 copy_boot_images(){
     msg2 "Copying boot images ..."
-    cp $1/x86_64/${iso_name} $1/efiboot/EFI/miso/${iso_name}.efi
-    cp $1/x86_64/${iso_name}.img $1/efiboot/EFI/miso/${iso_name}.img
+    cp $1/iso/${iso_name}/boot/x86_64/${iso_name} $1/efiboot/EFI/miso/${iso_name}.efi
+    cp $1/iso/${iso_name}/boot/x86_64/${iso_name}.img $1/efiboot/EFI/miso/${iso_name}.img
     if $(is_intel_ucode "$1"); then
         cp $1/iso/${iso_name}/boot/intel_ucode.img $1/efiboot/EFI/miso/intel_ucode.img
     fi
@@ -128,7 +128,7 @@ write_dvd_efi_loader_entry(){
 }
 
 copy_isolinux_bin(){
-    msg2 "Copying isolinux bios binaries ..." 
+    msg2 "Copying isolinux bios binaries ..."
     cp $1/usr/lib/syslinux/bios/{{isolinux,isohdpfx}.bin,{ldlinux,gfxboot,whichsys,mboot,hdt,chain,libcom32,libmenu,libutil,libgpl}.c32} $2/iso/isolinux
 }
 

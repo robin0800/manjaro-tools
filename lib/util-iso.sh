@@ -337,10 +337,10 @@ make_efi() {
         if ${nonfree_mhwd};then
             write_usb_efi_loader_entry "${work_dir}" "yes"
         fi
-        
+
 #         copy_syslinux_efi "${work_dir}/live-image" "${boot}"
 #         write_syslinux_cfg "${boot}" "usb"
-        
+
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/boot/EFI]" "${iso_name}"
     fi
@@ -358,7 +358,7 @@ make_efiboot() {
         mount ${miso}/${iso_name}.img ${work_dir}/efiboot
         mkdir -p ${work_dir}/efiboot/EFI/{miso,boot}
         copy_boot_images "${work_dir}"
-        
+
         local boot=${work_dir}/efiboot/EFI/boot
         copy_preloader_efi "${work_dir}/live-image" "${boot}"
         copy_loader_efi "${work_dir}/root-image" "${boot}"
@@ -372,7 +372,7 @@ make_efiboot() {
 #         write_syslinux_cfg "${boot}" "dvd"
 
         umount ${work_dir}/efiboot
-        
+
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/iso/EFI]" "${iso_name}"
     fi
