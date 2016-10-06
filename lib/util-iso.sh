@@ -325,7 +325,7 @@ make_image_boot() {
 }
 
 # Prepare /EFI
-make_efi() {
+make_efi_usb() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [%s/boot/EFI]" "${iso_name}"
         local boot=${work_dir}/iso/EFI/boot
@@ -334,9 +334,7 @@ make_efi() {
         copy_loader_efi "${work_dir}/root-image" "${boot}"
         write_efi_loader_conf "${work_dir}/iso/loader"
         write_usb_efi_loader_entry "${work_dir}" "no"
-        if ${nonfree_mhwd};then
-            write_usb_efi_loader_entry "${work_dir}" "yes"
-        fi
+        ${nonfree_mhwd} && write_usb_efi_loader_entry "${work_dir}" "yes"
 
 #         copy_syslinux_efi "${work_dir}/live-image" "${boot}"
 #         write_syslinux_cfg "${boot}" "usb"
@@ -347,7 +345,7 @@ make_efi() {
 }
 
 # Prepare kernel.img::/EFI for "El Torito" EFI boot mode
-make_efiboot() {
+make_efi_dvd() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [%s/iso/EFI]" "${iso_name}"
         local miso=${work_dir}/iso/EFI/miso
@@ -358,21 +356,17 @@ make_efiboot() {
         mount ${miso}/${iso_name}.img ${work_dir}/efiboot
         mkdir -p ${work_dir}/efiboot/EFI/{miso,boot}
         copy_boot_images "${work_dir}"
-
         local boot=${work_dir}/efiboot/EFI/boot
         copy_preloader_efi "${work_dir}/live-image" "${boot}"
         copy_loader_efi "${work_dir}/root-image" "${boot}"
         write_efi_loader_conf "${work_dir}/efiboot/loader"
         write_dvd_efi_loader_entry "${work_dir}" "no"
-        if ${nonfree_mhwd};then
-            write_dvd_efi_loader_entry "${work_dir}" "yes"
-        fi
+        ${nonfree_mhwd} && write_dvd_efi_loader_entry "${work_dir}" "yes"
 
 #         copy_syslinux_efi "${work_dir}/live-image" "${boot}"
 #         write_syslinux_cfg "${boot}" "dvd"
 
         umount ${work_dir}/efiboot
-
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/iso/EFI]" "${iso_name}"
     fi
@@ -482,8 +476,8 @@ prepare_images(){
     fi
     run_safe "make_image_boot"
     if [[ "${target_arch}" == "x86_64" ]]; then
-        run_safe "make_efi"
-        run_safe "make_efiboot"
+        run_safe "make_efi_usb"
+        run_safe "make_efi_dvd"
     fi
     run_safe "make_isolinux"
     run_safe "make_isomounts"

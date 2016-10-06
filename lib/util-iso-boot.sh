@@ -25,7 +25,7 @@ set_mkinicpio_hooks(){
 }
 
 set_silent_switch_root(){
-        sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
+    sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
 }
 
 copy_initcpio(){
@@ -80,9 +80,8 @@ copy_boot_images(){
 
 write_efi_loader_conf(){
     prepare_dir "$1"
-    local fn=loader.conf
-    local conf=$1/${fn}
-    msg2 "Writing %s ..." "${fn}"
+    local conf=$1/loader.conf
+    msg2 "Writing %s ..." "${conf##*/}"
     echo 'timeout 3' > ${conf}
     echo "default ${iso_name}-${target_arch}-free" >> ${conf}
 }
@@ -144,34 +143,36 @@ gen_initrd_arg(){
 write_isolinux_cfg(){
     local conf=$1/iso/isolinux/isolinux.cfg
     msg2 "Writing %s ..." "${conf##*/}"
+
     echo "default start" > ${conf}
     echo "implicit 1" >> ${conf}
     echo "display isolinux.msg" >> ${conf}
     echo "ui gfxboot bootlogo isolinux.msg" >> ${conf}
     echo "prompt   1" >> ${conf}
     echo "timeout  200" >> ${conf}
+
     echo '' >> ${conf}
     echo "label start" >> ${conf}
     echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
-
-    local initrd_arg=$(gen_initrd_arg "$1")
-
-    echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free $(gen_boot_args) showopts" >> ${conf}
-
+    echo "  append $(gen_initrd_arg "$1") misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free $(gen_boot_args) showopts" >> ${conf}
     echo '' >> ${conf}
+
     if ${nonfree_mhwd};then
         echo "label nonfree" >> ${conf}
         echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
-        echo "  append ${initrd_arg} misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree $(gen_boot_args) showopts" >> ${conf}
+        echo "  append $(gen_initrd_arg "$1") misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree $(gen_boot_args) showopts" >> ${conf}
         echo '' >> ${conf}
     fi
+
     echo "label harddisk" >> ${conf}
     echo "  com32 whichsys.c32" >> ${conf}
     echo "  append -iso- chain.c32 hd0" >> ${conf}
     echo '' >> ${conf}
+
     echo "label hdt" >> ${conf}
     echo "  kernel hdt.c32" >> ${conf}
     echo '' >> ${conf}
+
     echo "label memtest" >> ${conf}
     echo "  kernel memtest" >> ${conf}
 }
@@ -179,6 +180,7 @@ write_isolinux_cfg(){
 write_isolinux_msg(){
     local conf=$1/iso/isolinux/isolinux.msg
     msg2 "Writing %s ..." "${conf##*/}"
+
     echo "Welcome to ${dist_name} Linux!" > ${conf}
     echo '' >> ${conf}
     echo "To start the system enter 'start' and press <return>" >> ${conf}
@@ -211,7 +213,6 @@ update_isolinux_msg(){
 write_isomounts(){
     local file=$1/isomounts
     echo '# syntax: <img> <arch> <mount point> <type> <kernel argument>' > ${file}
-    echo '# Sample kernel argument in syslinux: overlay=extra,extra2' >> ${file}
     echo '' >> ${file}
     msg2 "Writing live entry ..."
     echo "${target_arch}/live-image.sqfs ${target_arch} / squashfs" >> ${file}
