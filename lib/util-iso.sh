@@ -118,10 +118,10 @@ make_sqfs() {
 assemble_iso(){
     msg "Creating ISO image..."
     local efi_boot_args=()
-    if [[ -f "${work_dir}/iso/EFI/miso/${iso_name}.img" ]]; then
+    if [[ -f "${work_dir}/iso/EFI/miso/efiboot.img" ]]; then
         msg2 "Setting efi args. El Torito detected."
         efi_boot_args=("-eltorito-alt-boot"
-                "-e EFI/miso/${iso_name}.img"
+                "-e EFI/miso/efiboot.img"
                 "-isohybrid-gpt-basdat"
                 "-no-emul-boot")
     fi
@@ -332,9 +332,10 @@ make_efi_usb() {
         mkdir -p ${boot}
         copy_preloader_efi "${work_dir}/live-image" "${boot}"
         copy_loader_efi "${work_dir}/root-image" "${boot}"
-        write_efi_loader_conf "${work_dir}/iso/loader"
-        write_usb_efi_loader_entry "${work_dir}" "no"
-        ${nonfree_mhwd} && write_usb_efi_loader_entry "${work_dir}" "yes"
+        prepare_efi_loader_conf "${work_dir}/iso/loader"
+        prepare_loader_entry "${work_dir}/iso" "usb"
+        copy_efi_shell "${work_dir}/live-image" "${work_dir}/iso/EFI"
+        copy_efi_shell_conf "${work_dir}/live-image" "${work_dir}/iso/loader/entries"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/boot/EFI]" "${iso_name}"
     fi
@@ -346,21 +347,36 @@ make_efi_dvd() {
         msg "Prepare [%s/iso/EFI]" "${iso_name}"
         local miso=${work_dir}/iso/EFI/miso
         mkdir -p ${miso}
-        truncate -s 31M ${miso}/${iso_name}.img
-        mkfs.fat -n MISO_EFI ${miso}/${iso_name}.img
+        truncate -s 31M ${miso}/efiboot.img
+        mkfs.fat -n MISO_EFI ${miso}/efiboot.img
         mkdir -p ${work_dir}/efiboot
-        mount ${miso}/${iso_name}.img ${work_dir}/efiboot
+        mount ${miso}/efiboot.img ${work_dir}/efiboot
         mkdir -p ${work_dir}/efiboot/EFI/{miso,boot}
         copy_boot_images "${work_dir}"
         local boot=${work_dir}/efiboot/EFI/boot
         copy_preloader_efi "${work_dir}/live-image" "${boot}"
         copy_loader_efi "${work_dir}/root-image" "${boot}"
-        write_efi_loader_conf "${work_dir}/efiboot/loader"
-        write_dvd_efi_loader_entry "${work_dir}" "no"
-        ${nonfree_mhwd} && write_dvd_efi_loader_entry "${work_dir}" "yes"
-        umount ${work_dir}/efiboot
+        prepare_efi_loader_conf "${work_dir}/efiboot/loader"
+        prepare_loader_entry "${work_dir}/efiboot" "dvd"
+        copy_efi_shell "${work_dir}/live-image" "${work_dir}/efiboot/EFI"
+        copy_efi_shell_conf "${work_dir}/live-image" "${work_dir}/efiboot/loader/entries"
+        umount -d ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/iso/EFI]" "${iso_name}"
+    fi
+}
+
+make_syslinux() {
+    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+        msg "Prepare [%s/iso/syslinux]" "${iso_name}"
+        local path=${work_dir}/iso/${iso_name}/boot/syslinux
+        mkdir -p ${path}
+        prepare_syslinux "${work_dir}/live-image" "${path}"
+        mkdir -p ${path}/hdt
+        gzip -c -9 ${work_dir}/root-image/usr/share/hwdata/pci.ids > ${path}/hdt/pciids.gz
+        gzip -c -9 ${work_dir}/live-image/usr/lib/modules/*-MANJARO/modules.alias > ${path}/hdt/modalias.gz
+        : > ${work_dir}/build.${FUNCNAME}
+        msg "Done [%s/iso/syslinux]" "${iso_name}"
     fi
 }
 
@@ -369,15 +385,7 @@ make_isolinux() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [%s/iso/isolinux]" "${iso_name}"
         mkdir -p ${work_dir}/iso/isolinux
-        copy_overlay "${DATADIR}/isolinux" "${work_dir}/iso/isolinux"
-        write_isolinux_cfg "${work_dir}"
-        write_isolinux_msg "${work_dir}"
-        if [[ -e ${profile_dir}/isolinux-overlay ]]; then
-            copy_overlay "${profile_dir}/isolinux-overlay" "${work_dir}/iso/isolinux"
-            update_isolinux_cfg "${work_dir}"
-            update_isolinux_msg "${work_dir}"
-        fi
-        copy_isolinux_bin "${work_dir}/live-image" "${work_dir}"
+        prepare_isolinux "${work_dir}/live-image" "${work_dir}/iso/isolinux"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/iso/isolinux]" "${iso_name}"
     fi
@@ -471,6 +479,7 @@ prepare_images(){
         run_safe "make_efi_usb"
         run_safe "make_efi_dvd"
     fi
+    run_safe "make_syslinux"
     run_safe "make_isolinux"
     run_safe "make_isomounts"
     show_elapsed_time "${FUNCNAME}" "${timer}"

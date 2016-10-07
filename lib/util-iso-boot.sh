@@ -64,6 +64,16 @@ is_intel_ucode(){
     fi
 }
 
+copy_efi_shell(){
+    msg2 "Copying efi shell ..."
+    cp $1${DATADIR}/efi_shell/*.efi $2/
+}
+
+copy_efi_shell_conf(){
+    msg2 "Copying efi shell loader entries ..."
+    cp $1${DATADIR}/efi_shell/*.conf $2/
+}
+
 copy_ucode(){
     cp $1/boot/intel-ucode.img $2/intel_ucode.img
     cp $1/usr/share/licenses/intel-ucode/LICENSE $2/intel_ucode.LICENSE
@@ -78,12 +88,9 @@ copy_boot_images(){
     fi
 }
 
-write_efi_loader_conf(){
+prepare_efi_loader_conf(){
     prepare_dir "$1"
-    local conf=$1/loader.conf
-    msg2 "Writing %s ..." "${conf##*/}"
-    echo 'timeout 3' > ${conf}
-    echo "default ${iso_name}-${target_arch}-free" >> ${conf}
+    sed "s|%ISO_NAME%|${iso_name}|g" ${run_dir}/shared/efiboot/loader.conf > $1/loader.conf
 }
 
 gen_boot_args(){
@@ -94,120 +101,48 @@ gen_boot_args(){
     echo ${args[@]}
 }
 
-write_usb_efi_loader_entry(){
-    prepare_dir "$1/iso/loader/entries"
-    local drv='free' switch="$2"
-    [[ ${switch} == 'yes' ]] && drv='nonfree'
-    local fn=${iso_name}-${target_arch}-${drv}.conf
-    local conf=$1/iso/loader/entries/${fn}
-    msg2 "Writing %s ..." "${fn}"
-    echo "title   ${dist_name} Linux ${target_arch} UEFI USB (${drv})" > ${conf}
-    echo "linux   /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
-    if $(is_intel_ucode "$1") ; then
-        echo "initrd  /${iso_name}/boot/intel_ucode.img" >> ${conf}
-    fi
-    echo "initrd  /${iso_name}/boot/${target_arch}/${iso_name}.img" >> ${conf}
-    echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=${drv} nonfree=${switch} $(gen_boot_args)" >> ${conf}
+set_efi_loader_entry_conf(){
+    sed -e "s|@ISO_NAME@|${iso_name}|g" \
+        -e "s|@ISO_LABEL@|${iso_label}|g" \
+        -e "s|@DRV@|$2|g" \
+        -e "s|@SWITCH@|$3|g" \
+        -e "s|@BOOT_ARGS@|$(gen_boot_args)|g" \
+        -i $1
 }
 
-write_dvd_efi_loader_entry(){
-    prepare_dir "$1/efiboot/loader/entries"
-    local drv='free' switch="$2"
-    [[ ${switch} == 'yes' ]] && drv='nonfree'
-    local fn=${iso_name}-${target_arch}-${drv}.conf
-    local conf=$1/efiboot/loader/entries/${fn}
-    msg2 "Writing %s ..." "${fn}"
-    echo "title   ${dist_name} Linux ${target_arch} UEFI DVD (${drv})" > ${conf}
-    echo "linux   /EFI/miso/${iso_name}.efi" >> ${conf}
-    if $(is_intel_ucode "$1") ; then
-        echo "initrd  /EFI/miso/intel_ucode.img" >> ${conf}
-    fi
-    echo "initrd  /EFI/miso/${iso_name}.img" >> ${conf}
-    echo "options misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=${drv} nonfree=${switch} $(gen_boot_args)" >> ${conf}
-}
-
-copy_isolinux_bin(){
-    msg2 "Copying isolinux bios binaries ..."
-    cp $1/usr/lib/syslinux/bios/{{isolinux,isohdpfx}.bin,{ldlinux,gfxboot,whichsys,mboot,hdt,chain,libcom32,libmenu,libutil,libgpl}.c32} $2/iso/isolinux
-}
-
-gen_initrd_arg(){
-    local path="/${iso_name}/boot/${target_arch}/${iso_name}.img"
-    local arg="initrd=${path}"
-    if $(is_intel_ucode "$1") ; then
-        arg="initrd=/${iso_name}/boot/intel_ucode.img,${path}"
-    fi
-    echo $arg
-}
-
-write_isolinux_cfg(){
-    local conf=$1/iso/isolinux/isolinux.cfg
-    msg2 "Writing %s ..." "${conf##*/}"
-
-    echo "default start" > ${conf}
-    echo "implicit 1" >> ${conf}
-    echo "display isolinux.msg" >> ${conf}
-    echo "ui gfxboot bootlogo isolinux.msg" >> ${conf}
-    echo "prompt   1" >> ${conf}
-    echo "timeout  200" >> ${conf}
-
-    echo '' >> ${conf}
-    echo "label start" >> ${conf}
-    echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
-    echo "  append $(gen_initrd_arg "$1") misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=1 i915.modeset=1 radeon.modeset=1 logo.nologo overlay=free $(gen_boot_args) showopts" >> ${conf}
-    echo '' >> ${conf}
-
+prepare_loader_entry(){
+    local drv='free' switch="no"
+    prepare_dir "$1/loader/entries"
+    cp ${run_dir}/shared/efiboot/miso-x86_64-$2.conf $1/loader/entries/${iso_name}-x86_64.conf
+    set_efi_loader_entry_conf "$1/loader/entries/${iso_name}-x86_64.conf" "$drv" "$switch"
     if ${nonfree_mhwd};then
-        echo "label nonfree" >> ${conf}
-        echo "  kernel /${iso_name}/boot/${target_arch}/${iso_name}" >> ${conf}
-        echo "  append $(gen_initrd_arg "$1") misobasedir=${iso_name} misolabel=${iso_label} nouveau.modeset=0 i915.modeset=1 radeon.modeset=0 nonfree=yes logo.nologo overlay=nonfree $(gen_boot_args) showopts" >> ${conf}
-        echo '' >> ${conf}
+        drv='nonfree' switch="yes"
+        cp ${run_dir}/shared/efiboot/miso-x86_64-$2.conf $1/loader/entries/${iso_name}-x86_64-nonfree.conf
+        set_efi_loader_entry_conf "$1/loader/entries/${iso_name}-x86_64-nonfree.conf" "$drv" "$switch"
     fi
-
-    echo "label harddisk" >> ${conf}
-    echo "  com32 whichsys.c32" >> ${conf}
-    echo "  append -iso- chain.c32 hd0" >> ${conf}
-    echo '' >> ${conf}
-
-    echo "label hdt" >> ${conf}
-    echo "  kernel hdt.c32" >> ${conf}
-    echo '' >> ${conf}
-
-    echo "label memtest" >> ${conf}
-    echo "  kernel memtest" >> ${conf}
 }
 
-write_isolinux_msg(){
-    local conf=$1/iso/isolinux/isolinux.msg
-    msg2 "Writing %s ..." "${conf##*/}"
-
-    echo "Welcome to ${dist_name} Linux!" > ${conf}
-    echo '' >> ${conf}
-    echo "To start the system enter 'start' and press <return>" >> ${conf}
-    echo '' >> ${conf}
-    echo '' >> ${conf}
-    echo "Available boot options:" >> ${conf}
-    echo "start                    - Start ${dist_name} Live System" >> ${conf}
-    if ${nonfree_mhwd};then
-        echo "nonfree                  - Start with proprietary drivers" >> ${conf}
-    fi
-    echo "harddisk                 - Boot from local hard disk" >> ${conf}
-    echo "hdt                      - Run Hardware Detection Tool" >> ${conf}
-    echo "memtest                  - Run Memory Test" >> ${conf}
+prepare_syslinux(){
+    for conf in ${run_dir}/shared/syslinux/*.cfg ${run_dir}/shared/syslinux/${target_arch}/*.cfg; do
+        msg2 "Copying %s ..." "${conf##*/}"
+        sed "s|@ISO_LABEL@|${iso_label}|g;
+            s|@ISO_NAME@|${iso_name}|g;
+            s|@BOOT_ARGS@|$(gen_boot_args)|g;
+            s|@DIST_NAME@|${dist_name}|g" ${conf} > $2/${conf##*/}
+    done
+    msg2 "Copying syslinux ..."
+    cp ${run_dir}/shared/syslinux/splash.png $2
+    cp $1/usr/lib/syslinux/bios/*.c32 $2
+    cp $1/usr/lib/syslinux/bios/lpxelinux.0 $2
+    cp $1/usr/lib/syslinux/bios/memdisk $2
 }
 
-update_isolinux_cfg(){
-    local conf=$1/iso/isolinux/isolinux.cfg
-    msg2 "Updating %s ..." "${conf##*/}"
-    sed -e "s|%ISO_LABEL%|${iso_label}|g;
-            s|%ISO_NAME%|${iso_name}|g;
-            s|%ARCH%|${target_arch}|g" -i ${conf}
-}
-
-update_isolinux_msg(){
-    local conf=$1/iso/isolinux/isolinux.msg
-    msg2 "Updating %s ..." "${conf##*/}"
-    sed -e "s|%DIST_NAME%|${dist_name}|g" -i ${conf}
+prepare_isolinux(){
+    msg2 "Copying isolinux ..."
+    sed "s|%ISO_NAME%|${iso_name}|g" ${run_dir}/shared/isolinux/isolinux.cfg > $2/isolinux.cfg
+    cp $1/usr/lib/syslinux/bios/isolinux.bin $2
+    cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2
+    cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2
 }
 
 write_isomounts(){
