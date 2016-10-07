@@ -125,27 +125,27 @@ prepare_loader_entry(){
 prepare_syslinux(){
     local syslinux=${run_dir}/shared/syslinux
     msg2 "Copying syslinux splash ..."
-    cp ${syslinux}/splash.png $2
+    cp ${syslinux}/splash.png $1
     for conf in ${syslinux}/*.cfg ${syslinux}/${target_arch}/*.cfg; do
         msg2 "Copying %s ..." "${conf##*/}"
         sed "s|@ISO_LABEL@|${iso_label}|g;
             s|@ISO_NAME@|${iso_name}|g;
             s|@BOOT_ARGS@|$(gen_boot_args)|g;
-            s|@DIST_NAME@|${dist_name}|g" ${conf} > $2/${conf##*/}
+            s|@DIST_NAME@|${dist_name}|g" ${conf} > $1/${conf##*/}
     done
     msg2 "Copying syslinux binaries ..."
-    cp $1/usr/lib/syslinux/bios/*.c32 $2
-    cp $1/usr/lib/syslinux/bios/lpxelinux.0 $2
-    cp $1/usr/lib/syslinux/bios/memdisk $2
+    cp /usr/lib/syslinux/bios/*.c32 $1
+    cp /usr/lib/syslinux/bios/lpxelinux.0 $1
+    cp /usr/lib/syslinux/bios/memdisk $1
 }
 
 prepare_isolinux(){
     msg2 "Copying isolinux.cfg ..."
-    sed "s|@ISO_NAME@|${iso_name}|g" ${run_dir}/shared/isolinux/isolinux.cfg > $2/isolinux.cfg
+    sed "s|@ISO_NAME@|${iso_name}|g" ${run_dir}/shared/isolinux/isolinux.cfg > $1/isolinux.cfg
     msg2 "Copying isolinux binaries ..."
-    cp $1/usr/lib/syslinux/bios/isolinux.bin $2
-    cp $1/usr/lib/syslinux/bios/isohdpfx.bin $2
-    cp $1/usr/lib/syslinux/bios/ldlinux.c32 $2
+    cp /usr/lib/syslinux/bios/isolinux.bin $1
+    cp /usr/lib/syslinux/bios/isohdpfx.bin $1
+    cp /usr/lib/syslinux/bios/ldlinux.c32 $1
 }
 
 write_isomounts(){
