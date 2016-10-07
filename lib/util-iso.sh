@@ -306,7 +306,7 @@ make_image_boot() {
         local path="${work_dir}/boot-image"
         mkdir -p ${path}
 
-        mount_image_select "${path}"
+        mount_image_live "${path}"
         configure_plymouth "${path}"
 
         copy_initcpio "${profile_dir}" "${path}"
@@ -371,7 +371,7 @@ make_syslinux() {
         msg "Prepare [%s/iso/syslinux]" "${iso_name}"
         local path=${work_dir}/iso/${iso_name}/boot/syslinux
         mkdir -p ${path}
-        prepare_syslinux "${path}"
+        prepare_syslinux "${work_dir}/live-image" "${path}"
         mkdir -p ${path}/hdt
         gzip -c -9 ${work_dir}/root-image/usr/share/hwdata/pci.ids > ${path}/hdt/pciids.gz
         gzip -c -9 ${work_dir}/live-image/usr/lib/modules/*-MANJARO/modules.alias > ${path}/hdt/modalias.gz
@@ -385,7 +385,7 @@ make_isolinux() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [%s/iso/isolinux]" "${iso_name}"
         mkdir -p ${work_dir}/iso/isolinux
-        prepare_isolinux "${work_dir}/iso/isolinux"
+        prepare_isolinux "${work_dir}/live-image" "${work_dir}/iso/isolinux"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/iso/isolinux]" "${iso_name}"
     fi
