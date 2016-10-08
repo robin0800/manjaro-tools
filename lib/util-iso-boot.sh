@@ -43,7 +43,7 @@ gen_boot_image(){
     chroot-run $1 \
         /usr/bin/mkinitcpio -k ${_kernver} \
         -c /etc/mkinitcpio-${iso_name}.conf \
-        -g /boot/${iso_name}.img
+        -g /boot/initramfs.img
 }
 
 copy_preloader_efi(){
@@ -81,8 +81,8 @@ copy_ucode(){
 
 copy_boot_images(){
     msg2 "Copying boot images ..."
-    cp $1/iso/${iso_name}/boot/x86_64/${iso_name} $1/efiboot/EFI/miso/${iso_name}.efi
-    cp $1/iso/${iso_name}/boot/x86_64/${iso_name}.img $1/efiboot/EFI/miso/${iso_name}.img
+    cp $1/iso/${iso_name}/boot/x86_64/vmlinuz $1/efiboot/EFI/miso/vmlinuz.efi
+    cp $1/iso/${iso_name}/boot/x86_64/initramfs.img $1/efiboot/EFI/miso/initramfs.img
     if $(is_intel_ucode "$1"); then
         cp $1/iso/${iso_name}/boot/intel_ucode.img $1/efiboot/EFI/miso/intel_ucode.img
     fi
@@ -124,11 +124,9 @@ prepare_loader_entry(){
 
 prepare_syslinux(){
     local syslinux=${run_dir}/shared/syslinux
-    if [[ -d ${syslinux}/bg ]];then
-        msg2 "Copying syslinux splash ..."
-        cp -r ${syslinux}/bg $2
-    fi
-    for conf in ${syslinux}/*.cfg ${syslinux}/${target_arch}/*.cfg; do
+    msg2 "Copying syslinux theme ..."
+    cp ${syslinux}/{*.{jpg,tr,hlp,tlk},bootlogo,languages,init} $2
+    for conf in ${syslinux}/*.cfg ${syslinux}/*.msg; do
         msg2 "Copying %s ..." "${conf##*/}"
         sed "s|@ARCH@|${target_arch}|g;
             s|@DIST_NAME@|${dist_name}|g

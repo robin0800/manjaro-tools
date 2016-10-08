@@ -302,7 +302,7 @@ make_image_boot() {
         local path_iso="${work_dir}/iso/${iso_name}/boot"
         mkdir -p ${path_iso}/${target_arch}
         cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${target_arch}/memtest
-        cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${target_arch}/${iso_name}
+        cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${target_arch}/vmlinuz
         local path="${work_dir}/boot-image"
         mkdir -p ${path}
 
@@ -313,7 +313,7 @@ make_image_boot() {
 
         gen_boot_image "${path}"
 
-        mv ${path}/boot/${iso_name}.img ${path_iso}/${target_arch}/${iso_name}.img
+        mv ${path}/boot/initramfs.img ${path_iso}/${target_arch}/initramfs.img
         [[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
 
         umount_image
