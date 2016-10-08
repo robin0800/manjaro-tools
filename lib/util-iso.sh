@@ -135,10 +135,10 @@ assemble_iso(){
         -appid "${iso_app_id}" \
         -publisher "${iso_publisher}" \
         -preparer "Prepared by manjaro-tools/${0##*/}" \
-        -eltorito-boot isolinux/isolinux.bin \
-        -eltorito-catalog isolinux/boot.cat \
+        -eltorito-boot syslinux/isolinux.bin \
+        -eltorito-catalog syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -isohybrid-mbr "${work_dir}/iso/isolinux/isohdpfx.bin" \
+        -isohybrid-mbr "${work_dir}/iso/syslinux/isohdpfx.bin" \
         ${efi_boot_args[@]} \
         -output "${iso_dir}/${iso_file}" \
         "${work_dir}/iso/"
@@ -369,25 +369,14 @@ make_efi_dvd() {
 make_syslinux() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [%s/iso/syslinux]" "${iso_name}"
-        local path=${work_dir}/iso/${iso_name}/boot/syslinux
-        mkdir -p ${path}
-        prepare_syslinux "${work_dir}/live-image" "${path}"
-        mkdir -p ${path}/hdt
-        gzip -c -9 ${work_dir}/root-image/usr/share/hwdata/pci.ids > ${path}/hdt/pciids.gz
-        gzip -c -9 ${work_dir}/live-image/usr/lib/modules/*-MANJARO/modules.alias > ${path}/hdt/modalias.gz
+        local syslinux=${work_dir}/iso/syslinux
+        mkdir -p ${syslinux}
+        prepare_syslinux "${work_dir}/live-image/usr/lib/syslinux/bios" "${syslinux}"
+        mkdir -p ${syslinux}/hdt
+        gzip -c -9 ${work_dir}/root-image/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
+        gzip -c -9 ${work_dir}/live-image/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [%s/iso/syslinux]" "${iso_name}"
-    fi
-}
-
-# Prepare /isolinux
-make_isolinux() {
-    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [%s/iso/isolinux]" "${iso_name}"
-        mkdir -p ${work_dir}/iso/isolinux
-        prepare_isolinux "${work_dir}/live-image" "${work_dir}/iso/isolinux"
-        : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [%s/iso/isolinux]" "${iso_name}"
     fi
 }
 
@@ -480,7 +469,6 @@ prepare_images(){
         run_safe "make_efi_dvd"
     fi
     run_safe "make_syslinux"
-    run_safe "make_isolinux"
     run_safe "make_isomounts"
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
