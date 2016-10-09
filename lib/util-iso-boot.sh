@@ -94,7 +94,7 @@ prepare_efi_loader(){
     msg2 "Preparing efi loader config ..."
     prepare_dir "${entries}"
 
-    cp $${efi_data}/loader.conf $2/loader/loader.conf
+    cp ${efi_data}/loader.conf $2/loader/loader.conf
     vars_to_boot_conf $2/loader/loader.conf
     cp ${efi_data}/uefi-shell-v{1,2}-x86_64.conf ${entries}
 
@@ -109,9 +109,10 @@ prepare_efi_loader(){
 }
 
 check_syslinux_optional(){
-    if ! ${nonfree_mhwd};then
-        sed "/LABEL optional/,/^$/d" -i "$1"
-    fi
+    msg2 "Configuring syslinux menu ..."
+    sed -e "/LABEL optional/,/^$/d" -i "$1/miso_sys_i686.cfg"
+    sed -e "/LABEL optional/,/^$/d" -i "$1/miso_sys_x86_64.cfg"
+    sed -e "/nonfree/ d" -i $1/syslinux.msg
 }
 
 prepare_syslinux(){
@@ -120,13 +121,12 @@ prepare_syslinux(){
     cp ${syslinux}/{*.c32,lpxelinux.0,memdisk,{isolinux,isohdpfx}.bin} $1
     msg2 "Copying syslinux theme ..."
     cp ${DATADIR}/syslinux-theme/* $1
-    for conf in ${syslinux}/*.cfg; do
-        vars_to_boot_conf "$1/${conf##*/}"
-        if [[ ${conf##*/} == "miso_sys_i686.cfg" ]] || \
-            [[ ${conf##*/} == "miso_sys_x86_64.cfg" ]];then
-                check_syslinux_optional "${conf}"
-            fi
+    for conf in $1/*.cfg; do
+        vars_to_boot_conf "${conf}"
     done
+    if ! ${nonfree_mhwd};then
+        check_syslinux_optional "$1"
+    fi
 }
 
 write_isomounts(){
