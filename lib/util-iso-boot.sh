@@ -59,15 +59,14 @@ copy_ucode(){
     cp $1/usr/share/licenses/intel-ucode/LICENSE $2/intel_ucode.LICENSE
 }
 
-copy_boot_images(){
-    msg2 "Copying boot images ..."
-    prepare_dir "$1/efiboot/EFI/miso"
-    local miso_efi=$1/efiboot/EFI/miso boot=$1/iso/${iso_name}/boot
-    cp ${boot}/x86_64/vmlinuz $1/efiboot/EFI/miso/vmlinuz.efi
-    cp ${boot}/x86_64/initramfs.img $1/efiboot/EFI/miso/initramfs.img
-
+prepare_efiboot_image(){
+    msg2 "Prepare efi boot images ..."
+    local efi=$1/efiboot/EFI/miso boot=$1/iso/${iso_name}/boot
+    prepare_dir "${efi}"
+    cp ${boot}/x86_64/vmlinuz ${efi}/vmlinuz.efi
+    cp ${boot}/x86_64/initramfs.img ${efi}/initramfs.img
     if [[ -f ${boot}/intel_ucode.img ]] ; then
-        cp ${boot}/intel_ucode.img $1/efiboot/EFI/miso/intel_ucode.img
+        cp ${boot}/intel_ucode.img ${efi}/intel_ucode.img
     fi
 }
 
@@ -83,27 +82,35 @@ vars_to_boot_conf(){
 }
 
 prepare_efi_loader(){
-    prepare_dir "$2/EFI/boot"
+    local efi_data=$1${DATADIR}/efiboot efi=$2/EFI/boot
+    msg2 "Preparing efi loaders ..."
+    prepare_dir "${efi}"
+    cp $1/usr/share/efitools/efi/PreLoader.efi ${efi}/bootx64.efi
+    cp $1/usr/share/efitools/efi/HashTool.efi ${efi}
+    cp ${efi_data}/gummibootx64.efi ${efi}/loader.efi
+    cp ${efi_data}/shellx64_v{1,2}.efi $2/EFI
 
-    msg2 "Copying efi loaders ..."
-    cp $1/usr/share/efitools/efi/PreLoader.efi $2/EFI/boot/bootx64.efi
-    cp $1/usr/share/efitools/efi/HashTool.efi $2/EFI/boot
-    cp $1${DATADIR}/efiboot/gummibootx64.efi $2/EFI/boot/loader.efi
-    cp $1${DATADIR}/efiboot/shellx64_v{1,2}.efi $2/EFI
+    local entries=$2/loader/entries
+    msg2 "Preparing efi loader config ..."
+    prepare_dir "${entries}"
 
-    prepare_dir "$2/loader/entries"
-
-    cp $1${DATADIR}/efiboot/loader.conf $2/loader/loader.conf
+    cp $${efi_data}/loader.conf $2/loader/loader.conf
     vars_to_boot_conf $2/loader/loader.conf
-    cp $1${DATADIR}/efiboot/uefi-shell-v{1,2}-x86_64.conf $2/loader/entries
+    cp ${efi_data}/uefi-shell-v{1,2}-x86_64.conf ${entries}
 
     local drv='free' switch="no"
-    cp $1${DATADIR}/efiboot/entry-x86_64-$3.conf $2/loader/entries/${iso_name}-x86_64.conf
-    vars_to_boot_conf "$2/loader/entries/${iso_name}-x86_64.conf" "$drv" "$switch"
+    cp ${efi_data}/entry-x86_64-$3.conf ${entries}/${iso_name}-x86_64.conf
+    vars_to_boot_conf "${entries}/${iso_name}-x86_64.conf" "$drv" "$switch"
     if ${nonfree_mhwd};then
         drv='nonfree' switch="yes"
-        cp $1${DATADIR}/efiboot/entry-x86_64-$3.conf $2/loader/entries/${iso_name}-x86_64-nonfree.conf
-        vars_to_boot_conf "$2/loader/entries/${iso_name}-x86_64-nonfree.conf" "$drv" "$switch"
+        cp ${efi_data}/entry-x86_64-$3.conf ${entries}/${iso_name}-x86_64-nonfree.conf
+        vars_to_boot_conf "${entries}/${iso_name}-x86_64-nonfree.conf" "$drv" "$switch"
+    fi
+}
+
+check_syslinux_optional(){
+    if ! ${nonfree_mhwd};then
+        sed "/LABEL optional/,/^$/d" -i "$1"
     fi
 }
 
@@ -115,6 +122,10 @@ prepare_syslinux(){
     cp ${DATADIR}/syslinux-theme/* $1
     for conf in ${syslinux}/*.cfg; do
         vars_to_boot_conf "$1/${conf##*/}"
+        if [[ ${conf##*/} == "miso_sys_i686.cfg" ]] || \
+            [[ ${conf##*/} == "miso_sys_x86_64.cfg" ]];then
+                check_syslinux_optional "${conf}"
+            fi
     done
 }
 

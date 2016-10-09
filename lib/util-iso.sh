@@ -344,7 +344,7 @@ make_efi_dvd() {
         mkfs.fat -n MISO_EFI ${miso}/efiboot.img
         mkdir -p ${work_dir}/efiboot
         mount ${miso}/efiboot.img ${work_dir}/efiboot
-        copy_boot_images "${work_dir}"
+        prepare_efiboot_image "${work_dir}"
         prepare_efi_loader "${work_dir}/live-image" "${work_dir}/efiboot" "dvd"
         umount -d ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
