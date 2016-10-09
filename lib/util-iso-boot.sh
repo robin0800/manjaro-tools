@@ -65,13 +65,17 @@ is_intel_ucode(){
 }
 
 copy_efi_shell(){
-    msg2 "Copying efi shell ..."
-    cp $1${DATADIR}/efi_shell/*.efi $2/
+    for f in $1${DATADIR}/efi_shell/*.efi;do
+        msg2 "Copying efi shell ..."
+        [[ -f $f ]] && cp $f $2/
+    done
 }
 
 copy_efi_shell_conf(){
-    msg2 "Copying efi shell loader entries ..."
-    cp $1${DATADIR}/efi_shell/*.conf $2/
+    for f in cp $1${DATADIR}/efi_shell/*.conf;do
+        msg2 "Copying efi shell loader entries ..."
+        [[ -f $f ]] && cp $f $2/
+    done
 }
 
 copy_ucode(){
@@ -90,7 +94,7 @@ copy_boot_images(){
 
 prepare_efi_loader_conf(){
     prepare_dir "$1"
-    sed "s|%ISO_NAME%|${iso_name}|g" ${run_dir}/shared/efiboot/loader.conf > $1/loader.conf
+    sed "s|%ISO_NAME%|${iso_name}|g" ${DATADIR}/efiboot/loader.conf > $1/loader.conf
 }
 
 gen_boot_args(){
@@ -101,9 +105,11 @@ gen_boot_args(){
     echo ${args[@]}
 }
 
-set_efi_loader_entry_conf(){
+vars_to_boot_conf(){
     sed -e "s|@ISO_NAME@|${iso_name}|g" \
         -e "s|@ISO_LABEL@|${iso_label}|g" \
+        -e "s|@DIST_NAME@|${dist_name}|g" \
+        -e "s|@ARCH@|${target_arch}|g" \
         -e "s|@DRV@|$2|g" \
         -e "s|@SWITCH@|$3|g" \
         -e "s|@BOOT_ARGS@|$(gen_boot_args)|g" \
@@ -113,30 +119,24 @@ set_efi_loader_entry_conf(){
 prepare_loader_entry(){
     local drv='free' switch="no"
     prepare_dir "$1/loader/entries"
-    cp ${run_dir}/shared/efiboot/miso-x86_64-$2.conf $1/loader/entries/${iso_name}-x86_64.conf
-    set_efi_loader_entry_conf "$1/loader/entries/${iso_name}-x86_64.conf" "$drv" "$switch"
+    cp ${DATADIR}/efiboot/miso-$2.conf $1/loader/entries/${iso_name}-x86_64.conf
+    vars_to_boot_conf "$1/loader/entries/${iso_name}-x86_64.conf" "$drv" "$switch"
     if ${nonfree_mhwd};then
         drv='nonfree' switch="yes"
-        cp ${run_dir}/shared/efiboot/miso-x86_64-$2.conf $1/loader/entries/${iso_name}-x86_64-nonfree.conf
-        set_efi_loader_entry_conf "$1/loader/entries/${iso_name}-x86_64-nonfree.conf" "$drv" "$switch"
+        cp ${DATADIR}/efiboot/miso-$2.conf $1/loader/entries/${iso_name}-x86_64-nonfree.conf
+        vars_to_boot_conf "$1/loader/entries/${iso_name}-x86_64-nonfree.conf" "$drv" "$switch"
     fi
 }
 
 prepare_syslinux(){
-    local syslinux=${run_dir}/shared/syslinux
-    msg2 "Copying syslinux theme ..."
-    cp ${syslinux}/{*.{jpg,tr,hlp,tlk},bootlogo,languages,init} $2
-    for conf in ${syslinux}/*.cfg ${syslinux}/*.msg; do
-        msg2 "Copying %s ..." "${conf##*/}"
-        sed "s|@ARCH@|${target_arch}|g;
-            s|@DIST_NAME@|${dist_name}|g
-            s|@ISO_NAME@|${iso_name}|g;
-            s|@ISO_LABEL@|${iso_label}|g;
-            s|@BOOT_ARGS@|$(gen_boot_args)|g;" ${conf} > $2/${conf##*/}
-    done
-
+    local syslinux=/usr/lib/syslinux/bios
     msg2 "Copying syslinux binaries ..."
-    cp $1/{*.c32,lpxelinux.0,memdisk,{isolinux,isohdpfx}.bin} $2
+    cp ${syslinux}/{*.c32,lpxelinux.0,memdisk,{isolinux,isohdpfx}.bin} $1
+    msg2 "Copying syslinux theme ..."
+    cp ${DATADIR}/syslinux-theme/* $1
+    for conf in ${syslinux}/*.cfg; do
+        vars_to_boot_conf "$1/${conf##*/}"
+    done
 }
 
 write_isomounts(){

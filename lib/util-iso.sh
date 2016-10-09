@@ -371,7 +371,7 @@ make_syslinux() {
         msg "Prepare [%s/iso/syslinux]" "${iso_name}"
         local syslinux=${work_dir}/iso/syslinux
         mkdir -p ${syslinux}
-        prepare_syslinux "${work_dir}/live-image/usr/lib/syslinux/bios" "${syslinux}"
+        prepare_syslinux "${syslinux}"
         mkdir -p ${syslinux}/hdt
         gzip -c -9 ${work_dir}/root-image/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
         gzip -c -9 ${work_dir}/live-image/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
