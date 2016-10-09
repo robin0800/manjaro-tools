@@ -24,6 +24,14 @@ set_mkinicpio_hooks(){
     fi
 }
 
+gen_boot_args(){
+    local args=(quiet)
+    if ${plymouth_boot};then
+        args+=(splash)
+    fi
+    echo ${args[@]}
+}
+
 set_silent_switch_root(){
     sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
 }
@@ -46,38 +54,6 @@ gen_boot_image(){
         -g /boot/initramfs.img
 }
 
-copy_preloader_efi(){
-    msg2 "Copying efi loaders ..."
-    cp $1/usr/share/efitools/efi/PreLoader.efi $2/bootx64.efi
-    cp $1/usr/share/efitools/efi/HashTool.efi $2/
-}
-
-copy_loader_efi(){
-    cp $1/usr/lib/systemd/boot/efi/systemd-bootx64.efi $2/loader.efi
-}
-
-is_intel_ucode(){
-    if [[ -f $1/iso/${iso_name}/boot/intel_ucode.img ]] ; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-copy_efi_shell(){
-    for f in $1${DATADIR}/efi_shell/*.efi;do
-        msg2 "Copying efi shell ..."
-        [[ -f $f ]] && cp $f $2/
-    done
-}
-
-copy_efi_shell_conf(){
-    for f in cp $1${DATADIR}/efi_shell/*.conf;do
-        msg2 "Copying efi shell loader entries ..."
-        [[ -f $f ]] && cp $f $2/
-    done
-}
-
 copy_ucode(){
     cp $1/boot/intel-ucode.img $2/intel_ucode.img
     cp $1/usr/share/licenses/intel-ucode/LICENSE $2/intel_ucode.LICENSE
@@ -85,24 +61,14 @@ copy_ucode(){
 
 copy_boot_images(){
     msg2 "Copying boot images ..."
-    cp $1/iso/${iso_name}/boot/x86_64/vmlinuz $1/efiboot/EFI/miso/vmlinuz.efi
-    cp $1/iso/${iso_name}/boot/x86_64/initramfs.img $1/efiboot/EFI/miso/initramfs.img
-    if $(is_intel_ucode "$1"); then
-        cp $1/iso/${iso_name}/boot/intel_ucode.img $1/efiboot/EFI/miso/intel_ucode.img
-    fi
-}
+    prepare_dir "$1/efiboot/EFI/miso"
+    local miso_efi=$1/efiboot/EFI/miso boot=$1/iso/${iso_name}/boot
+    cp ${boot}/x86_64/vmlinuz $1/efiboot/EFI/miso/vmlinuz.efi
+    cp ${boot}/x86_64/initramfs.img $1/efiboot/EFI/miso/initramfs.img
 
-prepare_efi_loader_conf(){
-    prepare_dir "$1"
-    sed "s|%ISO_NAME%|${iso_name}|g" ${DATADIR}/efiboot/loader.conf > $1/loader.conf
-}
-
-gen_boot_args(){
-    local args=(quiet)
-    if ${plymouth_boot};then
-        args+=(splash)
+    if [[ -f ${boot}/intel_ucode.img ]] ; then
+        cp ${boot}/intel_ucode.img $1/efiboot/EFI/miso/intel_ucode.img
     fi
-    echo ${args[@]}
 }
 
 vars_to_boot_conf(){
@@ -116,15 +82,28 @@ vars_to_boot_conf(){
         -i $1
 }
 
-prepare_loader_entry(){
+prepare_efi_loader(){
+    prepare_dir "$2/EFI/boot"
+
+    msg2 "Copying efi loaders ..."
+    cp $1/usr/share/efitools/efi/PreLoader.efi $2/EFI/boot/bootx64.efi
+    cp $1/usr/share/efitools/efi/HashTool.efi $2/EFI/boot
+    cp $1${DATADIR}/efiboot/gummibootx64.efi $2/EFI/boot/loader.efi
+    cp $1${DATADIR}/efiboot/shellx64_v{1,2}.efi $2/EFI
+
+    prepare_dir "$2/loader/entries"
+
+    cp $1${DATADIR}/efiboot/loader.conf $2/loader/loader.conf
+    vars_to_boot_conf $2/loader/loader.conf
+    cp $1${DATADIR}/efiboot/uefi-shell-v{1,2}-x86_64.conf $2/loader/entries
+
     local drv='free' switch="no"
-    prepare_dir "$1/loader/entries"
-    cp ${DATADIR}/efiboot/miso-$2.conf $1/loader/entries/${iso_name}-x86_64.conf
-    vars_to_boot_conf "$1/loader/entries/${iso_name}-x86_64.conf" "$drv" "$switch"
+    cp $1${DATADIR}/efiboot/entry-x86_64-$3.conf $2/loader/entries/${iso_name}-x86_64.conf
+    vars_to_boot_conf "$2/loader/entries/${iso_name}-x86_64.conf" "$drv" "$switch"
     if ${nonfree_mhwd};then
         drv='nonfree' switch="yes"
-        cp ${DATADIR}/efiboot/miso-$2.conf $1/loader/entries/${iso_name}-x86_64-nonfree.conf
-        vars_to_boot_conf "$1/loader/entries/${iso_name}-x86_64-nonfree.conf" "$drv" "$switch"
+        cp $1${DATADIR}/efiboot/entry-x86_64-$3.conf $2/loader/entries/${iso_name}-x86_64-nonfree.conf
+        vars_to_boot_conf "$2/loader/entries/${iso_name}-x86_64-nonfree.conf" "$drv" "$switch"
     fi
 }
 

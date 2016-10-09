@@ -298,7 +298,7 @@ make_image_mhwd() {
 
 make_image_boot() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [%s/boot]" "${iso_name}"
+        msg "Prepare [/iso/%s/boot]" "${iso_name}"
         local path_iso="${work_dir}/iso/${iso_name}/boot"
         mkdir -p ${path_iso}/${target_arch}
         cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${target_arch}/memtest
@@ -320,55 +320,41 @@ make_image_boot() {
 
         rm -R ${path}
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [%s/boot]" "${iso_name}"
+        msg "Done [/iso/%s/boot]" "${iso_name}"
     fi
 }
 
 # Prepare /EFI
 make_efi_usb() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [%s/boot/EFI]" "${iso_name}"
-        local boot=${work_dir}/iso/EFI/boot
-        mkdir -p ${boot}
-        copy_preloader_efi "${work_dir}/live-image" "${boot}"
-        copy_loader_efi "${work_dir}/root-image" "${boot}"
-        prepare_efi_loader_conf "${work_dir}/iso/loader"
-        prepare_loader_entry "${work_dir}/iso" "usb"
-        copy_efi_shell "${work_dir}/live-image" "${work_dir}/iso/EFI"
-        copy_efi_shell_conf "${work_dir}/live-image" "${work_dir}/iso/loader/entries"
+        msg "Prepare [/iso/EFI]"
+        prepare_efi_loader  "${work_dir}/live-image" "${work_dir}/iso" "usb"
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [%s/boot/EFI]" "${iso_name}"
+        msg "Done [/iso/EFI]"
     fi
 }
 
 # Prepare kernel.img::/EFI for "El Torito" EFI boot mode
 make_efi_dvd() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [%s/iso/EFI]" "${iso_name}"
+        msg "Prepare [/efiboot/EFI]"
         local miso=${work_dir}/iso/EFI/miso
         mkdir -p ${miso}
         truncate -s 31M ${miso}/efiboot.img
         mkfs.fat -n MISO_EFI ${miso}/efiboot.img
         mkdir -p ${work_dir}/efiboot
         mount ${miso}/efiboot.img ${work_dir}/efiboot
-        mkdir -p ${work_dir}/efiboot/EFI/{miso,boot}
         copy_boot_images "${work_dir}"
-        local boot=${work_dir}/efiboot/EFI/boot
-        copy_preloader_efi "${work_dir}/live-image" "${boot}"
-        copy_loader_efi "${work_dir}/root-image" "${boot}"
-        prepare_efi_loader_conf "${work_dir}/efiboot/loader"
-        prepare_loader_entry "${work_dir}/efiboot" "dvd"
-        copy_efi_shell "${work_dir}/live-image" "${work_dir}/efiboot/EFI"
-        copy_efi_shell_conf "${work_dir}/live-image" "${work_dir}/efiboot/loader/entries"
+        prepare_efi_loader "${work_dir}/live-image" "${work_dir}/efiboot" "dvd"
         umount -d ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [%s/iso/EFI]" "${iso_name}"
+        msg "Done [/efiboot/EFI]"
     fi
 }
 
 make_syslinux() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [%s/iso/syslinux]" "${iso_name}"
+        msg "Prepare [/iso/syslinux]"
         local syslinux=${work_dir}/iso/syslinux
         mkdir -p ${syslinux}
         prepare_syslinux "${syslinux}"
@@ -376,16 +362,16 @@ make_syslinux() {
         gzip -c -9 ${work_dir}/root-image/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
         gzip -c -9 ${work_dir}/live-image/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [%s/iso/syslinux]" "${iso_name}"
+        msg "Done [/iso/syslinux]"
     fi
 }
 
 make_isomounts() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [isomounts]"
+        msg "Prepare [/iso/%s/isomounts]" "${iso_name}"
         write_isomounts "${work_dir}/iso/${iso_name}"
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [isomounts]"
+        msg "Done [/iso/%s/isomounts]" "${iso_name}"
     fi
 }
 
@@ -464,11 +450,11 @@ prepare_images(){
         run_safe "make_image_mhwd"
     fi
     run_safe "make_image_boot"
+    run_safe "make_syslinux"
     if [[ "${target_arch}" == "x86_64" ]]; then
         run_safe "make_efi_usb"
         run_safe "make_efi_dvd"
     fi
-    run_safe "make_syslinux"
     run_safe "make_isomounts"
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
