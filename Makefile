@@ -88,7 +88,9 @@ CPIOHOOKS = \
 	initcpio/hooks/miso_overlayfs \
 	initcpio/hooks/miso_loop_mnt \
 	initcpio/hooks/miso_pxe_common \
-	initcpio/hooks/miso_pxe_http
+	initcpio/hooks/miso_pxe_http \
+	initcpio/hooks/miso_pxe_nbd \
+	initcpio/hooks/miso_pxe_nfs
 
 CPIOINST = \
 	initcpio/inst/miso \
@@ -96,6 +98,8 @@ CPIOINST = \
 	initcpio/inst/miso_loop_mnt \
 	initcpio/inst/miso_pxe_common \
 	initcpio/inst/miso_pxe_http \
+	initcpio/inst/miso_pxe_nbd \
+	initcpio/inst/miso_pxe_nfs \
 	initcpio/inst/miso_kms
 
 MAN_XML = \
