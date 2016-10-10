@@ -93,14 +93,14 @@ CPIOHOOKS = \
 	initcpio/hooks/miso_pxe_nfs
 
 CPIOINST = \
-	initcpio/inst/miso \
-	initcpio/inst/miso_overlayfs \
-	initcpio/inst/miso_loop_mnt \
-	initcpio/inst/miso_pxe_common \
-	initcpio/inst/miso_pxe_http \
-	initcpio/inst/miso_pxe_nbd \
-	initcpio/inst/miso_pxe_nfs \
-	initcpio/inst/miso_kms
+	initcpio/install/miso \
+	initcpio/install/miso_overlayfs \
+	initcpio/install/miso_loop_mnt \
+	initcpio/install/miso_pxe_common \
+	initcpio/install/miso_pxe_http \
+	initcpio/install/miso_pxe_nbd \
+	initcpio/install/miso_pxe_nfs \
+	initcpio/install/miso_kms
 
 MAN_XML = \
 	buildpkg.xml \
