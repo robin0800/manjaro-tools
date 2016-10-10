@@ -148,11 +148,8 @@ assemble_iso(){
 make_iso() {
     msg "Start [Build ISO]"
     touch "${iso_root}/.miso"
-    for d in $(find "${work_dir}" -maxdepth 1 -type d -name '[^.]*'); do
-        if [[ "$d" != "${work_dir}/iso" ]] && \
-        [[ "${d##*/}" != "iso" ]] && \
-        [[ "${d##*/}" != "efiboot" ]] && \
-        [[ "$d" != "${work_dir}" ]]; then
+    for d in $(find "${work_dir}" -maxdepth 1 -type d); do
+        if [[ "$d" != "${work_dir}" ]]; then
             make_sqfs "$d"
         fi
     done
@@ -349,6 +346,7 @@ make_efi_dvd() {
 
         prepare_efi_loader "${work_dir}/live-image" "${work_dir}/efiboot" "dvd"
         umount -d ${work_dir}/efiboot
+        rm -r ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/efiboot/EFI]"
     fi
@@ -359,7 +357,7 @@ make_syslinux() {
         msg "Prepare [/iso/syslinux]"
         local syslinux=${iso_root}/syslinux
         mkdir -p ${syslinux}
-        prepare_syslinux "${syslinux}"
+        prepare_syslinux "${work_dir}/live-image" "${syslinux}"
         mkdir -p ${syslinux}/hdt
         gzip -c -9 ${work_dir}/root-image/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
         gzip -c -9 ${work_dir}/live-image/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz

@@ -12,7 +12,7 @@
 set_mkinicpio_hooks(){
     if ! ${pxe_boot};then
         msg2 "Removing pxe hooks"
-        sed -e 's/miso_pxe_common miso_pxe_http //' \
+        sed -e 's/miso_pxe_common miso_pxe_http miso_pxe_nbd miso_pxe_nfs //' \
         -e 's/memdisk //' -i $1
     fi
     if ! ${plymouth_boot};then
@@ -115,16 +115,16 @@ check_syslinux_optional(){
 }
 
 prepare_syslinux(){
-    local syslinux=/usr/lib/syslinux/bios
+    local syslinux=$1/usr/lib/syslinux/bios
     msg2 "Copying syslinux binaries ..."
-    cp ${syslinux}/{*.c32,lpxelinux.0,memdisk,{isolinux,isohdpfx}.bin} $1
+    cp ${syslinux}/{*.c32,lpxelinux.0,memdisk,{isolinux,isohdpfx}.bin} $2
     msg2 "Copying syslinux theme ..."
-    cp ${DATADIR}/syslinux-theme/* $1
-    for conf in $1/*.cfg; do
+    cp $1${DATADIR}/syslinux-theme/* $2
+    for conf in $2/*.cfg; do
         vars_to_boot_conf "${conf}"
     done
     if ! ${nonfree_mhwd};then
-        check_syslinux_optional "$1"
+        check_syslinux_optional "$2"
     fi
 }
 
@@ -132,16 +132,16 @@ write_isomounts(){
     local file=$1/isomounts
     echo '# syntax: <img> <arch> <mount point> <type> <kernel argument>' > ${file}
     echo '' >> ${file}
-    msg2 "Writing live entry ..."
-    echo "${target_arch}/live-image.sqfs ${target_arch} / squashfs" >> ${file}
+    msg2 "Writing %s entry ..." "live-image"
+    echo "${imgarch}/live-image.sqfs ${imgarch} / squashfs" >> ${file}
     if [[ -f ${packages_mhwd} ]] ; then
-        msg2 "Writing mhwd entry ..."
-        echo "${target_arch}/mhwd-image.sqfs ${target_arch} / squashfs" >> ${file}
+        msg2 "Writing %s entry ..." "mhwd-image"
+        echo "${imgarch}/mhwd-image.sqfs ${imgarch} / squashfs" >> ${file}
     fi
     if [[ -f "${packages_custom}" ]] ; then
-        msg2 "Writing %s entry ..." "${profile}"
-        echo "${target_arch}/${profile}-image.sqfs ${target_arch} / squashfs" >> ${file}
+        msg2 "Writing %s entry ..." "${profile}-image"
+        echo "${imgarch}/${profile}-image.sqfs ${imgarch} / squashfs" >> ${file}
     fi
-    msg2 "Writing root entry ..."
-    echo "${target_arch}/root-image.sqfs ${target_arch} / squashfs" >> ${file}
+    msg2 "Writing %s entry ..." "root-image"
+    echo "${imgarch}/root-image.sqfs ${imgarch} / squashfs" >> ${file}
 }
