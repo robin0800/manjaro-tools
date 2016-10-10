@@ -133,15 +133,15 @@ write_isomounts(){
     echo '# syntax: <img> <arch> <mount point> <type> <kernel argument>' > ${file}
     echo '' >> ${file}
     msg2 "Writing %s entry ..." "live-image"
-    echo "${imgarch}/live-image.sqfs ${imgarch} / squashfs" >> ${file}
+    echo "${target_arch}/live-image.sqfs ${target_arch} / squashfs" >> ${file}
     if [[ -f ${packages_mhwd} ]] ; then
         msg2 "Writing %s entry ..." "mhwd-image"
-        echo "${imgarch}/mhwd-image.sqfs ${imgarch} / squashfs" >> ${file}
+        echo "${target_arch}/mhwd-image.sqfs ${target_arch} / squashfs" >> ${file}
     fi
     if [[ -f "${packages_custom}" ]] ; then
         msg2 "Writing %s entry ..." "${profile}-image"
-        echo "${imgarch}/${profile}-image.sqfs ${imgarch} / squashfs" >> ${file}
+        echo "${target_arch}/${profile}-image.sqfs ${target_arch} / squashfs" >> ${file}
     fi
     msg2 "Writing %s entry ..." "root-image"
-    echo "${imgarch}/root-image.sqfs ${imgarch} / squashfs" >> ${file}
+    echo "${target_arch}/root-image.sqfs ${target_arch} / squashfs" >> ${file}
 }
