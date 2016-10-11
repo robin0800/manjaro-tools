@@ -240,16 +240,16 @@ make_image_root() {
 
 make_image_custom() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [Desktop installation] (%s-image)" "${profile}"
-        local path="${work_dir}/desktop-image"
+        msg "Prepare [Desktop installation] (desktopfs)"
+        local path="${work_dir}/desktopfs"
         mkdir -p ${path}
 
         mount_image "${path}"
 
         chroot_create "${path}" "${packages}"
 
-        pacman -Qr "${path}" > "${path}/desktop-image-pkgs.txt"
-        cp "${path}/desktop-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
+        pacman -Qr "${path}" > "${path}/desktopfs-pkgs.txt"
+        cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
         [[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
 
         reset_pac_conf "${path}"
@@ -257,7 +257,7 @@ make_image_custom() {
         umount_image
         clean_up_image "${path}"
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [Desktop installation] (%s-image)" "${profile}"
+        msg "Done [Desktop installation] (desktopfs)"
     fi
 }
 
