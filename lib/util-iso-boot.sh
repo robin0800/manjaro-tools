@@ -127,21 +127,3 @@ prepare_syslinux(){
         check_syslinux_optional "$2"
     fi
 }
-
-write_isomounts(){
-    local file=$1/isomounts
-    echo '# syntax: <img> <arch> <mount point> <type> <kernel argument>' > ${file}
-    echo '' >> ${file}
-    msg2 "Writing %s entry ..." "live-image"
-    echo "${target_arch}/live-image.sqfs ${target_arch} / squashfs" >> ${file}
-    if [[ -f ${packages_mhwd} ]] ; then
-        msg2 "Writing %s entry ..." "mhwd-image"
-        echo "${target_arch}/mhwd-image.sqfs ${target_arch} / squashfs" >> ${file}
-    fi
-    if [[ -f "${packages_custom}" ]] ; then
-        msg2 "Writing %s entry ..." "${profile}-image"
-        echo "${target_arch}/${profile}-image.sqfs ${target_arch} / squashfs" >> ${file}
-    fi
-    msg2 "Writing %s entry ..." "root-image"
-    echo "${target_arch}/root-image.sqfs ${target_arch} / squashfs" >> ${file}
-}

@@ -68,14 +68,14 @@ trap_exit() {
 }
 
 # $1: image path
-make_sqfs() {
+make_sfs() {
     if [[ ! -d "$1" ]]; then
         error "$1 is not a directory"
-        return 1
+        retrun 1
     fi
     local timer=$(get_timer) path=${iso_root}/${iso_name}/${target_arch}
     local name=${1##*/}
-    local sq_img="${path}/$name.sqfs"
+    local sq_img="${path}/$name.sfs"
     mkdir -p ${path}
     msg "Generating SquashFS image for %s" "${1}"
     if [[ -f "${sq_img}" ]]; then
@@ -92,27 +92,57 @@ make_sqfs() {
     fi
 
     msg2 "Creating SquashFS image. This may take some time..."
-    local used_kernel=${kernel:5:1} mksqfs_args=(${1} ${sq_img} -noappend)
+    local used_kernel=${kernel:5:1} mksfs_args=(${1} ${sq_img} -noappend)
     local highcomp="-b 256K -Xbcj x86"
     [[ "${iso_compression}" != "xz" ]] && highcomp=""
 
-    if [[ "$name" == "mhwd-image" && ${used_kernel} < "4" ]]; then
-        mksqfs_args+=(-comp lz4)
+    if [[ "$name" == "mhwdfs" && ${used_kernel} < "4" ]]; then
+        mksfs_args+=(-comp lz4)
         if ${verbose};then
-            mksquashfs "${mksqfs_args[@]}" >/dev/null
+            mksquashfs "${mksfs_args[@]}" >/dev/null
         else
-            mksquashfs "${mksqfs_args[@]}"
+            mksquashfs "${mksfs_args[@]}"
         fi
     else
-        mksqfs_args+=(-comp ${iso_compression} ${highcomp})
+        mksfs_args+=(-comp ${iso_compression} ${highcomp})
         if ${verbose};then
-            mksquashfs "${mksqfs_args[@]}" >/dev/null
+            mksquashfs "${mksfs_args[@]}" >/dev/null
         else
-            mksquashfs "${mksqfs_args[@]}"
+            mksquashfs "${mksfs_args[@]}"
         fi
     fi
 
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
+}
+
+mount_persistentfs() {
+    mkdir -p "${work_dir}/mnt/cowfs"
+    info "Mounting %s on %s" "${work_dir}/cowfs.img" "${work_dir}/mnt/cowfs"
+    mount "${work_dir}/cowfs.img" "${work_dir}/mnt/cowfs"
+}
+
+umount_persistentfs() {
+    info "Unmounting %s" "${work_dir}/mnt/cowfs"
+    umount -d "${work_dir}/mnt/cowfs"
+    rm -r "${work_dir}/mnt/cowfs"
+}
+
+# Makes a ext4 filesystem inside a SquashFS from a source directory.
+make_persistent_img () {
+    msg "Creating ext4 image of 32GiB..."
+    truncate -s 32G "${work_dir}/cowfs.img"
+    local _qflag=""
+    if ${verbose}; then
+        _qflag="-q"
+    fi
+    mkfs.ext4 ${_qflag} -O ^has_journal,^resize_inode -E lazy_itable_init=0 -m 0 -F "${work_dir}/cowfs.img"
+    tune2fs -c 0 -i 0 "${work_dir}/cowfs.img" &> /dev/null
+    mount_persistentfs
+    msg2 "Copying %s to %s..." "${work_dir}/cowfs/" "${work_dir}/mnt/cowfs/"
+    cp -aT "${work_dir}/cowfs/" "${work_dir}/mnt/cowfs/"
+    umount_persistentfs
+    make_sfs "${work_dir}/cowfs.img"
+    rm ${work_dir}/cowfs.img
 }
 
 assemble_iso(){
@@ -150,7 +180,7 @@ make_iso() {
     touch "${iso_root}/.miso"
     for d in $(find "${work_dir}" -maxdepth 1 -type d); do
         if [[ "$d" != "${work_dir}" ]]; then
-            make_sqfs "$d"
+            make_sfs "$d"
         fi
     done
 
@@ -188,38 +218,38 @@ reset_pac_conf(){
         -i "$1/etc/pacman.conf"
 }
 
-# Base installation (root-image)
+# Base installation (rootfs)
 make_image_root() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [Base installation] (root-image)"
-        local path="${work_dir}/root-image"
+        msg "Prepare [Base installation] (rootfs)"
+        local path="${work_dir}/rootfs"
         mkdir -p ${path}
 
         chroot_create "${path}" "${packages}" || die
 
-        pacman -Qr "${path}" > "${path}/root-image-pkgs.txt"
+        pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${path}"
 
         reset_pac_conf "${path}"
 
         clean_up_image "${path}"
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [Base installation] (root-image)"
+        msg "Done [Base installation] (rootfs)"
     fi
 }
 
 make_image_custom() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Desktop installation] (%s-image)" "${profile}"
-        local path="${work_dir}/${profile}-image"
+        local path="${work_dir}/desktop-image"
         mkdir -p ${path}
 
         mount_image "${path}"
 
         chroot_create "${path}" "${packages}"
 
-        pacman -Qr "${path}" > "${path}/${profile}-image-pkgs.txt"
-        cp "${path}/${profile}-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
+        pacman -Qr "${path}" > "${path}/desktop-image-pkgs.txt"
+        cp "${path}/desktop-image-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
         [[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
 
         reset_pac_conf "${path}"
@@ -241,15 +271,15 @@ mount_image_select(){
 
 make_image_live() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [Live installation] (live-image)"
-        local path="${work_dir}/live-image"
+        msg "Prepare [Live installation] (livefs)"
+        local path="${work_dir}/livefs"
         mkdir -p ${path}
 
         mount_image_select "${path}"
 
         chroot_create "${path}" "${packages}"
 
-        pacman -Qr "${path}" > "${path}/live-image-pkgs.txt"
+        pacman -Qr "${path}" > "${path}/livefs-pkgs.txt"
         copy_overlay "${profile_dir}/live-overlay" "${path}"
         configure_live_image "${path}"
 
@@ -261,14 +291,14 @@ make_image_live() {
         rm -rf "${path}/etc/pacman.d/gnupg"
         clean_up_image "${path}"
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [Live installation] (live-image)"
+        msg "Done [Live installation] (livefs)"
     fi
 }
 
 make_image_mhwd() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [drivers repository] (mhwd-image)"
-        local path="${work_dir}/mhwd-image"
+        msg "Prepare [drivers repository] (mhwdfs)"
+        local path="${work_dir}/mhwdfs"
         mkdir -p ${path}${mhwd_repo}
 
         mount_image_select "${path}"
@@ -289,7 +319,7 @@ make_image_mhwd() {
         umount_image
         clean_up_image "${path}"
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [drivers repository] (mhwd-image)"
+        msg "Done [drivers repository] (mhwdfs)"
     fi
 }
 
@@ -298,8 +328,8 @@ make_image_boot() {
         msg "Prepare [/iso/%s/boot]" "${iso_name}"
         local path_iso="${iso_root}/${iso_name}/boot"
         mkdir -p ${path_iso}/${target_arch}
-        cp ${work_dir}/root-image/boot/memtest86+/memtest.bin ${path_iso}/${target_arch}/memtest
-        cp ${work_dir}/root-image/boot/vmlinuz* ${path_iso}/${target_arch}/vmlinuz
+        cp ${work_dir}/rootfs/boot/memtest86+/memtest.bin ${path_iso}/${target_arch}/memtest
+        cp ${work_dir}/rootfs/boot/vmlinuz* ${path_iso}/${target_arch}/vmlinuz
         local path="${work_dir}/boot-image"
         mkdir -p ${path}
 
@@ -325,7 +355,7 @@ make_image_boot() {
 make_efi_usb() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [/iso/EFI]"
-        prepare_efi_loader  "${work_dir}/live-image" "${iso_root}" "usb"
+        prepare_efi_loader  "${work_dir}/livefs" "${iso_root}" "usb"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/iso/EFI]"
     fi
@@ -344,7 +374,7 @@ make_efi_dvd() {
 
         prepare_efiboot_image "${work_dir}" "${iso_root}"
 
-        prepare_efi_loader "${work_dir}/live-image" "${work_dir}/efiboot" "dvd"
+        prepare_efi_loader "${work_dir}/livefs" "${work_dir}/efiboot" "dvd"
         umount -d ${work_dir}/efiboot
         rm -r ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
@@ -357,21 +387,12 @@ make_syslinux() {
         msg "Prepare [/iso/syslinux]"
         local syslinux=${iso_root}/syslinux
         mkdir -p ${syslinux}
-        prepare_syslinux "${work_dir}/live-image" "${syslinux}"
+        prepare_syslinux "${work_dir}/livefs" "${syslinux}"
         mkdir -p ${syslinux}/hdt
-        gzip -c -9 ${work_dir}/root-image/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
-        gzip -c -9 ${work_dir}/live-image/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
+        gzip -c -9 ${work_dir}/rootfs/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
+        gzip -c -9 ${work_dir}/livefs/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/iso/syslinux]"
-    fi
-}
-
-make_isomounts() {
-    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [/iso/%s/isomounts]" "${iso_name}"
-        write_isomounts "${iso_root}/${iso_name}"
-        : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [/iso/%s/isomounts]" "${iso_name}"
     fi
 }
 
@@ -455,7 +476,6 @@ prepare_images(){
         run_safe "make_efi_usb"
         run_safe "make_efi_dvd"
     fi
-    run_safe "make_isomounts"
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 

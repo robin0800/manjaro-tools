@@ -195,7 +195,7 @@ configure_system(){
 }
 
 configure_live_image(){
-    msg "Configuring [live-image]"
+    msg "Configuring [livefs]"
     configure_hosts "$1"
     configure_lsb "$1"
     configure_mhwd "$1"
@@ -203,7 +203,7 @@ configure_live_image(){
     configure_services "$1"
     configure_calamares "$1"
     write_live_session_conf "$1"
-    msg "Done configuring [live-image]"
+    msg "Done configuring [livefs]"
 }
 
 make_repo(){
@@ -232,7 +232,7 @@ copy_from_cache(){
 }
 
 chroot_create(){
-    [[ "${1##*/}" == "root-image" ]] && local flag="-L"
+    [[ "${1##*/}" == "rootfs" ]] && local flag="-L"
     setarch "${target_arch}" \
         mkchroot ${mkchroot_args[*]} ${flag} $@
 }
@@ -242,7 +242,7 @@ chroot_clean(){
     for image in "$1"/*-image; do
         [[ -d ${image} ]] || continue
         local name=${image##*/}
-        if [[ $name != "mhwd-image" ]];then
+        if [[ $name != "mhwdfs" ]];then
             msg2 "Deleting chroot [%s] ..." "$name"
             lock 9 "${image}.lock" "Locking chroot '${image}'"
             if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
@@ -261,7 +261,7 @@ clean_up_image(){
     msg2 "Cleaning [%s]" "${1##*/}"
 
     local path
-    if [[ ${1##*/} == 'mhwd-image' ]];then
+    if [[ ${1##*/} == 'mhwdfs' ]];then
         path=$1/var
         if [[ -d $path ]];then
             find "$path" -mindepth 0 -delete &> /dev/null
