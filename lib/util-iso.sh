@@ -67,82 +67,100 @@ trap_exit() {
     kill "-$sig" "$$"
 }
 
-# $1: image path
-make_sfs() {
-    if [[ ! -d "$1" ]]; then
-        error "$1 is not a directory"
+mount_sfs_img() {
+    mkdir -p "${work_dir}/mnt/$1"
+    info "Mounting %s on %s" "${work_dir}/$1.img" "${work_dir}/mnt/$1"
+    mount "${work_dir}/$1.img" "${work_dir}/mnt/$1"
+}
+
+umount_sfs_img() {
+    info "Unmounting %s" "${work_dir}/mnt/$1"
+    umount -d "${work_dir}/mnt/$1"
+    rm -r "${work_dir}/mnt/$1"
+}
+
+# Makes a ext4 filesystem inside a SquashFS from a source directory.
+make_sfs_img () {
+    if [[ ! -e "$1" ]]; then
+        error "The path %s does not exist" "$1"
         retrun 1
     fi
-    local timer=$(get_timer) path=${iso_root}/${iso_name}/${target_arch}
+    local timer=$(get_timer) dest=${iso_root}/${iso_name}/${target_arch}
     local name=${1##*/}
-    local sq_img="${path}/$name.sfs"
-    mkdir -p ${path}
+    local sfs_img="${dest}/${name}.sfs" img=$1.img
+    msg "Creating ext4 image of 8GiB..."
+    truncate -s 8G "${img}"
+    local _qflag=""
+    if ${verbose}; then
+        _qflag="-q"
+    fi
+    mkfs.ext4 ${_qflag} -O ^has_journal,^resize_inode -E lazy_itable_init=0 -m 0 -F "${img}"
+    tune2fs -c 0 -i 0 "${img}" &> /dev/null
+    mount_sfs_img "${name}"
+    msg2 "Copying %s to %s..." "$1/" "${work_dir}/mnt/${name}/"
+    cp -aT "${work_dir}/${name}/" "${work_dir}/mnt/${name}/"
+    umount_sfs_img "${name}"
+
+    mkdir -p "${dest}"
+    msg2 "Creating SquashFS image, this may take some time..."
+    local used_kernel=${kernel:5:1} mksfs_args=(${img} ${sfs_img} -noappend) #-no-progress
+    local highcomp="-b 256K -Xbcj x86"
+    [[ "${iso_compression}" != "xz" ]] && highcomp=""
+    if [[ "${name}" == "mhwdfs" && ${used_kernel} < "4" ]]; then
+        mksfs_args+=(-comp lz4)
+    else
+        mksfs_args+=(-comp ${iso_compression} ${highcomp})
+    fi
+    if ${verbose}; then
+        mksquashfs ${mksfs_args[@]}
+    else
+        mksquashfs ${mksfs_args[@]} &> /dev/null
+    fi
+
+    rm ${img}
+}
+
+# $1: image path
+make_sfs() {
+    if [[ ! -e "$1" ]]; then
+        error "The path %s does not exist" "$1"
+        retrun 1
+    fi
+    local timer=$(get_timer) dest=${iso_root}/${iso_name}/${target_arch}
+    local name=${1##*/}
+    local sfs_img="${dest}/${name}.sfs"
+    mkdir -p ${dest}
     msg "Generating SquashFS image for %s" "${1}"
-    if [[ -f "${sq_img}" ]]; then
-        local has_changed_dir=$(find ${1} -newer ${sq_img})
+    if [[ -f "${sfs_img}" ]]; then
+        local has_changed_dir=$(find ${1} -newer ${sfs_img})
         msg2 "Possible changes for %s ..." "${1}"  >> ${tmp_dir}/buildiso.debug
         msg2 "%s" "${has_changed_dir}" >> ${tmp_dir}/buildiso.debug
         if [[ -n "${has_changed_dir}" ]]; then
-            msg2 "SquashFS image %s is not up to date, rebuilding..." "${sq_img}"
-            rm "${sq_img}"
+            msg2 "SquashFS image %s is not up to date, rebuilding..." "${sfs_img}"
+            rm "${sfs_img}"
         else
-            msg2 "SquashFS image %s is up to date, skipping." "${sq_img}"
+            msg2 "SquashFS image %s is up to date, skipping." "${sfs_img}"
             return
         fi
     fi
 
     msg2 "Creating SquashFS image. This may take some time..."
-    local used_kernel=${kernel:5:1} mksfs_args=(${1} ${sq_img} -noappend)
+    local used_kernel=${kernel:5:1} mksfs_args=(${1} ${sfs_img} -noappend)
     local highcomp="-b 256K -Xbcj x86"
     [[ "${iso_compression}" != "xz" ]] && highcomp=""
 
-    if [[ "$name" == "mhwdfs" && ${used_kernel} < "4" ]]; then
+    if [[ "${name}" == "mhwdfs" && ${used_kernel} < "4" ]]; then
         mksfs_args+=(-comp lz4)
-        if ${verbose};then
-            mksquashfs "${mksfs_args[@]}" >/dev/null
-        else
-            mksquashfs "${mksfs_args[@]}"
-        fi
     else
         mksfs_args+=(-comp ${iso_compression} ${highcomp})
-        if ${verbose};then
-            mksquashfs "${mksfs_args[@]}" >/dev/null
-        else
-            mksquashfs "${mksfs_args[@]}"
-        fi
+    fi
+    if ${verbose};then
+        mksquashfs "${mksfs_args[@]}" >/dev/null
+    else
+        mksquashfs "${mksfs_args[@]}"
     fi
 
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
-}
-
-mount_persistentfs() {
-    mkdir -p "${work_dir}/mnt/cowfs"
-    info "Mounting %s on %s" "${work_dir}/cowfs.img" "${work_dir}/mnt/cowfs"
-    mount "${work_dir}/cowfs.img" "${work_dir}/mnt/cowfs"
-}
-
-umount_persistentfs() {
-    info "Unmounting %s" "${work_dir}/mnt/cowfs"
-    umount -d "${work_dir}/mnt/cowfs"
-    rm -r "${work_dir}/mnt/cowfs"
-}
-
-# Makes a ext4 filesystem inside a SquashFS from a source directory.
-make_persistent_img () {
-    msg "Creating ext4 image of 32GiB..."
-    truncate -s 32G "${work_dir}/cowfs.img"
-    local _qflag=""
-    if ${verbose}; then
-        _qflag="-q"
-    fi
-    mkfs.ext4 ${_qflag} -O ^has_journal,^resize_inode -E lazy_itable_init=0 -m 0 -F "${work_dir}/cowfs.img"
-    tune2fs -c 0 -i 0 "${work_dir}/cowfs.img" &> /dev/null
-    mount_persistentfs
-    msg2 "Copying %s to %s..." "${work_dir}/cowfs/" "${work_dir}/mnt/cowfs/"
-    cp -aT "${work_dir}/cowfs/" "${work_dir}/mnt/cowfs/"
-    umount_persistentfs
-    make_sfs "${work_dir}/cowfs.img"
-    rm ${work_dir}/cowfs.img
 }
 
 assemble_iso(){
@@ -178,9 +196,13 @@ assemble_iso(){
 make_iso() {
     msg "Start [Build ISO]"
     touch "${iso_root}/.miso"
-    for d in $(find "${work_dir}" -maxdepth 1 -type d); do
-        if [[ "$d" != "${work_dir}" ]]; then
-            make_sfs "$d"
+    for sfs_dir in $(find "${work_dir}" -maxdepth 1 -type d); do
+        if [[ "$sfs_dir" != "${work_dir}" ]]; then
+            if [[ ${sfs_mode} == "sfs" ]]; then
+                make_sfs "$sfs_dir"
+            else
+                make_sfs_img "$sfs_dir"
+            fi
         fi
     done
 

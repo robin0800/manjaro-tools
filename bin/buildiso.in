@@ -83,6 +83,7 @@ display_settings(){
     msg2 "branch: %s" "${target_branch}"
     msg2 "chroots_iso: %s" "${chroots_iso}"
     msg2 "initsys: %s" "${initsys}"
+    msg2 "sfs_mode: %s" "${sfs_mode}"
     msg2 "kernel: %s" "${kernel}"
 
     msg "ARGS:"
@@ -140,6 +141,10 @@ usage() {
     echo "                       [default: ${kernel}]"
     echo '    -i <name>          Init system to use'
     echo "                       [default: ${initsys}]"
+    echo "    -m <mode>          Set SquashFS image mode (img or sfs)"
+    echo "                       img: prepare airootfs.sfs for dm-snapshot usage"
+    echo "                       sfs: prepare airootfs.sfs for overlayfs usage"
+    echo "                       [default: ${sfs_mode}]"
     echo '    -s                 Sign the iso'
     echo '    -c                 Disable clean work dir'
     echo '    -x                 Build images only'
@@ -156,7 +161,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:czxswvqh'
+opts='p:a:b:r:t:m:k:i:czxswvqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -167,6 +172,7 @@ while getopts "${opts}" arg; do
         t) cache_dir_iso="$OPTARG" ;;
         k) kernel="$OPTARG" ;;
         i) initsys="$OPTARG" ;;
+        m) sfs_mode="$OPTARG" ;;
         s) sign=true ;;
         c) clean_first=false ;;
         x) images_only=true ;;

@@ -239,7 +239,7 @@ chroot_create(){
 
 chroot_clean(){
     msg "Cleaning up ..."
-    for image in "$1"/*-image; do
+    for image in "$1"/*fs; do
         [[ -d ${image} ]] || continue
         local name=${image##*/}
         if [[ $name != "mhwdfs" ]];then

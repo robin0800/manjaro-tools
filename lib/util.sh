@@ -313,6 +313,8 @@ init_buildiso(){
 
     [[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
 
+    [[ -z ${sfs_mode} ]] && sfs_mode="sfs"
+
     mhwd_repo="/opt/pkg"
 }
 
@@ -458,7 +460,7 @@ load_profile_config(){
 
     [[ -z ${chrootcfg} ]] && chrootcfg='false'
 
-    #[[ -z ${netgroups} ]] && -- needs to be hardcoded for now, until a standard has been established 
+    #[[ -z ${netgroups} ]] && -- needs to be hardcoded for now, until a standard has been established
     # will be unlocked again after everything has been established.
     netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinst"
 
@@ -576,7 +578,7 @@ load_pkgs(){
             _init_rm="s|>openrc.*||g"
         ;;
     esac
-    
+
     local _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64
     case "${target_arch}" in
         "i686")
@@ -623,19 +625,19 @@ load_pkgs(){
             fi
         ;;
     esac
-    
+
     local _edition _edition_rm
     case "${edition}" in
-        'sonar') 
+        'sonar')
             _edition="s|>sonar||g"
             _edition_rm="s|>manjaro.*||g"
         ;;
-        *) 
+        *)
             _edition="s|>manjaro||g"
             _edition_rm="s|>sonar.*||g"
         ;;
     esac
-    
+
     local _blacklist="s|>blacklist.*||g" \
         _kernel="s|KERNEL|$kernel|g" \
         _used_kernel=${kernel:5:2} \

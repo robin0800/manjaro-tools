@@ -25,7 +25,7 @@ set_mkinicpio_hooks(){
 }
 
 gen_boot_args(){
-    local args=(quiet)
+    local args=()
     if ${plymouth_boot};then
         args+=(splash)
     fi
