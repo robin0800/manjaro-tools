@@ -78,12 +78,19 @@ SHARED_ISO = \
 	data/pacman-mhwd.conf \
 	data/profile.conf.example
 
+EFI_ISO = \
+	data/efiboot/loader.conf \
+	data/efiboot/miso-dvd.conf \
+	data/efiboot/miso-usb.conf
+
 CPIOHOOKS = \
 	initcpio/hooks/miso \
 	initcpio/hooks/miso_overlayfs \
 	initcpio/hooks/miso_loop_mnt \
 	initcpio/hooks/miso_pxe_common \
-	initcpio/hooks/miso_pxe_http
+	initcpio/hooks/miso_pxe_http \
+	initcpio/hooks/miso_pxe_nbd \
+	initcpio/hooks/miso_pxe_nfs
 
 CPIOINST = \
 	initcpio/inst/miso \
@@ -91,6 +98,8 @@ CPIOINST = \
 	initcpio/inst/miso_loop_mnt \
 	initcpio/inst/miso_pxe_common \
 	initcpio/inst/miso_pxe_http \
+	initcpio/inst/miso_pxe_nbd \
+	initcpio/inst/miso_pxe_nfs \
 	initcpio/inst/miso_kms
 
 MAN_XML = \
@@ -187,6 +196,9 @@ install_iso:
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -m0644 ${SHARED_ISO} $(DESTDIR)$(PREFIX)/share/manjaro-tools
 
+	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools/efiboot
+	install -m0644 ${EFI_ISO} $(DESTDIR)$(PREFIX)/share/manjaro-tools/efiboot
+
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/man/man1
 	gzip -c man/buildiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
 	gzip -c man/deployiso.1 > $(DESTDIR)$(PREFIX)/share/man/man1/deployiso.1.gz
@@ -228,6 +240,7 @@ uninstall_iso:
 	for f in ${LIST_ISO}; do rm -f $(DESTDIR)$(SYSCONFDIR)/manjaro-tools/iso.list.d/$$f; done
 	for f in ${BIN_ISO}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${SHARED_ISO}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/$$f; done
+	for f in ${EFI_ISO}; do rm -f $(DESTDIR)$(PREFIX)/share/manjaro-tools/efiboot/$$f; done
 
 	for f in ${LIBS_ISO}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
 	for f in ${CPIOHOOKS}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/hooks/$$f; done

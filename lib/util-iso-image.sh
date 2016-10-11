@@ -253,6 +253,8 @@ chroot_clean(){
     done
     exec 9>&-
     rm -rf --one-file-system "$1"
+    msg2 "Deleting isoroot [%s] ..." "${2##*/}"
+    rm -rf --one-file-system "$2"
 }
 
 clean_up_image(){
@@ -296,5 +298,5 @@ clean_up_image(){
             find "$path" -mindepth 1 -delete &> /dev/null
         fi
     fi
-# 	find "${work_dir}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+	find "$1" -name *.pacnew -name *.pacsave -name *.pacorig -delete
 }
