@@ -45,7 +45,7 @@ _mnt_overlayfs() {
     local work_dir=/run/miso/cowspace/${cow_directory}/workdir
     local upper_dir=/run/miso/cowspace/${cow_directory}/upperdir
     mkdir -p ${upper_dir} ${work_dir}
-    mount -t overlay misofs -o lowerdir=${lower_dir},upperdir=${upper_dir},workdir=${work_dir} "${newroot}${mnt}"
+    mount -t overlay overlay -o lowerdir=${lower_dir},upperdir=${upper_dir},workdir=${work_dir} "${newroot}${mnt}"
 }
 
 # args: /path/to/image_file, mountpoint
@@ -97,6 +97,24 @@ _mnt_dev() {
     fi
 }
 
+_verify_checksum() {
+    local _status
+    cd "/run/archiso/bootmnt/${misobasedir}/${arch}"
+    md5sum -c $1.md5 > /tmp/checksum.log 2>&1
+    _status=$?
+    cd "${OLDPWD}"
+    return ${_status}
+}
+
+_verify_signature() {
+    local _status
+    cd "/run/archiso/bootmnt/${misobasedir}/${arch}"
+    gpg --homedir /gpg --status-fd 1 --verify $1.sfs.sig 2>/dev/null | grep -qE '^\[GNUPG:\] GOODSIG'
+    _status=$?
+    cd "${OLDPWD}"
+    return ${_status}
+}
+
 run_hook() {
     [[ -z "${arch}" ]] && arch="$(uname -m)"
     [[ -z "${copytoram_size}" ]] && copytoram_size="75%"
@@ -136,6 +154,41 @@ miso_mount_handler() {
         fi
     fi
 
+    if [[ "${checksum}" == "y" ]]; then
+        for fs in livefs mhwdfs desktopfs rootfs;do
+            if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/${fs}.md5" ]]; then
+                msg -n ":: Self-test requested, please wait..."
+                if _verify_checksum "${fs}"; then
+                    msg "done. Checksum is OK, continue booting."
+                else
+                    echo "ERROR: one or more files are corrupted"
+                    echo "see /tmp/checksum.log for details"
+                    launch_interactive_shell
+                fi
+            else
+                echo "ERROR: checksum=y option specified but ${misobasedir}/${arch}/${fs}.md5 not found"
+                launch_interactive_shell
+            fi
+        done
+    fi
+
+    if [[ "${verify}" == "y" ]]; then
+        for fs in livefs mhwdfs desktopfs rootfs;do
+            if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/${fs}.sfs.sig" ]]; then
+                msg -n ":: Signature verification requested, please wait..."
+                if _verify_signature; then
+                    msg "done. Signature is OK, continue booting."
+                else
+                    echo "ERROR: one or more files are corrupted"
+                    launch_interactive_shell
+                fi
+            else
+                echo "ERROR: verify=y option specified but ${misobasedir}/${arch}/${fs}.sfs.sig not found"
+                launch_interactive_shell
+            fi
+        done
+    fi
+
     if [[ "${copytoram}" == "y" ]]; then
         msg ":: Mounting /run/miso/copytoram (tmpfs) filesystem, size=${copytoram_size}"
         mkdir -p /run/miso/copytoram
@@ -155,14 +208,13 @@ miso_mount_handler() {
 
     local _src=/run/miso/bootmnt/${misobasedir}/${arch}
 
-    for fs in livefs mhwdfs desktopfs rootfs cowfs;do
+    for fs in livefs mhwdfs desktopfs rootfs;do
         if [[ -f "${_src}/${fs}.sfs" ]]; then
             _mnt_sfs "${_src}/${fs}.sfs" "/run/miso/sfs/${fs}"
-            if [[ -f "/run/miso/sfs/${fs}/${fs}.img" ]]; then
-                _mnt_dmsnapshot "/run/miso/sfs/${fs}/${fs}.img" "${newroot}" "/"
-            else
-                _mnt_overlayfs "/run/miso/sfs/${fs}" "${newroot}" "/"
-            fi
+            _mnt_overlayfs "/run/miso/sfs/${fs}" "${newroot}" "/"
+        fi
+        if [[ -f "/run/miso/sfs/${fs}/${fs}.img" ]]; then
+            _mnt_dmsnapshot "/run/miso/sfs/${fs}/${fs}.img" "${newroot}" "/"
         fi
     done
 
