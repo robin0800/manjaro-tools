@@ -30,27 +30,21 @@ _curl_get() {
 miso_pxe_http_mount_handler () {
     newroot="${1}"
 
-#     _curl_get "${miso_http_srv}${misobasedir}/isomounts" "${isomounts}"
-#
-#     msg ":: Retrieving images"
-#     while read img imgarch mountpoint type kernelarg; do
-#         # check if this line is a comment (starts with #)
-#         [ "${img#"#"}" != "${img}" ] && continue
-#
-#         [ "$imgarch" != "$arch" ] && continue
-#
-#         _curl_get "${miso_http_srv}${misobasedir}/${img}" "/bootmnt/${misobasedir}/${img}"
-#
-#     done < "${isomounts}"
     msg ":: Mounting /run/miso/httpspace (tmpfs) filesystem, size='${miso_http_spc}'"
     mkdir -p "/run/miso/httpspace"
     mount -t tmpfs -o size="${miso_http_spc}",mode=0755 httpspace "/run/miso/httpspace"
 
-    _curl_get "${miso_http_srv}${misobasedir}/${arch}/root-image.sqfs" "/${arch}"
+    _curl_get "${miso_http_srv}${misobasedir}/${arch}/airootfs.sfs" "/${arch}"
+
+    if [[ "${checksum}" == "y" ]]; then
+        _curl_get "${miso_http_srv}${misobasedir}/${arch}/airootfs.md5" "/${arch}"
+    fi
+    if [[ "${verify}" == "y" ]]; then
+        _curl_get "${miso_http_srv}${misobasedir}/${arch}/airootfs.sfs.sig" "/${arch}"
+    fi
 
     mkdir -p "/run/miso/bootmnt"
     mount -o bind /run/miso/httpspace /run/miso/bootmnt
 
     miso_mount_handler ${newroot}
 }
-

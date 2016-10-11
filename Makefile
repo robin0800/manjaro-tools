@@ -90,7 +90,8 @@ CPIOHOOKS = \
 	initcpio/hooks/miso_pxe_common \
 	initcpio/hooks/miso_pxe_http \
 	initcpio/hooks/miso_pxe_nbd \
-	initcpio/hooks/miso_pxe_nfs
+	initcpio/hooks/miso_pxe_nfs \
+	initcpio/hooks/miso_shutdown
 
 CPIOINST = \
 	initcpio/install/miso \
@@ -100,7 +101,8 @@ CPIOINST = \
 	initcpio/install/miso_pxe_http \
 	initcpio/install/miso_pxe_nbd \
 	initcpio/install/miso_pxe_nfs \
-	initcpio/install/miso_kms
+	initcpio/install/miso_kms \
+	initcpio/install/miso_shutdown
 
 MAN_XML = \
 	buildpkg.xml \
