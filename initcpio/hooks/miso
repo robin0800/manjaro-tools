@@ -100,7 +100,7 @@ _mnt_dev() {
 
 _verify_checksum() {
     local _status
-    cd "/run/archiso/bootmnt/${misobasedir}/${arch}"
+    cd "/run/miso/bootmnt/${misobasedir}/${arch}"
     md5sum -c $1.md5 > /tmp/checksum.log 2>&1
     _status=$?
     cd "${OLDPWD}"
@@ -109,7 +109,7 @@ _verify_checksum() {
 
 _verify_signature() {
     local _status
-    cd "/run/archiso/bootmnt/${misobasedir}/${arch}"
+    cd "/run/miso/bootmnt/${misobasedir}/${arch}"
     gpg --homedir /gpg --status-fd 1 --verify $1.sfs.sig 2>/dev/null | grep -qE '^\[GNUPG:\] GOODSIG'
     _status=$?
     cd "${OLDPWD}"
@@ -177,7 +177,7 @@ miso_mount_handler() {
         for fs in rootfs desktopfs mhwdfs livefs;do
             if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/${fs}.sfs.sig" ]]; then
                 msg -n ":: Signature verification requested, please wait..."
-                if _verify_signature; then
+                if _verify_signature "${fs}"; then
                     msg "done. Signature is OK, continue booting."
                 else
                     echo "ERROR: one or more files are corrupted"
