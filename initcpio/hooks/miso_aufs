@@ -37,15 +37,23 @@ _mnt_dmsnapshot() {
     echo $(readlink -f /dev/mapper/${dm_snap_name}) >> /run/miso/used_block_devices
 }
 
+_mnt_overlayfs_union(){
+    local src="${1}"
+    local newroot="${2}"
+    local mnt="${3}"
+
+    msg ":: Mounting root (aufs) filesystem"
+    mount -t aufs -o dirs=${src}=rw union "${newroot}${mnt}"
+}
+
 # args: source, newroot, mountpoint
 _mnt_overlayfs() {
     local src="${1}"
     local newroot="${2}"
     local mnt="${3}"
-#     msg "::: Adding new aufs branch: ${src} to ${newroot}${mnt}"
-#     mount -t aufs aufs -o remount,append:"${src}"=ro "${newroot}${mnt}"
 
-    mount -t aufs aufs -o remount,append:"${src}"=ro "${newroot}${mnt}"
+    msg ":: Adding new aufs branch: ${src} to ${newroot}${mnt}"
+    mount -t aufs -o remount,append:"${src}"=ro none "${newroot}${mnt}"
 }
 
 # args: /path/to/image_file, mountpoint
@@ -204,6 +212,13 @@ miso_mount_handler() {
         mount -t tmpfs -o "size=${cow_spacesize}",mode=0755 cowspace /run/miso/cowspace
     fi
     mkdir -p -m 0700 "/run/miso/cowspace/${cow_directory}"
+
+#     local aufs="/run/miso/aufs"
+#     mkdir -p ${aufs}
+#     msg -n ":: Mounting ${aufs} (tmpfs) filesystem, size=75%..."
+#     mount -t tmpfs -o "size=75%",mode=0755 aufs ${aufs}
+
+    _mnt_overlayfs_union "/run/miso/cowspace/${cow_directory}" "${newroot}" "/"
 
     local _src="/run/miso/bootmnt/${misobasedir}/${arch}"
     local _dest="/run/miso/sfs"
