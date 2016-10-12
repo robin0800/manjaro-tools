@@ -20,7 +20,7 @@ set_mkinicpio_hooks(){
         sed -e 's/plymouth //' -i $1
     fi
     if ! ${use_overlayfs};then
-        sed -e 's/miso_overlayfs /miso /' -i $1
+        sed -e 's/miso /miso_aufs /' -i $1
     fi
 }
 
