@@ -104,6 +104,9 @@ CPIOINST = \
 	initcpio/install/miso_kms \
 	initcpio/install/miso_shutdown
 
+CPIO = \
+	initcpio/script/miso_shutdown
+
 MAN_XML = \
 	buildpkg.xml \
 	buildtree.xml \
@@ -195,6 +198,8 @@ install_iso:
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/initcpio/install
 	install -m0755 ${CPIOINST} $(DESTDIR)$(PREFIX)/lib/initcpio/install
 
+	install -m0755 ${CPIO} $(DESTDIR)$(PREFIX)/lib/initcpio
+
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -m0644 ${SHARED_ISO} $(DESTDIR)$(PREFIX)/share/manjaro-tools
 
@@ -247,6 +252,7 @@ uninstall_iso:
 	for f in ${LIBS_ISO}; do rm -f $(DESTDIR)$(PREFIX)/lib/manjaro-tools/$$f; done
 	for f in ${CPIOHOOKS}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/hooks/$$f; done
 	for f in ${CPIOINST}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/$$f; done
+	for f in ${CPIO}; do rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/$$f; done
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/buildiso.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/deployiso.1.gz
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man5/manjaro-tools.conf.5.gz

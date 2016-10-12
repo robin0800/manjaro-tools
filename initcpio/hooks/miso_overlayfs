@@ -42,10 +42,16 @@ _mnt_overlayfs() {
     local lower_dir="${1}"
     local newroot="${2}"
     local mnt="${3}"
-    local work_dir=/run/miso/cowspace/${cow_directory}/workdir
-    local upper_dir=/run/miso/cowspace/${cow_directory}/upperdir
-    mkdir -p ${upper_dir} ${work_dir}
-    mount -t overlay overlay -o lowerdir=${lower_dir},upperdir=${upper_dir},workdir=${work_dir} "${newroot}${mnt}"
+    local work_dir="/run/miso/cowspace/${cow_directory}/workdir"
+    local upper_dir="/run/miso/cowspace/${cow_directory}/upperdir"
+    local tmp_mnt="/ro_branch/${img_name}"
+    mkdir -p "/rw_branch/upper"
+    mkdir -p "/rw_branch/work"
+
+mount -t overlay overlay -olowerdir="/ro_branch/${img_name}",upperdir="/rw_branch/upper",workdir="/rw_branch/work" "${newroot}/"
+
+    mkdir -p "${upper_dir}" "${work_dir}"
+    mount -t overlay overlay -o lowerdir="${lower_dir}",upperdir="${upper_dir}",workdir="${work_dir}" "${newroot}${mnt}"
 }
 
 # args: /path/to/image_file, mountpoint
@@ -155,7 +161,7 @@ miso_mount_handler() {
     fi
 
     if [[ "${checksum}" == "y" ]]; then
-        for fs in livefs mhwdfs desktopfs rootfs;do
+        for fs in rootfs desktopfs mhwdfs livefs;do
             if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/${fs}.md5" ]]; then
                 msg -n ":: Self-test requested, please wait..."
                 if _verify_checksum "${fs}"; then
@@ -173,7 +179,7 @@ miso_mount_handler() {
     fi
 
     if [[ "${verify}" == "y" ]]; then
-        for fs in livefs mhwdfs desktopfs rootfs;do
+        for fs in rootfs desktopfs mhwdfs livefs;do
             if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/${fs}.sfs.sig" ]]; then
                 msg -n ":: Signature verification requested, please wait..."
                 if _verify_signature; then
@@ -206,15 +212,17 @@ miso_mount_handler() {
     fi
     mkdir -p -m 0700 "/run/miso/cowspace/${cow_directory}"
 
-    local _src=/run/miso/bootmnt/${misobasedir}/${arch}
+    local _src="/run/miso/bootmnt/${misobasedir}/${arch}"
+    local _dest="/run/miso/sfs"
 
-    for fs in livefs mhwdfs desktopfs rootfs;do
-        if [[ -f "${_src}/${fs}.sfs" ]]; then
-            _mnt_sfs "${_src}/${fs}.sfs" "/run/miso/sfs/${fs}"
-            _mnt_overlayfs "/run/miso/sfs/${fs}" "${newroot}" "/"
-        fi
-        if [[ -f "/run/miso/sfs/${fs}/${fs}.img" ]]; then
-            _mnt_dmsnapshot "/run/miso/sfs/${fs}/${fs}.img" "${newroot}" "/"
+    for sfs in livefs mhwdfs desktopfs rootfs;do
+        if [[ -f "${_src}/${sfs}.sfs" ]]; then
+            _mnt_sfs "${_src}/${sfs}.sfs" "${_dest}/${sfs}"
+            if [[ -f "${_dest}/${sfs}/${sfs}.img" ]]; then
+                _mnt_dmsnapshot "${_dest}/${sfs}/${sfs}.img" "${newroot}" "/"
+            else
+                _mnt_overlayfs "${_dest}/${sfs}" "${newroot}" "/"
+            fi
         fi
     done
 
