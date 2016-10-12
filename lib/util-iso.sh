@@ -88,8 +88,9 @@ make_sfs_img () {
     local timer=$(get_timer) dest=${iso_root}/${iso_name}/${target_arch}
     local name=${1##*/}
     local sfs_img="${dest}/${name}.sfs" img=$1.img
-    msg "Creating ext4 image of 8GiB..."
-    truncate -s 8G "${img}"
+    local size=8G
+    msg2 "Creating ext4 image of %s ..." "${size}"
+    truncate -s ${size} "${img}"
     local _qflag=""
     if ${verbose}; then
         _qflag="-q"
@@ -260,7 +261,7 @@ make_image_root() {
     fi
 }
 
-make_image_custom() {
+make_image_desktop() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Desktop installation] (desktopfs)"
         local path="${work_dir}/desktopfs"
@@ -348,22 +349,23 @@ make_image_mhwd() {
 make_image_boot() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [/iso/%s/boot]" "${iso_name}"
-        local path_iso="${iso_root}/${iso_name}/boot"
-        mkdir -p ${path_iso}/${target_arch}
-        cp ${work_dir}/rootfs/boot/memtest86+/memtest.bin ${path_iso}/${target_arch}/memtest
-        cp ${work_dir}/rootfs/boot/vmlinuz* ${path_iso}/${target_arch}/vmlinuz
-        local path="${work_dir}/boot-image"
+        local boot="${iso_root}/${iso_name}/boot"
+        mkdir -p ${boot}/${target_arch}
+
+        cp ${work_dir}/rootfs/boot/vmlinuz* ${boot}/${target_arch}/vmlinuz
+
+        local path="${work_dir}/bootfs"
         mkdir -p ${path}
 
         mount_image_live "${path}"
         configure_plymouth "${path}"
 
-        copy_initcpio "${profile_dir}" "${path}"
+        prepare_initcpio "${profile_dir}" "${path}"
 
         gen_boot_image "${path}"
 
-        mv ${path}/boot/initramfs.img ${path_iso}/${target_arch}/initramfs.img
-        [[ -f ${path}/boot/intel-ucode.img ]] && copy_ucode "${path}" "${path_iso}"
+        mv ${path}/boot/initramfs.img ${boot}/${target_arch}/initramfs.img
+        copy_boot_extra "${path}" "${boot}"
 
         umount_image
 
@@ -389,7 +391,10 @@ make_efi_dvd() {
         msg "Prepare [/efiboot/EFI]"
         local miso=${iso_root}/EFI/miso
         mkdir -p ${miso}
-        truncate -s 31M ${miso}/efiboot.img
+        local size=31M
+        ${pxe_boot} && size=40M
+        msg2 "Creating fat image of %s ..." "${size}"
+        truncate -s ${size} ${miso}/efiboot.img
         mkfs.fat -n MISO_EFI ${miso}/efiboot.img
         mkdir -p ${work_dir}/efiboot
         mount ${miso}/efiboot.img ${work_dir}/efiboot
@@ -411,8 +416,8 @@ make_syslinux() {
         mkdir -p ${syslinux}
         prepare_syslinux "${work_dir}/livefs" "${syslinux}"
         mkdir -p ${syslinux}/hdt
-        gzip -c -9 ${work_dir}/rootfs/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
-        gzip -c -9 ${work_dir}/livefs/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
+#         gzip -c -9 ${work_dir}/rootfs/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
+#         gzip -c -9 ${work_dir}/livefs/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/iso/syslinux]"
     fi
@@ -482,7 +487,7 @@ prepare_images(){
     run_safe "make_image_root"
     if [[ -f "${packages_custom}" ]] ; then
         load_pkgs "${packages_custom}"
-        run_safe "make_image_custom"
+        run_safe "make_image_desktop"
     fi
     if [[ -f ${profile_dir}/Packages-Live ]]; then
         load_pkgs "${profile_dir}/Packages-Live"

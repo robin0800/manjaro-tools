@@ -19,12 +19,13 @@ set_mkinicpio_hooks(){
         msg2 "Removing plymouth hook"
         sed -e 's/plymouth //' -i $1
     fi
-    if ${use_overlayfs};then
-        sed -e 's/miso /miso_overlayfs /' -i $1
+    if ! ${use_overlayfs};then
+        sed -e 's/miso_overlayfs /miso /' -i $1
     fi
 }
 
 gen_boot_args(){
+#     local args=(quiet)
     local args=()
     if ${plymouth_boot};then
         args+=(splash)
@@ -36,13 +37,16 @@ set_silent_switch_root(){
     sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
 }
 
-copy_initcpio(){
+# $1: ${profile_dir}
+# $2: ${work_dir}/bootfs
+prepare_initcpio(){
     msg2 "Copying initcpio ..."
     cp /usr/lib/initcpio/hooks/miso* $2/usr/lib/initcpio/hooks
     cp /usr/lib/initcpio/install/miso* $2/usr/lib/initcpio/install
+    cp /usr/lib/initcpio/miso_shutdown $2/usr/lib/initcpio
     cp $1/mkinitcpio.conf $2/etc/mkinitcpio-${iso_name}.conf
     set_mkinicpio_hooks "$2/etc/mkinitcpio-${iso_name}.conf"
-    set_silent_switch_root "$2"
+#     set_silent_switch_root "$2"
 }
 
 # $1: work_dir
@@ -54,9 +58,11 @@ gen_boot_image(){
         -g /boot/initramfs.img
 }
 
-copy_ucode(){
+copy_boot_extra(){
     cp $1/boot/intel-ucode.img $2/intel_ucode.img
     cp $1/usr/share/licenses/intel-ucode/LICENSE $2/intel_ucode.LICENSE
+    cp $1/boot/memtest86+/memtest.bin $2/memtest
+    cp $1/usr/share/licenses/common/GPL2/license.txt $2/memtest.COPYING
 }
 
 prepare_efiboot_image(){
