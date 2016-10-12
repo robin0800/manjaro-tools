@@ -42,10 +42,10 @@ _mnt_overlayfs() {
     local src="${1}"
     local newroot="${2}"
     local mnt="${3}"
-    local work_dir=/run/miso/cowspace/${cow_directory}/aufs
-    mkdir -p ${work_dir}
+#     msg "::: Adding new aufs branch: ${src} to ${newroot}${mnt}"
+#     mount -t aufs aufs -o remount,append:"${src}"=ro "${newroot}${mnt}"
 
-    mount -t aufs -o br=${work_dir}=rw:"${src}"=ro none "${newroot}${mnt}"
+    mount -t aufs aufs -o remount,append:"${src}"=ro "${newroot}${mnt}"
 }
 
 # args: /path/to/image_file, mountpoint
@@ -154,34 +154,38 @@ miso_mount_handler() {
     fi
 
     if [[ "${checksum}" == "y" ]]; then
-        if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/airootfs.md5" ]]; then
-            msg -n ":: Self-test requested, please wait..."
-            if _verify_checksum; then
-                msg "done. Checksum is OK, continue booting."
+        for fs in rootfs desktopfs mhwdfs livefs;do
+            if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/${fs}.md5" ]]; then
+                msg -n ":: Self-test requested, please wait..."
+                if _verify_checksum "${fs}"; then
+                    msg "done. Checksum is OK, continue booting."
+                else
+                    echo "ERROR: one or more files are corrupted"
+                    echo "see /tmp/checksum.log for details"
+                    launch_interactive_shell
+                fi
             else
-                echo "ERROR: one or more files are corrupted"
-                echo "see /tmp/checksum.log for details"
+                echo "ERROR: checksum=y option specified but ${misobasedir}/${arch}/${fs}.md5 not found"
                 launch_interactive_shell
             fi
-        else
-            echo "ERROR: checksum=y option specified but ${misobasedir}/${arch}/airootfs.md5 not found"
-            launch_interactive_shell
-        fi
+        done
     fi
 
     if [[ "${verify}" == "y" ]]; then
-        if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/airootfs.sfs.sig" ]]; then
-            msg -n ":: Signature verification requested, please wait..."
-            if _verify_signature; then
-                msg "done. Signature is OK, continue booting."
+        for fs in rootfs desktopfs mhwdfs livefs;do
+            if [[ -f "/run/miso/bootmnt/${misobasedir}/${arch}/${fs}.sfs.sig" ]]; then
+                msg -n ":: Signature verification requested, please wait..."
+                if _verify_signature; then
+                    msg "done. Signature is OK, continue booting."
+                else
+                    echo "ERROR: one or more files are corrupted"
+                    launch_interactive_shell
+                fi
             else
-                echo "ERROR: one or more files are corrupted"
+                echo "ERROR: verify=y option specified but ${misobasedir}/${arch}/${fs}.sfs.sig not found"
                 launch_interactive_shell
             fi
-        else
-            echo "ERROR: verify=y option specified but ${misobasedir}/${arch}/airootfs.sfs.sig not found"
-            launch_interactive_shell
-        fi
+        done
     fi
 
     if [[ "${copytoram}" == "y" ]]; then
@@ -201,15 +205,16 @@ miso_mount_handler() {
     fi
     mkdir -p -m 0700 "/run/miso/cowspace/${cow_directory}"
 
-    local _src=/run/miso/bootmnt/${misobasedir}/${arch}
+    local _src="/run/miso/bootmnt/${misobasedir}/${arch}"
+    local _dest="/run/miso/sfs"
 
-    for fs in livefs mhwdfs desktopfs rootfs;do
-        if [[ -f "${_src}/${fs}.sfs" ]]; then
-            _mnt_sfs "${_src}/${fs}.sfs" "/run/miso/sfs/${fs}"
-            if [[ -f "/run/miso/sfs/${fs}/${fs}.img" ]]; then
-                _mnt_dmsnapshot "/run/miso/sfs/${fs}/${fs}.img" "${newroot}" "/"
+    for sfs in livefs mhwdfs desktopfs rootfs;do
+        if [[ -f "${_src}/${sfs}.sfs" ]]; then
+            _mnt_sfs "${_src}/${sfs}.sfs" "${_dest}/${sfs}"
+            if [[ -f "${_dest}/${sfs}/${sfs}.img" ]]; then
+                _mnt_dmsnapshot "${_dest}/${sfs}/${sfs}.img" "${newroot}" "/"
             else
-                _mnt_overlayfs "/run/miso/sfs/${fs}" "${newroot}" "/"
+                _mnt_overlayfs "${_dest}/${sfs}" "${newroot}" "/"
             fi
         fi
     done
