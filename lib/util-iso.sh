@@ -173,10 +173,10 @@ assemble_iso(){
         -appid "${iso_app_id}" \
         -publisher "${iso_publisher}" \
         -preparer "Prepared by manjaro-tools/${0##*/}" \
-        -eltorito-boot syslinux/isolinux.bin \
-        -eltorito-catalog syslinux/boot.cat \
+        -eltorito-boot isolinux/isolinux.bin \
+        -eltorito-catalog isolinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -isohybrid-mbr "${iso_root}/syslinux/isohdpfx.bin" \
+        -isohybrid-mbr "${iso_root}/isolinux/isohdpfx.bin" \
         ${efi_boot_args[@]} \
         -output "${iso_dir}/${iso_file}" \
         "${iso_root}/"
@@ -400,17 +400,29 @@ make_efi_dvd() {
     fi
 }
 
+make_isolinux() {
+    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+        msg "Prepare [/iso/isolinux]"
+        local isolinux=${iso_root}/isolinux
+        mkdir -p ${isolinux}
+        prepare_isolinux "${work_dir}/livefs" "${isolinux}"
+
+        : > ${work_dir}/build.${FUNCNAME}
+        msg "Done [/iso/isolinux]"
+    fi
+}
+
 make_syslinux() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [/iso/syslinux]"
-        local syslinux=${iso_root}/syslinux
+        msg "Prepare [/iso/${iso_name}/boot/syslinux]"
+        local syslinux=${iso_root}/${iso_name}/boot/syslinux
         mkdir -p ${syslinux}
         prepare_syslinux "${work_dir}/livefs" "${syslinux}"
         mkdir -p ${syslinux}/hdt
 #         gzip -c -9 ${work_dir}/rootfs/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
 #         gzip -c -9 ${work_dir}/livefs/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [/iso/syslinux]"
+        msg "Done [/iso/${iso_name}/boot/syslinux]"
     fi
 }
 
@@ -489,6 +501,7 @@ prepare_images(){
         run_safe "make_image_mhwd"
     fi
     run_safe "make_image_boot"
+    run_safe "make_isolinux"
     run_safe "make_syslinux"
     if [[ "${target_arch}" == "x86_64" ]]; then
         run_safe "make_efi_usb"
