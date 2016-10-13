@@ -213,12 +213,8 @@ miso_mount_handler() {
     fi
     mkdir -p -m 0700 "/run/miso/cowspace/${cow_directory}"
 
-#     local aufs="/run/miso/aufs"
-#     mkdir -p ${aufs}
-#     msg -n ":: Mounting ${aufs} (tmpfs) filesystem, size=75%..."
-#     mount -t tmpfs -o "size=75%",mode=0755 aufs ${aufs}
-
-    _mnt_overlayfs_union "/run/miso/cowspace/${cow_directory}" "${newroot}" "/"
+    local work_dir="/run/miso/cowspace"
+    _mnt_overlayfs_union "${work_dir}" "${newroot}" "/"
 
     local _src="/run/miso/bootmnt/${misobasedir}/${arch}"
     local _dest="/run/miso/sfs"
