@@ -125,7 +125,15 @@ make_sfs() {
     ${persist} && prepare_ext4_img "${src}"
 
     msg2 "Creating SquashFS image, this may take some time..."
-    local used_kernel=${kernel:5:1} mksfs_args=(${src} ${sfs} -noappend)
+    local used_kernel=${kernel:5:1} mksfs_args=()
+    if ${persist};then
+        mksfs_args+=(${work_dir}/${name}.img)
+    else
+        mksfs_args+=(${src})
+    fi
+
+    mksfs_args+=(${sfs} -noappend)
+
     local highcomp="-b 256K -Xbcj x86"
     [[ "${sfs_compress}" != "xz" ]] && highcomp=""
 
