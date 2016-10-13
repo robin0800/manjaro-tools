@@ -39,14 +39,15 @@ _mnt_dmsnapshot() {
 
 # args: source, newroot, mountpoint
 _mnt_overlayfs() {
-    local lower_dir="${1}"
+    local src="${1}"
     local newroot="${2}"
     local mnt="${3}"
-    local work_dir="/run/miso/cowspace/${cow_directory}/workdir"
-    local upper_dir="/run/miso/cowspace/${cow_directory}/upperdir"
+    local work_dir="/run/miso/cowspace/work"
+    local upper_dir="/run/miso/cowspace/upper"
 
     mkdir -p "${upper_dir}" "${work_dir}"
-    mount -t overlay overlay -olowerdir="${lower_dir}",upperdir="${upper_dir}",workdir="${work_dir}" "${newroot}${mnt}"
+
+    mount -t overlay overlay -o lowerdir="${src}",upperdir="${upper_dir}",workdir="${work_dir}" "${newroot}${mnt}"
 }
 
 # args: /path/to/image_file, mountpoint
@@ -207,19 +208,22 @@ miso_mount_handler() {
     fi
     mkdir -p -m 0700 "/run/miso/cowspace/${cow_directory}"
 
-    local _src="/run/miso/bootmnt/${misobasedir}/${arch}"
-    local _dest="/run/miso/sfs"
+    local src="/run/miso/bootmnt/${misobasedir}/${arch}"
+    local dest="/run/miso/sfs"
+    local lower_dir=
+
 
     for sfs in livefs mhwdfs desktopfs rootfs;do
-        if [[ -f "${_src}/${sfs}.sfs" ]]; then
-            _mnt_sfs "${_src}/${sfs}.sfs" "${_dest}/${sfs}"
-            if [[ -f "${_dest}/${sfs}/${sfs}.img" ]]; then
-                _mnt_dmsnapshot "${_dest}/${sfs}/${sfs}.img" "${newroot}" "/"
-            else
-                _mnt_overlayfs "${_dest}/${sfs}" "${newroot}" "/"
+        if [[ -f "${src}/${sfs}.sfs" ]]; then
+            _mnt_sfs "${src}/${sfs}.sfs" "${dest}/${sfs}"
+            lower_dir=${lower_dir:-}${lower_dir:+:}"${dest}/${sfs}"
+            if [[ -f "${dest}/${sfs}/${sfs}.img" ]]; then
+                _mnt_dmsnapshot "${dest}/${sfs}/${sfs}.img" "${newroot}" "/"
             fi
         fi
     done
+
+     _mnt_overlayfs "${lower_dir}" "${newroot}" "/"
 
     if [[ "${copytoram}" == "y" ]]; then
         umount -d /run/miso/bootmnt
