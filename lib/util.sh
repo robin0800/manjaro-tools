@@ -93,12 +93,12 @@ show_build_lists(){
 
 # $1: make_conf_dir
 show_build_profiles(){
-    local arch temp
+    local cpuarch temp
     for item in $(ls $1/*.conf); do
         temp=${item##*/}
-        arch=${arch:-}${arch:+|}${temp%.conf}
+        cpuarch=${cpuarch:-}${cpuarch:+|}${temp%.conf}
     done
-    echo $arch
+    echo $cpuarch
 }
 
 # $1: list_dir
