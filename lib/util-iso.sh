@@ -89,10 +89,10 @@ prepare_ext4_img(){
     local ext4_args=()
     ${verbose} && ext4_args+=(-q)
     ext4_args+=(-O ^has_journal,^resize_inode -E lazy_itable_init=0 -m 0)
-    mkfs.ext4 ${ext4_args[@]} -F "${src}.img" >/dev/null
+    mkfs.ext4 ${ext4_args[@]} -F "${src}.img" &>/dev/null
     tune2fs -c 0 -i 0 "${src}.img" &> /dev/null
     mount_img "${work_dir}/${name}.img" "${mnt}"
-    msg2 "Copying %s to %s..." "${src}/" "${mnt}/"
+    msg2 "Copying %s ..." "${src}/"
     cp -aT "${src}/" "${mnt}/"
     umount_img "${mnt}"
 }
@@ -127,12 +127,12 @@ make_sfs() {
     msg2 "Creating SquashFS image, this may take some time..."
     local used_kernel=${kernel:5:1} mksfs_args=(${src} ${sfs} -noappend)
     local highcomp="-b 256K -Xbcj x86"
-    [[ "${iso_compression}" != "xz" ]] && highcomp=""
+    [[ "${sfs_compress}" != "xz" ]] && highcomp=""
 
     if [[ "${name}" == "mhwdfs" && ${used_kernel} < "4" ]]; then
         mksfs_args+=(-comp lz4)
     else
-        mksfs_args+=(-comp ${iso_compression} ${highcomp})
+        mksfs_args+=(-comp ${sfs_compress} ${highcomp})
     fi
     if ${verbose};then
         mksquashfs "${mksfs_args[@]}" >/dev/null
@@ -370,7 +370,7 @@ prepare_fat_img(){
     ${pxe_boot} && size=40M
     msg2 "Creating fat image of %s ..." "${size}"
     truncate -s ${size} "${img}"
-    mkfs.fat -n MISO_EFI "${img}" >/dev/null
+    mkfs.fat -n MISO_EFI "${img}" &>/dev/null
     mkdir -p "${mnt}"
     mount_img "${img}" "${mnt}"
     prepare_efiboot_image "${mnt}" "${iso_root}"
@@ -446,12 +446,12 @@ make_torrent(){
 
 # $1: file
 make_checksum(){
-    msg "Creating [%s] sum ..." "${iso_checksum}"
+    msg "Creating [%s] sum ..." "${sfs_checksum}"
     cd ${iso_dir}
-    local cs=$(${iso_checksum}sum $1)
-    msg2 "%s sum: %s" "${iso_checksum}" "${cs##*/}"
-    echo "${cs}" > ${iso_dir}/$1.${iso_checksum}
-    msg "Done [%s] sum" "${iso_checksum}"
+    local cs=$(${sfs_checksum}sum $1)
+    msg2 "%s sum: %s" "${sfs_checksum}" "${cs##*/}"
+    echo "${cs}" > ${iso_dir}/$1.${sfs_checksum}
+    msg "Done [%s] sum" "${sfs_checksum}"
 }
 
 compress_images(){

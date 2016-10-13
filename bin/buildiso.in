@@ -102,8 +102,8 @@ display_settings(){
     msg2 "iso_label: %s" "${iso_label}"
     msg2 "iso_publisher: %s" "${iso_publisher}"
     msg2 "iso_app_id: %s" "${iso_app_id}"
-    msg2 "iso_compression: %s" "${iso_compression}"
-    msg2 "iso_checksum: %s" "${iso_checksum}"
+    msg2 "sfs_compress: %s" "${sfs_compress}"
+    msg2 "sfs_checksum: %s" "${sfs_checksum}"
     msg2 "use_overlayfs: %s" "${use_overlayfs}"
     ${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
 
