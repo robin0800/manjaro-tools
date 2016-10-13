@@ -67,86 +67,65 @@ trap_exit() {
     kill "-$sig" "$$"
 }
 
-mount_sfs_img() {
-    mkdir -p "${work_dir}/mnt/$1"
-    info "Mounting %s on %s" "${work_dir}/$1.img" "${work_dir}/mnt/$1"
-    mount "${work_dir}/$1.img" "${work_dir}/mnt/$1"
+mount_img() {
+    mkdir -p "$2"
+    info "mount: [%s]" "$1"
+    mount "$1" "$2"
 }
 
-umount_sfs_img() {
-    info "Unmounting %s" "${work_dir}/mnt/$1"
-    umount -d "${work_dir}/mnt/$1"
-    rm -r "${work_dir}/mnt/$1"
+umount_img() {
+    info "umount: [%s]" "$1"
+    umount -d "$1"
+    rm -r "$1"
 }
 
-# Makes a ext4 filesystem inside a SquashFS from a source directory.
-make_sfs_img () {
-    if [[ ! -e "$1" ]]; then
-        error "The path %s does not exist" "$1"
-        retrun 1
-    fi
-    local timer=$(get_timer) dest=${iso_root}/${iso_name}/${target_arch}
-    local name=${1##*/}
-    local sfs_img="${dest}/${name}.sfs" img=$1.img
-    local size=8G
+prepare_ext4_img(){
+    local size=32G
+    local src="$1"
+    local name=${src##*/}
+    local mnt="${mnt_dir}/${name}"
     msg2 "Creating ext4 image of %s ..." "${size}"
-    truncate -s ${size} "${img}"
-    local _qflag=""
-    if ${verbose}; then
-        _qflag="-q"
-    fi
-    mkfs.ext4 ${_qflag} -O ^has_journal,^resize_inode -E lazy_itable_init=0 -m 0 -F "${img}"
-    tune2fs -c 0 -i 0 "${img}" &> /dev/null
-    mount_sfs_img "${name}"
-    msg2 "Copying %s to %s..." "$1/" "${work_dir}/mnt/${name}/"
-    cp -aT "${work_dir}/${name}/" "${work_dir}/mnt/${name}/"
-    umount_sfs_img "${name}"
-
-    mkdir -p "${dest}"
-    msg2 "Creating SquashFS image, this may take some time..."
-    local used_kernel=${kernel:5:1} mksfs_args=(${img} ${sfs_img} -noappend) #-no-progress
-    local highcomp="-b 256K -Xbcj x86"
-    [[ "${iso_compression}" != "xz" ]] && highcomp=""
-    if [[ "${name}" == "mhwdfs" && ${used_kernel} < "4" ]]; then
-        mksfs_args+=(-comp lz4)
-    else
-        mksfs_args+=(-comp ${iso_compression} ${highcomp})
-    fi
-    if ${verbose}; then
-        mksquashfs ${mksfs_args[@]}
-    else
-        mksquashfs ${mksfs_args[@]} &> /dev/null
-    fi
-
-    rm ${img}
+    truncate -s ${size} "${src}.img"
+    local ext4_args=()
+    ${verbose} && ext4_args+=(-q)
+    ext4_args+=(-O ^has_journal,^resize_inode -E lazy_itable_init=0 -m 0)
+    mkfs.ext4 ${ext4_args[@]} -F "${src}.img" >/dev/null
+    tune2fs -c 0 -i 0 "${src}.img" &> /dev/null
+    mount_img "${work_dir}/${name}.img" "${mnt}"
+    msg2 "Copying %s to %s..." "${src}/" "${mnt}/"
+    cp -aT "${src}/" "${mnt}/"
+    umount_img "${mnt}"
 }
 
 # $1: image path
 make_sfs() {
-    if [[ ! -e "$1" ]]; then
-        error "The path %s does not exist" "$1"
+    local src="$1"
+    if [[ ! -e "${src}" ]]; then
+        error "The path %s does not exist" "${src}"
         retrun 1
     fi
     local timer=$(get_timer) dest=${iso_root}/${iso_name}/${target_arch}
     local name=${1##*/}
-    local sfs_img="${dest}/${name}.sfs"
+    local sfs="${dest}/${name}.sfs"
     mkdir -p ${dest}
-    msg "Generating SquashFS image for %s" "${1}"
-    if [[ -f "${sfs_img}" ]]; then
-        local has_changed_dir=$(find ${1} -newer ${sfs_img})
-        msg2 "Possible changes for %s ..." "${1}"  >> ${tmp_dir}/buildiso.debug
+    msg "Generating SquashFS image for %s" "${src}"
+    if [[ -f "${sfs}" ]]; then
+        local has_changed_dir=$(find ${src} -newer ${sfs})
+        msg2 "Possible changes for %s ..." "${src}"  >> ${tmp_dir}/buildiso.debug
         msg2 "%s" "${has_changed_dir}" >> ${tmp_dir}/buildiso.debug
         if [[ -n "${has_changed_dir}" ]]; then
-            msg2 "SquashFS image %s is not up to date, rebuilding..." "${sfs_img}"
-            rm "${sfs_img}"
+            msg2 "SquashFS image %s is not up to date, rebuilding..." "${sfs}"
+            rm "${sfs}"
         else
-            msg2 "SquashFS image %s is up to date, skipping." "${sfs_img}"
+            msg2 "SquashFS image %s is up to date, skipping." "${sfs}"
             return
         fi
     fi
 
-    msg2 "Creating SquashFS image. This may take some time..."
-    local used_kernel=${kernel:5:1} mksfs_args=(${1} ${sfs_img} -noappend)
+    ${persist} && prepare_ext4_img "${src}"
+
+    msg2 "Creating SquashFS image, this may take some time..."
+    local used_kernel=${kernel:5:1} mksfs_args=(${src} ${sfs} -noappend)
     local highcomp="-b 256K -Xbcj x86"
     [[ "${iso_compression}" != "xz" ]] && highcomp=""
 
@@ -160,6 +139,8 @@ make_sfs() {
     else
         mksquashfs "${mksfs_args[@]}"
     fi
+
+    ${persist} && rm "${src}.img"
 
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
@@ -198,12 +179,8 @@ make_iso() {
     msg "Start [Build ISO]"
     touch "${iso_root}/.miso"
     for sfs_dir in $(find "${work_dir}" -maxdepth 1 -type d); do
-        if [[ "$sfs_dir" != "${work_dir}" ]]; then
-            if [[ ${sfs_mode} == "sfs" ]]; then
-                make_sfs "$sfs_dir"
-            else
-                make_sfs_img "$sfs_dir"
-            fi
+        if [[ "${sfs_dir}" != "${work_dir}" ]]; then
+            make_sfs "${sfs_dir}"
         fi
     done
 
@@ -385,25 +362,31 @@ make_efi_usb() {
     fi
 }
 
+prepare_fat_img(){
+    local size=31M
+    local src="$1"
+    local mnt="${mnt_dir}/efiboot"
+    local img="${src}/efiboot.img"
+    ${pxe_boot} && size=40M
+    msg2 "Creating fat image of %s ..." "${size}"
+    truncate -s ${size} "${img}"
+    mkfs.fat -n MISO_EFI "${img}" >/dev/null
+    mkdir -p "${mnt}"
+    mount_img "${img}" "${mnt}"
+    prepare_efiboot_image "${mnt}" "${iso_root}"
+    prepare_efi_loader "${work_dir}/livefs" "${mnt}" "dvd"
+    umount_img "${mnt}"
+}
+
 # Prepare kernel.img::/EFI for "El Torito" EFI boot mode
 make_efi_dvd() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [/efiboot/EFI]"
-        local miso=${iso_root}/EFI/miso
-        mkdir -p ${miso}
-        local size=31M
-        ${pxe_boot} && size=40M
-        msg2 "Creating fat image of %s ..." "${size}"
-        truncate -s ${size} ${miso}/efiboot.img
-        mkfs.fat -n MISO_EFI ${miso}/efiboot.img
-        mkdir -p ${work_dir}/efiboot
-        mount ${miso}/efiboot.img ${work_dir}/efiboot
+        local src="${iso_root}/EFI/miso"
+        mkdir -p "${src}"
 
-        prepare_efiboot_image "${work_dir}" "${iso_root}"
+        prepare_fat_img "${src}"
 
-        prepare_efi_loader "${work_dir}/livefs" "${work_dir}/efiboot" "dvd"
-        umount -d ${work_dir}/efiboot
-        rm -r ${work_dir}/efiboot
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/efiboot/EFI]"
     fi
@@ -584,6 +567,8 @@ load_profile(){
     iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
 
     iso_root=${chroots_iso}/${profile}/iso
+    mnt_dir=${chroots_iso}/${profile}/mnt
+    prepare_dir "${mnt_dir}"
 
     prepare_dir "${iso_dir}"
     user_own "${iso_dir}"

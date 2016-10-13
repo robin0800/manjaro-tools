@@ -313,8 +313,6 @@ init_buildiso(){
 
     [[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
 
-    [[ -z ${sfs_mode} ]] && sfs_mode="sfs"
-
     mhwd_repo="/opt/pkg"
 }
 

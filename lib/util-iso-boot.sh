@@ -66,7 +66,7 @@ copy_boot_extra(){
 }
 
 prepare_efiboot_image(){
-    local efi=$1/efiboot/EFI/miso boot=$2/${iso_name}/boot
+    local efi=$1/EFI/miso boot=$2/${iso_name}/boot
     prepare_dir "${efi}"
     cp ${boot}/x86_64/vmlinuz ${efi}/vmlinuz.efi
     cp ${boot}/x86_64/initramfs.img ${efi}/initramfs.img

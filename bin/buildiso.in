@@ -83,13 +83,13 @@ display_settings(){
     msg2 "branch: %s" "${target_branch}"
     msg2 "chroots_iso: %s" "${chroots_iso}"
     msg2 "initsys: %s" "${initsys}"
-    msg2 "sfs_mode: %s" "${sfs_mode}"
     msg2 "kernel: %s" "${kernel}"
 
     msg "ARGS:"
     msg2 "clean_first: %s" "${clean_first}"
     msg2 "images_only: %s" "${images_only}"
     msg2 "iso_only: %s" "${iso_only}"
+    msg2 "persist: %s" "${persist}"
     msg2 "sign: %s" "${sign}"
     msg2 "torrent: %s" "${torrent}"
 
@@ -127,6 +127,7 @@ iso_only=false
 verbose=false
 sign=false
 torrent=false
+persist=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
@@ -141,10 +142,7 @@ usage() {
     echo "                       [default: ${kernel}]"
     echo '    -i <name>          Init system to use'
     echo "                       [default: ${initsys}]"
-    echo "    -m <mode>          Set SquashFS image mode (img or sfs)"
-    echo "                       img: prepare airootfs.sfs for dm-snapshot usage"
-    echo "                       sfs: prepare airootfs.sfs for overlayfs usage"
-    echo "                       [default: ${sfs_mode}]"
+    echo '    -m                 Set SquashFS image mode to persistence'
     echo '    -s                 Sign the iso'
     echo '    -c                 Disable clean work dir'
     echo '    -x                 Build images only'
@@ -161,7 +159,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:m:k:i:czxswvqh'
+opts='p:a:b:r:t:k:i:czxsmwvqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -172,11 +170,11 @@ while getopts "${opts}" arg; do
         t) cache_dir_iso="$OPTARG" ;;
         k) kernel="$OPTARG" ;;
         i) initsys="$OPTARG" ;;
-        m) sfs_mode="$OPTARG" ;;
         s) sign=true ;;
         c) clean_first=false ;;
         x) images_only=true ;;
         z) iso_only=true ;;
+        m) persist=true ;;
         w) torrent=true ;;
         v) verbose=true ;;
         q) pretend=true ;;
