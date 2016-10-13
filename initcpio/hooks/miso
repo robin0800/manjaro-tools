@@ -1,8 +1,7 @@
 # args: source, newroot, mountpoint
 _mnt_dmsnapshot() {
     local img="${1}"
-    local newroot="${2}"
-    local mnt="${3}"
+    local mnt="${2}"
     local img_fullname="${img##*/}";
     local img_name="${img_fullname%%.*}"
     local dm_snap_name="${dm_snap_prefix}_${img_name}"
@@ -33,7 +32,7 @@ _mnt_dmsnapshot() {
 
     dmsetup create ${dm_snap_name} --table "0 ${ro_dev_size} snapshot ${ro_dev} ${rw_dev} ${cow_persistent} ${cow_chunksize}"
 
-    _mnt_dev "/dev/mapper/${dm_snap_name}" "${newroot}${mnt}" "-w" "defaults"
+    _mnt_dev "/dev/mapper/${dm_snap_name}" "${mnt}" "-w" "defaults"
     echo $(readlink -f /dev/mapper/${dm_snap_name}) >> /run/miso/used_block_devices
 }
 
@@ -209,21 +208,23 @@ miso_mount_handler() {
     mkdir -p -m 0700 "/run/miso/cowspace/${cow_directory}"
 
     local src="/run/miso/bootmnt/${misobasedir}/${arch}"
-    local dest="/run/miso/sfs"
-    local lower_dir=
-
+    local dest_sfs="/run/miso/sfs" dest_img="/run/miso/img"
+    local lower_dir
+    mkdir -p ${dest_img}
 
     for sfs in livefs mhwdfs desktopfs rootfs;do
         if [[ -f "${src}/${sfs}.sfs" ]]; then
-            _mnt_sfs "${src}/${sfs}.sfs" "${dest}/${sfs}"
-            lower_dir=${lower_dir:-}${lower_dir:+:}"${dest}/${sfs}"
-            if [[ -f "${dest}/${sfs}/${sfs}.img" ]]; then
-                _mnt_dmsnapshot "${dest}/${sfs}/${sfs}.img" "${newroot}" "/"
+            _mnt_sfs "${src}/${sfs}.sfs" "${dest_sfs}/${sfs}"
+            if [[ -f "${dest_sfs}/${sfs}/${sfs}.img" ]]; then
+                lower_dir=${lower_dir:-}${lower_dir:+:}"${dest_img}/${sfs}"
+                _mnt_dmsnapshot "${dest_sfs}/${sfs}/${sfs}.img" "${dest_img}/${sfs}"
+            else
+                lower_dir=${lower_dir:-}${lower_dir:+:}"${dest_sfs}/${sfs}"
             fi
         fi
     done
 
-     _mnt_overlayfs "${lower_dir}" "${newroot}" "/"
+    _mnt_overlayfs "${lower_dir}" "${newroot}" "/"
 
     if [[ "${copytoram}" == "y" ]]; then
         umount -d /run/miso/bootmnt
