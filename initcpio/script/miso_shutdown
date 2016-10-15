@@ -20,10 +20,6 @@ done
 # Unmount the space used to store *.cow.
 umount /oldrun/miso/cowspace
 
-if [[ -d /oldrun/miso/img ]];then
-    umount /oldrun/miso/img
-fi
-
 # Unmount boot device if needed (no copytoram=y used)
 if [[ ! -d /oldrun/miso/copytoram ]]; then
     if [[ -d /oldrun/miso/img_dev ]]; then
