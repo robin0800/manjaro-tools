@@ -210,12 +210,12 @@ miso_mount_handler() {
     local src="/run/miso/bootmnt/${misobasedir}/${arch}"
     local dest_sfs="/run/miso/sfs" dest_img="/run/miso/img"
     local lower_dir
-    mkdir -p ${dest_img}
 
     for sfs in livefs mhwdfs desktopfs rootfs;do
         if [[ -f "${src}/${sfs}.sfs" ]]; then
             _mnt_sfs "${src}/${sfs}.sfs" "${dest_sfs}/${sfs}"
             if [[ -f "${dest_sfs}/${sfs}/${sfs}.img" ]]; then
+                mkdir -p ${dest_img}
                 lower_dir=${lower_dir:-}${lower_dir:+:}"${dest_img}/${sfs}"
                 _mnt_dmsnapshot "${dest_sfs}/${sfs}/${sfs}.img" "${dest_img}/${sfs}"
             else
