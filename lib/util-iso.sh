@@ -97,6 +97,18 @@ prepare_ext4_img(){
     umount_img "${mnt}"
 }
 
+sign_iso(){
+    su ${OWNER} -c "signfile ${iso_dir}/$1"
+}
+
+# $1: file
+make_checksum(){
+    msg2 "Creating md5sum ..."
+    cd $1
+    md5sum $2.sfs > $2.md5
+    cd ${OLDPWD}
+}
+
 # $1: image path
 make_sfs() {
     local src="$1"
@@ -134,20 +146,19 @@ make_sfs() {
 
     mksfs_args+=(${sfs} -noappend)
 
-    local highcomp="-b 256K -Xbcj x86"
-    [[ "${sfs_compress}" != "xz" ]] && highcomp=""
+    local highcomp="-b 256K -Xbcj x86" comp='xz'
 
     if [[ "${name}" == "mhwdfs" && ${used_kernel} < "4" ]]; then
         mksfs_args+=(-comp lz4)
     else
-        mksfs_args+=(-comp ${sfs_compress} ${highcomp})
+        mksfs_args+=(-comp ${comp} ${highcomp})
     fi
     if ${verbose};then
         mksquashfs "${mksfs_args[@]}" >/dev/null
     else
         mksquashfs "${mksfs_args[@]}"
     fi
-
+    make_checksum "${dest}" "${name}"
     ${persist} && rm "${src}.img"
 
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
@@ -455,9 +466,6 @@ check_requirements(){
     import ${LIBDIR}/util-iso-${iso_fs}.sh
 }
 
-sign_iso(){
-    su ${OWNER} -c "signfile ${iso_dir}/$1"
-}
 
 make_torrent(){
     local fn=${iso_file}.torrent
@@ -466,21 +474,9 @@ make_torrent(){
     mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${fn} ${iso_dir}/${iso_file}
 }
 
-# $1: file
-make_checksum(){
-    msg "Creating [%s] sum ..." "${sfs_checksum}"
-    cd ${iso_dir}
-    local cs=$(${sfs_checksum}sum $1)
-    msg2 "%s sum: %s" "${sfs_checksum}" "${cs##*/}"
-    echo "${cs}" > ${iso_dir}/$1.${sfs_checksum}
-    msg "Done [%s] sum" "${sfs_checksum}"
-}
-
 compress_images(){
     local timer=$(get_timer)
     run_safe "make_iso"
-    make_checksum "${iso_file}"
-    ${sign} && sign_iso "${iso_file}"
     ${torrent} && make_torrent
     user_own "${iso_dir}" "-R"
     show_elapsed_time "${FUNCNAME}" "${timer}"
