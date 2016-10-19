@@ -301,10 +301,6 @@ init_buildiso(){
 
     [[ -z ${iso_app_id} ]] && iso_app_id='Manjaro Linux Live/Rescue CD'
 
-    [[ -z ${sfs_compress} ]] && sfs_compress='xz'
-
-    [[ -z ${sfs_checksum} ]] && sfs_checksum='md5'
-
     [[ -z ${initsys} ]] && initsys="systemd"
 
     [[ -z ${kernel} ]] && kernel="linux44"

@@ -97,6 +97,18 @@ prepare_ext4_img(){
     umount_img "${mnt}"
 }
 
+sign_iso(){
+    su ${OWNER} -c "signfile ${iso_dir}/$1"
+}
+
+# $1: file
+make_checksum(){
+    msg2 "Creating md5sum ..."
+    cd $1
+    md5sum $2.sfs > $2.md5
+    cd ${OLDPWD}
+}
+
 # $1: image path
 make_sfs() {
     local src="$1"
@@ -134,20 +146,19 @@ make_sfs() {
 
     mksfs_args+=(${sfs} -noappend)
 
-    local highcomp="-b 256K -Xbcj x86"
-    [[ "${sfs_compress}" != "xz" ]] && highcomp=""
+    local highcomp="-b 256K -Xbcj x86" comp='xz'
 
     if [[ "${name}" == "mhwdfs" && ${used_kernel} < "4" ]]; then
         mksfs_args+=(-comp lz4)
     else
-        mksfs_args+=(-comp ${sfs_compress} ${highcomp})
+        mksfs_args+=(-comp ${comp} ${highcomp})
     fi
     if ${verbose};then
         mksquashfs "${mksfs_args[@]}" >/dev/null
     else
         mksquashfs "${mksfs_args[@]}"
     fi
-
+    make_checksum "${dest}" "${name}"
     ${persist} && rm "${src}.img"
 
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
@@ -173,10 +184,10 @@ assemble_iso(){
         -appid "${iso_app_id}" \
         -publisher "${iso_publisher}" \
         -preparer "Prepared by manjaro-tools/${0##*/}" \
-        -eltorito-boot syslinux/isolinux.bin \
-        -eltorito-catalog syslinux/boot.cat \
+        -eltorito-boot isolinux/isolinux.bin \
+        -eltorito-catalog isolinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -isohybrid-mbr "${iso_root}/syslinux/isohdpfx.bin" \
+        -isohybrid-mbr "${iso_root}/isolinux/isohdpfx.bin" \
         ${efi_boot_args[@]} \
         -output "${iso_dir}/${iso_file}" \
         "${iso_root}/"
@@ -237,6 +248,8 @@ make_image_root() {
 
         pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${path}"
+
+        prepare_initcpio "${path}"
 
         reset_pac_conf "${path}"
 
@@ -345,7 +358,7 @@ make_image_boot() {
         mount_image_live "${path}"
         configure_plymouth "${path}"
 
-        prepare_initcpio "${profile_dir}" "${path}"
+        gen_boot_initramfs "${profile_dir}" "${path}"
 
         gen_boot_image "${path}"
 
@@ -400,17 +413,29 @@ make_efi_dvd() {
     fi
 }
 
+make_isolinux() {
+    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+        msg "Prepare [/iso/isolinux]"
+        local isolinux=${iso_root}/isolinux
+        mkdir -p ${isolinux}
+        prepare_isolinux "${work_dir}/livefs" "${isolinux}"
+
+        : > ${work_dir}/build.${FUNCNAME}
+        msg "Done [/iso/isolinux]"
+    fi
+}
+
 make_syslinux() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
-        msg "Prepare [/iso/syslinux]"
-        local syslinux=${iso_root}/syslinux
+        msg "Prepare [/iso/${iso_name}/boot/syslinux]"
+        local syslinux=${iso_root}/${iso_name}/boot/syslinux
         mkdir -p ${syslinux}
         prepare_syslinux "${work_dir}/livefs" "${syslinux}"
         mkdir -p ${syslinux}/hdt
 #         gzip -c -9 ${work_dir}/rootfs/usr/share/hwdata/pci.ids > ${syslinux}/hdt/pciids.gz
 #         gzip -c -9 ${work_dir}/livefs/usr/lib/modules/*-MANJARO/modules.alias > ${syslinux}/hdt/modalias.gz
         : > ${work_dir}/build.${FUNCNAME}
-        msg "Done [/iso/syslinux]"
+        msg "Done [/iso/${iso_name}/boot/syslinux]"
     fi
 }
 
@@ -441,9 +466,6 @@ check_requirements(){
     import ${LIBDIR}/util-iso-${iso_fs}.sh
 }
 
-sign_iso(){
-    su ${OWNER} -c "signfile ${iso_dir}/$1"
-}
 
 make_torrent(){
     local fn=${iso_file}.torrent
@@ -452,21 +474,9 @@ make_torrent(){
     mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${fn} ${iso_dir}/${iso_file}
 }
 
-# $1: file
-make_checksum(){
-    msg "Creating [%s] sum ..." "${sfs_checksum}"
-    cd ${iso_dir}
-    local cs=$(${sfs_checksum}sum $1)
-    msg2 "%s sum: %s" "${sfs_checksum}" "${cs##*/}"
-    echo "${cs}" > ${iso_dir}/$1.${sfs_checksum}
-    msg "Done [%s] sum" "${sfs_checksum}"
-}
-
 compress_images(){
     local timer=$(get_timer)
     run_safe "make_iso"
-    make_checksum "${iso_file}"
-    ${sign} && sign_iso "${iso_file}"
     ${torrent} && make_torrent
     user_own "${iso_dir}" "-R"
     show_elapsed_time "${FUNCNAME}" "${timer}"
@@ -489,6 +499,7 @@ prepare_images(){
         run_safe "make_image_mhwd"
     fi
     run_safe "make_image_boot"
+    run_safe "make_isolinux"
     run_safe "make_syslinux"
     if [[ "${target_arch}" == "x86_64" ]]; then
         run_safe "make_efi_usb"

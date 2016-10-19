@@ -20,6 +20,7 @@ set_mkinicpio_hooks(){
         sed -e 's/plymouth //' -i $1
     fi
     if ! ${use_overlayfs};then
+        msg2 "Setting aufs hook"
         sed -e 's/miso /miso_aufs /' -i $1
     fi
 }
@@ -33,20 +34,17 @@ gen_boot_args(){
     echo ${args[@]}
 }
 
-set_silent_switch_root(){
-    sed -e 's|"$@"|"$@" >/dev/null 2>&1|' -i $1/usr/lib/initcpio/init
-}
-
-# $1: ${profile_dir}
-# $2: ${work_dir}/bootfs
 prepare_initcpio(){
     msg2 "Copying initcpio ..."
-    cp /usr/lib/initcpio/hooks/miso* $2/usr/lib/initcpio/hooks
-    cp /usr/lib/initcpio/install/miso* $2/usr/lib/initcpio/install
-    cp /usr/lib/initcpio/miso_shutdown $2/usr/lib/initcpio
+    cp /usr/lib/initcpio/hooks/miso* $1/etc/initcpio/hooks
+    cp /usr/lib/initcpio/install/miso* $1/etc/initcpio/install
+    cp /usr/lib/initcpio/miso_shutdown $1/etc/initcpio
+    sed -e "s|/usr/lib/initcpio/|/etc/initcpio/|" -i $1/etc/initcpio/install/miso_shutdown
+}
+
+gen_boot_initramfs(){
     cp $1/mkinitcpio.conf $2/etc/mkinitcpio-${iso_name}.conf
     set_mkinicpio_hooks "$2/etc/mkinitcpio-${iso_name}.conf"
-#     set_silent_switch_root "$2"
 }
 
 # $1: work_dir
@@ -87,7 +85,7 @@ vars_to_boot_conf(){
 }
 
 prepare_efi_loader(){
-    local efi_data=$1${DATADIR}/efiboot efi=$2/EFI/boot
+    local efi_data=$1/usr/share/efi-utils efi=$2/EFI/boot
     msg2 "Preparing efi loaders ..."
     prepare_dir "${efi}"
     cp $1/usr/share/efitools/efi/PreLoader.efi ${efi}/bootx64.efi
@@ -120,12 +118,22 @@ check_syslinux_optional(){
     sed -e "/nonfree/ d" -i $1/syslinux.msg
 }
 
+prepare_isolinux(){
+    local syslinux=$1/usr/lib/syslinux/bios
+    msg2 "Copying isolinux binaries ..."
+    cp ${syslinux}/{{isolinux,isohdpfx}.bin,ldlinux.c32} $2
+    msg2 "Copying isolinux.cfg ..."
+    cp $1/usr/share/syslinux/isolinux/isolinux.cfg $2
+    vars_to_boot_conf "$2/isolinux.cfg"
+}
+
 prepare_syslinux(){
     local syslinux=$1/usr/lib/syslinux/bios
     msg2 "Copying syslinux binaries ..."
-    cp ${syslinux}/{*.c32,lpxelinux.0,memdisk,{isolinux,isohdpfx}.bin} $2
+    cp ${syslinux}/{*.c32,lpxelinux.0,memdisk} $2
     msg2 "Copying syslinux theme ..."
-    cp $1${DATADIR}/syslinux-theme/* $2
+    syslinux=$1/usr/share/syslinux/theme
+    cp ${syslinux}/* $2
     for conf in $2/*.cfg; do
         vars_to_boot_conf "${conf}"
     done
