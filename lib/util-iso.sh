@@ -97,8 +97,11 @@ prepare_ext4_img(){
     umount_img "${mnt}"
 }
 
-sign_iso(){
-    su ${OWNER} -c "signfile ${iso_dir}/$1"
+make_sig () {
+    msg2 "Creating signature file..."
+    cd "$1"
+    gpg --detach-sign --default-key ${gpg_key} $2.sfs
+    cd ${OLDPWD}
 }
 
 # $1: file
@@ -358,12 +361,20 @@ make_image_boot() {
         mount_image_live "${path}"
         configure_plymouth "${path}"
 
-        gen_boot_initramfs "${profile_dir}" "${path}"
+#         if [[ ${gpg_key} ]]; then
+#             gpg --export ${gpg_key} >${work_dir}/gpgkey
+#             exec 17<>${work_dir}/gpgkey
+#         fi
+#         MISO_GNUPG_FD=${gpg_key:+17}
 
-        gen_boot_image "${path}"
+        prepare_initramfs "${profile_dir}" "${path}"
+
+#         if [[ ${gpg_key} ]]; then
+#             exec 17<&-
+#         fi
 
         mv ${path}/boot/initramfs.img ${boot}/${target_arch}/initramfs.img
-        copy_boot_extra "${path}" "${boot}"
+        prepare_boot_extras "${path}" "${boot}"
 
         umount_image
 
@@ -482,6 +493,18 @@ compress_images(){
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
+prepare_boot_loaders(){
+    local timer=$(get_timer)
+    run_safe "make_image_boot"
+    run_safe "make_isolinux"
+    run_safe "make_syslinux"
+    if [[ "${target_arch}" == "x86_64" ]]; then
+        run_safe "make_efi_usb"
+        run_safe "make_efi_dvd"
+    fi
+    show_elapsed_time "${FUNCNAME}" "${timer}"
+}
+
 prepare_images(){
     local timer=$(get_timer)
     load_pkgs "${profile_dir}/Packages-Root"
@@ -498,13 +521,13 @@ prepare_images(){
         load_pkgs "${packages_mhwd}"
         run_safe "make_image_mhwd"
     fi
-    run_safe "make_image_boot"
-    run_safe "make_isolinux"
-    run_safe "make_syslinux"
-    if [[ "${target_arch}" == "x86_64" ]]; then
-        run_safe "make_efi_usb"
-        run_safe "make_efi_dvd"
-    fi
+#     run_safe "make_image_boot"
+#     run_safe "make_isolinux"
+#     run_safe "make_syslinux"
+#     if [[ "${target_arch}" == "x86_64" ]]; then
+#         run_safe "make_efi_usb"
+#         run_safe "make_efi_dvd"
+#     fi
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
@@ -524,6 +547,10 @@ make_profile(){
         [[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -x" "${profile}"
         compress_images
         ${verbose} && archive_logs
+        exit 1
+    fi
+    if ${boot_only}; then
+        prepare_boot_loaders
         exit 1
     fi
     if ${images_only}; then
