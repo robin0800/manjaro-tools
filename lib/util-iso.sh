@@ -67,36 +67,6 @@ trap_exit() {
     kill "-$sig" "$$"
 }
 
-mount_img() {
-    mkdir -p "$2"
-    info "mount: [%s]" "$1"
-    mount "$1" "$2"
-}
-
-umount_img() {
-    info "umount: [%s]" "$1"
-    umount -d "$1"
-    rm -r "$1"
-}
-
-prepare_ext4_img(){
-    local size=32G
-    local src="$1"
-    local name=${src##*/}
-    local mnt="${mnt_dir}/${name}"
-    msg2 "Creating ext4 image of %s ..." "${size}"
-    truncate -s ${size} "${src}.img"
-    local ext4_args=()
-    ${verbose} && ext4_args+=(-q)
-    ext4_args+=(-O ^has_journal,^resize_inode -E lazy_itable_init=0 -m 0)
-    mkfs.ext4 ${ext4_args[@]} -F "${src}.img" &>/dev/null
-    tune2fs -c 0 -i 0 "${src}.img" &> /dev/null
-    mount_img "${work_dir}/${name}.img" "${mnt}"
-    msg2 "Copying %s ..." "${src}/"
-    cp -aT "${src}/" "${mnt}/"
-    umount_img "${mnt}"
-}
-
 make_sig () {
     msg2 "Creating signature file..."
     cd "$1"
@@ -137,7 +107,22 @@ make_sfs() {
         fi
     fi
 
-    ${persist} && prepare_ext4_img "${src}"
+    if ${persist};then
+        local size=32G
+        local mnt="${mnt_dir}/${name}"
+        msg2 "Creating ext4 image of %s ..." "${size}"
+        truncate -s ${size} "${src}.img"
+        local ext4_args=()
+        ${verbose} && ext4_args+=(-q)
+        ext4_args+=(-O ^has_journal,^resize_inode -E lazy_itable_init=0 -m 0)
+        mkfs.ext4 ${ext4_args[@]} -F "${src}.img" &>/dev/null
+        tune2fs -c 0 -i 0 "${src}.img" &> /dev/null
+        mount_img "${work_dir}/${name}.img" "${mnt}"
+        msg2 "Copying %s ..." "${src}/"
+        cp -aT "${src}/" "${mnt}/"
+        umount_img "${mnt}"
+
+    fi
 
     msg2 "Creating SquashFS image, this may take some time..."
     local used_kernel=${kernel:5:1} mksfs_args=()
@@ -394,22 +379,6 @@ make_efi_usb() {
     fi
 }
 
-prepare_fat_img(){
-    local size=31M
-    local src="$1"
-    local mnt="${mnt_dir}/efiboot"
-    local img="${src}/efiboot.img"
-    ${pxe_boot} && size=40M
-    msg2 "Creating fat image of %s ..." "${size}"
-    truncate -s ${size} "${img}"
-    mkfs.fat -n MISO_EFI "${img}" &>/dev/null
-    mkdir -p "${mnt}"
-    mount_img "${img}" "${mnt}"
-    prepare_efiboot_image "${mnt}" "${iso_root}"
-    prepare_efi_loader "${work_dir}/livefs" "${mnt}" "dvd"
-    umount_img "${mnt}"
-}
-
 # Prepare kernel.img::/EFI for "El Torito" EFI boot mode
 make_efi_dvd() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
@@ -417,7 +386,17 @@ make_efi_dvd() {
         local src="${iso_root}/EFI/miso"
         mkdir -p "${src}"
 
-        prepare_fat_img "${src}"
+        local size=31M
+        local mnt="${mnt_dir}/efiboot" img="${src}/efiboot.img"
+        ${pxe_boot} && size=40M
+        msg2 "Creating fat image of %s ..." "${size}"
+        truncate -s ${size} "${img}"
+        mkfs.fat -n MISO_EFI "${img}" &>/dev/null
+        mkdir -p "${mnt}"
+        mount_img "${img}" "${mnt}"
+        prepare_efiboot_image "${mnt}" "${iso_root}"
+        prepare_efi_loader "${work_dir}/livefs" "${mnt}" "dvd"
+        umount_img "${mnt}"
 
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/efiboot/EFI]"
@@ -493,17 +472,17 @@ compress_images(){
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
-prepare_boot_loaders(){
-    local timer=$(get_timer)
-    run_safe "make_image_boot"
-    run_safe "make_isolinux"
-    run_safe "make_syslinux"
-    if [[ "${target_arch}" == "x86_64" ]]; then
-        run_safe "make_efi_usb"
-        run_safe "make_efi_dvd"
-    fi
-    show_elapsed_time "${FUNCNAME}" "${timer}"
-}
+# prepare_boot_loaders(){
+#     local timer=$(get_timer)
+#     run_safe "make_image_boot"
+#     run_safe "make_isolinux"
+#     run_safe "make_syslinux"
+#     if [[ "${target_arch}" == "x86_64" ]]; then
+#         run_safe "make_efi_usb"
+#         run_safe "make_efi_dvd"
+#     fi
+#     show_elapsed_time "${FUNCNAME}" "${timer}"
+# }
 
 prepare_images(){
     local timer=$(get_timer)
@@ -521,13 +500,13 @@ prepare_images(){
         load_pkgs "${packages_mhwd}"
         run_safe "make_image_mhwd"
     fi
-#     run_safe "make_image_boot"
-#     run_safe "make_isolinux"
-#     run_safe "make_syslinux"
-#     if [[ "${target_arch}" == "x86_64" ]]; then
-#         run_safe "make_efi_usb"
-#         run_safe "make_efi_dvd"
-#     fi
+    run_safe "make_image_boot"
+    run_safe "make_isolinux"
+    run_safe "make_syslinux"
+    if [[ "${target_arch}" == "x86_64" ]]; then
+        run_safe "make_efi_usb"
+        run_safe "make_efi_dvd"
+    fi
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
@@ -549,10 +528,10 @@ make_profile(){
         ${verbose} && archive_logs
         exit 1
     fi
-    if ${boot_only}; then
-        prepare_boot_loaders
-        exit 1
-    fi
+#     if ${boot_only}; then
+#         prepare_boot_loaders
+#         exit 1
+#     fi
     if ${images_only}; then
         prepare_images
         ${verbose} && archive_logs
