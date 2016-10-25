@@ -493,7 +493,7 @@ reset_profile(){
     unset disable_openrc
     unset enable_systemd_live
     unset enable_openrc_live
-    unset packages_custom
+    unset packages_desktop
     unset packages_mhwd
     unset login_shell
     unset tracker_url
@@ -533,28 +533,13 @@ check_profile(){
         die "Profile [%s] sanity check failed!" "${profile_dir}"
     fi
 
-    local files=$(ls ${profile_dir}/Packages*)
-    for f in ${files[@]};do
-        case $f in
-            ${profile_dir}/Packages-Root|${profile_dir}/Packages-Live|${profile_dir}/Packages-Mhwd) continue ;;
-            *) packages_custom="$f" ;;
-        esac
-    done
+    [[ -f "${profile_dir}/Packages-Desktop" ]] && packages_desktop=${profile_dir}/Packages-Desktop
 
     [[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
 
     if ! ${netinstall}; then
         chrootcfg="false"
     fi
-}
-
-get_shared_list(){
-    local path
-    case ${edition} in
-        sonar|netrunner) path=${run_dir}/shared/${edition}/Packages-Desktop ;;
-        *) path=${run_dir}/shared/manjaro/Packages-Desktop ;;
-    esac
-    echo $path
 }
 
 # $1: file name
@@ -641,14 +626,7 @@ load_pkgs(){
         _purge="s|>cleanup.*||g" \
         _purge_rm="s|>cleanup||g"
 
-    local list="$1"
-
-    if [[ "$list" == "${packages_custom}" ]];then
-        sort -u $(get_shared_list) ${packages_custom} > ${tmp_dir}/packages-desktop.list
-        list=${tmp_dir}/packages-desktop.list
-    fi
-
-    packages=$(sed "$_com_rm" "$list" \
+    packages=$(sed "$_com_rm" "$1" \
             | sed "$_space" \
             | sed "$_blacklist" \
             | sed "$_purge" \

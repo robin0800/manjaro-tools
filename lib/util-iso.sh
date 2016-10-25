@@ -259,7 +259,7 @@ make_image_desktop() {
 
         pacman -Qr "${path}" > "${path}/desktopfs-pkgs.txt"
         cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
-        [[ -e ${profile_dir}/${profile}-overlay ]] && copy_overlay "${profile_dir}/${profile}-overlay" "${path}"
+        [[ -e ${profile_dir}/desktop-overlay ]] && copy_overlay "${profile_dir}/desktop-overlay" "${path}"
 
         reset_pac_conf "${path}"
 
@@ -271,7 +271,7 @@ make_image_desktop() {
 }
 
 mount_image_select(){
-    if [[ -f "${packages_custom}" ]]; then
+    if [[ -f "${packages_desktop}" ]]; then
         mount_image_custom "$1"
     else
         mount_image "$1"
@@ -488,8 +488,8 @@ prepare_images(){
     local timer=$(get_timer)
     load_pkgs "${profile_dir}/Packages-Root"
     run_safe "make_image_root"
-    if [[ -f "${packages_custom}" ]] ; then
-        load_pkgs "${packages_custom}"
+    if [[ -f "${packages_desktop}" ]] ; then
+        load_pkgs "${packages_desktop}"
         run_safe "make_image_desktop"
     fi
     if [[ -f ${profile_dir}/Packages-Live ]]; then
