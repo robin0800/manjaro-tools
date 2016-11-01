@@ -456,7 +456,7 @@ load_profile_config(){
 
     #[[ -z ${netgroups} ]] && -- needs to be hardcoded for now, until a standard has been established
     # will be unlocked again after everything has been established.
-    netgroups="https://raw.githubusercontent.com/manjaro/iso-profiles/master/shared/netgroups"
+    netgroups="https://raw.githubusercontent.com/manjaro/calamares-netgroups/master"
 
     [[ -z ${geoip} ]] && geoip='true'
 
@@ -646,8 +646,7 @@ load_pkgs(){
 
     if [[ $1 == "${packages_mhwd}" ]]; then
 
-        local  _used_kernel=${kernel:5:2}
-                [[ ${_used_kernel} < "42" ]] && local _amd="s|xf86-video-amdgpu||g"
+        [[ ${_used_kernel} < "42" ]] && local _amd="s|xf86-video-amdgpu||g"
 
         packages_cleanup=$(sed "$_com_rm" "$1" \
             | grep cleanup \
