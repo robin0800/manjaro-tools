@@ -135,7 +135,7 @@ write_unpack_conf(){
     echo "    - source: \"/run/miso/bootmnt/${iso_name}/${target_arch}/rootfs.sfs\"" >> "$conf"
     echo "      sourcefs: \"squashfs\"" >> "$conf"
     echo "      destination: \"\"" >> "$conf"
-    if [[ -f "${packages_custom}" ]] ; then
+    if [[ -f "${packages_desktop}" ]] ; then
         echo "    - source: \"/run/miso/bootmnt/${iso_name}/${target_arch}/desktopfs.sfs\"" >> "$conf"
         echo "      sourcefs: \"squashfs\"" >> "$conf"
         echo "      destination: \"\"" >> "$conf"
@@ -152,9 +152,11 @@ write_users_conf(){
         echo "    - $g" >> "$conf"
     done
     unset IFS
-    echo "autologinGroup: autologin" >> "$conf"
-    echo "sudoersGroup:   wheel" >> "$conf"
-    echo "setRootPassword: true" >> "$conf"
+    echo "autologinGroup:  autologin" >> "$conf"
+    echo "doAutologin:     ${autologin}" >> "$conf"
+    echo "sudoersGroup:    wheel" >> "$conf"
+    echo "setRootPassword: false" >> "$conf"
+    echo "availableShells: /bin/bash, /bin/zsh" >> "$conf"
 }
 
 write_packages_conf(){
@@ -211,7 +213,7 @@ write_mhwdcfg_conf(){
     echo "driver: ${drv}" >> "$conf"
     echo '' >> "$conf"
     local switch='true'
-    ${chrootcfg} && switch='false'
+    ${netinstall} && switch='false'
     echo "local: ${switch}" >> "$conf"
     echo '' >> "$conf"
     echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
@@ -232,18 +234,18 @@ write_postcfg_conf(){
 }
 
 get_yaml(){
-    local args=() ext="yaml" yaml
+    local args=() yaml
     if ${chrootcfg};then
-        args+=('netinstall')
+        args+=('chrootcfg')
     else
-        args+=("hybrid")
+        args+=("${profile}/packages")
     fi
     args+=("${initsys}")
     [[ ${edition} == 'sonar' ]] && args+=("${edition}")
     for arg in ${args[@]};do
         yaml=${yaml:-}${yaml:+-}${arg}
     done
-    echo "${yaml}.${ext}"
+    echo "${yaml}.yaml"
 }
 
 write_netinstall_conf(){
@@ -419,9 +421,9 @@ make_profile_yaml(){
     prepare_check "$1"
     load_pkgs "${profile_dir}/Packages-Root"
     write_netgroup_yaml "$1" "$(gen_fn "Packages-Root")"
-    if [[ -f "${packages_custom}" ]]; then
-        load_pkgs "${packages_custom}"
-        write_netgroup_yaml "$1" "$(gen_fn "${packages_custom##*/}")"
+    if [[ -f "${packages_desktop}" ]]; then
+        load_pkgs "${packages_desktop}"
+        write_netgroup_yaml "$1" "$(gen_fn "Packages-Desktop")"
     fi
     ${calamares} && write_calamares_yaml "$1"
     user_own "${cache_dir_netinstall}/$1" "-R"
