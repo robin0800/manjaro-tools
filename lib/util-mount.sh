@@ -133,7 +133,7 @@ chroot_mount_conditional() {
 chroot_api_efi_mount() {
     CHROOT_ACTIVE_MOUNTS=()
     [[ $(trap -p EXIT) ]] && die 'Error! Attempting to overwrite existing EXIT trap'
-    trap 'chroot_api_efi_mount' EXIT
+    trap 'chroot_api_efi_umount' EXIT
 
     chroot_mount_conditional "! mountpoint -q '$1'" "$1" "$1" --bind &&
     chroot_mount proc "$1/proc" -t proc -o nosuid,noexec,nodev &&
@@ -155,8 +155,6 @@ chroot_api_mount() {
     chroot_mount_conditional "! mountpoint -q '$1'" "$1" "$1" --bind &&
     chroot_mount proc "$1/proc" -t proc -o nosuid,noexec,nodev &&
     chroot_mount sys "$1/sys" -t sysfs -o nosuid,noexec,nodev,ro &&
-# 	ignore_error chroot_mount_conditional "[[ -d '$1/sys/firmware/efi/efivars' ]]" \
-# 	   efivarfs "$1/sys/firmware/efi/efivars" -t efivarfs -o nosuid,noexec,nodev &&
     chroot_mount udev "$1/dev" -t devtmpfs -o mode=0755,nosuid &&
     chroot_mount devpts "$1/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec &&
     chroot_mount shm "$1/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev &&
@@ -171,6 +169,12 @@ chroot_part_umount() {
 }
 
 chroot_api_umount() {
+    #info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
+    umount "${CHROOT_ACTIVE_MOUNTS[@]}"
+    unset CHROOT_ACTIVE_MOUNTS
+}
+
+chroot_api_efi_umount() {
     #info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
     umount "${CHROOT_ACTIVE_MOUNTS[@]}"
     unset CHROOT_ACTIVE_MOUNTS
