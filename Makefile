@@ -187,13 +187,26 @@ install_iso:
 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/manjaro-tools
 	install -m0644 ${LIBS_ISO} $(DESTDIR)$(PREFIX)/lib/manjaro-tools
 
-	install -dm0755 $(DESTDIR)$(PREFIX)/lib/initcpio/hooks
-	install -m0755 ${CPIOHOOKS} $(DESTDIR)$(PREFIX)/lib/initcpio/hooks
 
-	install -dm0755 $(DESTDIR)$(PREFIX)/lib/initcpio/install
-	install -m0755 ${CPIOINST} $(DESTDIR)$(PREFIX)/lib/initcpio/install
+# 	install -m0755 ${CPIO} $(DESTDIR)$(PREFIX)/lib/initcpio
 
-	install -m0755 ${CPIO} $(DESTDIR)$(PREFIX)/lib/initcpio
+# 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/initcpio/hooks
+# 	install -m0755 ${CPIOHOOKS} $(DESTDIR)$(PREFIX)/lib/initcpio/hooks
+#
+# 	install -dm0755 $(DESTDIR)$(PREFIX)/lib/initcpio/install
+# 	install -m0755 ${CPIOINST} $(DESTDIR)$(PREFIX)/lib/initcpio/install
+
+
+
+	install -m0755 ${CPIO} $(DESTDIR)$(SYSCONFDIR)/initcpio
+
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/initcpio/hooks
+	install -m0755 ${CPIOHOOKS} $(DESTDIR)$(SYSCONFDIR)/initcpio/hooks
+
+	install -dm0755 $(DESTDIR)$(SYSCONFDIR)/initcpio/install
+	install -m0755 ${CPIOINST} $(DESTDIR)$(SYSCONFDIR)/initcpio/install
+
+
 
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/manjaro-tools
 	install -m0644 ${SHARED_ISO} $(DESTDIR)$(PREFIX)/share/manjaro-tools
