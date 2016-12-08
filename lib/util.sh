@@ -307,7 +307,7 @@ init_buildiso(){
 
     [[ -z ${use_overlayfs} ]] && use_overlayfs='true'
 
-    [[ -z ${profile_repo} ]] && profile_repo='manjaro-tools-iso-profiles'
+    [[ -z ${profile_repo} ]] && profile_repo='iso-profiles'
 
     mhwd_repo="/opt/pkg"
 }
@@ -456,7 +456,7 @@ load_profile_config(){
 
     #[[ -z ${netgroups} ]] && -- needs to be hardcoded for now, until a standard has been established
     # will be unlocked again after everything has been established.
-    netgroups="https://raw.githubusercontent.com/manjaro/manjaro-tools-iso-profiles/master/shared/netinst"
+    netgroups="https://raw.githubusercontent.com/manjaro/calamares-netgroups/master"
 
     [[ -z ${geoip} ]] && geoip='true'
 
@@ -493,7 +493,7 @@ reset_profile(){
     unset disable_openrc
     unset enable_systemd_live
     unset enable_openrc_live
-    unset packages_custom
+    unset packages_desktop
     unset packages_mhwd
     unset login_shell
     unset tracker_url
@@ -533,28 +533,13 @@ check_profile(){
         die "Profile [%s] sanity check failed!" "${profile_dir}"
     fi
 
-    local files=$(ls ${profile_dir}/Packages*)
-    for f in ${files[@]};do
-        case $f in
-            ${profile_dir}/Packages-Root|${profile_dir}/Packages-Live|${profile_dir}/Packages-Mhwd) continue ;;
-            *) packages_custom="$f" ;;
-        esac
-    done
+    [[ -f "${profile_dir}/Packages-Desktop" ]] && packages_desktop=${profile_dir}/Packages-Desktop
 
     [[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
 
     if ! ${netinstall}; then
         chrootcfg="false"
     fi
-}
-
-get_shared_list(){
-    local path
-    case ${edition} in
-        sonar|netrunner) path=${run_dir}/shared/${edition}/Packages-Desktop ;;
-        *) path=${run_dir}/shared/manjaro/Packages-Desktop ;;
-    esac
-    echo $path
 }
 
 # $1: file name
@@ -641,14 +626,7 @@ load_pkgs(){
         _purge="s|>cleanup.*||g" \
         _purge_rm="s|>cleanup||g"
 
-    local list="$1"
-
-    if [[ "$list" == "${packages_custom}" ]];then
-        sort -u $(get_shared_list) ${packages_custom} > ${tmp_dir}/packages-desktop.list
-        list=${tmp_dir}/packages-desktop.list
-    fi
-
-    packages=$(sed "$_com_rm" "$list" \
+    packages=$(sed "$_com_rm" "$1" \
             | sed "$_space" \
             | sed "$_blacklist" \
             | sed "$_purge" \
@@ -668,8 +646,7 @@ load_pkgs(){
 
     if [[ $1 == "${packages_mhwd}" ]]; then
 
-        local  _used_kernel=${kernel:5:2}
-                [[ ${_used_kernel} < "42" ]] && local _amd="s|xf86-video-amdgpu||g"
+        [[ ${_used_kernel} < "42" ]] && local _amd="s|xf86-video-amdgpu||g"
 
         packages_cleanup=$(sed "$_com_rm" "$1" \
             | grep cleanup \

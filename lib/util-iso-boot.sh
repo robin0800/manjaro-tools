@@ -36,27 +36,23 @@ gen_boot_args(){
 
 prepare_initcpio(){
     msg2 "Copying initcpio ..."
-    cp /usr/lib/initcpio/hooks/miso* $1/etc/initcpio/hooks
-    cp /usr/lib/initcpio/install/miso* $1/etc/initcpio/install
-    cp /usr/lib/initcpio/miso_shutdown $1/etc/initcpio
-    sed -e "s|/usr/lib/initcpio/|/etc/initcpio/|" -i $1/etc/initcpio/install/miso_shutdown
+    cp /etc/initcpio/hooks/miso* $1/etc/initcpio/hooks
+    cp /etc/initcpio/install/miso* $1/etc/initcpio/install
+    cp /etc/initcpio/miso_shutdown $1/etc/initcpio
+#     sed -e "s|/usr/lib/initcpio/|/etc/initcpio/|" -i $1/etc/initcpio/install/miso_shutdown
 }
 
-gen_boot_initramfs(){
+prepare_initramfs(){
     cp $1/mkinitcpio.conf $2/etc/mkinitcpio-${iso_name}.conf
     set_mkinicpio_hooks "$2/etc/mkinitcpio-${iso_name}.conf"
-}
-
-# $1: work_dir
-gen_boot_image(){
-    local _kernver=$(cat $1/usr/lib/modules/*/version)
-    chroot-run $1 \
+    local _kernver=$(cat $2/usr/lib/modules/*/version)
+    chroot-run $2 \
         /usr/bin/mkinitcpio -k ${_kernver} \
         -c /etc/mkinitcpio-${iso_name}.conf \
         -g /boot/initramfs.img
 }
 
-copy_boot_extra(){
+prepare_boot_extras(){
     cp $1/boot/intel-ucode.img $2/intel_ucode.img
     cp $1/usr/share/licenses/intel-ucode/LICENSE $2/intel_ucode.LICENSE
     cp $1/boot/memtest86+/memtest.bin $2/memtest
