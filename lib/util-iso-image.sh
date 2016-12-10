@@ -40,16 +40,16 @@ umount_img() {
     fi
 }
 
-has_plymouth(){
-    if $(chroot $1 which plymouth);then
-        return 0
-    else
-        return 1
-    fi
-}
+# has_plymouth(){
+#     if $(chroot "$1" which plymouth);then
+#         return 0
+#     else
+#         return 1
+#     fi
+# }
 
 configure_plymouth(){
-    if $(has_plymouth $1);then
+    if [[ -f "$1"/usr/bin/plymouth ]];then
         msg2 "Configuring plymouth: %s" "${plymouth_theme}"
         local conf=$1/etc/plymouth/plymouthd.conf
         sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" "${conf}"
