@@ -41,7 +41,7 @@ umount_img() {
 }
 
 has_plymouth(){
-    If $(which plymouth);then
+    if $(which plymouth);then
         return 0
     else
         return 1
