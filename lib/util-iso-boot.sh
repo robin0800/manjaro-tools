@@ -107,10 +107,10 @@ prepare_efi_loader(){
     fi
 }
 
-check_syslinux_optional(){
+check_syslinux_nonfree(){
     msg2 "Configuring syslinux menu ..."
-    sed -e "/LABEL optional/,/^$/d" -i "$1/miso_sys_i686.cfg"
-    sed -e "/LABEL optional/,/^$/d" -i "$1/miso_sys_x86_64.cfg"
+    sed -e "/LABEL nonfree/,/^$/d" -i "$1/miso_sys_i686.cfg"
+    sed -e "/LABEL nonfree/,/^$/d" -i "$1/miso_sys_x86_64.cfg"
     sed -e "/nonfree/ d" -i $1/syslinux.msg
 }
 
@@ -134,6 +134,6 @@ prepare_syslinux(){
         vars_to_boot_conf "${conf}"
     done
     if ! ${nonfree_mhwd};then
-        check_syslinux_optional "$2"
+        check_syslinux_nonfree "$2"
     fi
 }
