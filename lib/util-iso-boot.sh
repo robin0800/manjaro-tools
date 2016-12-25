@@ -107,6 +107,13 @@ prepare_efi_loader(){
     fi
 }
 
+check_syslinux_select(){
+    if [[ ! -f ${boot}/x86_64/vmlinuz ]] ; then
+        msg2 "Configuring syslinux for i686 architecture only ..."
+        sed -e "s/select.cfg/i686_inc.cfg/g" -i "$1/miso.cfg"
+    fi
+}
+
 check_syslinux_nonfree(){
     msg2 "Configuring syslinux menu ..."
     sed -e "/LABEL nonfree/,/^$/d" -i "$1/miso_sys_i686.cfg"
@@ -133,6 +140,8 @@ prepare_syslinux(){
     for conf in $2/*.cfg; do
         vars_to_boot_conf "${conf}"
     done
+    # Check for dual-arch
+    check_syslinux_select "$2"
     if ! ${nonfree_mhwd};then
         check_syslinux_nonfree "$2"
     fi
