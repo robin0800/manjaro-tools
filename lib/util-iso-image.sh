@@ -350,5 +350,8 @@ clean_up_image(){
         fi
     fi
 	find "$1" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-	[[ -f $1/boot/grub/grub.cfg ]] && rm $1/boot/grub/grub.cfg
+	file=$1/boot/grub/grub.cfg
+        if [[ -f "$file" ]]; then
+            rm $file
+        fi
 }
