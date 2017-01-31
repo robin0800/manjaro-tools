@@ -602,13 +602,6 @@ load_pkgs(){
         ;;
     esac
 
-    local _plymouth _plymouth_rm
-    if ${plymouth_boot};then
-        _plymouth="s|>plymouth||g"
-    else
-        _plymouth_rm="s|>plymouth.*||g"
-    fi
-
     local _edition _edition_rm
     case "${edition}" in
         'sonar')
@@ -646,8 +639,6 @@ load_pkgs(){
             | sed "$_kernel" \
             | sed "$_edition" \
             | sed "$_edition_rm" \
-            | sed "$_plymouth" \
-            | sed "$_plymouth_rm" \
             | sed "$_clean")
 
     if [[ $1 == "${packages_mhwd}" ]]; then
