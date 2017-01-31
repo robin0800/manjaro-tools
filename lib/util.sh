@@ -411,8 +411,6 @@ load_profile_config(){
 
     [[ -z ${username} ]] && username="manjaro"
 
-    [[ -z ${plymouth_theme} ]] && plymouth_theme="manjaro-elegant"
-
     [[ -z ${password} ]] && password="manjaro"
 
     [[ -z ${login_shell} ]] && login_shell='/bin/bash'
@@ -501,7 +499,6 @@ reset_profile(){
     unset netgroups
     unset geoip
     unset plymouth_boot
-    unset plymouth_theme
 }
 
 check_profile(){

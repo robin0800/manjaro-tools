@@ -48,13 +48,6 @@ umount_img() {
 #     fi
 # }
 
-configure_plymouth(){
-    if [[ -f "$1"/usr/bin/plymouth ]];then
-        msg2 "Configuring plymouth: %s" "${plymouth_theme}"
-        local conf=$1/etc/plymouth/plymouthd.conf
-        sed -i -e "s/^.*Theme=.*/Theme=${plymouth_theme}/" "${conf}"
-    fi
-}
 
 add_svc_rc(){
     if [[ -f $1/etc/init.d/$2 ]];then
