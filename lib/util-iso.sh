@@ -346,7 +346,11 @@ make_image_boot() {
         local path="${work_dir}/bootfs"
         mkdir -p ${path}
 
-        mount_fs_live "${path}"
+        if [[ -f "${packages_desktop}" ]]; then
+            mount_fs_live "${path}"
+        else
+            mount_fs_net "${path}"
+        fi
 
 #         if [[ ${gpg_key} ]]; then
 #             gpg --export ${gpg_key} >${work_dir}/gpgkey

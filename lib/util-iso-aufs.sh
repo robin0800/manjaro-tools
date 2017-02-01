@@ -30,6 +30,11 @@ mount_fs_live(){
     track_fs -t aufs -o br="$1":${work_dir}/livefs=ro:${work_dir}/desktopfs=ro:${work_dir}/rootfs=ro none "$1"
 }
 
+mount_fs_net(){
+    FS_ACTIVE_MOUNTS=()
+    track_fs -t aufs -o br="$1":${work_dir}/livefs=ro:${work_dir}/rootfs=ro none "$1"
+}
+
 # $1: image path
 umount_fs(){
     if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]];then

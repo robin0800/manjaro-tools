@@ -33,6 +33,12 @@ mount_fs_live(){
     track_fs -t overlay overlay -olowerdir="${work_dir}/livefs":"${work_dir}/desktopfs":"${work_dir}/rootfs",upperdir="$1",workdir="${mnt_dir}/work" "$1"
 }
 
+mount_fs_net(){
+    FS_ACTIVE_MOUNTS=()
+    mkdir -p "${mnt_dir}/work"
+    track_fs -t overlay overlay -olowerdir="${work_dir}/livefs":"${work_dir}/rootfs",upperdir="$1",workdir="${mnt_dir}/work" "$1"
+}
+
 umount_fs(){
     if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]];then
         info "%s umount: [%s]" "${iso_fs}" "${FS_ACTIVE_MOUNTS[@]}"
