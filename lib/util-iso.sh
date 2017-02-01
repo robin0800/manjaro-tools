@@ -256,7 +256,7 @@ make_image_desktop() {
         local path="${work_dir}/desktopfs"
         mkdir -p ${path}
 
-        mount_image "${path}"
+        mount_fs_root "${path}"
 
         chroot_create "${path}" "${packages}"
 
