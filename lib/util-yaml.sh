@@ -181,6 +181,7 @@ write_welcome_conf(){
     echo "requirements:" >> "$conf"
     echo "    requiredStorage:    7.9" >> "$conf"
     echo "    requiredRam:        1.0" >> "$conf"
+    echo "    internetCheckUrl:   https://manjaro.org" >> "$conf"
     echo "    check:" >> "$conf"
     echo "      - storage" >> "$conf"
     echo "      - ram" >> "$conf"
