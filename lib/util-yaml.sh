@@ -166,6 +166,8 @@ write_packages_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "backend: pacman" >> "$conf"
+    echo '' >> "$conf"
+    echo "update_db: true" >> "$conf"
 }
 
 write_welcome_conf(){
@@ -240,7 +242,7 @@ get_yaml(){
     if ${chrootcfg};then
         args+=('chrootcfg')
     else
-        args+=("${profile}/packages")
+        args+=("packages")
     fi
     args+=("${initsys}")
     [[ ${edition} == 'sonar' ]] && args+=("${edition}")
@@ -255,13 +257,6 @@ write_netinstall_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "groupsUrl: ${netgroups}/$(get_yaml)" >> "$conf"
-}
-
-write_plymouthcfg_conf(){
-    local conf="${modules_dir}/plymouthcfg.conf"
-    msg2 "Writing %s ..." "${conf##*/}"
-    echo "---" > "$conf"
-    echo "plymouth_theme: ${plymouth_theme}" >> "$conf"
 }
 
 write_locale_conf(){
@@ -317,7 +312,6 @@ write_settings_conf(){
     echo "        - localecfg" >> "$conf"
     echo "        - luksopenswaphookcfg" >> "$conf"
     echo "        - luksbootkeyfile" >> "$conf"
-    echo "        - plymouthcfg" >> "$conf" && write_plymouthcfg_conf
     echo "        - initcpiocfg" >> "$conf"
     echo "        - initcpio" >> "$conf" && write_initcpio_conf
     echo "        - users" >> "$conf"
