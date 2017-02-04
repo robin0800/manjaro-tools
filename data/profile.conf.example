@@ -8,6 +8,9 @@
 # use pxe
 # pxe_boot="true"
 
+# use extra packages as defined in pkglist to activate a full profile
+# extra="false"
+
 ################ torrent ################
 
 # the torrent tracker urls, comma separated
