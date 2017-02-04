@@ -557,7 +557,13 @@ load_pkgs(){
         ;;
     esac
 
-    local _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64 _extra _extra_rm
+    local _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64 _basic _basic_rm _extra _extra_rm
+
+    if ${basic};then
+        _basic="s|>basic||g"
+    else
+        _basic_rm="s|>basic.*||g"
+    fi
 
     if ${extra};then
         _extra="s|>extra||g"
@@ -648,6 +654,8 @@ load_pkgs(){
             | sed "$_kernel" \
             | sed "$_edition" \
             | sed "$_edition_rm" \
+            | sed "$_basic" \
+            | sed "$_basic_rm" \
             | sed "$_extra" \
             | sed "$_extra_rm" \
             | sed "$_clean")
