@@ -400,8 +400,6 @@ load_profile_config(){
 
     [[ -z ${pxe_boot} ]] && pxe_boot="true"
 
-    [[ -z ${extra} ]] && extra='false'
-
     [[ -z ${plymouth_boot} ]] && plymouth_boot="true"
 
     [[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
@@ -460,6 +458,12 @@ load_profile_config(){
     [[ -z ${geoip} ]] && geoip='true'
 
     [[ -z ${smb_workgroup} ]] && smb_workgroup=''
+
+    [[ -z ${basic} ]] && basic='true'
+    [[ -z ${extra} ]] && extra='false'
+
+    #${basic} && extra='false'
+    ${extra} && basic='false'
 
     check_profile_vars
 
