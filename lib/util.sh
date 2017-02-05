@@ -136,8 +136,8 @@ show_elapsed_time(){
 get_project(){
     local project
     case "$1" in
-        'community'|'minimal') project='manjarolinux-community' ;;
-        'official') project='manjarolinux' ;;
+        'community') project='manjarolinux-community' ;;
+        'manjaro') project='manjarolinux' ;;
         'sonar') project='sonargnulinux' ;;
     esac
     echo ${project}
