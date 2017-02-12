@@ -513,10 +513,6 @@ make_profile(){
         ${verbose} && archive_logs
         exit 1
     fi
-#     if ${boot_only}; then
-#         prepare_boot_loaders
-#         exit 1
-#     fi
     if ${images_only}; then
         prepare_images
         ${verbose} && archive_logs
@@ -562,7 +558,7 @@ load_profile(){
     mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -K)
     work_dir=${chroots_iso}/${profile}/${target_arch}
 
-    iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
+    iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}"
 
     iso_root=${chroots_iso}/${profile}/iso
     mnt_dir=${chroots_iso}/${profile}/mnt
