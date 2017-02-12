@@ -9,26 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-create_release(){
-    msg "Create release (%s) ..." "${dist_release}"
-    rsync ${rsync_args[*]} /dev/null ${url}/${dist_release}/
-    show_elapsed_time "${FUNCNAME}" "${timer_start}"
-    msg "Done (%s)" "${dist_release}"
-}
-
-get_edition(){
-    local result=$(find ${run_dir} -maxdepth 3 -name "$1") path
-    [[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
-    path=${result%/*}
-    path=${path%/*}
-    echo ${path##*/}
-}
-
-connect(){
-    local home="/home/frs/project"
-    echo "${account},$1@frs.${host}:${home}/$1"
-}
-
 # get_project(){
 #     local project
 #     case "$1" in
@@ -41,6 +21,27 @@ connect(){
 #     echo ${project}
 # }
 
+create_release(){
+    msg "Create release (%s) ..." "${target_dir}"
+    rsync ${rsync_args[*]} /dev/null ${url}/${profile}/
+    rsync ${rsync_args[*]} /dev/null ${url}/${target_dir}/
+    show_elapsed_time "${FUNCNAME}" "${timer_start}"
+    msg "Done (%s)" "${target_dir}"
+}
+
+get_edition(){
+    local result=$(find ${run_dir} -maxdepth 3 -name "${profile}") path
+    [[ -z $result ]] && die "%s is not a valid profile or build list!" "${profile}"
+    path=${result%/*}
+    path=${path%/*}
+    echo ${path##*/}
+}
+
+connect(){
+    local home="/home/frs/project"
+    echo "${account},${project}@frs.${host}:${home}/${profile}"
+}
+
 gen_webseed(){
     local webseed seed="$1"
     local mirrors=('heanet' 'jaist' 'netcologne' 'iweb' 'kent')
@@ -51,36 +52,35 @@ gen_webseed(){
 }
 
 make_torrent(){
-    for iso in $(ls {src_dir}/${1}/*.iso);do
-        local iso_dir="${cache_dir_iso}/${edition}/${1}/${dist_release}"
-        local seed=${host}/project/${project}/${1}/${dist_release}/${iso}
-        local mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed ${seed}))
-        local fn=${iso}.torrent
+    rm ${src_dir}/*.iso.torrent
+    for iso in $(ls ${src_dir}/*.iso);do
 
-        msg2 "Creating (%s) ..." "${fn}"
-        [[ -f ${iso_dir}/${fn} ]] && rm ${iso_dir}/${fn}
-        mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${fn} ${iso_dir}/${iso}
+        local seed=${host}/project/${project}/${target_dir}/${iso}
+        local mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed ${seed}))
+
+        msg2 "Creating (%s) ..." "${iso}.torrent"
+        mktorrent ${mktorrent_args[*]} -o ${src_dir}/${iso}.torrent ${src_dir}/${iso}
     done
 }
 
 prepare_transfer(){
-    edition=$(get_edition $1)
-#     project=$(get_project "${edition}")
-    url=$(connect "${project}")
+    edition=$(get_edition)
+    url=$(connect)
 
-    target_dir="$1/${dist_release}"
+    target_dir="${profile}/${dist_release}"
     src_dir="${run_dir}/${edition}/${target_dir}"
-    ${torrent} && make_torrent "$1"
+    ${torrent} && make_torrent
 }
 
 sync_dir(){
-    prepare_transfer "$1"
+    profile="$1"
+    prepare_transfer "${profile}"
     if ${release} && ! ${exists};then
         create_release
         exists=true
     fi
-    msg "Start upload [%s] ..." "$1"
+    msg "Start upload [%s] ..." "${profile}"
     rsync ${rsync_args[*]} ${src_dir}/ ${url}/${target_dir}/
-    msg "Done upload [%s]" "$1"
+    msg "Done upload [%s]" "${profile}"
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
