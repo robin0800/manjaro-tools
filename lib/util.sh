@@ -489,6 +489,7 @@ reset_profile(){
     unset netgroups
     unset geoip
     unset plymouth_boot
+    unset basic
     unset extra
 }
 
