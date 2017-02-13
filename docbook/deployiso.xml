@@ -96,7 +96,7 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
-                <term><option>-w</option></term>
+                <term><option>-t</option></term>
 
                 <listitem><para>Create a torrent from iso file.</para></listitem>
             </varlistentry>
