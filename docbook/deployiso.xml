@@ -59,8 +59,7 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
         <para><command>deployiso</command> is used to upload a particular ISO or a set of ISOs. </para>
 
-        <para>deployiso is a script to upload a specific iso or a buiildset to SF.
-        It needs to be run inside the iso-profiles directory.</para>
+        <para>deployiso is a script to upload a specific iso or a buiildset to SF.</para>
 
     </refsect1>
 
