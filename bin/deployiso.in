@@ -22,7 +22,6 @@ import ${LIBDIR}/util-publish.sh
 show_profile(){
     prepare_transfer "$1"
     info "Profile: [$1]"
-    msg2 "project: %s" "${project}"
     msg2 "src_dir: ${src_dir}"
     msg2 "target_dir: ${target_dir}"
 }
@@ -58,6 +57,7 @@ display_settings(){
     msg "REMOTE:"
     msg2 "account: %s" "${account}"
     msg2 "host: %s" "${host}"
+    msg2 "project: %s" "${project}"
 
     msg "UPLOAD QUEUE:"
     run show_profile "${build_list_iso}"
