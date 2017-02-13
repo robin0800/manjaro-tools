@@ -133,16 +133,6 @@ show_elapsed_time(){
     info "Time %s: %s minutes" "$1" "$(elapsed_time $2)"
 }
 
-get_project(){
-    local project
-    case "$1" in
-        'community'|'minimal') project='manjarolinux-community' ;;
-        'official') project='manjarolinux' ;;
-        'sonar') project='sonargnulinux' ;;
-    esac
-    echo ${project}
-}
-
 lock() {
     eval "exec $1>"'"$2"'
     if ! flock -n $1; then
@@ -228,8 +218,6 @@ init_common(){
     [[ -z ${build_mirror} ]] && build_mirror='http://mirror.netzspielplatz.de/manjaro/packages'
 
     [[ -z ${tmp_dir} ]] && tmp_dir='/tmp/manjaro-tools'
-
-    [[ -z ${host} ]] && host="sourceforge.net"
 }
 
 init_buildtree(){
@@ -314,9 +302,21 @@ init_buildiso(){
 
 init_deployiso(){
 
+    host="sourceforge.net"
+
+    [[ -z ${project} ]] && project="manjarolinux"
+
     [[ -z ${account} ]] && account="[SetUser]"
 
     [[ -z ${limit} ]] && limit=100
+
+    [[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
+
+    [[ -z ${piece_size} ]] && piece_size=21
+
+    [[ -z ${iso_mirrors[@]} ]] && iso_mirrors=('heanet' 'jaist' 'netcologne' 'iweb' 'kent')
+
+    [[ -z ${torrent_meta} ]] && torrent_meta="ManjaroLinux"
 }
 
 load_config(){
@@ -440,10 +440,6 @@ load_profile_config(){
         enable_systemd+=("$(get_svc)")
     fi
 
-    [[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
-
-    [[ -z ${piece_size} ]] && piece_size=21
-
     [[ -z ${netinstall} ]] && netinstall='false'
 
     [[ -z ${chrootcfg} ]] && chrootcfg='false'
@@ -494,13 +490,12 @@ reset_profile(){
     unset packages_desktop
     unset packages_mhwd
     unset login_shell
-    unset tracker_url
-    unset piece_size
     unset netinstall
     unset chrootcfg
     unset netgroups
     unset geoip
     unset plymouth_boot
+    unset basic
     unset extra
 }
 

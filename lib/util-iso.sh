@@ -238,8 +238,6 @@ make_image_root() {
         pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${path}"
 
-        prepare_initcpio "${path}"
-
         reset_pac_conf "${path}"
 
         configure_lsb "${path}"
@@ -352,6 +350,8 @@ make_image_boot() {
             mount_fs_net "${path}"
         fi
 
+        prepare_initcpio "${path}"
+
 #         if [[ ${gpg_key} ]]; then
 #             gpg --export ${gpg_key} >${work_dir}/gpgkey
 #             exec 17<>${work_dir}/gpgkey
@@ -462,18 +462,9 @@ check_requirements(){
     import ${LIBDIR}/util-iso-${iso_fs}.sh
 }
 
-
-make_torrent(){
-    local fn=${iso_file}.torrent
-    msg2 "Creating (%s) ..." "${fn}"
-    [[ -f ${iso_dir}/${fn} ]] && rm ${iso_dir}/${fn}
-    mktorrent ${mktorrent_args[*]} -o ${iso_dir}/${fn} ${iso_dir}/${iso_file}
-}
-
 compress_images(){
     local timer=$(get_timer)
     run_safe "make_iso"
-    ${torrent} && make_torrent
     user_own "${iso_dir}" "-R"
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
@@ -522,10 +513,6 @@ make_profile(){
         ${verbose} && archive_logs
         exit 1
     fi
-#     if ${boot_only}; then
-#         prepare_boot_loaders
-#         exit 1
-#     fi
     if ${images_only}; then
         prepare_images
         ${verbose} && archive_logs
@@ -555,18 +542,6 @@ get_pacman_conf(){
     echo "$conf"
 }
 
-gen_webseed(){
-    local webseed url project=$(get_project "${edition}")
-        url=${host}/project/${project}/${dist_release}/${profile}/${iso_file}
-
-        local mirrors=('heanet' 'jaist' 'netcologne' 'iweb' 'kent')
-
-    for m in ${mirrors[@]};do
-        webseed=${webseed:-}${webseed:+,}"http://${m}.dl.${url}"
-    done
-    echo ${webseed}
-}
-
 load_profile(){
     conf="${profile_dir}/profile.conf"
 
@@ -583,7 +558,7 @@ load_profile(){
     mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -K)
     work_dir=${chroots_iso}/${profile}/${target_arch}
 
-    iso_dir="${cache_dir_iso}/${edition}/${dist_release}/${profile}"
+    iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}"
 
     iso_root=${chroots_iso}/${profile}/iso
     mnt_dir=${chroots_iso}/${profile}/mnt
@@ -591,8 +566,6 @@ load_profile(){
 
     prepare_dir "${iso_dir}"
     user_own "${iso_dir}"
-
-    mktorrent_args=(-v -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed))
 }
 
 prepare_profile(){

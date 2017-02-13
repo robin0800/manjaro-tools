@@ -61,7 +61,7 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
         <para>With buildiso you can build ISOs suitable to be booted from a removable media
         like a DVD o a USB Stick, it will automatically create the necessary files to
-        install this ISO using calamares or the cli installer.</para>
+        install this ISO using calamares.</para>
 
     </refsect1>
 
@@ -143,12 +143,6 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
                 <term><option>-z</option></term>
 
                 <listitem><para>Generate iso from already created images, for example created with the -x option.</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-w</option></term>
-
-                <listitem><para>Create a torrent from iso file.</para></listitem>
             </varlistentry>
 
             <varlistentry>

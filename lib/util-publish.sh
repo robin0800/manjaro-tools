@@ -9,32 +9,68 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+# get_project(){
+#     local project
+#     case "$1" in
+#         'community') project='manjarolinux-community' ;;
+#         'manjaro') project='manjarolinux' ;;
+#         'sonar') project='sonargnulinux' ;;
+#         # manjarotest
+#         # manjarotest-community
+#     esac
+#     echo ${project}
+# }
+
 create_release(){
-    msg "Create release (%s) ..." "${dist_release}"
-    rsync ${rsync_args[*]} /dev/null ${url}/${dist_release}/
+    msg "Create release (%s) ..." "${target_dir}"
+    rsync ${rsync_args[*]} /dev/null ${url}/${profile}/
+    rsync ${rsync_args[*]} /dev/null ${url}/${target_dir}/
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
-    msg "Done (%s)" "${dist_release}"
+    msg "Done (%s)" "${target_dir}"
 }
 
 get_edition(){
-    local result=$(find ${run_dir} -maxdepth 3 -name "$1") path
-    [[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
+    local result=$(find ${run_dir} -maxdepth 3 -name "${profile}") path
+    [[ -z $result ]] && die "%s is not a valid profile or build list!" "${profile}"
     path=${result%/*}
-    path=${path%/*}
     echo ${path##*/}
 }
 
 connect(){
     local home="/home/frs/project"
-    echo "${account},$1@frs.${host}:${home}/$1"
+    echo "${account},${project}@frs.${host}:${home}/${profile}"
+}
+
+gen_webseed(){
+    local webseed seed="$1"
+    for mirror in ${iso_mirrors[@]};do
+        webseed=${webseed:-}${webseed:+,}"http://${mirror}.dl.${seed}"
+    done
+    echo ${webseed}
+}
+
+make_torrent(){
+    find ${src_dir} -type f -name "*.torrent" -delete
+
+    if [[ -n $(find ${src_dir} -type f -name "*.iso") ]]; then
+        for iso in $(ls ${src_dir}/*.iso);do
+            local seed=${host}/project/${project}/${target_dir}/${iso##*/}
+            local mktorrent_args=(-c "${torrent_meta}" -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed ${seed}))
+            ${verbose} && mktorrent_args+=(-v)
+            msg2 "Creating (%s) ..." "${iso##*/}.torrent"
+            mktorrent ${mktorrent_args[*]} -o ${iso}.torrent ${iso}
+        done
+    fi
 }
 
 prepare_transfer(){
-    local edition=$(get_edition $1)
-    project=$(get_project "${edition}")
-    url=$(connect "${project}")
-    target_dir="${dist_release}/$1"
+    profile="$1"
+    edition=$(get_edition)
+    url=$(connect)
+
+    target_dir="${profile}/${dist_release}"
     src_dir="${run_dir}/${edition}/${target_dir}"
+    ${torrent} && make_torrent
 }
 
 sync_dir(){
