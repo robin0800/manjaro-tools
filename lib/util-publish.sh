@@ -56,7 +56,7 @@ make_torrent(){
         for iso in $(ls ${src_dir}/*.iso);do
             local seed=${host}/project/${project}/${target_dir}/${iso##*/}
             local mktorrent_args=(-c "${torrent_meta}" -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed ${seed}))
-
+            ${verbose} && mktorrent_args+=(-v)
             msg2 "Creating (%s) ..." "${iso##*/}.torrent"
             mktorrent ${mktorrent_args[*]} -o ${iso}.torrent ${iso}
         done
