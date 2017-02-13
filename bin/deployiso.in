@@ -44,7 +44,7 @@ display_settings(){
     msg2 "update: %s" "${update}"
     msg2 "release: %s" "${release}"
     msg2 "verbose: %s" "${verbose}"
-    msg2 "rsync_args: %s" "${rsync_args[*]}"
+#     msg2 "rsync_args: %s" "${rsync_args[*]}"
     msg2 "torrent: %s" "${torrent}"
 
     if ${torrent};then
