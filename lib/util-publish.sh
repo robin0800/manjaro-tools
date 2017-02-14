@@ -30,7 +30,7 @@ create_release(){
 }
 
 get_edition(){
-    local result=$(find ${run_dir} -maxdepth 3 -name "${profile}") path
+    local result=$(find ${run_dir} -maxdepth 2 -name "${profile}") path
     [[ -z $result ]] && die "%s is not a valid profile or build list!" "${profile}"
     path=${result%/*}
     echo ${path##*/}
@@ -38,7 +38,7 @@ get_edition(){
 
 connect(){
     local home="/home/frs/project"
-    echo "${account},${project}@frs.${host}:${home}/${profile}"
+    echo "${account},${project}@frs.${host}:${home}/${project}"
 }
 
 gen_webseed(){
