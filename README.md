@@ -94,23 +94,11 @@ overriding
 # default iso build list; name without .list extension
 # build_list_iso=default
 
-# the dist name; default: Manjaro
-# dist_name="Manjaro"
-
 # the dist release; default: auto
 # dist_release=17.0
 
-# the codename; defaults to value sourced from /etc/lsb-release
-# dist_codename="Gellivara"
-
 # the branding; default: auto
 # dist_branding="MJRO"
-
-# iso publisher
-# iso_publisher="Manjaro Linux <http://www.manjaro.org>"
-
-# iso app id
-# iso_app_id="Manjaro Linux Live/Rescue CD"
 
 # possible values: openrc,systemd
 # initsys="systemd"
