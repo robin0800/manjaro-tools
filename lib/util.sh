@@ -297,6 +297,8 @@ init_buildiso(){
 
     [[ -z ${profile_repo} ]] && profile_repo='iso-profiles'
 
+    [[ -z ${gpgkey} ]] && gpgkey=''
+
     mhwd_repo="/opt/pkg"
 }
 

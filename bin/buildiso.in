@@ -82,6 +82,7 @@ display_settings(){
     msg2 "chroots_iso: %s" "${chroots_iso}"
     msg2 "initsys: %s" "${initsys}"
     msg2 "kernel: %s" "${kernel}"
+    [[ -n ${gpgkey} ]] && msg2 "gpgkey: %s" "${gpgkey}"
 
     msg "ARGS:"
     msg2 "clean_first: %s" "${clean_first}"
@@ -134,6 +135,8 @@ usage() {
     echo "                       [default: ${kernel}]"
     echo '    -i <name>          Init system to use'
     echo "                       [default: ${initsys}]"
+    echo '    -g <key>           The gpg key for sfs signing'
+    echo "                       [default: ${gpgkey}]"
     echo '    -m                 Set SquashFS image mode to persistence'
     echo '    -c                 Disable clean work dir'
     echo '    -x                 Build images only'
@@ -149,7 +152,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:czxmvqh'
+opts='p:a:b:r:t:k:i:g:czxmvqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -160,6 +163,7 @@ while getopts "${opts}" arg; do
         t) cache_dir_iso="$OPTARG" ;;
         k) kernel="$OPTARG" ;;
         i) initsys="$OPTARG" ;;
+        g) gpgkey="$OPTARG" ;;
         c) clean_first=false ;;
         x) images_only=true ;;
         z) iso_only=true ;;
