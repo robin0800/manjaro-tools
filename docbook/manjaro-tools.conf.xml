@@ -242,6 +242,14 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
         </varlistentry>
 
         <varlistentry>
+            <term><varname>gpgkey=</varname></term>
+
+            <listitem><para>If the gpgkey is supplied, the sfs images on iso will be signed.
+                    If the key is left empty or commented, signing will be skipped.
+                    </para></listitem>
+        </varlistentry>
+
+        <varlistentry>
             <term><varname>initsys=</varname></term>
 
             <listitem><para>Takes <option>systemd</option> (the default)
