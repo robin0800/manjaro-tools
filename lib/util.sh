@@ -186,12 +186,6 @@ prepare_dir(){
     [[ ! -d $1 ]] && mkdir -p $1
 }
 
-version_gen(){
-    local y=$(date +%Y) m=$(date +%m) ver
-    ver=${y:2}.$m
-    echo $ver
-}
-
 # $1: chroot
 get_branch(){
     echo $(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch = ' | sed 's/Branch = \s*//g')
@@ -260,6 +254,31 @@ get_codename(){
     echo "${DISTRIB_CODENAME}"
 }
 
+get_release(){
+    source /etc/lsb-release
+    echo "${DISTRIB_RELEASE}"
+}
+
+get_distname(){
+    source /etc/lsb-release
+    echo "${DISTRIB_ID%Linux}"
+}
+
+get_disturl(){
+    source /etc/os-release
+    echo "${HOME_URL}"
+}
+
+get_osname(){
+    source /etc/os-release
+    echo "${NAME}"
+}
+
+get_osid(){
+    source /etc/os-release
+    echo "${ID}"
+}
+
 init_buildiso(){
     chroots_iso="${chroots_dir}/buildiso"
 
@@ -273,21 +292,17 @@ init_buildiso(){
 
     ##### iso settings #####
 
-    [[ -z ${dist_release} ]] && dist_release=$(version_gen)
+    [[ -z ${dist_release} ]] && dist_release=$(get_release)
 
-    [[ -z ${dist_codename} ]] && dist_codename=$(get_codename)
+    dist_codename=$(get_codename)
+
+    dist_name=$(get_distname)
 
     [[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
-    [[ -z ${dist_name} ]] && dist_name="Manjaro"
-
-    iso_name=${dist_name,,}
+    iso_name=$(get_osid)
 
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
-
-    [[ -z ${iso_publisher} ]] && iso_publisher='Manjaro Linux <http://www.manjaro.org>'
-
-    [[ -z ${iso_app_id} ]] && iso_app_id='Manjaro Linux Live/Rescue CD'
 
     [[ -z ${initsys} ]] && initsys="systemd"
 

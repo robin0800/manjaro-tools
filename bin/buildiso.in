@@ -97,8 +97,6 @@ display_settings(){
 
     msg "ISO SETTINGS:"
     msg2 "iso_label: %s" "${iso_label}"
-    msg2 "iso_publisher: %s" "${iso_publisher}"
-    msg2 "iso_app_id: %s" "${iso_app_id}"
     msg2 "use_overlayfs: %s" "${use_overlayfs}"
     ${verbose} && msg2 "iso_fs: %s" "${iso_fs}"
 

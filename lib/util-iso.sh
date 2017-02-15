@@ -161,7 +161,7 @@ make_sfs() {
 
 assemble_iso(){
     msg "Creating ISO image..."
-    local efi_boot_args=()
+    local efi_boot_args=() iso_publisher iso_app_id
     if [[ -f "${iso_root}/EFI/miso/efiboot.img" ]]; then
         msg2 "Setting efi args. El Torito detected."
         efi_boot_args=("-eltorito-alt-boot"
@@ -169,6 +169,10 @@ assemble_iso(){
                 "-isohybrid-gpt-basdat"
                 "-no-emul-boot")
     fi
+
+    iso_publisher="$(get_osname) <$(get_disturl)>"
+
+    iso_app_id="$(get_osname) Live/Rescue CD"
 
     xorriso -as mkisofs \
         -iso-level 3 -rock -joliet \
