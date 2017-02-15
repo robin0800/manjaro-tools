@@ -71,7 +71,9 @@ trap_exit() {
 make_sig () {
     msg2 "Creating signature file..."
     cd "$1"
-    gpg --detach-sign --default-key ${gpg_key} $2.sfs
+    user_own "$1"
+    su ${OWNER} -c "gpg --detach-sign --default-key ${gpgkey} $2.sfs"
+    chown -R root "$1"
     cd ${OLDPWD}
 }
 
@@ -149,6 +151,10 @@ make_sfs() {
     fi
     make_checksum "${dest}" "${name}"
     ${persist} && rm "${src}.img"
+
+    if [[ -n ${gpgkey} ]];then
+        make_sig "${dest}" "${name}"
+    fi
 
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
 }
@@ -351,18 +357,7 @@ make_image_boot() {
         fi
 
         prepare_initcpio "${path}"
-
-#         if [[ ${gpg_key} ]]; then
-#             gpg --export ${gpg_key} >${work_dir}/gpgkey
-#             exec 17<>${work_dir}/gpgkey
-#         fi
-#         MISO_GNUPG_FD=${gpg_key:+17}
-
         prepare_initramfs "${profile_dir}" "${path}"
-
-#         if [[ ${gpg_key} ]]; then
-#             exec 17<&-
-#         fi
 
         mv ${path}/boot/initramfs.img ${boot}/${target_arch}/initramfs.img
         prepare_boot_extras "${path}" "${boot}"
