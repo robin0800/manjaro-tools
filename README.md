@@ -122,6 +122,9 @@ overriding
 # requires minimum 4.0 kernel on the build host and on iso in profile.conf
 # use_overlayfs="false"
 
+# gpg key; leave empty or commented to skip sfs signing
+# gpgkey=""
+
 ################ deployiso ################
 
 # the server user
@@ -225,10 +228,12 @@ Usage: buildiso [options]
     -t <dir>           Target directory
                        [default: /var/cache/manjaro-tools/iso]
     -k <name>          Kernel to use
-                       [default: linux44]
+                       [default: linux49]
     -i <name>          Init system to use
                        [default: systemd]
-    -s                 Sign the iso
+    -g <key>           The gpg key for sfs signing
+                       [default: empty]
+    -m                 Set SquashFS image mode to persistence
     -c                 Disable clean work dir
     -x                 Build images only
     -z                 Generate iso only
