@@ -298,9 +298,9 @@ init_buildiso(){
 
     dist_name=$(get_distname)
 
-    [[ -z ${dist_branding} ]] && dist_branding="MJRO"
-
     iso_name=$(get_osid)
+
+    [[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
 
@@ -739,7 +739,6 @@ show_config(){
     else
         msg2 "manjaro_tools_conf: %s" "${manjaro_tools_conf}"
     fi
-    msg2 "log_dir: %s" "${log_dir}"
 }
 
 # $1: chroot
