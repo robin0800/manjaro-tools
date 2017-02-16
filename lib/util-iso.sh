@@ -435,7 +435,7 @@ make_syslinux() {
 }
 
 check_requirements(){
-    [[ -f ${run_dir}/.buildiso ]] || die "%s is not a valid iso profiles directory!" "${run_dir}"
+    [[ -f ${run_dir}/repo_info ]] || die "%s is not a valid iso profiles directory!" "${run_dir}"
     if ! $(is_valid_arch_iso ${target_arch});then
         die "%s is not a valid arch!" "${target_arch}"
     fi
