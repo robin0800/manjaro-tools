@@ -58,7 +58,9 @@ prepare_initramfs(){
     if [[ -n ${gpgkey} ]]; then
         exec 17<&-
     fi
-    [[ -f ${USERCONFDIR}/gpgkey ]] && rm ${USERCONFDIR}/gpgkey
+    if [[ -f ${USERCONFDIR}/gpgkey ]]; then
+        rm ${USERCONFDIR}/gpgkey
+    fi
 }
 
 prepare_boot_extras(){
