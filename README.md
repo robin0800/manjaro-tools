@@ -127,9 +127,6 @@ overriding
 # Piece size, 2^n
 # piece_size=21
 
-# torrent meta comment
-# torrent_meta="ManjaroLinux"
-
 # iso mirrors
 # iso_mirrors=('heanet' 'jaist' 'netcologne' 'iweb' 'kent')
 ~~~

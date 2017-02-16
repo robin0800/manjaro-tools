@@ -264,6 +264,11 @@ get_distname(){
     echo "${DISTRIB_ID%Linux}"
 }
 
+get_distid(){
+    source /etc/lsb-release
+    echo "${DISTRIB_ID}"
+}
+
 get_disturl(){
     source /etc/os-release
     echo "${HOME_URL}"
@@ -321,7 +326,7 @@ init_deployiso(){
 
     host="sourceforge.net"
 
-    [[ -z ${project} ]] && project="manjarolinux"
+    [[ -z ${project} ]] && project="[SetProject]"
 
     [[ -z ${account} ]] && account="[SetUser]"
 
@@ -333,7 +338,7 @@ init_deployiso(){
 
     [[ -z ${iso_mirrors[@]} ]] && iso_mirrors=('heanet' 'jaist' 'netcologne' 'iweb' 'kent')
 
-    [[ -z ${torrent_meta} ]] && torrent_meta="ManjaroLinux"
+    torrent_meta="$(get_distid)"
 }
 
 load_config(){
@@ -735,9 +740,9 @@ show_version(){
 
 show_config(){
     if [[ -f ${USERCONFDIR}/manjaro-tools.conf ]]; then
-        msg2 "user_config: %s" "${USERCONFDIR}/manjaro-tools.conf"
+        msg2 "config: %s" "~/.config/manjaro-tools/manjaro-tools.conf"
     else
-        msg2 "manjaro_tools_conf: %s" "${manjaro_tools_conf}"
+        msg2 "config: %s" "${manjaro_tools_conf}"
     fi
 }
 

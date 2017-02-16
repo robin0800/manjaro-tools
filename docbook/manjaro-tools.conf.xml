@@ -253,13 +253,6 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
-                <term><varname>torrent_meta=</varname></term>
-
-                <listitem><para>Default meta comment for the torrent.
-                </para></listitem>
-            </varlistentry>
-
-            <varlistentry>
                 <term><varname>limit=</varname></term>
 
                 <listitem><para>Default upload bandwidth limit in kb/s.
