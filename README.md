@@ -88,9 +88,6 @@ overriding
 
 ################ buildiso ################
 
-# the name of the profiles directory
-# profile_repo='manjaro-tools-iso-profiles'
-
 # default iso build list; name without .list extension
 # build_list_iso=default
 
