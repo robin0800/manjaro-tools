@@ -295,6 +295,8 @@ init_buildiso(){
 
     cache_dir_iso="${cache_dir}/iso"
 
+    profile_repo='iso-profiles'
+
     ##### iso settings #####
 
     [[ -z ${dist_release} ]] && dist_release=$(get_release)
@@ -314,8 +316,6 @@ init_buildiso(){
     [[ -z ${kernel} ]] && kernel="linux49"
 
     [[ -z ${use_overlayfs} ]] && use_overlayfs='true'
-
-    [[ -z ${profile_repo} ]] && profile_repo='iso-profiles'
 
     [[ -z ${gpgkey} ]] && gpgkey=''
 
@@ -708,7 +708,7 @@ write_repo_conf(){
     local path name
     [[ -z ${repos[@]} ]] && run_dir=${DATADIR}/iso-profiles && return 1
     for r in ${repos[@]}; do
-        path=${r%/.*}
+        path=${r%/repo_info}
         name=${path##*/}
         echo "run_dir=$path" > ${USERCONFDIR}/$name.conf
     done
