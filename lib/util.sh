@@ -708,7 +708,7 @@ write_repo_conf(){
     local path name
     [[ -z ${repos[@]} ]] && run_dir=${DATADIR}/iso-profiles && return 1
     for r in ${repos[@]}; do
-        path=${r%/.*}
+        path=${r%/repo_info}
         name=${path##*/}
         echo "run_dir=$path" > ${USERCONFDIR}/$name.conf
     done
