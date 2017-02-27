@@ -379,9 +379,6 @@ check_profile_vars(){
     if ! is_valid_bool "${nonfree_mhwd}";then
         die "nonfree_mhwd only accepts true/false value!"
     fi
-    if ! is_valid_bool "${plymouth_boot}";then
-        die "plymouth_boot only accepts true/false value!"
-    fi
     if ! is_valid_bool "${pxe_boot}";then
         die "pxe_boot only accepts true/false value!"
     fi
@@ -398,7 +395,6 @@ check_profile_vars(){
 
 get_svc(){
     local service=${displaymanager}
-    ${plymouth_boot} && service="$service-plymouth"
     echo $service
 }
 
@@ -418,8 +414,6 @@ load_profile_config(){
     [[ -z ${multilib} ]] && multilib="true"
 
     [[ -z ${pxe_boot} ]] && pxe_boot="true"
-
-    [[ -z ${plymouth_boot} ]] && plymouth_boot="true"
 
     [[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
 
@@ -514,7 +508,6 @@ reset_profile(){
     unset chrootcfg
     unset netgroups
     unset geoip
-    unset plymouth_boot
     unset basic
     unset extra
 }

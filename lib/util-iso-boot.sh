@@ -15,10 +15,6 @@ set_mkinicpio_hooks(){
         sed -e 's/miso_pxe_common miso_pxe_http miso_pxe_nbd miso_pxe_nfs //' \
         -e 's/memdisk //' -i $1
     fi
-    if ! ${plymouth_boot};then
-        msg2 "Removing plymouth hook"
-        sed -e 's/plymouth //' -i $1
-    fi
     if ! ${use_overlayfs};then
         msg2 "Setting aufs hook"
         sed -e 's/miso /miso_aufs /' -i $1
@@ -27,10 +23,6 @@ set_mkinicpio_hooks(){
 
 gen_boot_args(){
     local args=(quiet)
-    local args=()
-    if ${plymouth_boot};then
-        args+=(splash)
-    fi
     echo ${args[@]}
 }
 
