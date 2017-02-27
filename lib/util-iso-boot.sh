@@ -21,17 +21,11 @@ set_mkinicpio_hooks(){
     fi
 }
 
-gen_boot_args(){
-    local args=(quiet)
-    echo ${args[@]}
-}
-
 prepare_initcpio(){
     msg2 "Copying initcpio ..."
     cp /etc/initcpio/hooks/miso* $1/etc/initcpio/hooks
     cp /etc/initcpio/install/miso* $1/etc/initcpio/install
     cp /etc/initcpio/miso_shutdown $1/etc/initcpio
-#     sed -e "s|/usr/lib/initcpio/|/etc/initcpio/|" -i $1/etc/initcpio/install/miso_shutdown
 }
 
 prepare_initramfs(){
@@ -79,7 +73,7 @@ vars_to_boot_conf(){
         -e "s|@ARCH@|${target_arch}|g" \
         -e "s|@DRV@|$2|g" \
         -e "s|@SWITCH@|$3|g" \
-        -e "s|@BOOT_ARGS@|$(gen_boot_args)|g" \
+        -e "s|@BOOT_ARGS@||g" \
         -i $1
 }
 

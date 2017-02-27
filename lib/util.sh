@@ -393,11 +393,6 @@ check_profile_vars(){
     fi
 }
 
-get_svc(){
-    local service=${displaymanager}
-    echo $service
-}
-
 load_profile_config(){
 
     [[ -f $1 ]] || return 1
@@ -453,7 +448,7 @@ load_profile_config(){
 
     if [[ ${displaymanager} != "none" ]]; then
         enable_openrc+=('xdm')
-        enable_systemd+=("$(get_svc)")
+        enable_systemd+=("${displaymanager}")
     fi
 
     [[ -z ${netinstall} ]] && netinstall='false'
