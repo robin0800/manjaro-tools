@@ -466,8 +466,6 @@ load_profile_config(){
 
     [[ -z ${chrootcfg} ]] && chrootcfg='false'
 
-    #[[ -z ${netgroups} ]] && -- needs to be hardcoded for now, until a standard has been established
-    # will be unlocked again after everything has been established.
     netgroups="https://raw.githubusercontent.com/manjaro/calamares-netgroups/master"
 
     [[ -z ${geoip} ]] && geoip='true'
