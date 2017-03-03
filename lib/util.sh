@@ -419,7 +419,7 @@ load_profile_config(){
 
     [[ -z ${pxe_boot} ]] && pxe_boot="true"
 
-    [[ -z ${plymouth_boot} ]] && plymouth_boot="true"
+    [[ -z ${plymouth_boot} ]] && plymouth_boot="false"
 
     [[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
 
