@@ -108,11 +108,11 @@ prepare_efi_loader(){
     vars_to_boot_conf $2/loader/loader.conf
     cp ${efi_data}/uefi-shell-v{1,2}-x86_64.conf ${entries}
 
-    local drv='free' switch="no"
+    local drv='nonfree' switch="no"
     cp ${efi_data}/entry-x86_64-$3.conf ${entries}/${iso_name}-x86_64.conf
     vars_to_boot_conf "${entries}/${iso_name}-x86_64.conf" "$drv" "$switch"
     if ${nonfree_mhwd};then
-        drv='nonfree' switch="yes"
+        switch="yes"
         cp ${efi_data}/entry-x86_64-$3.conf ${entries}/${iso_name}-x86_64-nonfree.conf
         vars_to_boot_conf "${entries}/${iso_name}-x86_64-nonfree.conf" "$drv" "$switch"
     fi
