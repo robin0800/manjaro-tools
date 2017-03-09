@@ -360,37 +360,6 @@ load_config(){
     return 0
 }
 
-is_valid_bool(){
-    case $1 in
-        'true'|'false') return 0 ;;
-        *) return 1 ;;
-    esac
-}
-
-check_profile_vars(){
-    if ! is_valid_bool "${autologin}";then
-        die "autologin only accepts true/false value!"
-    fi
-    if ! is_valid_bool "${multilib}";then
-        die "multilib only accepts true/false value!"
-    fi
-    if ! is_valid_bool "${nonfree_mhwd}";then
-        die "nonfree_mhwd only accepts true/false value!"
-    fi
-    if ! is_valid_bool "${pxe_boot}";then
-        die "pxe_boot only accepts true/false value!"
-    fi
-    if ! is_valid_bool "${netinstall}";then
-        die "netinstall only accepts true/false value!"
-    fi
-    if ! is_valid_bool "${chrootcfg}";then
-        die "chrootcfg only accepts true/false value!"
-    fi
-    if ! is_valid_bool "${geoip}";then
-        die "geoip only accepts true/false value!"
-    fi
-}
-
 load_profile_config(){
 
     [[ -f $1 ]] || return 1
@@ -463,8 +432,6 @@ load_profile_config(){
     [[ -z ${extra} ]] && extra='false'
 
     ${extra} && basic='false'
-
-    check_profile_vars
 
     return 0
 }

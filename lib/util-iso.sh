@@ -535,7 +535,7 @@ get_pacman_conf(){
 }
 
 load_profile(){
-    conf="${profile_dir}/profile.conf"
+    conf="$1/profile.conf"
 
     info "Profile: [%s]" "${profile}"
 
@@ -565,7 +565,7 @@ prepare_profile(){
     edition=$(get_edition ${profile})
     profile_dir=${run_dir}/${edition}/${profile}
     check_profile "${profile_dir}"
-    load_profile
+    load_profile "${profile_dir}"
 }
 
 build(){
