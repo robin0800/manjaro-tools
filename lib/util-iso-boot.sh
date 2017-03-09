@@ -15,10 +15,6 @@ set_mkinicpio_hooks(){
         sed -e 's/miso_pxe_common miso_pxe_http miso_pxe_nbd miso_pxe_nfs //' \
         -e 's/memdisk //' -i $1
     fi
-    if ! ${use_overlayfs};then
-        msg2 "Setting aufs hook"
-        sed -e 's/miso /miso_aufs /' -i $1
-    fi
 }
 
 prepare_initcpio(){
@@ -29,14 +25,14 @@ prepare_initcpio(){
 }
 
 prepare_initramfs(){
-    cp $1/mkinitcpio.conf $2/etc/mkinitcpio-${iso_name}.conf
-    set_mkinicpio_hooks "$2/etc/mkinitcpio-${iso_name}.conf"
-    local _kernver=$(cat $2/usr/lib/modules/*/version)
+    cp ${DATADIR}/mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
+    set_mkinicpio_hooks "$1/etc/mkinitcpio-${iso_name}.conf"
+    local _kernver=$(cat $1/usr/lib/modules/*/version)
     if [[ -n ${gpgkey} ]]; then
         su ${OWNER} -c "gpg --export ${gpgkey} >${USERCONFDIR}/gpgkey"
         exec 17<>${USERCONFDIR}/gpgkey
     fi
-    MISO_GNUPG_FD=${gpgkey:+17} chroot-run $2 \
+    MISO_GNUPG_FD=${gpgkey:+17} chroot-run $1 \
         /usr/bin/mkinitcpio -k ${_kernver} \
         -c /etc/mkinitcpio-${iso_name}.conf \
         -g /boot/initramfs.img

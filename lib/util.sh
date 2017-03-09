@@ -315,8 +315,6 @@ init_buildiso(){
 
     [[ -z ${kernel} ]] && kernel="linux49"
 
-    [[ -z ${use_overlayfs} ]] && use_overlayfs='true'
-
     [[ -z ${gpgkey} ]] && gpgkey=''
 
     mhwd_repo="/opt/pkg"
@@ -423,7 +421,7 @@ load_profile_config(){
     [[ -z ${login_shell} ]] && login_shell='/bin/bash'
 
     if [[ -z ${addgroups} ]];then
-        addgroups="video,power,storage,optical,network,lp,scanner,wheel"
+        addgroups="video,power,storage,optical,network,lp,scanner,wheel,sys"
     fi
 
     if [[ -z ${enable_systemd[@]} ]];then
@@ -508,8 +506,7 @@ reset_profile(){
 }
 
 check_profile(){
-    local keyfiles=("${profile_dir}/mkinitcpio.conf"
-            "${profile_dir}/Packages-Root"
+    local keyfiles=("${profile_dir}/Packages-Root"
             "${profile_dir}/Packages-Live")
 
     local keydirs=("${profile_dir}/root-overlay"
