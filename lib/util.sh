@@ -459,10 +459,9 @@ load_profile_config(){
 
     [[ -z ${smb_workgroup} ]] && smb_workgroup=''
 
-    [[ -z ${basic} ]] && basic='true'
+    basic='true'
     [[ -z ${extra} ]] && extra='false'
 
-    #${basic} && extra='false'
     ${extra} && basic='false'
 
     check_profile_vars
@@ -506,11 +505,11 @@ reset_profile(){
 }
 
 check_profile(){
-    local keyfiles=("${profile_dir}/Packages-Root"
-            "${profile_dir}/Packages-Live")
+    local keyfiles=("$1/Packages-Root"
+            "$1/Packages-Live")
 
-    local keydirs=("${profile_dir}/root-overlay"
-            "${profile_dir}/live-overlay")
+    local keydirs=("$1/root-overlay"
+            "$1/live-overlay")
 
     local has_keyfiles=false has_keydirs=false
     for f in ${keyfiles[@]}; do
@@ -530,12 +529,12 @@ check_profile(){
         fi
     done
     if ! ${has_keyfiles} && ! ${has_keydirs};then
-        die "Profile [%s] sanity check failed!" "${profile_dir}"
+        die "Profile [%s] sanity check failed!" "$1"
     fi
 
-    [[ -f "${profile_dir}/Packages-Desktop" ]] && packages_desktop=${profile_dir}/Packages-Desktop
+    [[ -f "$1/Packages-Desktop" ]] && packages_desktop=$1/Packages-Desktop
 
-    [[ -f "${profile_dir}/Packages-Mhwd" ]] && packages_mhwd=${profile_dir}/Packages-Mhwd
+    [[ -f "$1/Packages-Mhwd" ]] && packages_mhwd=$1/Packages-Mhwd
 
     if ! ${netinstall}; then
         chrootcfg="false"

@@ -564,7 +564,7 @@ prepare_profile(){
     profile=$1
     edition=$(get_edition ${profile})
     profile_dir=${run_dir}/${edition}/${profile}
-    check_profile
+    check_profile "${profile_dir}"
     load_profile
 }
 
