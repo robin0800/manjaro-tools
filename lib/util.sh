@@ -465,9 +465,7 @@ reset_profile(){
     unset login_shell
     unset netinstall
     unset chrootcfg
-    unset netgroups
     unset geoip
-    unset basic
     unset extra
 }
 
