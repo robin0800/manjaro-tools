@@ -400,7 +400,7 @@ load_profile_config(){
     [[ -z ${disable_systemd[@]} ]] && disable_systemd=('pacman-init')
 
     if [[ -z ${enable_openrc[@]} ]];then
-        enable_openrc=('acpid' 'bluetooth' 'cgmanager' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+        enable_openrc=('acpid' 'bluetooth' 'elogind' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
     fi
 
     [[ -z ${disable_openrc[@]} ]] && disable_openrc=()
