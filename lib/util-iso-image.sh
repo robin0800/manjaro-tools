@@ -84,15 +84,6 @@ configure_lsb(){
     fi
 }
 
-configure_mhwd(){
-    if [[ ${target_arch} == "x86_64" ]];then
-        if ! ${multilib};then
-            msg2 "Disable mhwd lib32 support"
-            echo 'MHWD64_IS_LIB32="false"' > $1/etc/mhwd-x86_64.conf
-        fi
-    fi
-}
-
 configure_logind(){
     msg2 "Configuring logind ..."
     local conf=$1/etc/systemd/logind.conf
@@ -164,10 +155,10 @@ configure_hosts(){
 }
 
 configure_system(){
+    configure_logind "$1"
     case ${initsys} in
         'systemd')
             configure_journald "$1"
-            configure_logind "$1"
 
             # Prevent some services to be started in the livecd
             echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
@@ -211,7 +202,6 @@ configure_thus(){
 configure_live_image(){
     msg "Configuring [livefs]"
     configure_hosts "$1"
-    configure_mhwd "$1"
     configure_system "$1"
     configure_services "$1"
     configure_calamares "$1"
