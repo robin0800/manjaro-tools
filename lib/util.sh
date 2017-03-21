@@ -721,6 +721,7 @@ create_min_fs(){
     mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
     mkdir -m 1777 -p $1/tmp
     mkdir -m 0555 -p $1/{sys,proc}
+    touch $1/etc/resolv.conf
 }
 
 is_valid_init(){
