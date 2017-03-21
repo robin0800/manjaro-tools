@@ -86,8 +86,7 @@ configure_lsb(){
 
 configure_logind(){
     msg2 "Configuring logind ..."
-    local conf=$1/etc/systemd/logind.conf
-    [[ ${initsys} == 'openrc' ]] && conf=$1/etc/elogind/logind.conf
+    local conf=$1/etc/$2/logind.conf
     sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
     sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
     sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' "$conf"
@@ -156,9 +155,9 @@ configure_hosts(){
 }
 
 configure_system(){
-    configure_logind "$1"
     case ${initsys} in
         'systemd')
+            configure_logind "$1" "systemd"
             configure_journald "$1"
 
             # Prevent some services to be started in the livecd
@@ -167,14 +166,14 @@ configure_system(){
 
             msg2 "Disable systemd-gpt-auto-generator"
             ln -sf /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
-
-            echo ${hostname} > $1/etc/hostname
         ;;
         'openrc')
-            local hn='hostname="'${hostname}'"'
-            sed -i -e "s|^.*hostname=.*|${hn}|" $1/etc/conf.d/hostname
+            configure_logind "$1" "elogind"
+#             local hn='hostname="'${hostname}'"'
+#             sed -i -e "s|^.*hostname=.*|${hn}|" $1/etc/conf.d/hostname
         ;;
     esac
+    echo ${hostname} > $1/etc/hostname
 }
 
 configure_thus(){
