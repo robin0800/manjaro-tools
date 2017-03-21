@@ -87,6 +87,7 @@ configure_lsb(){
 configure_logind(){
     msg2 "Configuring logind ..."
     local conf=$1/etc/systemd/logind.conf
+    [[ ${initsys} == 'openrc' ]] && conf=$1/etc/elogind/logind.conf
     sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
     sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
     sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' "$conf"
