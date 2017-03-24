@@ -375,8 +375,6 @@ load_profile_config(){
 
     [[ -z ${multilib} ]] && multilib="true"
 
-    [[ -z ${pxe_boot} ]] && pxe_boot="true"
-
     [[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
 
     [[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
@@ -447,7 +445,6 @@ reset_profile(){
     unset displaymanager
     unset autologin
     unset multilib
-    unset pxe_boot
     unset nonfree_mhwd
     unset efi_boot_loader
     unset hostname
