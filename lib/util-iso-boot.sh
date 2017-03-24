@@ -52,44 +52,42 @@ vars_to_boot_conf(){
 }
 
 prepare_grub(){
-    local src=i386-pc app='core.img' grub=$2/boot/grub efi=$2/efi/boot \
-        data=$1/usr/share/grub lib=$1/usr/lib/grub
+    local platform=i386-pc img='core.img' grub=$2/boot/grub efi=$2/efi/boot \
+        data=$1/usr/share/grub lib=$1/usr/lib/grub prefix=/boot/grub
 
-    prepare_dir ${grub}/${src}
+    prepare_dir ${grub}/${platform}
 
     cp ${data}/cfg/*.cfg ${grub}
 
     vars_to_boot_conf "${grub}/kernels.cfg"
 
-    cp ${lib}/${src}/* ${grub}/${src}
+    cp ${lib}/${platform}/* ${grub}/${platform}
 
-    msg2 "Building %s ..." "${app}"
+    msg2 "Building %s ..." "${img}"
 
-    local mods=(iso9660 normal extcmd boot bufio crypto gettext terminal multiboot configfile linux linux16)
+    grub-mkimage -d ${grub}/${platform} -o ${grub}/${platform}/${img} -O ${platform} -p ${prefix} biosdisk iso9660
 
-    grub-mkimage -d ${grub}/${src} -o ${grub}/${src}/core.img -O ${src} -p /boot/grub biosdisk ${mods[@]}
-
-    cat ${grub}/${src}/cdboot.img ${grub}/${src}/core.img > ${grub}/${src}/eltorito.img
+    cat ${grub}/${platform}/cdboot.img ${grub}/${platform}/${img} > ${grub}/${platform}/eltorito.img
 
     case ${target_arch} in
         'i686')
-            src=i386-efi
-            app=bootia32.efi
+            platform=i386-efi
+            img=bootia32.efi
         ;;
         'x86_64')
-            src=x86_64-efi
-            app=bootx64.efi
+            platform=x86_64-efi
+            img=bootx64.efi
         ;;
     esac
 
     prepare_dir ${efi}
-    prepare_dir ${grub}/${src}
+    prepare_dir ${grub}/${platform}
 
-    cp ${lib}/${src}/* ${grub}/${src}
+    cp ${lib}/${platform}/* ${grub}/${platform}
 
-    msg2 "Building %s ..." "${app}"
+    msg2 "Building %s ..." "${img}"
 
-    grub-mkimage -d ${grub}/${src} -o ${efi}/${app} -O ${src} -p /boot/grub ${mods[@]}
+    grub-mkimage -d ${grub}/${platform} -o ${efi}/${img} -O ${platform} -p ${prefix} iso9660
 
     prepare_dir ${grub}/themes
     cp -r ${data}/themes/${iso_name}-live ${grub}/themes/
@@ -105,8 +103,8 @@ prepare_grub(){
 
     prepare_dir ${mnt}/efi/boot
 
-    msg2 "Building %s ..." "${app}"
-    grub-mkimage -d ${grub}/${src} -o ${mnt}/efi/boot/${app} -O ${src} -p /boot/grub ${mods[@]}
+    msg2 "Building %s ..." "${img}"
+    grub-mkimage -d ${grub}/${platform} -o ${mnt}/efi/boot/${img} -O ${platform} -p ${prefix} iso9660
 
     umount_img "${mnt}"
 }
