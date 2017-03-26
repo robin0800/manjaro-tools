@@ -109,7 +109,7 @@ prepare_grub(){
     prepare_dir "${mnt}"
     mount_img "${efi_img}" "${mnt}"    
     prepare_dir ${mnt}/efi/boot
-    msg2 "Building %s ..." "${efi_img}"
+    msg2 "Building %s ..." "${img}"
     grub-mkimage -d ${grub}/${platform} -o ${mnt}/efi/boot/${img} -O ${platform} -p ${prefix} iso9660
     umount_img "${mnt}"
 }
