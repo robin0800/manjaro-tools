@@ -380,7 +380,7 @@ make_grub(){
         
         prepare_grub "${path}" "${iso_root}"
         
-        configure_grub "${iso_root}/boot/grub/kernels.cfg" "${initsys}" "${profile}" 
+        configure_grub "${iso_root}/boot/grub/kernels.cfg" "${initsys}" "${profile}" "${nonfree_mhwd}"
         
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/iso/boot/grub]"
