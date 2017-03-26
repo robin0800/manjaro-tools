@@ -445,7 +445,20 @@ archive_logs(){
 
 make_profile(){
     msg "Start building [%s]" "${profile}"
-    ${clean_first} && chroot_clean "${work_dir}" "${iso_root}"
+    if ${clean_first};then
+        chroot_clean "${chroots_iso}/${profile}/${target_arch}"
+        
+        local unused_arch=''
+        case ${target_arch} in
+            i686) unused_arch='x86_64' ;;
+            x86_64) unused_arch='i686' ;;
+        esac
+        if [[ -d "${chroots_iso}/${profile}/${unused_arch}" ]];then
+            chroot_clean "${chroots_iso}/${profile}/${unused_arch}"
+        fi
+        clean_iso_root "${iso_root}"
+    fi
+    
     if ${iso_only}; then
         [[ ! -d ${work_dir} ]] && die "Create images: buildiso -p %s -x" "${profile}"
         compress_images

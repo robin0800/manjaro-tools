@@ -44,10 +44,16 @@ prepare_boot_extras(){
 }
 
 vars_to_boot_conf(){
-    sed -e "s|@ISO_NAME@|${iso_name}|g" \
-        -e "s|@ISO_LABEL@|${iso_label}|g" \
-        -e "s|@DIST_NAME@|${dist_name}|g" \
+    local default_args="misobasedir=${iso_name} misolabel=${iso_label}" \
+        video_args="nouveau.modeset=1 i915.modeset=1 radeon.modeset=1" \
+        boot_args=(quiet) 
+        [[ ${initsys} == 'systemd' ]] && boot_args+=(systemd.show_status=1)
+    sed -e "s|@DIST_NAME@|${dist_name}|g" \
         -e "s|@ARCH@|${target_arch}|g" \
+        -e "s|@DEFAULT_ARGS@|${initcpio_args}|g" \
+        -e "s|@VIDEO_ARGS@|${video_args}|g" \
+        -e "s|@BOOT_ARGS@|${boot_args[@]}|g" \
+        -e "s|@PROFILE@|${profile}|g" \
         -i $1
 }
 
