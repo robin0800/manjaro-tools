@@ -100,17 +100,14 @@ prepare_grub(){
     cp ${data}/unicode.pf2 ${grub}
     cp -r ${data}/{locales,tz} ${grub}
 
-    local size=8M mnt="${mnt_dir}/efiboot" img="efi.img"
+    local size=8M mnt="${mnt_dir}/efiboot" efi_img="$2/efi.img"
     msg2 "Creating fat image of %s ..." "${size}"
-    truncate -s ${size} "${img}"
-    mkfs.fat -n MISO_EFI "${img}" &>/dev/null
-    mkdir -p "${mnt}"
-    mount_img "${img}" "${mnt}"
-
+    truncate -s ${size} "${efi_img}"
+    mkfs.fat -n MISO_EFI "${efi_img}" &>/dev/null
+    prepare_dir "${mnt}"
+    mount_img "${efi_img}" "${mnt}"    
     prepare_dir ${mnt}/efi/boot
-
-    msg2 "Building %s ..." "${img}"
+    msg2 "Building %s ..." "${efi_img}"
     grub-mkimage -d ${grub}/${platform} -o ${mnt}/efi/boot/${img} -O ${platform} -p ${prefix} iso9660
-
     umount_img "${mnt}"
 }
