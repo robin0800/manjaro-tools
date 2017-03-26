@@ -100,7 +100,7 @@ prepare_grub(){
     cp ${data}/unicode.pf2 ${grub}
     cp -r ${data}/{locales,tz} ${grub}
 
-    local size=8M mnt="${mnt_dir}/efiboot" img="$2/efi.img"
+    local size=8M mnt="${mnt_dir}/efiboot" img="efi.img"
     msg2 "Creating fat image of %s ..." "${size}"
     truncate -s ${size} "${img}"
     mkfs.fat -n MISO_EFI "${img}" &>/dev/null
