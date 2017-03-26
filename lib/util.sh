@@ -375,8 +375,6 @@ load_profile_config(){
 
     [[ -z ${multilib} ]] && multilib="true"
 
-    [[ -z ${pxe_boot} ]] && pxe_boot="true"
-
     [[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
 
     [[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
@@ -400,7 +398,7 @@ load_profile_config(){
     [[ -z ${disable_systemd[@]} ]] && disable_systemd=('pacman-init')
 
     if [[ -z ${enable_openrc[@]} ]];then
-        enable_openrc=('acpid' 'bluetooth' 'cgmanager' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+        enable_openrc=('acpid' 'bluetooth' 'elogind' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
     fi
 
     [[ -z ${disable_openrc[@]} ]] && disable_openrc=()
@@ -447,7 +445,6 @@ reset_profile(){
     unset displaymanager
     unset autologin
     unset multilib
-    unset pxe_boot
     unset nonfree_mhwd
     unset efi_boot_loader
     unset hostname
@@ -759,4 +756,23 @@ run(){
     else
         $1 $2
     fi
+}
+
+is_btrfs() {
+    [[ -e "$1" && "$(stat -f -c %T "$1")" == btrfs ]]
+}
+
+subvolume_delete_recursive() {
+    local subvol
+
+    is_btrfs "$1" || return 0
+
+    while IFS= read -d $'\0' -r subvol; do
+        if ! btrfs subvolume delete "$subvol" &>/dev/null; then
+            error "Unable to delete subvolume %s" "$subvol"
+            return 1
+        fi
+    done < <(find "$1" -xdev -depth -inum 256 -print0)
+
+    return 0
 }
