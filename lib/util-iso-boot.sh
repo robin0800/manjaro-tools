@@ -43,17 +43,17 @@ prepare_boot_extras(){
     cp $1/usr/share/licenses/common/GPL2/license.txt $2/memtest.COPYING
 }
 
-vars_to_boot_conf(){
+configure_grub(){
     local default_args="misobasedir=${iso_name} misolabel=${iso_label}" \
         video_args="nouveau.modeset=1 i915.modeset=1 radeon.modeset=1" \
         boot_args=(quiet) 
-        [[ ${initsys} == 'systemd' ]] && boot_args+=(systemd.show_status=1)
+        [[ $2 == 'systemd' ]] && boot_args+=(systemd.show_status=1)
     sed -e "s|@DIST_NAME@|${dist_name}|g" \
         -e "s|@ARCH@|${target_arch}|g" \
-        -e "s|@DEFAULT_ARGS@|${initcpio_args}|g" \
+        -e "s|@DEFAULT_ARGS@|${default_args}|g" \
         -e "s|@VIDEO_ARGS@|${video_args}|g" \
         -e "s|@BOOT_ARGS@|${boot_args[@]}|g" \
-        -e "s|@PROFILE@|${profile}|g" \
+        -e "s|@PROFILE@|$3|g" \
         -i $1
 }
 
@@ -64,8 +64,6 @@ prepare_grub(){
     prepare_dir ${grub}/${platform}
 
     cp ${data}/cfg/*.cfg ${grub}
-
-    vars_to_boot_conf "${grub}/kernels.cfg"
 
     cp ${lib}/${platform}/* ${grub}/${platform}
 
