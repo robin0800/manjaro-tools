@@ -49,7 +49,7 @@ configure_grub(){
         boot_args=(quiet) 
         [[ $2 == 'systemd' ]] && boot_args+=(systemd.show_status=1)
         
-        local mhwdargs="nonfree=$4"
+        local mhwd_args="nonfree=$4"
         
     sed -e "s|@DIST_NAME@|${dist_name}|g" \
         -e "s|@ARCH@|${target_arch}|g" \
