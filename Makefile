@@ -58,6 +58,7 @@ BIN_ISO = \
 
 LIBS_ISO = \
 	$(wildcard lib/util-iso*.sh) \
+	lib/util-yaml.sh \
 	lib/util-publish.sh
 
 SHARED_ISO = \
