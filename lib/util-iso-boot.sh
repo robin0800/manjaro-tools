@@ -82,7 +82,7 @@ prepare_grub(){
     prepare_dir ${grub}/themes
     cp -r ${data}/themes/${iso_name}-live ${grub}/themes/
     cp ${data}/unicode.pf2 ${grub}
-    cp -r ${data}/{locales,tz} ${grub}
+    cp -r ${data}/{locales,tz,video} ${grub}
 
     local size=8M mnt="${mnt_dir}/efiboot" efi_img="$2/efi.img"
     msg2 "Creating fat image of %s ..." "${size}"
