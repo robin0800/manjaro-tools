@@ -167,26 +167,49 @@ assemble_iso(){
 
     iso_app_id="$(get_osname) Live/Rescue CD"
 
+#     xorriso -as mkisofs \
+#         --protective-msdos-label \
+#         -volid "${iso_label}" \
+#         -appid "${iso_app_id}" \
+#         -publisher "${iso_publisher}" \
+#         -preparer "Prepared by manjaro-tools/${0##*/}" \
+#         -e /efi.img \
+#         -b boot/grub/i386-pc/eltorito.img \
+#         -c boot.catalog \
+#         -no-emul-boot \
+#         -boot-load-size 4 \
+#         -boot-info-table \
+#         -graft-points \
+#         --grub2-boot-info \
+#         --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
+#         --sort-weight 0 / --sort-weight 1 /boot \
+#         -isohybrid-gpt-basdat \
+#         -eltorito-alt-boot \
+#         -output "${iso_dir}/${iso_file}" \
+#         "${iso_root}/"
+
     xorriso -as mkisofs \
-        --protective-msdos-label \
-        -volid "${iso_label}" \
-        -appid "${iso_app_id}" \
-        -publisher "${iso_publisher}" \
-        -preparer "Prepared by manjaro-tools/${0##*/}" \
-        -e /efi.img \
-        -b boot/grub/i386-pc/eltorito.img \
-        -c boot.catalog \
-        -no-emul-boot \
-        -boot-load-size 4 \
-        -boot-info-table \
-        -graft-points \
-        --grub2-boot-info \
-        --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
-        --sort-weight 0 / --sort-weight 1 /boot \
-        -isohybrid-gpt-basdat \
-        -eltorito-alt-boot \
-        -output "${iso_dir}/${iso_file}" \
-        "${iso_root}/"
+            --protective-msdos-label \
+            -volid "${iso_label}" \
+            -appid "${iso_app_id}" \
+            -publisher "${iso_publisher}" \
+            -preparer "Prepared by manjaro-tools/${0##*/}" \
+            -b boot/grub/i386-pc/eltorito.img \
+            -c boot.catalog \
+            -no-emul-boot \
+            -boot-load-size 4 \
+            -boot-info-table \
+            -graft-points \
+            --grub2-boot-info \
+            --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
+            --sort-weight 0 / --sort-weight 1 /boot \
+            -eltorito-alt-boot \
+            -efi-boot-part --efi-boot-image \
+            -e efi.img \
+            -no-emul-boot \
+            -isohybrid-gpt-basdat \
+            -output "${iso_dir}/${iso_file}" \
+            "${iso_root}/"
 }
 
 # Build ISO
@@ -374,16 +397,13 @@ make_image_boot() {
 
 configure_grub(){
     local default_args="misobasedir=${iso_name} misolabel=${iso_label}" \
-        video_args="nouveau.modeset=1 i915.modeset=1 radeon.modeset=1" \
-        boot_args=('quiet') mhwd_args="nonfree=${nonfree_mhwd}"
+        boot_args=('quiet')
     [[ ${initsys} == 'systemd' ]] && boot_args+=('systemd.show_status=1')
 
     sed -e "s|@DIST_NAME@|${dist_name}|g" \
         -e "s|@ARCH@|${target_arch}|g" \
         -e "s|@DEFAULT_ARGS@|${default_args}|g" \
-        -e "s|@VIDEO_ARGS@|${video_args}|g" \
         -e "s|@BOOT_ARGS@|${boot_args[*]}|g" \
-        -e "s|@MHWD_ARGS@|${mhwd_args}|g" \
         -e "s|@PROFILE@|${profile}|g" \
         -i $1
 }
