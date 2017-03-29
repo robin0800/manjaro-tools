@@ -188,28 +188,45 @@ assemble_iso(){
 #         -output "${iso_dir}/${iso_file}" \
 #         "${iso_root}/"
 
+#     xorriso -as mkisofs \
+#             --protective-msdos-label \
+#             -volid "${iso_label}" \
+#             -appid "${iso_app_id}" \
+#             -publisher "${iso_publisher}" \
+#             -preparer "Prepared by manjaro-tools/${0##*/}" \
+#             -b boot/grub/i386-pc/eltorito.img \
+#             -c boot.catalog \
+#             -no-emul-boot \
+#             -boot-load-size 4 \
+#             -boot-info-table \
+#             -graft-points \
+#             --grub2-boot-info \
+#             --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
+#             --sort-weight 0 / --sort-weight 1 /boot \
+#             -eltorito-alt-boot \
+#             -efi-boot-part --efi-boot-image \
+#             -e efi.img \
+#             -no-emul-boot \
+#             -isohybrid-gpt-basdat \
+#             -output "${iso_dir}/${iso_file}" \
+#             "${iso_root}/"
+
     xorriso -as mkisofs \
-            --protective-msdos-label \
-            -volid "${iso_label}" \
-            -appid "${iso_app_id}" \
-            -publisher "${iso_publisher}" \
-            -preparer "Prepared by manjaro-tools/${0##*/}" \
-            -b boot/grub/i386-pc/eltorito.img \
-            -c boot.catalog \
-            -no-emul-boot \
-            -boot-load-size 4 \
-            -boot-info-table \
-            -graft-points \
-            --grub2-boot-info \
-            --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
-            --sort-weight 0 / --sort-weight 1 /boot \
-            -eltorito-alt-boot \
-            -efi-boot-part --efi-boot-image \
-            -e efi.img \
-            -no-emul-boot \
-            -isohybrid-gpt-basdat \
-            -output "${iso_dir}/${iso_file}" \
-            "${iso_root}/"
+        -r -graft-points -no-pad \
+        --sort-weight 0 / \
+        --sort-weight 1 /boot \
+        --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
+        -partition_offset 16 \
+        -append_partition 2 0xef efi.img \
+        -b boot/grub/i386-pc/eltorito.img \
+        -c boot.catalog \
+        -no-emul-boot -boot-load-size 4 -boot-info-table --grub2-boot-info \
+        -eltorito-alt-boot \
+        -e --interval:appended_partition_2:all:: \
+        -no-emul-boot \
+        -iso-level 3 \
+        -o ${iso_dir}/${iso_file} \
+        ${iso_root}/
 }
 
 # Build ISO
