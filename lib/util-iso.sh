@@ -161,13 +161,23 @@ make_sfs() {
 
 assemble_iso(){
     msg "Creating ISO image..."
-    local iso_publisher iso_app_id
+    local iso_publisher iso_app_id mod_date
 
     iso_publisher="$(get_osname) <$(get_disturl)>"
 
     iso_app_id="$(get_osname) Live/Rescue CD"
 
+    mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00)
+
+    touch ${iso_root}/boot/grub/${mod_date}
+
     xorriso -as mkisofs \
+        --modification-date=${mod_date} \
+        --protective-msdos-label \
+        -volid "${iso_label}" \
+        -appid "${iso_app_id}" \
+        -publisher "${iso_publisher}" \
+        -preparer "Prepared by manjaro-tools/${0##*/}" \
         -r -graft-points -no-pad \
         --sort-weight 0 / \
         --sort-weight 1 /boot \
