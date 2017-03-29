@@ -169,7 +169,7 @@ assemble_iso(){
 
     mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00  | sed -e s/-//g)
 
-    touch ${iso_root}/boot/grub/${mod_date}
+#     touch ${iso_root}/boot/grub/${mod_date}
 
     xorriso -as mkisofs \
         --modification-date=${mod_date} \
