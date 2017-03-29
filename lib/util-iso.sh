@@ -181,13 +181,13 @@ assemble_iso(){
         -r -graft-points -no-pad \
         --sort-weight 0 / \
         --sort-weight 1 /boot \
-        --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
+        --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
         -partition_offset 16 \
-        -append_partition 2 0xef efi.img \
         -b boot/grub/i386-pc/eltorito.img \
         -c boot.catalog \
         -no-emul-boot -boot-load-size 4 -boot-info-table --grub2-boot-info \
         -eltorito-alt-boot \
+        -append_partition 2 0xef ${iso_root}/efi.img \
         -e --interval:appended_partition_2:all:: \
         -no-emul-boot \
         -iso-level 3 \
