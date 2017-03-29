@@ -167,55 +167,11 @@ assemble_iso(){
 
     iso_app_id="$(get_osname) Live/Rescue CD"
 
-#     xorriso -as mkisofs \
-#         --protective-msdos-label \
-#         -volid "${iso_label}" \
-#         -appid "${iso_app_id}" \
-#         -publisher "${iso_publisher}" \
-#         -preparer "Prepared by manjaro-tools/${0##*/}" \
-#         -e /efi.img \
-#         -b boot/grub/i386-pc/eltorito.img \
-#         -c boot.catalog \
-#         -no-emul-boot \
-#         -boot-load-size 4 \
-#         -boot-info-table \
-#         -graft-points \
-#         --grub2-boot-info \
-#         --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
-#         --sort-weight 0 / --sort-weight 1 /boot \
-#         -isohybrid-gpt-basdat \
-#         -eltorito-alt-boot \
-#         -output "${iso_dir}/${iso_file}" \
-#         "${iso_root}/"
-
-#     xorriso -as mkisofs \
-#             --protective-msdos-label \
-#             -volid "${iso_label}" \
-#             -appid "${iso_app_id}" \
-#             -publisher "${iso_publisher}" \
-#             -preparer "Prepared by manjaro-tools/${0##*/}" \
-#             -b boot/grub/i386-pc/eltorito.img \
-#             -c boot.catalog \
-#             -no-emul-boot \
-#             -boot-load-size 4 \
-#             -boot-info-table \
-#             -graft-points \
-#             --grub2-boot-info \
-#             --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
-#             --sort-weight 0 / --sort-weight 1 /boot \
-#             -eltorito-alt-boot \
-#             -efi-boot-part --efi-boot-image \
-#             -e efi.img \
-#             -no-emul-boot \
-#             -isohybrid-gpt-basdat \
-#             -output "${iso_dir}/${iso_file}" \
-#             "${iso_root}/"
-
     xorriso -as mkisofs \
         -r -graft-points -no-pad \
         --sort-weight 0 / \
         --sort-weight 1 /boot \
-        --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
+        --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
         -partition_offset 16 \
         -append_partition 2 0xef efi.img \
         -b boot/grub/i386-pc/eltorito.img \
@@ -227,6 +183,9 @@ assemble_iso(){
         -iso-level 3 \
         -o ${iso_dir}/${iso_file} \
         ${iso_root}/
+
+#         arg to add with xorriso-1.4.7
+#         -iso_mbr_part_type 0x00
 }
 
 # Build ISO
@@ -429,7 +388,7 @@ make_grub(){
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [/iso/boot/grub]"
 
-        local path="${work_dir}/rootfs"
+        local path="${work_dir}/livefs"
 
         prepare_grub "${path}" "${iso_root}"
 
