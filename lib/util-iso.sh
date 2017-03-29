@@ -167,7 +167,7 @@ assemble_iso(){
 
     iso_app_id="$(get_osname) Live/Rescue CD"
 
-    mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00)
+    mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00  | sed -e s/-//g)
 
     touch ${iso_root}/boot/grub/${mod_date}
 
