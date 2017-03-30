@@ -161,15 +161,9 @@ make_sfs() {
 
 assemble_iso(){
     msg "Creating ISO image..."
-    local iso_publisher iso_app_id mod_date
-
-    iso_publisher="$(get_osname) <$(get_disturl)>"
-
-    iso_app_id="$(get_osname) Live/Rescue CD"
-
-    mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00  | sed -e s/-//g)
-
-#     touch ${iso_root}/boot/grub/${mod_date}
+    local iso_publisher="$(get_osname) <$(get_disturl)>" \
+        iso_app_id="$(get_osname) Live/Rescue CD" \
+        mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00  | sed -e s/-//g)
 
     xorriso -as mkisofs \
         --modification-date=${mod_date} \
