@@ -161,55 +161,35 @@ make_sfs() {
 
 assemble_iso(){
     msg "Creating ISO image..."
-    local iso_publisher iso_app_id
-
-    iso_publisher="$(get_osname) <$(get_disturl)>"
-
-    iso_app_id="$(get_osname) Live/Rescue CD"
-
-#     xorriso -as mkisofs \
-#         --protective-msdos-label \
-#         -volid "${iso_label}" \
-#         -appid "${iso_app_id}" \
-#         -publisher "${iso_publisher}" \
-#         -preparer "Prepared by manjaro-tools/${0##*/}" \
-#         -e /efi.img \
-#         -b boot/grub/i386-pc/eltorito.img \
-#         -c boot.catalog \
-#         -no-emul-boot \
-#         -boot-load-size 4 \
-#         -boot-info-table \
-#         -graft-points \
-#         --grub2-boot-info \
-#         --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
-#         --sort-weight 0 / --sort-weight 1 /boot \
-#         -isohybrid-gpt-basdat \
-#         -eltorito-alt-boot \
-#         -output "${iso_dir}/${iso_file}" \
-#         "${iso_root}/"
+    local iso_publisher="$(get_osname) <$(get_disturl)>" \
+        iso_app_id="$(get_osname) Live/Rescue CD" \
+        mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00  | sed -e s/-//g)
 
     xorriso -as mkisofs \
-            --protective-msdos-label \
-            -volid "${iso_label}" \
-            -appid "${iso_app_id}" \
-            -publisher "${iso_publisher}" \
-            -preparer "Prepared by manjaro-tools/${0##*/}" \
-            -b boot/grub/i386-pc/eltorito.img \
-            -c boot.catalog \
-            -no-emul-boot \
-            -boot-load-size 4 \
-            -boot-info-table \
-            -graft-points \
-            --grub2-boot-info \
-            --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
-            --sort-weight 0 / --sort-weight 1 /boot \
-            -eltorito-alt-boot \
-            -efi-boot-part --efi-boot-image \
-            -e efi.img \
-            -no-emul-boot \
-            -isohybrid-gpt-basdat \
-            -output "${iso_dir}/${iso_file}" \
-            "${iso_root}/"
+        --modification-date=${mod_date} \
+        --protective-msdos-label \
+        -volid "${iso_label}" \
+        -appid "${iso_app_id}" \
+        -publisher "${iso_publisher}" \
+        -preparer "Prepared by manjaro-tools/${0##*/}" \
+        -r -graft-points -no-pad \
+        --sort-weight 0 / \
+        --sort-weight 1 /boot \
+        --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
+        -partition_offset 16 \
+        -b boot/grub/i386-pc/eltorito.img \
+        -c boot.catalog \
+        -no-emul-boot -boot-load-size 4 -boot-info-table --grub2-boot-info \
+        -eltorito-alt-boot \
+        -append_partition 2 0xef ${iso_root}/efi.img \
+        -e --interval:appended_partition_2:all:: \
+        -no-emul-boot \
+        -iso-level 3 \
+        -o ${iso_dir}/${iso_file} \
+        ${iso_root}/
+
+#         arg to add with xorriso-1.4.7
+#         -iso_mbr_part_type 0x00
 }
 
 # Build ISO
@@ -408,15 +388,20 @@ configure_grub(){
         -i $1
 }
 
+configure_grub_theme(){
+    sed -e "s|@ISO_NAME@|${iso_name}|" -i "$1"
+}
+
 make_grub(){
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [/iso/boot/grub]"
 
-        local path="${work_dir}/rootfs"
+        local path="${work_dir}/livefs"
 
         prepare_grub "${path}" "${iso_root}"
 
         configure_grub "${iso_root}/boot/grub/kernels.cfg"
+        configure_grub_theme "${iso_root}/boot/grub/variable.cfg"
 
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/iso/boot/grub]"
