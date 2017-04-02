@@ -73,7 +73,7 @@ prepare_grub(){
     prepare_dir ${efi}
     prepare_dir ${grub}/${platform}
 
-    cp ${2}/${lib}/${platform}/* ${grub}/${platform}
+    cp ${1}/${lib}/${platform}/* ${grub}/${platform}
 
     msg2 "Building %s ..." "${img}"
 
