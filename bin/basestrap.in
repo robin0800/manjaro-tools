@@ -49,8 +49,6 @@ usage() {
 # fi
 #
 
-orig_argv=("$@")
-
 opts=':C:cdGiM'
 
 while getopts ${opts} arg; do
@@ -67,7 +65,7 @@ while getopts ${opts} arg; do
 done
 shift $(( OPTIND - 1 ))
 
-check_root "$0" "${orig_argv[@]}"
+check_root
 
 (( $# )) || die "No root directory specified"
 newroot=$1; shift
@@ -97,7 +95,7 @@ if ! pacman -r "$newroot" -Sy "${pacman_args[@]}"; then
 fi
 
 # kill chroot process if needed (TODO: check if needed at all)
-kill_chroot_process "$newroot"
+# kill_chroot_process "$newroot"
 
 if ${copykeyring};then
     copy_keyring "$newroot"

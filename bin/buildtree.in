@@ -55,8 +55,6 @@ usage() {
     exit $1
 }
 
-orig_argv=("$@")
-
 opts='sacqh'
 
 while getopts "${opts}" arg; do
@@ -72,7 +70,7 @@ done
 
 shift $(($OPTIND - 1))
 
-check_root "$0" "${orig_argv[@]}"
+check_root
 
 prepare_dir "${tree_dir_abs}"
 

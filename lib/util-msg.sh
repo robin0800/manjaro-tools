@@ -11,11 +11,9 @@
 export LC_MESSAGES=C
 export LANG=C
 
-disable_colors(){
-    unset ALL_OFF BOLD BLUE GREEN RED YELLOW
-}
+declare ALL_OFF='' BOLD='' BLUE='' GREEN='' RED='' YELLOW=''
 
-enable_colors(){
+if [[ -t 2 ]]; then
     # prefer terminal safe colored and bold text when tput is supported
     if tput setaf 0 &>/dev/null; then
         ALL_OFF="$(tput sgr0)"
@@ -32,14 +30,8 @@ enable_colors(){
         YELLOW="${BOLD}\e[33m"
         BLUE="${BOLD}\e[34m"
     fi
-    readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
-}
-
-if [[ -t 2 ]]; then
-    enable_colors
-else
-    disable_colors
 fi
+readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
 
 plain() {
     local mesg=$1; shift

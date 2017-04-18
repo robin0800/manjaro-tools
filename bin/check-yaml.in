@@ -112,8 +112,6 @@ usage() {
     exit $1
 }
 
-orig_argv=("$@")
-
 opts='p:a:i:k:gcvqh'
 
 while getopts "${opts}" arg; do
@@ -133,7 +131,7 @@ done
 
 shift $(($OPTIND - 1))
 
-check_root "$0" "${orig_argv[@]}"
+check_root
 
 prepare_dir "${tmp_dir}"
 

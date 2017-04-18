@@ -133,8 +133,16 @@ show_elapsed_time(){
     info "Time %s: %s minutes" "$1" "$(elapsed_time $2)"
 }
 
+lock_close() {
+	local fd=$1
+	exec {fd}>&-
+}
+
 lock() {
-    eval "exec $1>"'"$2"'
+    if ! [[ "/dev/fd/$1" -ef "$2" ]]; then
+        mkdir -p -- "$(dirname -- "$2")"
+        eval "exec $1>"'"$2"'
+    fi
     if ! flock -n $1; then
         stat_busy "$3"
         flock $1
@@ -143,20 +151,14 @@ lock() {
 }
 
 slock() {
-    eval "exec $1>"'"$2"'
+    if ! [[ "/dev/fd/$1" -ef "$2" ]]; then
+        mkdir -p -- "$(dirname -- "$2")"
+        eval "exec $1>"'"$2"'
+    fi
     if ! flock -sn $1; then
         stat_busy "$3"
         flock -s $1
         stat_done
-    fi
-}
-
-check_root() {
-    (( EUID == 0 )) && return
-    if type -P sudo >/dev/null; then
-        exec sudo -- "$@"
-    else
-        exec su root -c "$(printf ' %q' "$@")"
     fi
 }
 
@@ -691,27 +693,27 @@ show_config(){
 }
 
 # $1: chroot
-kill_chroot_process(){
-    # enable to have more debug info
-    #msg "machine-id (etc): $(cat $1/etc/machine-id)"
-    #[[ -e $1/var/lib/dbus/machine-id ]] && msg "machine-id (lib): $(cat $1/var/lib/dbus/machine-id)"
-    #msg "running processes: "
-    #lsof | grep $1
-
-    local prefix="$1" flink pid name
-    for root_dir in /proc/*/root; do
-        flink=$(readlink $root_dir)
-        if [ "x$flink" != "x" ]; then
-            if [ "x${flink:0:${#prefix}}" = "x$prefix" ]; then
-                # this process is in the chroot...
-                pid=$(basename $(dirname "$root_dir"))
-                name=$(ps -p $pid -o comm=)
-                info "Killing chroot process: %s (%s)" "$name" "$pid"
-                kill -9 "$pid"
-            fi
-        fi
-    done
-}
+# kill_chroot_process(){
+#     # enable to have more debug info
+#     #msg "machine-id (etc): $(cat $1/etc/machine-id)"
+#     #[[ -e $1/var/lib/dbus/machine-id ]] && msg "machine-id (lib): $(cat $1/var/lib/dbus/machine-id)"
+#     #msg "running processes: "
+#     #lsof | grep $1
+#
+#     local prefix="$1" flink pid name
+#     for root_dir in /proc/*/root; do
+#         flink=$(readlink $root_dir)
+#         if [ "x$flink" != "x" ]; then
+#             if [ "x${flink:0:${#prefix}}" = "x$prefix" ]; then
+#                 # this process is in the chroot...
+#                 pid=$(basename $(dirname "$root_dir"))
+#                 name=$(ps -p $pid -o comm=)
+#                 info "Killing chroot process: %s (%s)" "$name" "$pid"
+#                 kill -9 "$pid"
+#             fi
+#         fi
+#     done
+# }
 
 create_min_fs(){
     msg "Creating install root at %s" "$1"
@@ -758,21 +760,41 @@ run(){
     fi
 }
 
-is_btrfs() {
-    [[ -e "$1" && "$(stat -f -c %T "$1")" == btrfs ]]
+orig_argv=("$0" "$@")
+
+check_root() {
+    (( EUID == 0 )) && return
+    if type -P sudo >/dev/null; then
+        exec sudo -- "${orig_argv[@]}"
+    else
+        exec su root -c "$(printf ' %q' "${orig_argv[@]}")"
+    fi
 }
 
+##
+#  usage : is_btrfs( $path )
+# return : whether $path is on a btrfs
+##
+is_btrfs() {
+	[[ -e "$1" && "$(stat -f -c %T "$1")" == btrfs ]]
+}
+
+##
+#  usage : subvolume_delete_recursive( $path )
+#
+#    Find all btrfs subvolumes under and including $path and delete them.
+##
 subvolume_delete_recursive() {
-    local subvol
+	local subvol
 
-    is_btrfs "$1" || return 0
+	is_btrfs "$1" || return 0
 
-    while IFS= read -d $'\0' -r subvol; do
-        if ! btrfs subvolume delete "$subvol" &>/dev/null; then
-            error "Unable to delete subvolume %s" "$subvol"
-            return 1
-        fi
-    done < <(find "$1" -xdev -depth -inum 256 -print0)
+	while IFS= read -d $'\0' -r subvol; do
+		if ! btrfs subvolume delete "$subvol" &>/dev/null; then
+			error "Unable to delete subvolume %s" "$subvol"
+			return 1
+		fi
+	done < <(find "$1" -xdev -depth -inum 256 -print0)
 
-    return 0
+	return 0
 }

@@ -135,8 +135,6 @@ usage() {
     exit $1
 }
 
-orig_argv=("$@")
-
 opts='p:a:b:r:t:k:i:g:czxmvqh'
 
 while getopts "${opts}" arg; do
@@ -164,7 +162,7 @@ shift $(($OPTIND - 1))
 
 timer_start=$(get_timer)
 
-check_root "$0" "${orig_argv[@]}"
+check_root
 
 prepare_dir "${log_dir}"
 

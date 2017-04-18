@@ -55,8 +55,6 @@ usage() {
     exit $1
 }
 
-orig_argv=("$@")
-
 opts=':haq'
 
 while getopts ${opts} arg; do
@@ -69,7 +67,7 @@ while getopts ${opts} arg; do
 done
 shift $(( OPTIND - 1 ))
 
-check_root "$0" "${orig_argv[@]}"
+check_root
 
 if ${automount};then
     chrootdir=/mnt
