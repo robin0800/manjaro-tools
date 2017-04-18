@@ -151,7 +151,7 @@ install_packages() {
     pkgnames=("${install_pkgs[@]##*/}")
 
     cp -- "${install_pkgs[@]}" "$copydir/root/"
-    chroot-run -r "${bindmounts_ro[@]}" -w "${bindmounts_rw[@]}" "$copydir" \
+    chroot-run -r "${bindmounts_ro[*]}" -w "${bindmounts_rw[*]}" "$copydir" \
         pacman -U --noconfirm -- "${pkgnames[@]/#//root/}"
     ret=$?
     rm -- "${pkgnames[@]/#/$copydir/root/}"
@@ -293,6 +293,8 @@ move_products() {
 # }}}
 
 
+orig_argv=("$0" "$@")
+
 main() {
     init_variables
 
@@ -364,11 +366,8 @@ main() {
         sync_chroot "$chrootdir" "$copy"
     fi
 
-    $update_first && chroot-run \
-            -r "${bindmounts_ro[@]}" \
-            -w "${bindmounts_rw[@]}" \
-            "$copydir" \
-            pacman -Syu --noconfirm
+    $update_first && chroot-run -r "${bindmounts_ro[*]}" -w "${bindmounts_rw[*]}" "$copydir" \
+        pacman -Syu --noconfirm
 
     if [[ -n ${install_pkgs[*]:-} ]]; then
         install_packages "$copydir" "${install_pkgs[@]}"
@@ -383,10 +382,8 @@ main() {
 
     bindmounts_rw=("${PWD}:/startdir" "${SRCDEST}:/srcdest")
 
-    if chroot-run -r "${bindmounts_ro[@]}" \
-            -w "${bindmounts_rw[@]}" \
-            "$copydir" \
-            /chrootbuild "${makepkg_args[@]}"; then
+    if chroot-run -r "${bindmounts_ro[*]}" -w "${bindmounts_rw[*]}" "$copydir" \
+        /chrootbuild "${makepkg_args[@]}"; then
         move_products "$copydir" "$src_owner"
     else
         (( ret += 1 ))

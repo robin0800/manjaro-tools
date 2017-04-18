@@ -760,8 +760,6 @@ run(){
     fi
 }
 
-orig_argv=("$0" "$@")
-
 check_root() {
     (( EUID == 0 )) && return
     if type -P sudo >/dev/null; then

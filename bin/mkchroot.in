@@ -42,6 +42,8 @@ usage() {
     exit 1
 }
 
+orig_argv=("$0" "$@")
+
 opts='hLKC:M:S:c:B:f:s'
 
 while getopts ${opts} arg; do

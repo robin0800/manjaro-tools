@@ -135,6 +135,8 @@ usage() {
     exit $1
 }
 
+orig_argv=("$0" "$@")
+
 opts='p:a:b:r:t:k:i:g:czxmvqh'
 
 while getopts "${opts}" arg; do

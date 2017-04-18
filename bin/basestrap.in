@@ -48,6 +48,7 @@ usage() {
 #   exit $(( $# ? 0 : 1 ))
 # fi
 #
+orig_argv=("$0" "$@")
 
 opts=':C:cdGiM'
 

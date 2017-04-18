@@ -55,6 +55,8 @@ usage() {
     exit $1
 }
 
+orig_argv=("$0" "$@")
+
 opts='sacqh'
 
 while getopts "${opts}" arg; do

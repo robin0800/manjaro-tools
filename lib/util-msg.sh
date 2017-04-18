@@ -65,7 +65,7 @@ error() {
 
 stat_busy() {
     local mesg=$1; shift
-    printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}...${ALL_OFF}" >&2
+    printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}...${ALL_OFF}" "$@" >&2
 }
 
 stat_done() {
