@@ -292,17 +292,18 @@ move_products() {
 }
 # }}}
 
-
 orig_argv=("$0" "$@")
 
 main() {
     init_variables
 
-    while getopts 'hcur:I:l:nTD:d:U:' arg; do
+    local opts='hcur:I:l:nTD:d:U:'
+
+    while getopts ${opts} arg; do
         case "$arg" in
             c) clean_first=true ;;
-            D) bindmounts_ro+=(--bind-ro="$OPTARG") ;;
-			d) bindmounts_rw+=(--bind="$OPTARG") ;;
+            D) bindmounts_ro+=("$OPTARG") ;;
+			d) bindmounts_rw+=("$OPTARG") ;;
             u) update_first=true ;;
             r) passeddir="$OPTARG" ;;
             I) install_pkgs+=("$OPTARG") ;;
@@ -351,7 +352,8 @@ main() {
 
     umask 0022
 
-    load_vars "$USER_HOME/.makepkg.conf" || load_vars /etc/makepkg.conf
+    load_vars "${XDG_CONFIG_HOME:-$USER_HOME/.config}/pacman/makepkg.conf" || load_vars "$USER_HOME/.makepkg.conf"
+    load_vars /etc/makepkg.conf
 
     # Use PKGBUILD directory if these don't exist
     [[ -d $PKGDEST ]]    || PKGDEST=$PWD

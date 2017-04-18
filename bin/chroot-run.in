@@ -36,7 +36,7 @@ usage() {
     echo '    -s            Do not run setarch'
     echo '    -r <list>     Bind mountargs ro'
     echo '    -w <list>     Bind mountargs rw'
-    echo '                  List format [src1:target1,...,srcN:targetN]'
+    echo '                  List format [src1:target1 ... srcN:targetN]'
     echo '    -B            Use custom  build mirror'
     echo '    -K            Keep mirrorlist (-B)'
     echo '    -h            This message'
@@ -116,21 +116,13 @@ chroot_extra_mount() {
         chroot_mount "$cache_dir" "$1${cache_dir}" -Br
     done
 
-#     if [[ -n ${bindmounts_ro[@]} ]];then
-#         local IFS=','
-        for m in ${bindmounts_ro[@]}; do
-            chroot_mount "${m%%:*}" "$1${m##*:}" -Br
-        done
-#         unset IFS
-#     fi
+    for m in ${bindmounts_ro[@]}; do
+        chroot_mount "${m%%:*}" "$1${m##*:}" -Br
+    done
 
-#     if [[ -n ${bindmounts_rw[@]} ]];then
-#         local IFS=','
-        for m in ${bindmounts_rw[@]}; do
-            chroot_mount "${m%%:*}" "$1${m##*:}" -B
-        done
-#         unset IFS
-#     fi
+    for m in ${bindmounts_rw[@]}; do
+        chroot_mount "${m%%:*}" "$1${m##*:}" -B
+    done
 }
 
 umask 0022
