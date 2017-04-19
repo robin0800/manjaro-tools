@@ -344,11 +344,7 @@ main() {
         esac
     done
 
-    if [[ -n $SUDO_USER ]]; then
-        eval "USER_HOME=~$SUDO_USER"
-    else
-        USER_HOME=$HOME
-    fi
+    load_user_info
 
     umask 0022
 
@@ -380,9 +376,9 @@ main() {
 
     download_sources "$copydir" "$src_owner"
 
-    prepare_chroot "$copydir" "$USER_HOME" "$repack"
+    prepare_chroot "$copydir" "$USER_HOME" "$repack" "$run_namcap"
 
-    bindmounts_rw=("${PWD}:/startdir" "${SRCDEST}:/srcdest")
+    bindmounts_rw+=("${PWD}:/startdir" "${SRCDEST}:/srcdest")
 
     if chroot-run -r "${bindmounts_ro[*]}" -w "${bindmounts_rw[*]}" "$copydir" \
         /chrootbuild "${makepkg_args[@]}"; then
