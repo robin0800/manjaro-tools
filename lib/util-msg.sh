@@ -72,6 +72,35 @@ stat_done() {
     printf "${BOLD}done${ALL_OFF}\n" >&2
 }
 
+lock_close() {
+	local fd=$1
+	exec {fd}>&-
+}
+
+lock() {
+    if ! [[ "/dev/fd/$1" -ef "$2" ]]; then
+        mkdir -p -- "$(dirname -- "$2")"
+        eval "exec $1>"'"$2"'
+    fi
+    if ! flock -n $1; then
+        stat_busy "$3"
+        flock $1
+        stat_done
+    fi
+}
+
+slock() {
+    if ! [[ "/dev/fd/$1" -ef "$2" ]]; then
+        mkdir -p -- "$(dirname -- "$2")"
+        eval "exec $1>"'"$2"'
+    fi
+    if ! flock -sn $1; then
+        stat_busy "$3"
+        flock -s $1
+        stat_done
+    fi
+}
+
 cleanup() {
     exit ${1:-0}
 }
