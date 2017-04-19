@@ -103,7 +103,7 @@ usage() {
     exit $1
 }
 
-orig_argv=("$@")
+orig_argv=("$0" "$@")
 
 opts='p:a:b:r:i:cwnsuqh'
 
@@ -127,7 +127,7 @@ done
 
 shift $(($OPTIND - 1))
 
-check_root "$0" "${orig_argv[@]}"
+check_root
 
 prepare_dir "${log_dir}"
 
