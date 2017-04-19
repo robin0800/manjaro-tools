@@ -44,10 +44,10 @@ usage() {
 }
 
 # if [[ -z $1 || $1 = @(-h|--help) ]]; then
-#   usage
-#   exit $(( $# ? 0 : 1 ))
+#     usage
+#     exit $(( $# ? 0 : 1 ))
 # fi
-#
+
 orig_argv=("$0" "$@")
 
 opts=':C:cdGiM'
@@ -81,7 +81,7 @@ ${interactive} && pacman_args+=(--noconfirm)
 [[ -d $newroot ]] || die "%s is not a directory" "$newroot"
 
 if ! mountpoint -q "$newroot" && ! ${directory}; then
-die '%s is not a mountpoint!' "$newroot"
+    die '%s is not a mountpoint!' "$newroot"
 fi
 
 # create obligatory directories
