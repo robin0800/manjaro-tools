@@ -19,6 +19,7 @@ LIBDIR='@libdir@'
 
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-mount.sh
+import ${LIBDIR}/util-chroot.sh
 
 newroot=/mnt
 
