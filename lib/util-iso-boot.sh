@@ -20,8 +20,8 @@ prepare_initramfs(){
     cp ${DATADIR}/mkinitcpio.conf $1/etc/mkinitcpio-${iso_name}.conf
     local _kernver=$(cat $1/usr/lib/modules/*/version)
     if [[ -n ${gpgkey} ]]; then
-        su ${OWNER} -c "gpg --export ${gpgkey} >${USERCONFDIR}/gpgkey"
-        exec 17<>${USERCONFDIR}/gpgkey
+        su ${OWNER} -c "gpg --export ${gpgkey} >${MT_USERCONFDIR}/gpgkey"
+        exec 17<>${MT_USERCONFDIR}/gpgkey
     fi
     MISO_GNUPG_FD=${gpgkey:+17} chroot-run $1 \
         /usr/bin/mkinitcpio -k ${_kernver} \
@@ -31,8 +31,8 @@ prepare_initramfs(){
     if [[ -n ${gpgkey} ]]; then
         exec 17<&-
     fi
-    if [[ -f ${USERCONFDIR}/gpgkey ]]; then
-        rm ${USERCONFDIR}/gpgkey
+    if [[ -f ${MT_USERCONFDIR}/gpgkey ]]; then
+        rm ${MT_USERCONFDIR}/gpgkey
     fi
 }
 

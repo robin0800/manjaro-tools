@@ -303,7 +303,7 @@ main() {
         case "$arg" in
             c) clean_first=true ;;
             D) bindmounts_ro+=("$OPTARG") ;;
-			d) bindmounts_rw+=("$OPTARG") ;;
+            d) bindmounts_rw+=("$OPTARG") ;;
             u) update_first=true ;;
             r) passeddir="$OPTARG" ;;
             I) install_pkgs+=("$OPTARG") ;;
@@ -348,7 +348,7 @@ main() {
 
     umask 0022
 
-    load_vars "${XDG_CONFIG_HOME:-$USER_HOME/.config}/pacman/makepkg.conf" || load_vars "$USER_HOME/.makepkg.conf"
+    load_vars "${PAC_USERCONFDIR}/makepkg.conf" || load_vars "$USER_HOME/.makepkg.conf"
     load_vars /etc/makepkg.conf
 
     # Use PKGBUILD directory if these don't exist

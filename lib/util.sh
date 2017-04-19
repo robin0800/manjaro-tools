@@ -205,7 +205,7 @@ init_buildpkg(){
 
     make_conf_dir="${SYSCONFDIR}/make.conf.d"
 
-    [[ -d ${USERCONFDIR}/pkg.list.d ]] && list_dir_pkg=${USERCONFDIR}/pkg.list.d
+    [[ -d ${MT_USERCONFDIR}/pkg.list.d ]] && list_dir_pkg=${MT_USERCONFDIR}/pkg.list.d
 
     [[ -z ${build_list_pkg} ]] && build_list_pkg='default'
 
@@ -261,7 +261,7 @@ init_buildiso(){
 
     list_dir_iso="${SYSCONFDIR}/iso.list.d"
 
-    [[ -d ${USERCONFDIR}/iso.list.d ]] && list_dir_iso=${USERCONFDIR}/iso.list.d
+    [[ -d ${MT_USERCONFDIR}/iso.list.d ]] && list_dir_iso=${MT_USERCONFDIR}/iso.list.d
 
     [[ -z ${build_list_iso} ]] && build_list_iso='default'
 
@@ -626,7 +626,7 @@ write_repo_conf(){
     for r in ${repos[@]}; do
         path=${r%/repo_info}
         name=${path##*/}
-        echo "run_dir=$path" > ${USERCONFDIR}/$name.conf
+        echo "run_dir=$path" > ${MT_USERCONFDIR}/$name.conf
     done
 }
 
@@ -639,13 +639,14 @@ load_user_info(){
         USER_HOME=$HOME
     fi
 
-    USERCONFDIR="$USER_HOME/.config/manjaro-tools"
-    prepare_dir "${USERCONFDIR}"
+    MT_USERCONFDIR="${XDG_CONFIG_HOME:-$USER_HOME/.config}/manjaro-tools"
+    PAC_USERCONFDIR="${XDG_CONFIG_HOME:-$USER_HOME/.config}/pacman"
+    prepare_dir "${MT_USERCONFDIR}"
 }
 
 load_run_dir(){
-    [[ -f ${USERCONFDIR}/$1.conf ]] || write_repo_conf
-    [[ -r ${USERCONFDIR}/$1.conf ]] && source ${USERCONFDIR}/$1.conf
+    [[ -f ${MT_USERCONFDIR}/$1.conf ]] || write_repo_conf
+    [[ -r ${MT_USERCONFDIR}/$1.conf ]] && source ${MT_USERCONFDIR}/$1.conf
     return 0
 }
 
@@ -655,7 +656,7 @@ show_version(){
 }
 
 show_config(){
-    if [[ -f ${USERCONFDIR}/manjaro-tools.conf ]]; then
+    if [[ -f ${MT_USERCONFDIR}/manjaro-tools.conf ]]; then
         msg2 "config: %s" "~/.config/manjaro-tools/manjaro-tools.conf"
     else
         msg2 "config: %s" "${manjaro_tools_conf}"
