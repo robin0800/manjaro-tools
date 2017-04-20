@@ -19,6 +19,8 @@ import ${LIBDIR}/util-pkg.sh
 
 shopt -s extglob
 
+load_user_info
+
 load_vars "${PAC_USERCONFDIR}/makepkg.conf" || load_vars "$USER_HOME/.makepkg.conf"
 load_vars /etc/makepkg.conf
 
