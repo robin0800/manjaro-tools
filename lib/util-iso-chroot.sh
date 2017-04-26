@@ -261,20 +261,19 @@ chroot_create(){
 }
 
 chroot_clean(){
-    msg "Cleaning up ..."
-    for image in "$1"/*fs; do
-        [[ -d ${image} ]] || continue
-        local name=${image##*/}
+    msg "Cleaning chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
+    for root in "$1"/*fs; do
+        [[ -d ${root} ]] || continue
+        local name=${root##*/}
         if [[ $name != "mhwdfs" ]];then
-            msg2 "Deleting chroot [%s] (%s) ..." "$name" "${1##*/}"
-            lock 9 "${image}.lock" "Locking chroot '${image}'"
-            if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
-                { type -P btrfs && btrfs subvolume delete "${image}"; } #&> /dev/null
-            fi
-        rm -rf --one-file-system "${image}"
+            stat_busy "Deleting chroot [%s] (%s) ..." "$name" "${1##*/}"
+            lock 9 "%s.lock" "Locking chroot '%s'" "${root}" "${root}"
+            subvolume_delete_recursive  "${root}"
+            rm -rf --one-file-system "${root}"
+            rm -f "${root}.lock"
         fi
     done
-    exec 9>&-
+    lock_close 9
     rm -rf --one-file-system "$1"
 }
 

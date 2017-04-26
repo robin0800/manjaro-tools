@@ -117,18 +117,15 @@ chroot_create(){
 
 chroot_clean(){
     msg "Cleaning chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
-    for copy in "${work_dir}"/*; do
-        [[ -d ${copy} ]] || continue
-        msg2 "Deleting chroot copy %s ..." "$(basename "${copy}")"
-
-        lock 9 "${copy}.lock" "Locking chroot copy '${copy}'"
-
-        subvolume_delete_recursive "${copy}"
-        rm -rf --one-file-system "${copy}"
+    for root in "$1"/*; do
+        [[ -d ${root} ]] || continue
+        stat_busy "Deleting chroot copy %s ..." "${copy##*/}"
+        lock 9 "%s.lock" "Locking chroot copy '%s'" "${root}" "${root}"
+        subvolume_delete_recursive "${root}"
+        rm -rf --one-file-system "${root}"
     done
-    exec 9>&-
-
-    rm -rf --one-file-system "${work_dir}"
+    lock_close 9
+    rm -rf --one-file-system "$1"
 }
 
 chroot_update(){
@@ -136,7 +133,6 @@ chroot_update(){
     chroot-run ${mkchroot_args[*]} \
             "${work_dir}/${OWNER}" \
             pacman -Syu --noconfirm || abort
-
 }
 
 clean_up(){
@@ -200,7 +196,7 @@ post_build(){
 chroot_init(){
     local timer=$(get_timer)
     if ${clean_first} || [[ ! -d "${work_dir}" ]]; then
-        chroot_clean
+        chroot_clean "${work_dir}"
         chroot_create
     else
         chroot_update
