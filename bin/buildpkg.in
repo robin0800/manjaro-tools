@@ -53,7 +53,7 @@ display_settings(){
     msg2 "create_first: %s" "${create_first}"
     msg2 "clean_first: %s" "${clean_first}"
     msg2 "update_first: %s" "${update_first}"
-    msg2 "wipe_clean: %s" "${wipe_clean}"
+    msg2 "purge: %s" "${purge}"
     msg2 "namcap: %s" "${namcap}"
     msg2 "sign: %s" "${sign}"
     msg2 "udev_root: %s" "${udev_root}"
@@ -76,42 +76,40 @@ load_config "${MT_USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}
 load_vars "${PAC_USERCONFDIR}/makepkg.conf" || load_vars "$USER_HOME/.makepkg.conf"
 load_vars /etc/makepkg.conf
 
+create_first=false
 clean_first=false
 update_first=false
-wipe_clean=false
+purge=false
 namcap=false
 pretend=false
 is_build_list=false
 sign=false
 udev_root=false
 is_multilib=false
-create_first=false
 
-mkchroot_args=()
+mkchroot_args=(-L)
 mkchrootpkg_args=()
 
 install_pkgs=()
 
-# $1: target_arch
 prepare_build(){
-    local arch="$1"
-    if ! is_valid_arch_pkg "${arch}";then
-        die "%s is not a valid arch!" "${arch}"
+    if ! is_valid_arch_pkg "${target_arch}";then
+        die "%s is not a valid arch!" "${target_arch}"
     fi
 
     local pac_arch='default'
 
-    if [[ "${arch}" == 'multilib' ]];then
+    if [[ "${target_arch}" == 'multilib' ]];then
         pac_arch='multilib'
         is_multilib=true
     fi
 
     local pacman_conf="${DATADIR}/pacman-$pac_arch.conf"
 
-    work_dir="${chroots_pkg}/${target_branch}/${arch}"
-    pkg_dir="${cache_dir_pkg}/${target_branch}/${arch}"
+    work_dir="${chroots_pkg}/${target_branch}/${target_arch}"
+    pkg_dir="${cache_dir_pkg}/${target_branch}/${target_arch}"
 
-    local makepkg_conf=$(get_makepkg_conf "${arch}")
+    local makepkg_conf=$(get_makepkg_conf "${target_arch}")
 
     [[ "$pac_arch" == 'multilib' ]] && target_arch='x86_64'
 
@@ -124,6 +122,8 @@ prepare_build(){
     mkchrootpkg_args+=(-r ${work_dir})
 
     eval_build_list "${list_dir_pkg}" "${build_list_pkg}"
+
+    init_base_devel
 
     timer_start=$(get_timer)
 }
@@ -178,7 +178,7 @@ shift $(($OPTIND - 1))
 
 check_root
 
-prepare_build "${target_arch}"
+prepare_build
 
 ${pretend} && display_settings && exit
 

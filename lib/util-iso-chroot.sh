@@ -262,7 +262,6 @@ chroot_create(){
 
 chroot_clean(){
     local dest="$1"
-#     msg "Cleaning chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
     for root in "$dest"/*; do
         [[ -d ${root} ]] || continue
         local name=${root##*/}

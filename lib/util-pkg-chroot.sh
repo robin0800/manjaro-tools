@@ -10,12 +10,12 @@
 # GNU General Public License for more details.
 
 load_compiler_settings(){
-    local tarch="$1" conf
-    conf=${make_conf_dir}/$tarch.conf
+    local arch="$1" conf
+    conf=${make_conf_dir}/$arch.conf
 
     [[ -f $conf ]] || return 1
 
-    info "Loading compiler settings: %s" "$tarch"
+    info "Loading compiler settings: %s" "$arch"
     source $conf
 
     return 0
@@ -51,29 +51,23 @@ find_pkg(){
     [[ -z $result ]] && die "%s is not a valid package or build list!" "${bdir}"
 }
 
-base_devel_udev(){
-    local _multi _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g"
-    local devel_group='' file=${DATADIR}/base-devel-udev
-
-    info "Loading custom group: %s" "$file"
-
-    if ${is_multilib}; then
-        _multi="s|>multilib||g"
-    else
-        _multi="s|>multilib.*||g"
-    fi
-
-    devel_group=$(sed "$_com_rm" "$file" \
-            | sed "$_space" \
-            | sed "$_multi" \
-            | sed "$_clean")
-
-    echo ${devel_group}
-}
-
 init_base_devel(){
     if ${udev_root};then
-        base_packages=( "$(base_devel_udev)" )
+        local _multi _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g"
+        local file=${DATADIR}/base-devel-udev
+
+#         info "Loading custom group: %s" "$file"
+
+        if ${is_multilib}; then
+            _multi="s|>multilib||g"
+        else
+            _multi="s|>multilib.*||g"
+        fi
+
+        base_packages=($(sed "$_com_rm" "$file" \
+                | sed "$_space" \
+                | sed "$_multi" \
+                | sed "$_clean"))
     else
         if ${is_multilib};then
             base_packages=('base-devel' 'multilib-devel')
@@ -147,13 +141,11 @@ post_build(){
 chroot_init(){
     local timer=$(get_timer)
     local dest="$1"
-    init_base_devel
-#     msg "Initialize chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
     mkdir -p "${dest}"
     setarch "${target_arch}" \
         mkchroot "${mkchroot_args[@]}" \
         "${dest}/root" \
-        ${base_packages[*]} || abort
+        "${base_packages[@]}" || abort
 
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
@@ -161,7 +153,7 @@ chroot_init(){
 build_pkg(){
     prepare_dir "${pkg_dir}"
     user_own "${pkg_dir}"
-    ${wipe_clean} && clean_up
+    ${purge} && clean_up
     setarch "${target_arch}" \
         mkchrootpkg "${mkchrootpkg_args[@]}"
     post_build
