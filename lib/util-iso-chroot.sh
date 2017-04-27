@@ -257,24 +257,30 @@ copy_from_cache(){
 chroot_create(){
     [[ "${1##*/}" == "rootfs" ]] && local flag="-L"
     setarch "${target_arch}" \
-        mkchroot ${mkchroot_args[*]} ${flag} $@
+        mkchroot "${mkchroot_args[@]}" ${flag} $@
 }
 
 chroot_clean(){
-    msg "Cleaning chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
-    for root in "$1"/*fs; do
+    local dest="$1"
+#     msg "Cleaning chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
+    for root in "$dest"/*; do
         [[ -d ${root} ]] || continue
         local name=${root##*/}
         if [[ $name != "mhwdfs" ]];then
-            stat_busy "Deleting chroot [%s] (%s) ..." "$name" "${1##*/}"
-            lock 9 "%s.lock" "Locking chroot '%s'" "${root}" "${root}"
+            slock 9 "%s.lock" "Locking chroot '%s'" "${root}" "${root}"
+            stat_busy "Deleting chroot [%s] (%s) ..." "${root}" "${root}"
+
             subvolume_delete_recursive  "${root}"
+
+            stat_done
+            lock_close 9
+
             rm -rf --one-file-system "${root}"
             rm -f "${root}.lock"
         fi
     done
-    lock_close 9
-    rm -rf --one-file-system "$1"
+
+    rm -rf --one-file-system "$dest"
 }
 
 prepare_initcpio(){

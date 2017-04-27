@@ -148,12 +148,12 @@ chroot_init(){
     local timer=$(get_timer)
     local dest="$1"
     init_base_devel
-    msg "Initialize chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
+#     msg "Initialize chroot for [%s] (%s)..." "${target_branch}" "${target_arch}"
     mkdir -p "${dest}"
     setarch "${target_arch}" \
         mkchroot "${mkchroot_args[@]}" \
         "${dest}/root" \
-        "${base_packages[@]}" || abort
+        ${base_packages[*]} || abort
 
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
