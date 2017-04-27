@@ -55,7 +55,7 @@ usage() {
     echo ''
     echo 'The chroot "root" directory must be created via the following'
     echo 'command:'
-    echo '    mkarchroot <chrootdir>/root base-devel'
+    echo '    mkchroot <chrootdir>/root base-devel'
     echo ''
     echo 'This script reads {SRC,SRCPKG,PKG,LOG}DEST, MAKEFLAGS and PACKAGER'
     echo 'from makepkg.conf(5), if those variables are not part of the'
@@ -324,7 +324,7 @@ main() {
     # Canonicalize chrootdir, getting rid of trailing /
     chrootdir=$(readlink -e "$passeddir")
     [[ ! -d $chrootdir ]] && die "No chroot dir defined, or invalid path '%s'" "$passeddir"
-    [[ ! -d $chrootdir/root ]] && die "Missing chroot dir root directory. Try using: mkarchroot %s/root base-devel" "$chrootdir"
+    [[ ! -d $chrootdir/root ]] && die "Missing chroot dir root directory. Try using: mkchroot %s/root base-devel" "$chrootdir"
 
     if [[ ${copy:0:1} = / ]]; then
         copydir=$copy
