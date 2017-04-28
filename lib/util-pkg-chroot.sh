@@ -57,23 +57,16 @@ init_base_devel(){
         local file=${DATADIR}/base-devel-udev
 
 #         info "Loading custom group: %s" "$file"
-
-        if ${is_multilib}; then
-            _multi="s|>multilib||g"
-        else
-            _multi="s|>multilib.*||g"
-        fi
+        _multi="s|>multilib.*||g"
+        ${is_multilib} && _multi="s|>multilib||g"
 
         base_packages=($(sed "$_com_rm" "$file" \
                 | sed "$_space" \
                 | sed "$_multi" \
                 | sed "$_clean"))
     else
-        if ${is_multilib};then
-            base_packages=('base-devel' 'multilib-devel')
-        else
-            base_packages=('base-devel')
-        fi
+        base_packages=('base-devel')
+        ${is_multilib} && base_packages+=('multilib-devel')
     fi
 }
 
