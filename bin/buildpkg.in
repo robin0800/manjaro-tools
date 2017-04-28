@@ -93,10 +93,6 @@ mkchrootpkg_args=()
 install_pkgs=()
 
 prepare_build(){
-    if ! is_valid_arch_pkg "${target_arch}";then
-        die "%s is not a valid arch!" "${target_arch}"
-    fi
-
     local pac_arch='default'
 
     if [[ "${target_arch}" == 'multilib' ]];then

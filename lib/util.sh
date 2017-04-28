@@ -644,34 +644,6 @@ show_config(){
     fi
 }
 
-is_valid_init(){
-    case $1 in
-        'openrc'|'systemd') return 0 ;;
-        *) return 1 ;;
-    esac
-}
-
-is_valid_arch_pkg(){
-    eval "case $1 in
-        $(show_build_profiles "${make_conf_dir}")) return 0 ;;
-        *) return 1 ;;
-    esac"
-}
-
-is_valid_arch_iso(){
-    case $1 in
-        'i686'|'x86_64') return 0 ;;
-        *) return 1 ;;
-    esac
-}
-
-is_valid_branch(){
-    case $1 in
-        'stable'|'testing'|'unstable') return 0 ;;
-        *) return 1 ;;
-    esac
-}
-
 run(){
     if ${is_build_list};then
         for item in ${build_list[@]};do

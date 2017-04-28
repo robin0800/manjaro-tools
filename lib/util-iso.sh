@@ -17,9 +17,10 @@ error_function() {
     if [[ -p $logpipe ]]; then
         rm "$logpipe"
     fi
+    local func="$1"
     # first exit all subshells, then print the error
     if (( ! BASH_SUBSHELL )); then
-        error "A failure occurred in %s()." "$1"
+        error "A failure occurred in %s()." "$func"
         plain "Aborting..."
     fi
     umount_fs
@@ -69,9 +70,10 @@ trap_exit() {
 }
 
 configure_thus(){
+    local fs="$1"
     msg2 "Configuring Thus ..."
-    source "$1/etc/mkinitcpio.d/${kernel}.preset"
-    local conf="$1/etc/thus.conf"
+    source "$fs/etc/mkinitcpio.d/${kernel}.preset"
+    local conf="$fs/etc/thus.conf"
     echo "[distribution]" > "$conf"
     echo "DISTRIBUTION_NAME = \"${dist_name} Linux\"" >> "$conf"
     echo "DISTRIBUTION_VERSION = \"${dist_release}\"" >> "$conf"
@@ -86,36 +88,38 @@ configure_thus(){
     echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
     echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
 
-    if [[ -f $1/usr/share/applications/thus.desktop && -f $1/usr/bin/kdesu ]];then
-        sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
+    if [[ -f $fs/usr/share/applications/thus.desktop && -f $fs/usr/bin/kdesu ]];then
+        sed -i -e 's|sudo|kdesu|g' $fs/usr/share/applications/thus.desktop
     fi
 }
 
 configure_live_image(){
+    local fs="$1"
     msg "Configuring [livefs]"
-    configure_hosts "$1"
-    configure_system "$1"
-    configure_services "$1"
-    configure_calamares "$1"
-    [[ ${edition} == "sonar" ]] && configure_thus "$1"
-    write_live_session_conf "$1"
+    configure_hosts "$fs"
+    configure_system "$fs"
+    configure_services "$fs"
+    configure_calamares "$fs"
+    [[ ${edition} == "sonar" ]] && configure_thus "$fs"
+    write_live_session_conf "$fs"
     msg "Done configuring [livefs]"
 }
 
 make_sig () {
+    local idir="$1" file="$2"
     msg2 "Creating signature file..."
-    cd "$1"
-    user_own "$1"
-    su ${OWNER} -c "gpg --detach-sign --default-key ${gpgkey} $2.sfs"
-    chown -R root "$1"
+    cd "$idir"
+    user_own "$idir"
+    su ${OWNER} -c "gpg --detach-sign --default-key ${gpgkey} $file.sfs"
+    chown -R root "$idir"
     cd ${OLDPWD}
 }
 
-# $1: file
 make_checksum(){
+    local idir="$1" file="$2"
     msg2 "Creating md5sum ..."
-    cd $1
-    md5sum $2.sfs > $2.md5
+    cd $idir
+    md5sum $file.sfs > $file.md5
     cd ${OLDPWD}
 }
 
@@ -264,10 +268,11 @@ gen_iso_fn(){
 }
 
 reset_pac_conf(){
-    info "Restoring [%s/etc/pacman.conf] ..." "$1"
+    local fs="$1"
+    info "Restoring [%s/etc/pacman.conf] ..." "$fs"
     sed -e 's|^.*HoldPkg.*|HoldPkg      = pacman glibc manjaro-system|' \
         -e "s|^.*#CheckSpace|CheckSpace|" \
-        -i "$1/etc/pacman.conf"
+        -i "$fs/etc/pacman.conf"
 }
 
 # Base installation (rootfs)
@@ -316,10 +321,11 @@ make_image_desktop() {
 }
 
 mount_fs_select(){
+    local fs="$1"
     if [[ -f "${packages_desktop}" ]]; then
-        mount_fs_desktop "$1"
+        mount_fs_desktop "$fs"
     else
-        mount_fs_root "$1"
+        mount_fs_root "$fs"
     fi
 }
 
@@ -410,8 +416,8 @@ make_image_boot() {
 }
 
 configure_grub(){
-    local default_args="misobasedir=${iso_name} misolabel=${iso_label}" \
-        boot_args=('quiet')
+    local conf="$1"
+    local default_args="misobasedir=${iso_name} misolabel=${iso_label}" boot_args=('quiet')
     [[ ${initsys} == 'systemd' ]] && boot_args+=('systemd.show_status=1')
 
     sed -e "s|@DIST_NAME@|${dist_name}|g" \
@@ -419,11 +425,12 @@ configure_grub(){
         -e "s|@DEFAULT_ARGS@|${default_args}|g" \
         -e "s|@BOOT_ARGS@|${boot_args[*]}|g" \
         -e "s|@PROFILE@|${profile}|g" \
-        -i $1
+        -i $conf
 }
 
 configure_grub_theme(){
-    sed -e "s|@ISO_NAME@|${iso_name}|" -i "$1"
+    local conf="$1"
+    sed -e "s|@ISO_NAME@|${iso_name}|" -i "$conf"
 }
 
 make_grub(){
@@ -441,23 +448,25 @@ make_grub(){
 }
 
 check_requirements(){
-    [[ -f ${run_dir}/repo_info ]] || die "%s is not a valid iso profiles directory!" "${run_dir}"
-    if ! $(is_valid_arch_iso ${target_arch});then
-        die "%s is not a valid arch!" "${target_arch}"
-    fi
-    if ! $(is_valid_branch ${target_branch});then
-        die "%s is not a valid branch!" "${target_branch}"
-    fi
+    prepare_dir "${log_dir}"
 
-    if ! is_valid_init "${initsys}";then
-        die "%s is not a valid init system!" "${initsys}"
-    fi
+    prepare_dir "${tmp_dir}"
+
+    eval_build_list "${list_dir_iso}" "${build_list_iso}"
+
+    [[ -f ${run_dir}/repo_info ]] || die "%s is not a valid iso profiles directory!" "${run_dir}"
 
     local iso_kernel=${kernel:5:1} host_kernel=$(uname -r)
     if [[ ${iso_kernel} < "4" ]] \
     || [[ ${host_kernel%%*.} < "4" ]];then
         die "The host and iso kernels must be version>=4.0!"
     fi
+
+    for sig in TERM HUP QUIT; do
+        trap "trap_exit $sig \"$(gettext "%s signal caught. Exiting...")\" \"$sig\"" "$sig"
+    done
+    trap 'trap_exit INT "$(gettext "Aborted by user! Exiting...")"' INT
+    trap 'trap_exit USR1 "$(gettext "An unknown error has occurred. Exiting...")"' ERR
 }
 
 compress_images(){
@@ -549,41 +558,8 @@ get_pacman_conf(){
     echo "$conf"
 }
 
-load_profile(){
-    conf="$1/profile.conf"
-
-    info "Profile: [%s]" "${profile}"
-
-    load_profile_config "$conf"
-
-    pacman_conf=$(get_pacman_conf)
-
-    mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
-
-    iso_file=$(gen_iso_fn).iso
-
-    mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -K)
-    work_dir=${chroots_iso}/${profile}/${target_arch}
-
-    iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}"
-
-    iso_root=${chroots_iso}/${profile}/iso
-    mnt_dir=${chroots_iso}/${profile}/mnt
-    prepare_dir "${mnt_dir}"
-
-    prepare_dir "${iso_dir}"
-    user_own "${iso_dir}"
-}
-
-prepare_profile(){
-    profile=$1
-    edition=$(get_edition ${profile})
-    profile_dir=${run_dir}/${edition}/${profile}
-    check_profile "${profile_dir}"
-    load_profile "${profile_dir}"
-}
-
 build(){
-    prepare_profile "$1"
+    local prof="$1"
+    prepare_build "$prof"
     make_profile
 }
