@@ -280,9 +280,9 @@ make_image_root() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Base installation] (rootfs)"
         local path="${work_dir}/rootfs"
-        mkdir -p ${path}
+#         mkdir -p ${path}
 
-        chroot_create "${path}" "${packages}" || die
+        create_chroot "-L" "${path}" "${packages[@]}" || die
 
         pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${path}"
@@ -301,11 +301,11 @@ make_image_desktop() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Desktop installation] (desktopfs)"
         local path="${work_dir}/desktopfs"
-        mkdir -p ${path}
+#         mkdir -p ${path}
 
         mount_fs_root "${path}"
 
-        chroot_create "${path}" "${packages}"
+        create_chroot "${path}" "${packages[@]}"
 
         pacman -Qr "${path}" > "${path}/desktopfs-pkgs.txt"
         cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
@@ -322,7 +322,7 @@ make_image_desktop() {
 
 mount_fs_select(){
     local fs="$1"
-    if [[ -f "${packages_desktop}" ]]; then
+    if [[ -f "${pkglist_desktop}" ]]; then
         mount_fs_desktop "$fs"
     else
         mount_fs_root "$fs"
@@ -333,11 +333,11 @@ make_image_live() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Live installation] (livefs)"
         local path="${work_dir}/livefs"
-        mkdir -p ${path}
+#         mkdir -p ${path}
 
         mount_fs_select "${path}"
 
-        chroot_create "${path}" "${packages}"
+        create_chroot "${path}" "${packages[@]}"
 
         pacman -Qr "${path}" > "${path}/livefs-pkgs.txt"
         copy_overlay "${profile_dir}/live-overlay" "${path}"
@@ -365,11 +365,11 @@ make_image_mhwd() {
 
         reset_pac_conf "${path}"
 
-        copy_from_cache "${path}" "${packages}"
+        copy_from_cache "${path}" "${packages[@]}"
 
-        if [[ -n "${packages_cleanup}" ]]; then
-            for mhwd_clean in ${packages_cleanup}; do
-                rm ${path}${mhwd_repo}/${mhwd_clean}
+        if [[ -n "${packages_cleanup[@]}" ]]; then
+            for pkg in ${packages_cleanup[@]}; do
+                rm ${path}${mhwd_repo}/${pkg}
             done
         fi
         cp ${DATADIR}/pacman-mhwd.conf ${path}/opt
@@ -395,7 +395,7 @@ make_image_boot() {
         local path="${work_dir}/bootfs"
         mkdir -p ${path}
 
-        if [[ -f "${packages_desktop}" ]]; then
+        if [[ -f "${pkglist_desktop}" ]]; then
             mount_fs_live "${path}"
         else
             mount_fs_net "${path}"
@@ -480,16 +480,16 @@ prepare_images(){
     local timer=$(get_timer)
     load_pkgs "${profile_dir}/Packages-Root"
     run_safe "make_image_root"
-    if [[ -f "${packages_desktop}" ]] ; then
-        load_pkgs "${packages_desktop}"
+    if [[ -f "${pkglist_desktop}" ]] ; then
+        load_pkgs "${pkglist_desktop}"
         run_safe "make_image_desktop"
     fi
     if [[ -f ${profile_dir}/Packages-Live ]]; then
         load_pkgs "${profile_dir}/Packages-Live"
         run_safe "make_image_live"
     fi
-    if [[ -f ${packages_mhwd} ]] ; then
-        load_pkgs "${packages_mhwd}"
+    if [[ -f ${mhwd_list} ]] ; then
+        load_pkgs "${mhwd_list}"
         run_safe "make_image_mhwd"
     fi
     run_safe "make_image_boot"

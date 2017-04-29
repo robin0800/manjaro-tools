@@ -254,28 +254,14 @@ copy_from_cache(){
     rsync -v --files-from="$list" /var/cache/pacman/pkg "$1${mhwd_repo}"
 }
 
-chroot_create(){
-    [[ "${1##*/}" == "rootfs" ]] && local flag="-L"
-    setarch "${target_arch}" \
-        mkchroot "${mkchroot_args[@]}" ${flag} $@
-}
-
 chroot_clean(){
     local dest="$1"
     for root in "$dest"/*; do
         [[ -d ${root} ]] || continue
         local name=${root##*/}
         if [[ $name != "mhwdfs" ]];then
-            slock 9 "%s.lock" "Locking chroot '%s'" "${root}" "${root}"
-            stat_busy "Deleting chroot [%s] (%s) ..." "${root}" "${root}"
-
-            subvolume_delete_recursive  "${root}"
-
-            stat_done
-            lock_close 9
-
-            rm -rf --one-file-system "${root}"
-            rm -f "${root}.lock"
+            lock 9 "$name.lock" "Locking chroot copy [%s]" "$name"
+            delete_chroot "$dest" "${root}"
         fi
     done
 

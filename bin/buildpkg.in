@@ -51,6 +51,7 @@ display_settings(){
 
     msg "ARGS:"
     msg2 "create_first: %s" "${create_first}"
+    msg2 "delete_first: %s" "${delete_first}"
     msg2 "clean_first: %s" "${clean_first}"
     msg2 "update_first: %s" "${update_first}"
     msg2 "purge: %s" "${purge}"
@@ -63,7 +64,7 @@ display_settings(){
 
     if ${create_first};then
         msg "PKG:"
-        msg2 "base_packages: %s" "${base_packages[*]}"
+        msg2 "packages: %s" "${packages[*]}"
     fi
 
     msg "BUILD QUEUE:"
@@ -77,6 +78,7 @@ load_vars "${PAC_USERCONFDIR}/makepkg.conf" || load_vars "$USER_HOME/.makepkg.co
 load_vars /etc/makepkg.conf
 
 create_first=false
+delete_first=false
 clean_first=false
 update_first=false
 purge=false
@@ -133,12 +135,13 @@ usage() {
     echo "                       [default: ${chroots_pkg}]"
     echo '    -i <pkgs>          Install packages into the working copy of the chroot'
     echo '    -o                 Create chroot'
+    echo '    -d                 Delete chroot'
     echo '    -c                 Clean chroot copy'
     echo '    -u                 Update chroot copy'
     echo '    -w                 Clean up cache and sources'
     echo '    -n                 Install and run namcap check'
     echo '    -s                 Sign packages'
-    echo '    -d                 Udev base-devel group (no systemd)'
+    echo '    -x                 Udev base-devel group (no systemd)'
     echo '    -q                 Query settings and pretend build'
     echo '    -h                 This help'
     echo ''
@@ -148,7 +151,7 @@ usage() {
 
 orig_argv=("$0" "$@")
 
-opts='p:a:b:r:i:cownsudqh'
+opts='p:a:b:r:i:cdownsxdqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -158,6 +161,7 @@ while getopts "${opts}" arg; do
         r) chroots_pkg="$OPTARG" ;;
         i) install_pkgs+=("$OPTARG"); mkchrootpkg_args+=(-I "${install_pkgs[*]}") ;;
         o) create_first=true ;;
+        d) delete_first=true ;;
         c) clean_first=true ; mkchrootpkg_args+=(-c) ;;
         u) update_first=true ; mkchrootpkg_args+=(-u) ;;
         w) wipe_clean=true ;;
@@ -166,7 +170,7 @@ while getopts "${opts}" arg; do
         d) udev_root=true ;;
         q) pretend=true ;;
         h|?) usage 0 ;;
-        *) echo "invalid argument '${arg}'"; usage 1 ;;
+        *) echo "invalid argument '%s'" "${arg}"; usage 1 ;;
     esac
 done
 
@@ -178,6 +182,8 @@ prepare_build
 
 ${pretend} && display_settings && exit
 
-${create_first} && chroot_init "${work_dir}"
+${delete_first} && delete_chroot "${work_dir}" "${work_dir}/root"
+
+${create_first} && create_chroot "${work_dir}/root" "${packages[@]}"
 
 run make_pkg "${build_list_pkg}"

@@ -60,13 +60,13 @@ init_base_devel(){
         _multi="s|>multilib.*||g"
         ${is_multilib} && _multi="s|>multilib||g"
 
-        base_packages=($(sed "$_com_rm" "$file" \
+        packages=($(sed "$_com_rm" "$file" \
                 | sed "$_space" \
                 | sed "$_multi" \
                 | sed "$_clean"))
     else
-        base_packages=('base-devel')
-        ${is_multilib} && base_packages+=('multilib-devel')
+        packages=('base-devel')
+        ${is_multilib} && packages+=('multilib-devel')
     fi
 }
 
@@ -129,18 +129,6 @@ post_build(){
     done
     local name=${pkgbase:-$pkgname}
     archive_logs "$name"
-}
-
-chroot_init(){
-    local timer=$(get_timer)
-    local dest="$1"
-    mkdir -p "${dest}"
-    setarch "${target_arch}" \
-        mkchroot "${mkchroot_args[@]}" \
-        "${dest}/root" \
-        "${base_packages[@]}" || abort
-
-    show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
 build_pkg(){
