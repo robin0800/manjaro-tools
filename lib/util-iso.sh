@@ -280,9 +280,8 @@ make_image_root() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Base installation] (rootfs)"
         local path="${work_dir}/rootfs"
-#         mkdir -p ${path}
 
-        create_chroot "-L" "${path}" "${packages[@]}" || die
+        create_chroot "${path}" "${packages[@]}" || die
 
         pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${path}"
@@ -301,11 +300,10 @@ make_image_desktop() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Desktop installation] (desktopfs)"
         local path="${work_dir}/desktopfs"
-#         mkdir -p ${path}
 
         mount_fs_root "${path}"
 
-        create_chroot "${path}" "${packages[@]}"
+        create_chroot "${path}" "${packages[@]}" || die
 
         pacman -Qr "${path}" > "${path}/desktopfs-pkgs.txt"
         cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
@@ -322,7 +320,7 @@ make_image_desktop() {
 
 mount_fs_select(){
     local fs="$1"
-    if [[ -f "${pkglist_desktop}" ]]; then
+    if [[ -f "${desktop_list}" ]]; then
         mount_fs_desktop "$fs"
     else
         mount_fs_root "$fs"
@@ -333,11 +331,10 @@ make_image_live() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Live installation] (livefs)"
         local path="${work_dir}/livefs"
-#         mkdir -p ${path}
 
         mount_fs_select "${path}"
 
-        create_chroot "${path}" "${packages[@]}"
+        create_chroot "${path}" "${packages[@]}" || die
 
         pacman -Qr "${path}" > "${path}/livefs-pkgs.txt"
         copy_overlay "${profile_dir}/live-overlay" "${path}"
@@ -393,9 +390,8 @@ make_image_boot() {
         cp ${work_dir}/rootfs/boot/vmlinuz* ${boot}/vmlinuz-${target_arch}
 
         local path="${work_dir}/bootfs"
-        mkdir -p ${path}
 
-        if [[ -f "${pkglist_desktop}" ]]; then
+        if [[ -f "${desktop_list}" ]]; then
             mount_fs_live "${path}"
         else
             mount_fs_net "${path}"
@@ -480,8 +476,8 @@ prepare_images(){
     local timer=$(get_timer)
     load_pkgs "${profile_dir}/Packages-Root"
     run_safe "make_image_root"
-    if [[ -f "${pkglist_desktop}" ]] ; then
-        load_pkgs "${pkglist_desktop}"
+    if [[ -f "${desktop_list}" ]] ; then
+        load_pkgs "${desktop_list}"
         run_safe "make_image_desktop"
     fi
     if [[ -f ${profile_dir}/Packages-Live ]]; then

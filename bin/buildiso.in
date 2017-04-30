@@ -52,7 +52,8 @@ prepare_build(){
 }
 
 show_profile(){
-    prepare_profile "$1"
+    local prof="$1"
+    prepare_build "$prof"
     msg2 "iso_file: %s" "${iso_file}"
     if ${verbose};then
         msg2 "autologin: %s" "${autologin}"

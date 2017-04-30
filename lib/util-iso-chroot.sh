@@ -261,7 +261,7 @@ chroot_clean(){
         local name=${root##*/}
         if [[ $name != "mhwdfs" ]];then
             lock 9 "$name.lock" "Locking chroot copy [%s]" "$name"
-            delete_chroot "$dest" "${root}"
+            delete_chroot "${root}" "$dest"
         fi
     done
 

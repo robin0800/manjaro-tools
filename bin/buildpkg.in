@@ -151,7 +151,7 @@ usage() {
 
 orig_argv=("$0" "$@")
 
-opts='p:a:b:r:i:cdownsxdqh'
+opts='p:a:b:r:i:odcuwnsxqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -164,10 +164,10 @@ while getopts "${opts}" arg; do
         d) delete_first=true ;;
         c) clean_first=true ; mkchrootpkg_args+=(-c) ;;
         u) update_first=true ; mkchrootpkg_args+=(-u) ;;
-        w) wipe_clean=true ;;
+        w) purge=true ;;
         n) namcap=true; mkchrootpkg_args+=(-n) ;;
         s) sign=true ;;
-        d) udev_root=true ;;
+        x) udev_root=true ;;
         q) pretend=true ;;
         h|?) usage 0 ;;
         *) echo "invalid argument '%s'" "${arg}"; usage 1 ;;
