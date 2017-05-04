@@ -136,19 +136,20 @@ It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
 ~~~
 $ buildpkg -h
 Usage: buildpkg [options]
-    -p <pkg>           Build list or pkg [default: sysvinit]
-    -a <arch>          Arch [default: x86_64]
-    -b <branch>        Branch [default: unstable]
+    -p <pkg>           Build list or pkg [default: default]
+    -a <arch>          Arch [default: auto]
+    -b <branch>        Branch [default: stable]
     -r <dir>           Chroots directory
-                       [default: /var/build/manjaro-tools/buildpkg]
+                       [default: /var/lib/manjaro-tools/buildpkg]
     -i <pkgs>          Install packages into the working copy of the chroot
     -o                 Create chroot
+    -d                 Delete chroot
     -c                 Clean chroot copy
     -u                 Update chroot copy
     -w                 Clean up cache and sources
     -n                 Install and run namcap check
     -s                 Sign packages
-    -d                 Udev base-devel group (no systemd)
+    -x                 Udev base-devel group (no systemd)
     -q                 Query settings and pretend build
     -h                 This help
 ~~~
