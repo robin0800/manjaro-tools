@@ -135,8 +135,6 @@ shift $(($OPTIND - 1))
 
 check_root
 
-prepare_dir "${tmp_dir}"
-
 eval_build_list "${list_dir_iso}" "${build_list_iso}"
 
 ${pretend} && display_settings && exit 1
