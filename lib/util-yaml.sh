@@ -30,7 +30,6 @@ write_finished_conf(){
 }
 
 get_preset(){
-    prepare_dir "${tmp_dir}"
     local p=${tmp_dir}/${kernel}.preset kvmaj kvmin digit
     cp ${DATADIR}/linux.preset $p
     digit=${kernel##linux}

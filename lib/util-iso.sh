@@ -446,8 +446,6 @@ make_grub(){
 check_requirements(){
     prepare_dir "${log_dir}"
 
-    prepare_dir "${tmp_dir}"
-
     eval_build_list "${list_dir_iso}" "${build_list_iso}"
 
     [[ -f ${run_dir}/repo_info ]] || die "%s is not a valid iso profiles directory!" "${run_dir}"
