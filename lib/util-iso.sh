@@ -279,20 +279,20 @@ reset_pac_conf(){
 make_image_root() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Base installation] (rootfs)"
-        local path="${work_dir}/rootfs"
+        local rootfs="${work_dir}/rootfs"
 
-        prepare_dir "${path}"
+        prepare_dir "${rootfs}"
 
-        create_chroot "${mkchroot_args[@]}" "${path}" "${packages[@]}" || die
+        create_chroot "${mkchroot_args[@]}" "${rootfs}" "${packages[@]}" || die
 
-        pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
-        copy_overlay "${profile_dir}/root-overlay" "${path}"
+        pacman -Qr "${rootfs}" > "${rootfs}/rootfs-pkgs.txt"
+        copy_overlay "${profile_dir}/root-overlay" "${rootfs}"
 
-        reset_pac_conf "${path}"
+        reset_pac_conf "${rootfs}"
 
-        configure_lsb "${path}"
+        configure_lsb "${rootfs}"
 
-        clean_up_image "${path}"
+        clean_up_image "${rootfs}"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [Base installation] (rootfs)"
     fi
@@ -301,22 +301,22 @@ make_image_root() {
 make_image_desktop() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Desktop installation] (desktopfs)"
-        local path="${work_dir}/desktopfs"
+        local desktopfs="${work_dir}/desktopfs"
 
-        prepare_dir "${path}"
+        prepare_dir "${desktopfs}"
 
-        mount_fs_root "${path}"
+        mount_fs_root "${desktopfs}"
 
-        create_chroot "${mkchroot_args[@]}" "${path}" "${packages[@]}" || die
+        create_chroot "${mkchroot_args[@]}" "${desktopfs}" "${packages[@]}" || die
 
-        pacman -Qr "${path}" > "${path}/desktopfs-pkgs.txt"
-        cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
-        [[ -e ${profile_dir}/desktop-overlay ]] && copy_overlay "${profile_dir}/desktop-overlay" "${path}"
+        pacman -Qr "${desktopfs}" > "${desktopfs}/desktopfs-pkgs.txt"
+        cp "${desktopfs}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
+        [[ -e ${profile_dir}/desktop-overlay ]] && copy_overlay "${profile_dir}/desktop-overlay" "${desktopfs}"
 
-        reset_pac_conf "${path}"
+        reset_pac_conf "${desktopfs}"
 
         umount_fs
-        clean_up_image "${path}"
+        clean_up_image "${desktopfs}"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [Desktop installation] (desktopfs)"
     fi
@@ -334,25 +334,25 @@ mount_fs_select(){
 make_image_live() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [Live installation] (livefs)"
-        local path="${work_dir}/livefs"
+        local livefs="${work_dir}/livefs"
 
-        prepare_dir "${path}"
+        prepare_dir "${livefs}"
 
-        mount_fs_select "${path}"
+        mount_fs_select "${livefs}"
 
-        create_chroot "${mkchroot_args[@]}" "${path}" "${packages[@]}" || die
+        create_chroot "${mkchroot_args[@]}" "${livefs}" "${packages[@]}" || die
 
-        pacman -Qr "${path}" > "${path}/livefs-pkgs.txt"
-        copy_overlay "${profile_dir}/live-overlay" "${path}"
-        configure_live_image "${path}"
+        pacman -Qr "${livefs}" > "${livefs}/livefs-pkgs.txt"
+        copy_overlay "${profile_dir}/live-overlay" "${livefs}"
+        configure_live_image "${livefs}"
 
-        reset_pac_conf "${path}"
+        reset_pac_conf "${livefs}"
 
         umount_fs
 
         # Clean up GnuPG keys
-        rm -rf "${path}/etc/pacman.d/gnupg"
-        clean_up_image "${path}"
+        rm -rf "${livefs}/etc/pacman.d/gnupg"
+        clean_up_image "${livefs}"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [Live installation] (livefs)"
     fi
@@ -361,27 +361,27 @@ make_image_live() {
 make_image_mhwd() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [drivers repository] (mhwdfs)"
-        local path="${work_dir}/mhwdfs"
+        local mhwdfs="${work_dir}/mhwdfs"
 
-        prepare_dir "${path}${mhwd_repo}"
+        prepare_dir "${mhwdfs}${mhwd_repo}"
 
-        mount_fs_select "${path}"
+        mount_fs_select "${mhwdfs}"
 
-        reset_pac_conf "${path}"
+        reset_pac_conf "${mhwdfs}"
 
-        copy_from_cache "${path}" "${packages[@]}"
+        copy_from_cache "${mhwdfs}" "${packages[@]}"
 
         if [[ -n "${packages_cleanup[@]}" ]]; then
             for pkg in ${packages_cleanup[@]}; do
-                rm ${path}${mhwd_repo}/${pkg}
+                rm ${mhwdfs}${mhwd_repo}/${pkg}
             done
         fi
-        cp ${DATADIR}/pacman-mhwd.conf ${path}/opt
-        make_repo "${path}"
-        configure_mhwd_drivers "${path}"
+        cp ${DATADIR}/pacman-mhwd.conf ${mhwdfs}/opt
+        make_repo "${mhwdfs}"
+        configure_mhwd_drivers "${mhwdfs}"
 
         umount_fs
-        clean_up_image "${path}"
+        clean_up_image "${mhwdfs}"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [drivers repository] (mhwdfs)"
     fi
@@ -396,23 +396,23 @@ make_image_boot() {
 
         cp ${work_dir}/rootfs/boot/vmlinuz* ${boot}/vmlinuz-${target_arch}
 
-        local path="${work_dir}/bootfs"
+        local bootfs="${work_dir}/bootfs"
 
         if [[ -f "${desktop_list}" ]]; then
-            mount_fs_live "${path}"
+            mount_fs_live "${bootfs}"
         else
-            mount_fs_net "${path}"
+            mount_fs_net "${bootfs}"
         fi
 
-        prepare_initcpio "${path}"
-        prepare_initramfs "${path}"
+        prepare_initcpio "${bootfs}"
+        prepare_initramfs "${bootfs}"
 
-        cp ${path}/boot/initramfs.img ${boot}/initramfs-${target_arch}.img
-        prepare_boot_extras "${path}" "${boot}"
+        cp ${bootfs}/boot/initramfs.img ${boot}/initramfs-${target_arch}.img
+        prepare_boot_extras "${bootfs}" "${boot}"
 
         umount_fs
 
-        rm -R ${path}
+        rm -R ${bootfs}
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [/iso/boot]"
     fi
