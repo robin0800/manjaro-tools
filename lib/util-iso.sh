@@ -281,7 +281,9 @@ make_image_root() {
         msg "Prepare [Base installation] (rootfs)"
         local path="${work_dir}/rootfs"
 
-        create_chroot "${path}" "${packages[@]}" || die
+        prepare_dir "${path}"
+
+        create_chroot "${mkchroot_args[@]}" "${path}" "${packages[@]}" || die
 
         pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${path}"
@@ -301,9 +303,11 @@ make_image_desktop() {
         msg "Prepare [Desktop installation] (desktopfs)"
         local path="${work_dir}/desktopfs"
 
+        prepare_dir "${path}"
+
         mount_fs_root "${path}"
 
-        create_chroot "${path}" "${packages[@]}" || die
+        create_chroot "${mkchroot_args[@]}" "${path}" "${packages[@]}" || die
 
         pacman -Qr "${path}" > "${path}/desktopfs-pkgs.txt"
         cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
@@ -332,9 +336,11 @@ make_image_live() {
         msg "Prepare [Live installation] (livefs)"
         local path="${work_dir}/livefs"
 
+        prepare_dir "${path}"
+
         mount_fs_select "${path}"
 
-        create_chroot "${path}" "${packages[@]}" || die
+        create_chroot "${mkchroot_args[@]}" "${path}" "${packages[@]}" || die
 
         pacman -Qr "${path}" > "${path}/livefs-pkgs.txt"
         copy_overlay "${profile_dir}/live-overlay" "${path}"
@@ -356,7 +362,8 @@ make_image_mhwd() {
     if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
         msg "Prepare [drivers repository] (mhwdfs)"
         local path="${work_dir}/mhwdfs"
-        mkdir -p ${path}${mhwd_repo}
+
+        prepare_dir "${path}${mhwd_repo}"
 
         mount_fs_select "${path}"
 
@@ -385,7 +392,7 @@ make_image_boot() {
         msg "Prepare [/iso/boot]"
         local boot="${iso_root}/boot"
 
-        mkdir -p ${boot}
+        prepare_dir "${boot}"
 
         cp ${work_dir}/rootfs/boot/vmlinuz* ${boot}/vmlinuz-${target_arch}
 

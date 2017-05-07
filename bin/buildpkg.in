@@ -184,6 +184,6 @@ ${pretend} && display_settings && exit
 
 ${delete_first} && delete_chroot "${work_dir}/root" "${work_dir}"
 
-${create_first} && create_chroot "${work_dir}/root" "${packages[@]}"
+${create_first} && create_chroot "${mkchroot_args[@]}" "${work_dir}/root" "${packages[@]}"
 
 run make_pkg "${build_list_pkg}"

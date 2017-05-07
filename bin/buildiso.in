@@ -137,6 +137,8 @@ iso_only=false
 verbose=false
 persist=false
 
+mkchroot_args=(-L)
+
 usage() {
     echo "Usage: ${0##*/} [options]"
     echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
