@@ -283,7 +283,7 @@ make_image_root() {
 
         prepare_dir "${rootfs}"
 
-        create_chroot "${mkchroot_args[@]}" "${rootfs}" "${packages[@]}" || die
+        create_chroot "${mkchroot_args[@]}" "${rootfs}" "${packages[@]}"
 
         pacman -Qr "${rootfs}" > "${rootfs}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${rootfs}"
@@ -307,7 +307,7 @@ make_image_desktop() {
 
         mount_fs_root "${desktopfs}"
 
-        create_chroot "${mkchroot_args[@]}" "${desktopfs}" "${packages[@]}" || die
+        create_chroot "${mkchroot_args[@]}" "${desktopfs}" "${packages[@]}"
 
         pacman -Qr "${desktopfs}" > "${desktopfs}/desktopfs-pkgs.txt"
         cp "${desktopfs}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
@@ -340,7 +340,7 @@ make_image_live() {
 
         mount_fs_select "${livefs}"
 
-        create_chroot "${mkchroot_args[@]}" "${livefs}" "${packages[@]}" || die
+        create_chroot "${mkchroot_args[@]}" "${livefs}" "${packages[@]}"
 
         pacman -Qr "${livefs}" > "${livefs}/livefs-pkgs.txt"
         copy_overlay "${profile_dir}/live-overlay" "${livefs}"
