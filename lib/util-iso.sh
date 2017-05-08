@@ -277,7 +277,7 @@ reset_pac_conf(){
 
 # Base installation (rootfs)
 make_image_root() {
-    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+    if [[ ! -e ${work_dir}/rootfs.lock ]]; then
         msg "Prepare [Base installation] (rootfs)"
         local rootfs="${work_dir}/rootfs"
 
@@ -293,13 +293,13 @@ make_image_root() {
         configure_lsb "${rootfs}"
 
         clean_up_image "${rootfs}"
-        : > ${work_dir}/build.${FUNCNAME}
+
         msg "Done [Base installation] (rootfs)"
     fi
 }
 
 make_image_desktop() {
-    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+    if [[ ! -e ${work_dir}/desktopfs.lock ]]; then
         msg "Prepare [Desktop installation] (desktopfs)"
         local desktopfs="${work_dir}/desktopfs"
 
@@ -317,7 +317,7 @@ make_image_desktop() {
 
         umount_fs
         clean_up_image "${desktopfs}"
-        : > ${work_dir}/build.${FUNCNAME}
+
         msg "Done [Desktop installation] (desktopfs)"
     fi
 }
@@ -332,7 +332,7 @@ mount_fs_select(){
 }
 
 make_image_live() {
-    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+    if [[ ! -e ${work_dir}/livefs.lock ]]; then
         msg "Prepare [Live installation] (livefs)"
         local livefs="${work_dir}/livefs"
 
@@ -350,16 +350,14 @@ make_image_live() {
 
         umount_fs
 
-        # Clean up GnuPG keys
-        rm -rf "${livefs}/etc/pacman.d/gnupg"
         clean_up_image "${livefs}"
-        : > ${work_dir}/build.${FUNCNAME}
+
         msg "Done [Live installation] (livefs)"
     fi
 }
 
 make_image_mhwd() {
-    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+    if [[ ! -e ${work_dir}/mhwdfs.lock ]]; then
         msg "Prepare [drivers repository] (mhwdfs)"
         local mhwdfs="${work_dir}/mhwdfs"
 
@@ -376,19 +374,19 @@ make_image_mhwd() {
                 rm ${mhwdfs}${mhwd_repo}/${pkg}
             done
         fi
-        cp ${DATADIR}/pacman-mhwd.conf ${mhwdfs}/opt
+
         make_repo "${mhwdfs}"
         configure_mhwd_drivers "${mhwdfs}"
 
         umount_fs
         clean_up_image "${mhwdfs}"
-        : > ${work_dir}/build.${FUNCNAME}
+        : > ${work_dir}/mhwdfs.lock
         msg "Done [drivers repository] (mhwdfs)"
     fi
 }
 
 make_image_boot() {
-    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+    if [[ ! -e ${work_dir}/bootfs.lock ]]; then
         msg "Prepare [/iso/boot]"
         local boot="${iso_root}/boot"
 
@@ -413,7 +411,7 @@ make_image_boot() {
         umount_fs
 
         rm -R ${bootfs}
-        : > ${work_dir}/build.${FUNCNAME}
+        : > ${work_dir}/bootfs.lock
         msg "Done [/iso/boot]"
     fi
 }
@@ -437,7 +435,7 @@ configure_grub_theme(){
 }
 
 make_grub(){
-    if [[ ! -e ${work_dir}/build.${FUNCNAME} ]]; then
+    if [[ ! -e ${work_dir}/grub.lock ]]; then
         msg "Prepare [/iso/boot/grub]"
 
         prepare_grub "${work_dir}/rootfs" "${work_dir}/livefs" "${iso_root}"
@@ -445,7 +443,7 @@ make_grub(){
         configure_grub "${iso_root}/boot/grub/kernels.cfg"
         configure_grub_theme "${iso_root}/boot/grub/variable.cfg"
 
-        : > ${work_dir}/build.${FUNCNAME}
+        : > ${work_dir}/grub.lock
         msg "Done [/iso/boot/grub]"
     fi
 }

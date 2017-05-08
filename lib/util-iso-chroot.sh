@@ -81,19 +81,22 @@ configure_hosts(){
 }
 
 configure_lsb(){
-    if [ -e $1/etc/lsb-release ] ; then
+    local conf=$1/etc/lsb-release
+    if [[ -e $conf ]] ; then
         msg2 "Configuring lsb-release"
-        sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${dist_release}/" $1/etc/lsb-release
-        sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${dist_codename}/" $1/etc/lsb-release
+        sed -i -e "s/^.*DISTRIB_RELEASE.*/DISTRIB_RELEASE=${dist_release}/" $conf
+        sed -i -e "s/^.*DISTRIB_CODENAME.*/DISTRIB_CODENAME=${dist_codename}/" $conf
     fi
 }
 
 configure_logind(){
     msg2 "Configuring logind ..."
     local conf=$1/etc/$2/logind.conf
-    sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
-    sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
-    sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' "$conf"
+    if [[ -e $conf ]];then
+        sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
+        sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
+        sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' "$conf"
+    fi
 }
 
 configure_journald(){
@@ -177,6 +180,7 @@ configure_system(){
 }
 
 make_repo(){
+    cp ${DATADIR}/pacman-mhwd.conf $1/opt
     repo-add $1${mhwd_repo}/mhwd.db.tar.gz $1${mhwd_repo}/*pkg*z
 }
 
@@ -225,12 +229,17 @@ clean_up_image(){
         if [[ -d $path ]];then
             find "$path" -mindepth 1 -delete &> /dev/null
         fi
-    fi
-	find "$1" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-	file=$1/boot/grub/grub.cfg
-        if [[ -f "$file" ]]; then
-            rm $file
+
+        if [[ ${1##*/} == 'livefs' ]];then
+            rm -rf "$1/etc/pacman.d/gnupg"
         fi
+    fi
+
+    find "$1" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+    file=$1/boot/grub/grub.cfg
+    if [[ -f "$file" ]]; then
+        rm $file
+    fi
 }
 
 copy_from_cache(){
