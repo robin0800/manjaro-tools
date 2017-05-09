@@ -235,7 +235,7 @@ clean_up_image(){
             find "$path" -mindepth 1 -delete &> /dev/null
         fi
 
-        if [[ ${$mnt##*/} == 'livefs' ]];then
+        if [[ ${mnt##*/} == 'livefs' ]];then
             rm -rf "$mnt/etc/pacman.d/gnupg"
         fi
     fi
