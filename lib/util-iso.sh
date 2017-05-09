@@ -305,7 +305,7 @@ make_image_desktop() {
 
         prepare_dir "${desktopfs}"
 
-        mount_fs_root "${desktopfs}"
+        mount_fs "${desktopfs}" "${work_dir}"
 
         create_chroot "${mkchroot_args[@]}" "${desktopfs}" "${packages[@]}"
 
@@ -322,15 +322,6 @@ make_image_desktop() {
     fi
 }
 
-mount_fs_select(){
-    local fs="$1"
-    if [[ -f "${desktop_list}" ]]; then
-        mount_fs_desktop "$fs"
-    else
-        mount_fs_root "$fs"
-    fi
-}
-
 make_image_live() {
     if [[ ! -e ${work_dir}/livefs.lock ]]; then
         msg "Prepare [Live installation] (livefs)"
@@ -338,7 +329,7 @@ make_image_live() {
 
         prepare_dir "${livefs}"
 
-        mount_fs_select "${livefs}"
+        mount_fs "${livefs}" "${work_dir}" "${desktop_list}"
 
         create_chroot "${mkchroot_args[@]}" "${livefs}" "${packages[@]}"
 
@@ -363,7 +354,7 @@ make_image_mhwd() {
 
         prepare_dir "${mhwdfs}${mhwd_repo}"
 
-        mount_fs_select "${mhwdfs}"
+        mount_fs "${mhwdfs}" "${work_dir}" "${desktop_list}"
 
         reset_pac_conf "${mhwdfs}"
 
@@ -396,11 +387,7 @@ make_image_boot() {
 
         local bootfs="${work_dir}/bootfs"
 
-        if [[ -f "${desktop_list}" ]]; then
-            mount_fs_live "${bootfs}"
-        else
-            mount_fs_net "${bootfs}"
-        fi
+        mount_fs "${bootfs}" "${work_dir}" "${desktop_list}"
 
         prepare_initcpio "${bootfs}"
         prepare_initramfs "${bootfs}"
