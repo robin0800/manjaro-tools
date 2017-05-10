@@ -22,7 +22,7 @@ copy_overlay(){
 }
 
 add_svc_rc(){
-    local mnt="$1" name="$1"
+    local mnt="$1" name="$2"
     if [[ -f $mnt/etc/init.d/$name ]];then
         msg2 "Setting %s ..." "$name"
         chroot $mnt rc-update add $name default &>/dev/null
@@ -30,7 +30,7 @@ add_svc_rc(){
 }
 
 add_svc_sd(){
-    local mnt="$1" name="$1"
+    local mnt="$1" name="$2"
     if [[ -f $mnt/etc/systemd/system/$name.service ]] || \
     [[ -f $mnt/usr/lib/systemd/system/$name.service ]];then
         msg2 "Setting %s ..." "$name"
@@ -248,19 +248,12 @@ clean_up_image(){
 }
 
 copy_from_cache(){
-    local list="${tmp_dir}"/mhwd-cache.list mnt="$1"
-    chroot-run \
-        -r "${bindmounts_ro[*]}" \
-        -w "${bindmounts_rw[*]}" \
-        -B "${build_mirror}/${target_branch}" \
-        "$mnt" \
-        pacman -v -Syw $2 --noconfirm || return 1
-    chroot-run \
-        -r "${bindmounts_ro[*]}" \
-        -w "${bindmounts_rw[*]}" \
-        -B "${build_mirror}/${target_branch}" \
-        "$mnt" \
-        pacman -v -Sp $2 --noconfirm > "$list"
+    local list="${tmp_dir}"/mhwd-cache.list mnt="$1" pkgs=$2
+    local mirror="${build_mirror}/${target_branch}"
+    chroot-run -B "$mirror" "$mnt" \
+        pacman -v -Syw ${pkgs[@]} --noconfirm || return 1
+    chroot-run -B "$mirror" "$mnt" \
+        pacman -v -Sp ${pkgs[@]} --noconfirm > "$list"
     sed -ni '/.pkg.tar.xz/p' "$list"
     sed -i "s/.*\///" "$list"
 
