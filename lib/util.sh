@@ -315,8 +315,8 @@ load_config(){
 }
 
 load_profile(){
-
-    local profile_conf="$1/profile.conf"
+    local profdir="$1"
+    local profile_conf="$profdir/profile.conf"
 
     [[ -f ${profile_conf} ]] || return 1
 
@@ -385,13 +385,13 @@ load_profile(){
 
     ${extra} && basic='false'
 
-    root_list=${profile_conf}/Packages-Root
+    root_list=$profdir/Packages-Root
 
     mhwd_list=${run_dir}/shared/Packages-Mhwd
 
-    desktop_list=${profile_conf}/Packages-Desktop
+    desktop_list=$profdir/Packages-Desktop
 
-    live_list=${profile_conf}/Packages-Live
+    live_list=$profdir/Packages-Live
 
     if ${netinstall};then
         sort -u ${run_dir}/shared/Packages-Net ${live_list} > ${tmp_dir}/packages-live-net.list
