@@ -20,6 +20,19 @@ SYSCONFDIR='@sysconfdir@'
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-yaml.sh
 
+prepare_check(){
+    profile="$1"
+    local edition=$(get_edition ${profile})
+    profile_dir=${run_dir}/${edition}/${profile}
+
+    load_profile "${profile_dir}"
+
+    yaml_dir=${cache_dir_netinstall}/${profile}/${target_arch}
+
+    prepare_dir "${yaml_dir}"
+    user_own "${yaml_dir}"
+}
+
 show_profile(){
     prepare_check "$1"
     msg2 "yaml_dir: %s" "${yaml_dir}"

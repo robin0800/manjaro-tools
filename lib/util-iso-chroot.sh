@@ -93,9 +93,9 @@ configure_lsb(){
 }
 
 configure_logind(){
-    msg2 "Configuring logind ..."
     local conf=$1/etc/$2/logind.conf
     if [[ -e $conf ]];then
+        msg2 "Configuring logind ..."
         sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
         sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
         sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' "$conf"
@@ -190,7 +190,7 @@ make_repo(){
 
 clean_iso_root(){
     local dest="$1"
-    msg2 "Deleting isoroot [%s] ..." "${dest##*/}"
+    msg "Deleting isoroot [%s] ..." "${dest##*/}"
     rm -rf --one-file-system "$dest"
 }
 

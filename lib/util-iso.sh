@@ -199,16 +199,14 @@ make_sfs() {
 
 assemble_iso(){
     msg "Creating ISO image..."
-    local iso_publisher="$(get_osname) <$(get_disturl)>" \
-        iso_app_id="$(get_osname) Live/Rescue CD" \
-        mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00  | sed -e s/-//g)
+    local mod_date=$(date -u +%Y-%m-%d-%H-%M-%S-00  | sed -e s/-//g)
 
     xorriso -as mkisofs \
         --modification-date=${mod_date} \
         --protective-msdos-label \
         -volid "${iso_label}" \
-        -appid "${iso_app_id}" \
-        -publisher "${iso_publisher}" \
+        -appid "$(get_osname) Live/Rescue CD" \
+        -publisher "$(get_osname) <$(get_disturl)>" \
         -preparer "Prepared by manjaro-tools/${0##*/}" \
         -r -graft-points -no-pad \
         --sort-weight 0 / \
@@ -464,17 +462,17 @@ compress_images(){
 
 prepare_images(){
     local timer=$(get_timer)
-    load_pkgs "${profile_dir}/Packages-Root"
+    load_pkgs "${root_list}"
     run_safe "make_image_root"
     if [[ -f "${desktop_list}" ]] ; then
         load_pkgs "${desktop_list}"
         run_safe "make_image_desktop"
     fi
-    if [[ -f ${profile_dir}/Packages-Live ]]; then
-        load_pkgs "${profile_dir}/Packages-Live"
+    if [[ -f ${live_list} ]]; then
+        load_pkgs "${live_list}"
         run_safe "make_image_live"
     fi
-    if [[ -f ${mhwd_list} ]] ; then
+    if ! ${netinstall} ; then
         load_pkgs "${mhwd_list}"
         run_safe "make_image_mhwd"
     fi

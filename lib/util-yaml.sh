@@ -404,26 +404,13 @@ write_pacman_group_yaml(){
     user_own "${cache_dir_netinstall}/pacman" "-R"
 }
 
-prepare_check(){
-    profile=$1
-    local edition=$(get_edition ${profile})
-    profile_dir=${run_dir}/${edition}/${profile}
-    check_profile "${profile_dir}"
-    load_profile_config "${profile_dir}/profile.conf"
-
-    yaml_dir=${cache_dir_netinstall}/${profile}/${target_arch}
-
-    prepare_dir "${yaml_dir}"
-    user_own "${yaml_dir}"
-}
-
 gen_fn(){
     echo "${yaml_dir}/$1-${target_arch}-${initsys}.yaml"
 }
 
 make_profile_yaml(){
     prepare_check "$1"
-    load_pkgs "${profile_dir}/Packages-Root"
+    load_pkgs "${root_list}"
     write_netgroup_yaml "$1" "$(gen_fn "Packages-Root")"
     if [[ -f "${desktop_list}" ]]; then
         load_pkgs "${desktop_list}"

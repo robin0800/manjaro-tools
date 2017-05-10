@@ -193,14 +193,14 @@ init_buildpkg(){
     cache_dir_pkg=${cache_dir}/pkg
 }
 
-get_iso_label(){
-    local label="$1"
-    label="${label//_}"	# relace all _
-    label="${label//-}"	# relace all -
-    label="${label^^}"	# all uppercase
-    label="${label::8}"	# limit to 8 characters
-    echo ${label}
-}
+# get_iso_label(){
+#     local label="$1"
+#     label="${label//_}"	# relace all _
+#     label="${label//-}"	# relace all -
+#     label="${label^^}"	# all uppercase
+#     label="${label::8}"	# limit to 8 characters
+#     echo ${label}
+# }
 
 get_codename(){
     source /etc/lsb-release
@@ -262,7 +262,8 @@ init_buildiso(){
 
     [[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
-    iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
+#     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
+    iso_label="${dist_branding}${dist_release//.}"
 
     [[ -z ${initsys} ]] && initsys="systemd"
 
@@ -313,11 +314,18 @@ load_config(){
     return 0
 }
 
-load_profile_config(){
+load_profile(){
 
-    [[ -f $1 ]] || return 1
+    local prof="$1"
 
-    profile_conf="$1"
+    [[ -f $prof ]] || return 1
+
+    profile_conf="$prof/profile.conf"
+
+    root_list=$prof/Packages-Root
+    mhwd_list=${run_dir}/shared/Packages-Mhwd
+    desktop_list=$prof/Packages-Desktop
+    live_list=$prof/Packages-Live
 
     [[ -r ${profile_conf} ]] && source ${profile_conf}
 
@@ -384,6 +392,13 @@ load_profile_config(){
 
     ${extra} && basic='false'
 
+    if ${netinstall};then
+        sort -u ${run_dir}/shared/Packages-Net ${live_list} > ${tmp_dir}/packages-live-net.list
+        live_list=${tmp_dir}/packages-live-net.list
+    else
+        chrootcfg="false"
+    fi
+
     return 0
 }
 
@@ -410,50 +425,15 @@ reset_profile(){
     unset disable_openrc
     unset enable_systemd_live
     unset enable_openrc_live
+    unset root_list
     unset desktop_list
     unset mhwd_list
+    unset live_list
     unset login_shell
     unset netinstall
     unset chrootcfg
     unset geoip
     unset extra
-}
-
-check_profile(){
-    local keyfiles=("$1/Packages-Root"
-            "$1/Packages-Live")
-
-    local keydirs=("$1/root-overlay"
-            "$1/live-overlay")
-
-    local has_keyfiles=false has_keydirs=false
-    for f in ${keyfiles[@]}; do
-        if [[ -f $f ]];then
-            has_keyfiles=true
-        else
-            has_keyfiles=false
-            break
-        fi
-    done
-    for d in ${keydirs[@]}; do
-        if [[ -d $d ]];then
-            has_keydirs=true
-        else
-            has_keydirs=false
-            break
-        fi
-    done
-    if ! ${has_keyfiles} && ! ${has_keydirs};then
-        die "Profile [%s] sanity check failed!" "$1"
-    fi
-
-    [[ -f "$1/Packages-Desktop" ]] && desktop_list=$1/Packages-Desktop
-
-    [[ -f "$1/Packages-Mhwd" ]] && mhwd_list=$1/Packages-Mhwd
-
-    if ! ${netinstall}; then
-        chrootcfg="false"
-    fi
 }
 
 # $1: file name
