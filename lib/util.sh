@@ -316,16 +316,9 @@ load_config(){
 
 load_profile(){
 
-    local prof="$1"
+    local profile_conf="$1/profile.conf"
 
-    [[ -f $prof ]] || return 1
-
-    profile_conf="$prof/profile.conf"
-
-    root_list=$prof/Packages-Root
-    mhwd_list=${run_dir}/shared/Packages-Mhwd
-    desktop_list=$prof/Packages-Desktop
-    live_list=$prof/Packages-Live
+    [[ -f ${profile_conf} ]] || return 1
 
     [[ -r ${profile_conf} ]] && source ${profile_conf}
 
@@ -391,6 +384,14 @@ load_profile(){
     [[ -z ${extra} ]] && extra='false'
 
     ${extra} && basic='false'
+
+    root_list=${profile_conf}/Packages-Root
+
+    mhwd_list=${run_dir}/shared/Packages-Mhwd
+
+    desktop_list=${profile_conf}/Packages-Desktop
+
+    live_list=${profile_conf}/Packages-Live
 
     if ${netinstall};then
         sort -u ${run_dir}/shared/Packages-Net ${live_list} > ${tmp_dir}/packages-live-net.list
