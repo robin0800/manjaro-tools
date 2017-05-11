@@ -198,7 +198,7 @@ clean_up_image(){
 
     local path mnt="$1"
     msg2 "Cleaning [%s]" "${mnt##*/}"
-    if [[ ${1##*/} == 'mhwdfs' ]];then
+    if [[ ${mnt##*/} == 'mhwdfs' ]];then
         path=$mnt/var
         if [[ -d $path ]];then
             find "$path" -mindepth 0 -delete &> /dev/null
