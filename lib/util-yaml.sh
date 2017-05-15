@@ -217,9 +217,7 @@ write_mhwdcfg_conf(){
     ${nonfree_mhwd} && drv="nonfree"
     echo "driver: ${drv}" >> "$conf"
     echo '' >> "$conf"
-    local switch='true'
-    ${netinstall} && switch='false'
-    echo "local: ${switch}" >> "$conf"
+    echo "local: ${netinstall}" >> "$conf"
     echo '' >> "$conf"
     echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
 }
