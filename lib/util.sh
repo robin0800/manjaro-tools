@@ -385,7 +385,7 @@ load_profile(){
 
     ${extra} && basic='false'
 
-    root_list=$profdir/Packages-Root
+    root_list=${run_dir}/shared/Packages-Root
 
     mhwd_list=${run_dir}/shared/Packages-Mhwd
 
