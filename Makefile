@@ -88,7 +88,8 @@ BIN_YAML = \
 	bin/check-yaml
 
 LIBS_YAML = \
-	lib/util-yaml.sh
+	lib/util-yaml.sh \
+	lib/util-profile.sh
 
 SHARED_YAML = \
 	data/linux.preset

@@ -62,7 +62,7 @@ write_bootloader_conf(){
 }
 
 write_servicescfg_conf(){
-    local conf="${modules_dir}/servicescfg.conf"
+    local conf="${modules_dir}/servicescfg.conf" disable_openrc=()
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' >  "$conf"
     echo '' >> "$conf"
@@ -83,7 +83,7 @@ write_servicescfg_conf(){
 }
 
 write_services_conf(){
-    local conf="${modules_dir}/services.conf"
+    local conf="${modules_dir}/services.conf" disable_systemd=('pacman-init')
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' >  "$conf"
     echo '' >> "$conf"
