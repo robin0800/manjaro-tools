@@ -273,7 +273,7 @@ prepare_initcpio(){
 
 prepare_initramfs(){
     local mnt="$1"
-    cp ${DATADIR}/mkinitcpio.conf $mnt/etc/mkinitcpio-${iso_name}.conf
+    cp ${DATADIR}/mkinitcpio.conf $mnt/etc/mkinitcpio-${os_id}.conf
     local _kernver=$(cat $mnt/usr/lib/modules/*/version)
     if [[ -n ${gpgkey} ]]; then
         su ${OWNER} -c "gpg --export ${gpgkey} >${MT_USERCONFDIR}/gpgkey"
@@ -281,7 +281,7 @@ prepare_initramfs(){
     fi
     MISO_GNUPG_FD=${gpgkey:+17} chroot-run $mnt \
         /usr/bin/mkinitcpio -k ${_kernver} \
-        -c /etc/mkinitcpio-${iso_name}.conf \
+        -c /etc/mkinitcpio-${os_id}.conf \
         -g /boot/initramfs.img
 
     if [[ -n ${gpgkey} ]]; then
@@ -337,7 +337,7 @@ prepare_grub(){
     grub-mkimage -d ${grub}/${platform} -o ${efi}/${img} -O ${platform} -p ${prefix} iso9660
 
     prepare_dir ${grub}/themes
-    cp -r ${theme}/themes/${iso_name}-live ${grub}/themes/
+    cp -r ${theme}/themes/${os_id}-live ${grub}/themes/
     cp ${data}/unicode.pf2 ${grub}
     cp -r ${theme}/{locales,tz} ${grub}
 

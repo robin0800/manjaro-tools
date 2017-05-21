@@ -79,8 +79,8 @@ configure_thus(){
     echo "DISTRIBUTION_VERSION = \"${dist_release}\"" >> "$conf"
     echo "SHORT_NAME = \"${dist_name}\"" >> "$conf"
     echo "[install]" >> "$conf"
-    echo "LIVE_MEDIA_SOURCE = \"/run/miso/bootmnt/${iso_name}/${target_arch}/rootfs.sfs\"" >> "$conf"
-    echo "LIVE_MEDIA_DESKTOP = \"/run/miso/bootmnt/${iso_name}/${target_arch}/desktopfs.sfs\"" >> "$conf"
+    echo "LIVE_MEDIA_SOURCE = \"/run/miso/bootmnt/${os_id}/${target_arch}/rootfs.sfs\"" >> "$conf"
+    echo "LIVE_MEDIA_DESKTOP = \"/run/miso/bootmnt/${os_id}/${target_arch}/desktopfs.sfs\"" >> "$conf"
     echo "LIVE_MEDIA_TYPE = \"squashfs\"" >> "$conf"
     echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
     echo "KERNEL = \"${kernel}\"" >> "$conf"
@@ -130,7 +130,7 @@ make_sfs() {
         error "The path %s does not exist" "${src}"
         retrun 1
     fi
-    local timer=$(get_timer) dest=${iso_root}/${iso_name}/${target_arch}
+    local timer=$(get_timer) dest=${iso_root}/${os_id}/${target_arch}
     local name=${1##*/}
     local sfs="${dest}/${name}.sfs"
     mkdir -p ${dest}
@@ -251,7 +251,7 @@ make_iso() {
 
 gen_iso_fn(){
     local vars=() name
-    vars+=("${iso_name}")
+    vars+=("${os_id}")
     if ! ${chrootcfg};then
         [[ -n ${profile} ]] && vars+=("${profile}")
     fi
@@ -416,7 +416,7 @@ make_image_boot() {
 
 configure_grub(){
     local conf="$1"
-    local default_args="misobasedir=${iso_name} misolabel=${iso_label}" boot_args=('quiet')
+    local default_args="misobasedir=${os_id} misolabel=${iso_label}" boot_args=('quiet')
     [[ ${initsys} == 'systemd' ]] && boot_args+=('systemd.show_status=1')
 
     sed -e "s|@DIST_NAME@|${dist_name}|g" \
@@ -429,7 +429,7 @@ configure_grub(){
 
 configure_grub_theme(){
     local conf="$1"
-    sed -e "s|@ISO_NAME@|${iso_name}|" -i "$conf"
+    sed -e "s|@ISO_NAME@|${os_id}|" -i "$conf"
 }
 
 make_grub(){

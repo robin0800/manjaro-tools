@@ -258,7 +258,7 @@ init_buildiso(){
 
     dist_name=$(get_distname)
 
-    iso_name=$(get_osid)
+    os_id=$(get_osid)
 
     [[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
@@ -386,7 +386,7 @@ load_profile(){
     ${extra} && basic='false'
 
     root_list=${run_dir}/shared/Packages-Root
-    root_overlay="${run_dir}/shared/${dist_name}/root-overlay"
+    root_overlay="${run_dir}/shared/${os_id}/root-overlay"
     if [[ -e "$profdir/root-overlay" ]];then
         root_overlay="$profdir/root-overlay"
     fi
@@ -403,7 +403,7 @@ load_profile(){
         live_list="$profdir/Packages-Live"
     fi
 
-    live_overlay="${run_dir}/shared/${dist_name}/live-overlay"
+    live_overlay="${run_dir}/shared/${os_id}/live-overlay"
     if [[ -e "$profdir/live-overlay" ]];then
         live_overlay="$profdir/live-overlay"
     fi

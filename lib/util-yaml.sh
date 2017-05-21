@@ -132,11 +132,11 @@ write_unpack_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "unpack:" >> "$conf"
-    echo "    - source: \"/run/miso/bootmnt/${iso_name}/${target_arch}/rootfs.sfs\"" >> "$conf"
+    echo "    - source: \"/run/miso/bootmnt/${os_id}/${target_arch}/rootfs.sfs\"" >> "$conf"
     echo "      sourcefs: \"squashfs\"" >> "$conf"
     echo "      destination: \"\"" >> "$conf"
     if [[ -f "${desktop_list}" ]] ; then
-        echo "    - source: \"/run/miso/bootmnt/${iso_name}/${target_arch}/desktopfs.sfs\"" >> "$conf"
+        echo "    - source: \"/run/miso/bootmnt/${os_id}/${target_arch}/desktopfs.sfs\"" >> "$conf"
         echo "      sourcefs: \"squashfs\"" >> "$conf"
         echo "      destination: \"\"" >> "$conf"
     fi
@@ -335,7 +335,7 @@ write_settings_conf(){
     echo "    - show:" >> "$conf"
     echo "        - finished" >> "$conf" && write_finished_conf
     echo '' >> "$conf"
-    echo "branding: ${iso_name}" >> "$conf"
+    echo "branding: ${os_id}" >> "$conf"
     echo '' >> "$conf"
     echo "prompt-install: false" >> "$conf"
     echo '' >> "$conf"
