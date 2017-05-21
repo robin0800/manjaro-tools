@@ -105,7 +105,7 @@ configure_services(){
                 [[ $svc == "xdm" ]] && set_xdm "$mnt"
                 add_svc_rc "$mnt" "$svc"
             done
-            for svc in ${enable_openrc_live[@]}; do
+            for svc in ${enable_live[@]}; do
                 add_svc_rc "$mnt" "$svc"
             done
         ;;
@@ -113,7 +113,7 @@ configure_services(){
             for svc in ${enable_systemd[@]}; do
                 add_svc_sd "$mnt" "$svc"
             done
-            for svc in ${enable_systemd_live[@]}; do
+            for svc in ${enable_live[@]}; do
                 add_svc_sd "$mnt" "$svc"
             done
         ;;

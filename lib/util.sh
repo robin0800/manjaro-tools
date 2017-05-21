@@ -357,14 +357,6 @@ load_profile(){
 
     [[ -z ${disable_openrc[@]} ]] && disable_openrc=()
 
-    if [[ -z ${enable_systemd_live[@]} ]];then
-        enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
-    fi
-
-    if [[ -z ${enable_openrc_live[@]} ]];then
-        enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
-    fi
-
     if [[ ${displaymanager} != "none" ]]; then
         enable_openrc+=('xdm')
         enable_systemd+=("${displaymanager}")
@@ -373,6 +365,13 @@ load_profile(){
     [[ -z ${netinstall} ]] && netinstall='false'
 
     [[ -z ${chrootcfg} ]] && chrootcfg='false'
+
+    enable_live=('manjaro-live' 'pacman-init')
+    if ${netinstall};then
+        enable_live+=('mhwd-live-net' 'mirrors-live-net')
+    else
+        enable_live+=('mhwd-live' 'mirrors-live')
+    fi
 
     netgroups="https://raw.githubusercontent.com/manjaro/calamares-netgroups/master"
 
