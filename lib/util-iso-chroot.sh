@@ -9,18 +9,6 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
-copy_overlay(){
-    local src="$1" dest="$2"
-    if [[ -e $src ]];then
-        msg2 "Copying [%s] ..." "${src##*/}"
-        if [[ -L $src ]];then
-            cp -a --no-preserve=ownership $src/* $dest
-        else
-            cp -LR $src/* $dest
-        fi
-    fi
-}
-
 add_svc_rc(){
     local mnt="$1" name="$2"
     if [[ -f $mnt/etc/init.d/$name ]];then

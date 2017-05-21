@@ -386,12 +386,27 @@ load_profile(){
     ${extra} && basic='false'
 
     root_list=${run_dir}/shared/Packages-Root
+    root_overlay="${run_dir}/shared/${dist_name}/root-overlay"
+    if [[ -e "$profdir/root-overlay" ]];then
+        root_overlay="$profdir/root-overlay"
+    fi
 
     mhwd_list=${run_dir}/shared/Packages-Mhwd
 
     desktop_list=$profdir/Packages-Desktop
+    if [[ -e "$profdir/desktop-overlay" ]];then
+        desktop_overlay="$profdir/desktop-overlay"
+    fi
 
-    live_list=$profdir/Packages-Live
+    live_list="${run_dir}/shared/Packages-Live"
+    if [[ -f "$profdir/Packages-Live" ]];then
+        live_list="$profdir/Packages-Live"
+    fi
+
+    live_overlay="${run_dir}/shared/${dist_name}/live-overlay"
+    if [[ -e "$profdir/live-overlay" ]];then
+        live_overlay="$profdir/live-overlay"
+    fi
 
     if ${netinstall};then
         sort -u ${run_dir}/shared/Packages-Net ${live_list} > ${tmp_dir}/packages-live-net.list
@@ -426,15 +441,18 @@ reset_profile(){
     unset disable_openrc
     unset enable_systemd_live
     unset enable_openrc_live
-    unset root_list
-    unset desktop_list
-    unset mhwd_list
-    unset live_list
     unset login_shell
     unset netinstall
     unset chrootcfg
     unset geoip
     unset extra
+    unset root_list
+    unset desktop_list
+    unset mhwd_list
+    unset live_list
+    unset root_overlay
+    unset desktop_overlay
+    unset live_overlay
 }
 
 # $1: file name

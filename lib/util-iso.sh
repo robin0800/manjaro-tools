@@ -273,6 +273,14 @@ reset_pac_conf(){
         -i "$fs/etc/pacman.conf"
 }
 
+copy_overlay(){
+    local src="$1" dest="$2"
+    if [[ -e "$src" ]];then
+        msg2 "Copying [%s] ..." "${src##*/}"
+        cp -LR "$src"/* "$dest"
+    fi
+}
+
 # Base installation (rootfs)
 make_image_root() {
     if [[ ! -e ${work_dir}/rootfs.lock ]]; then
@@ -283,8 +291,9 @@ make_image_root() {
 
         create_chroot "${mkchroot_args[@]}" "${rootfs}" "${packages[@]}"
 
-        pacman -Qr "${rootfs}" > "${rootfs}/rootfs-pkgs.txt"
-        copy_overlay "${profile_dir}/root-overlay" "${rootfs}"
+#         pacman -Qr "${rootfs}" > "${rootfs}/rootfs-pkgs.txt"
+
+        copy_overlay "${root_overlay}" "${rootfs}"
 
         reset_pac_conf "${rootfs}"
 
@@ -307,9 +316,11 @@ make_image_desktop() {
 
         create_chroot "${mkchroot_args[@]}" "${desktopfs}" "${packages[@]}"
 
-        pacman -Qr "${desktopfs}" > "${desktopfs}/desktopfs-pkgs.txt"
-        cp "${desktopfs}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
-        [[ -e ${profile_dir}/desktop-overlay ]] && copy_overlay "${profile_dir}/desktop-overlay" "${desktopfs}"
+#         pacman -Qr "${desktopfs}" > "${desktopfs}/desktopfs-pkgs.txt"
+
+#         cp "${desktopfs}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
+
+        copy_overlay "${desktop_overlay}" "${desktopfs}"
 
         reset_pac_conf "${desktopfs}"
 
@@ -331,8 +342,10 @@ make_image_live() {
 
         create_chroot "${mkchroot_args[@]}" "${livefs}" "${packages[@]}"
 
-        pacman -Qr "${livefs}" > "${livefs}/livefs-pkgs.txt"
-        copy_overlay "${profile_dir}/live-overlay" "${livefs}"
+#         pacman -Qr "${livefs}" > "${livefs}/livefs-pkgs.txt"
+
+        copy_overlay "${live_overlay}" "${livefs}"
+
         configure_live_image "${livefs}"
 
         reset_pac_conf "${livefs}"
@@ -526,20 +539,6 @@ make_profile(){
     reset_profile
     msg "Finished building [%s]" "${profile}"
     show_elapsed_time "${FUNCNAME}" "${timer_start}"
-}
-
-get_pacman_conf(){
-    local user_conf=${profile_dir}/user-repos.conf pac_arch='default' conf
-    [[ "${target_arch}" == 'x86_64' ]] && pac_arch='multilib'
-    if [[ -f ${user_conf} ]];then
-        info "detected: %s" "user-repos.conf"
-        check_user_repos_conf "${user_conf}"
-        conf=${tmp_dir}/custom-pacman.conf
-        cat ${DATADIR}/pacman-$pac_arch.conf ${user_conf} > "$conf"
-    else
-        conf="${DATADIR}/pacman-$pac_arch.conf"
-    fi
-    echo "$conf"
 }
 
 build(){
