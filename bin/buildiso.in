@@ -85,13 +85,12 @@ show_profile(){
         msg2 "addgroups: %s" "${addgroups}"
         [[ -n ${smb_workgroup} ]] && msg2 "smb_workgroup: %s" "${smb_workgroup}"
 
+        msg2 "enable_live: %s" "${enable_live[*]}"
         if [[ ${initsys} == 'systemd' ]];then
             msg2 "enable_systemd: %s" "${enable_systemd[*]}"
-            msg2 "enable_systemd_live: %s" "${enable_systemd_live[*]}"
             [[ -n ${disable_systemd[*]} ]] && msg2 "disable_systemd: %s" "${disable_systemd[*]}"
         else
             msg2 "enable_openrc: %s" "${enable_openrc[*]}"
-            msg2 "enable_openrc_live: %s" "${enable_openrc_live[*]}"
             [[ -n ${disable_openrc[*]} ]] && msg2 "disable_openrc: %s" "${disable_openrc[*]}"
         fi
     fi
