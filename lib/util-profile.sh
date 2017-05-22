@@ -155,102 +155,86 @@ reset_profile(){
 
 # $1: file name
 load_pkgs(){
-    info "Loading Packages: [%s] ..." "${1##*/}"
+    local pkglist="$1" arch="$2" ed="$3" init="$4" _kv="$5"
+    info "Loading Packages: [%s] ..." "${pkglist##*/}"
 
-    local _init _init_rm
-    case "${initsys}" in
-        'openrc')
-            _init="s|>openrc||g"
-            _init_rm="s|>systemd.*||g"
-        ;;
-        *)
-            _init="s|>systemd||g"
-            _init_rm="s|>openrc.*||g"
-        ;;
-    esac
+    local _init="s|>systemd||g" _init_rm="s|>openrc.*||g"
+    if [[ $init == "openrc" ]];then
+        _init="s|>openrc||g"
+        _init_rm="s|>systemd.*||g"
+    fi
 
-    local _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64 _basic _basic_rm _extra _extra_rm
-
+    local _basic="s|>basic.*||g"
     if ${basic};then
         _basic="s|>basic||g"
-    else
-        _basic_rm="s|>basic.*||g"
     fi
 
+    local _extra="s|>extra.*||g"
     if ${extra};then
         _extra="s|>extra||g"
-    else
-        _extra_rm="s|>extra.*||g"
     fi
 
-    case "${target_arch}" in
-        "i686")
-            _arch="s|>i686||g"
-            _arch_rm="s|>x86_64.*||g"
-            _multi="s|>multilib.*||g"
-            _nonfree_multi="s|>nonfree_multilib.*||g"
-            _nonfree_x86_64="s|>nonfree_x86_64.*||g"
+    local _edition="s|>manjaro||g" _edition_rm="s|>sonar.*||g"
+    if [[ "$ed" == 'sonar' ]];then
+        _edition="s|>sonar||g"
+        _edition_rm="s|>manjaro.*||g"
+    fi
+
+    local _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64
+
+    if [[ "$arch" == 'i686' ]];then
+        _arch="s|>i686||g"
+        _arch_rm="s|>x86_64.*||g"
+        _multi="s|>multilib.*||g"
+        _nonfree_multi="s|>nonfree_multilib.*||g"
+        _nonfree_x86_64="s|>nonfree_x86_64.*||g"
+        if ${nonfree_mhwd};then
+            _nonfree_default="s|>nonfree_default||g"
+            _nonfree_i686="s|>nonfree_i686||g"
+
+        else
+            _nonfree_default="s|>nonfree_default.*||g"
+            _nonfree_i686="s|>nonfree_i686.*||g"
+        fi
+    else
+        _arch="s|>x86_64||g"
+        _arch_rm="s|>i686.*||g"
+        _nonfree_i686="s|>nonfree_i686.*||g"
+        if ${multilib};then
+            _multi="s|>multilib||g"
             if ${nonfree_mhwd};then
                 _nonfree_default="s|>nonfree_default||g"
-                _nonfree_i686="s|>nonfree_i686||g"
-
+                _nonfree_x86_64="s|>nonfree_x86_64||g"
+                _nonfree_multi="s|>nonfree_multilib||g"
             else
                 _nonfree_default="s|>nonfree_default.*||g"
-                _nonfree_i686="s|>nonfree_i686.*||g"
+                _nonfree_multi="s|>nonfree_multilib.*||g"
+                _nonfree_x86_64="s|>nonfree_x86_64.*||g"
             fi
-        ;;
-        *)
-            _arch="s|>x86_64||g"
-            _arch_rm="s|>i686.*||g"
-            _nonfree_i686="s|>nonfree_i686.*||g"
-            if ${multilib};then
-                _multi="s|>multilib||g"
-                if ${nonfree_mhwd};then
-                    _nonfree_default="s|>nonfree_default||g"
-                    _nonfree_x86_64="s|>nonfree_x86_64||g"
-                    _nonfree_multi="s|>nonfree_multilib||g"
-                else
-                    _nonfree_default="s|>nonfree_default.*||g"
-                    _nonfree_multi="s|>nonfree_multilib.*||g"
-                    _nonfree_x86_64="s|>nonfree_x86_64.*||g"
-                fi
+        else
+            _multi="s|>multilib.*||g"
+            if ${nonfree_mhwd};then
+                _nonfree_default="s|>nonfree_default||g"
+                _nonfree_x86_64="s|>nonfree_x86_64||g"
+                _nonfree_multi="s|>nonfree_multilib.*||g"
             else
-                _multi="s|>multilib.*||g"
-                if ${nonfree_mhwd};then
-                    _nonfree_default="s|>nonfree_default||g"
-                    _nonfree_x86_64="s|>nonfree_x86_64||g"
-                    _nonfree_multi="s|>nonfree_multilib.*||g"
-                else
-                    _nonfree_default="s|>nonfree_default.*||g"
-                    _nonfree_x86_64="s|>nonfree_x86_64.*||g"
-                    _nonfree_multi="s|>nonfree_multilib.*||g"
-                fi
+                _nonfree_default="s|>nonfree_default.*||g"
+                _nonfree_x86_64="s|>nonfree_x86_64.*||g"
+                _nonfree_multi="s|>nonfree_multilib.*||g"
             fi
-        ;;
-    esac
-
-    local _edition _edition_rm
-    case "${edition}" in
-        'sonar')
-            _edition="s|>sonar||g"
-            _edition_rm="s|>manjaro.*||g"
-        ;;
-        *)
-            _edition="s|>manjaro||g"
-            _edition_rm="s|>sonar.*||g"
-        ;;
-    esac
+        fi
+    fi
 
     local _blacklist="s|>blacklist.*||g" \
-        _kernel="s|KERNEL|$kernel|g" \
-        _used_kernel=${kernel:5:2} \
+        _kernel="s|KERNEL|$_kv|g" \
+        _used_kernel=${_kv:5:2} \
         _space="s| ||g" \
         _clean=':a;N;$!ba;s/\n/ /g' \
         _com_rm="s|#.*||g" \
         _purge="s|>cleanup.*||g" \
         _purge_rm="s|>cleanup||g"
 
-    packages=($(sed "$_com_rm" "$1" \
+    packages=($(sed "$_com_rm" "$pkglist" \
             | sed "$_space" \
             | sed "$_blacklist" \
             | sed "$_purge" \
@@ -267,16 +251,14 @@ load_pkgs(){
             | sed "$_edition" \
             | sed "$_edition_rm" \
             | sed "$_basic" \
-            | sed "$_basic_rm" \
             | sed "$_extra" \
-            | sed "$_extra_rm" \
             | sed "$_clean"))
 
-    if [[ $1 == "${mhwd_list}" ]]; then
+    if [[ $pkglist == "${mhwd_list}" ]]; then
 
         [[ ${_used_kernel} < "42" ]] && local _amd="s|xf86-video-amdgpu||g"
 
-        packages_cleanup=($(sed "$_com_rm" "$1" \
+        packages_cleanup=($(sed "$_com_rm" "$pkglist" \
             | grep cleanup \
             | sed "$_purge_rm" \
             | sed "$_kernel" \

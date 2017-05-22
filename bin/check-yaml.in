@@ -18,13 +18,13 @@ SYSCONFDIR='@sysconfdir@'
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 
 import ${LIBDIR}/util.sh
-import ${LIBDIR}/util-yaml.sh
+import ${LIBDIR}/util-yaml-check.sh
 import ${LIBDIR}/util-profile.sh
 
 prepare_check(){
     profile="$1"
-    local edition=$(get_edition ${profile})
-    profile_dir=${run_dir}/${edition}/${profile}
+    edition=$(get_edition ${profile})
+    local profile_dir=${run_dir}/${edition}/${profile}
 
     load_profile "${profile_dir}"
 
