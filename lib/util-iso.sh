@@ -11,6 +11,7 @@
 
 import ${LIBDIR}/util-chroot.sh
 import ${LIBDIR}/util-iso-chroot.sh
+import ${LIBDIR}/util-iso-grub.sh
 import ${LIBDIR}/util-yaml.sh
 
 error_function() {
