@@ -95,14 +95,17 @@ copy_hostconf () {
     done
 
     if [[ -n ${build_mirror} ]];then
-        build_mirror=${build_mirror}'/$repo/$arch'
+        local branch=$(pacman-mirrors -a --prefix "$1" -G)
         if ${keep_mirrors}; then
-            set_branch "$1" "$(get_branch $1)"
+#             set_branch "$1" "$(get_branch $1)"
+            pacman-mirrors -a -p "$1" -S "${branch}" -R
         else
-            echo "Server = ${build_mirror}" > "$1/etc/pacman.d/mirrorlist"
+            local mirror=${build_mirror}'/$repo/$arch'
+            echo "Server = ${mirror}" > "$1/etc/pacman.d/mirrorlist"
         fi
     else
-        set_branch "$1" "$(get_branch $1)"
+#         set_branch "$1" "$(get_branch $1)"
+        pacman-mirrors -a -p "$1" -S "$branch" -R
     fi
 
     sed -r "s|^#?\\s*CacheDir.+|CacheDir = $(echo -n ${cache_dirs[@]})|g" -i "$1/etc/pacman.conf"

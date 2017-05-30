@@ -139,17 +139,17 @@ prepare_dir(){
     [[ ! -d $1 ]] && mkdir -p $1
 }
 
-# $1: chroot
-get_branch(){
-    echo $(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch = ' | sed 's/Branch = \s*//g')
-}
-
-# $1: chroot
-# $2: branch
-set_branch(){
-    info "Setting mirrorlist branch: %s" "$2"
-    sed -e "s|/stable|/$2|g" -i "$1/etc/pacman.d/mirrorlist"
-}
+# # $1: chroot
+# get_branch(){
+#     echo $(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch = ' | sed 's/Branch = \s*//g')
+# }
+#
+# # $1: chroot
+# # $2: branch
+# set_branch(){
+#     info "Setting mirrorlist branch: %s" "$2"
+#     sed -e "s|/stable|/$2|g" -i "$1/etc/pacman.d/mirrorlist"
+# }
 
 init_common(){
     [[ -z ${target_branch} ]] && target_branch='stable'
