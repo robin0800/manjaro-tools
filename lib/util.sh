@@ -65,20 +65,8 @@ check_user_repos_conf(){
 get_pac_mirrors_conf(){
     local conf="$tmp_dir/pacman-mirrors-$1.conf"
     cp "${DATADIR}/pacman-mirrors.conf" "$conf"
-    sed -i "$conf" \
-        -e "s|Branch = stable|Branch = $1|"
-
+    sed -e "s|@branch@|$1|" -i "$conf"
     echo "$conf"
-}
-
-read_build_list(){
-    local _space="s| ||g" \
-        _clean=':a;N;$!ba;s/\n/ /g' \
-        _com_rm="s|#.*||g"
-
-    build_list=$(sed "$_com_rm" "$1.list" \
-        | sed "$_space" \
-        | sed "$_clean")
 }
 
 # $1: list_dir
@@ -99,15 +87,6 @@ show_build_profiles(){
         cpuarch=${cpuarch:-}${cpuarch:+|}${temp%.conf}
     done
     echo $cpuarch
-}
-
-# $1: list_dir
-# $2: build list
-eval_build_list(){
-    eval "case $2 in
-        $(show_build_lists $1)) is_build_list=true; read_build_list $1/$2 ;;
-        *) is_build_list=false ;;
-    esac"
 }
 
 get_timer(){
@@ -138,18 +117,6 @@ load_vars() {
 prepare_dir(){
     [[ ! -d $1 ]] && mkdir -p $1
 }
-
-# # $1: chroot
-# get_branch(){
-#     echo $(cat "$1/etc/pacman-mirrors.conf" | grep '^Branch = ' | sed 's/Branch = \s*//g')
-# }
-#
-# # $1: chroot
-# # $2: branch
-# set_branch(){
-#     info "Setting mirrorlist branch: %s" "$2"
-#     sed -e "s|/stable|/$2|g" -i "$1/etc/pacman.d/mirrorlist"
-# }
 
 init_common(){
     [[ -z ${target_branch} ]] && target_branch='stable'
@@ -348,6 +315,20 @@ show_config(){
     else
         msg2 "config: %s" "${manjaro_tools_conf}"
     fi
+}
+
+read_build_list(){
+    local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g"
+    echo $(sed "$_com_rm" "$1.list" | sed "$_space" | sed "$_clean")
+}
+
+# $1: list_dir
+# $2: build list
+eval_build_list(){
+    eval "case $2 in
+        $(show_build_lists $1)) is_build_list=true; build_list=$(read_build_list $1/$2) ;;
+        *) is_build_list=false ;;
+    esac"
 }
 
 run(){
