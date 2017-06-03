@@ -37,15 +37,13 @@ usage() {
     echo '    -r <list>     Bind mountargs ro'
     echo '    -w <list>     Bind mountargs rw'
     echo '                  List format [src1:target1 ... srcN:targetN]'
-    echo '    -B            Use custom  build mirror'
-    echo '    -K            Keep mirrorlist (-B)'
     echo '    -h            This message'
     exit 1
 }
 
 orig_argv=("$0" "$@")
 
-opts='hKC:M:S:c:r:w:B:f:s'
+opts='hC:M:S:c:r:w:f:s'
 
 while getopts ${opts} arg; do
     case "${arg}" in
@@ -57,8 +55,6 @@ while getopts ${opts} arg; do
         s) nosetarch=true ;;
         r) bindmounts_ro=("$OPTARG") ;;
         w) bindmounts_rw=("$OPTARG") ;;
-        B) build_mirror="$OPTARG" ;;
-        K) keep_mirrors=true ;;
         h|?) usage ;;
         *) error "invalid argument '$arg'"; usage ;;
     esac
@@ -86,27 +82,12 @@ copy_hostconf () {
     [[ -n $pac_conf ]] && cp $pac_conf "$1/etc/pacman.conf"
 
     [[ -n $makepkg_conf ]] && cp $makepkg_conf "$1/etc/makepkg.conf"
-    [[ -n $mirrors_conf ]] && cp ${mirrors_conf} "$1/etc/pacman-mirrors.conf"
 
     local file
     for file in "${files[@]}"; do
         mkdir -p "$(dirname "$working_dir$file")"
         cp -T "$file" "$working_dir$file"
     done
-
-    if [[ -n ${build_mirror} ]];then
-        local branch=$(pacman-mirrors -a --prefix "$1" -G)
-        if ${keep_mirrors}; then
-            info "Setting branch: %s" "${branch}"
-            pacman-mirrors -a -p "$1" -S "${branch}" -R
-        else
-            local mirror=${build_mirror}'/$repo/$arch'
-            echo "Server = ${mirror}" > "$1/etc/pacman.d/mirrorlist"
-        fi
-    else
-        info "Setting branch: %s" "${branch}"
-        pacman-mirrors -a -p "$1" -S "${branch}" -R
-    fi
 
     sed -r "s|^#?\\s*CacheDir.+|CacheDir = $(echo -n ${cache_dirs[@]})|g" -i "$1/etc/pacman.conf"
 }

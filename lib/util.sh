@@ -62,13 +62,6 @@ check_user_repos_conf(){
     done
 }
 
-get_pac_mirrors_conf(){
-    local conf="$tmp_dir/pacman-mirrors-$1.conf"
-    cp "${DATADIR}/pacman-mirrors.conf" "$conf"
-    sed -e "s|@branch@|$1|" -i "$conf"
-    echo "$conf"
-}
-
 # $1: list_dir
 show_build_lists(){
     local list temp
@@ -319,14 +312,14 @@ show_config(){
 
 read_build_list(){
     local _space="s| ||g" _clean=':a;N;$!ba;s/\n/ /g' _com_rm="s|#.*||g"
-    echo $(sed "$_com_rm" "$1.list" | sed "$_space" | sed "$_clean")
+    build_list=$(sed "$_com_rm" "$1.list" | sed "$_space" | sed "$_clean")
 }
 
 # $1: list_dir
 # $2: build list
 eval_build_list(){
     eval "case $2 in
-        $(show_build_lists $1)) is_build_list=true; build_list=$(read_build_list $1/$2) ;;
+        $(show_build_lists $1)) is_build_list=true; read_build_list $1/$2 ;;
         *) is_build_list=false ;;
     esac"
 }

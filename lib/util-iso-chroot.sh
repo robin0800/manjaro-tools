@@ -236,11 +236,11 @@ clean_up_image(){
 }
 
 copy_from_cache(){
-    local list="${tmp_dir}"/mhwd-cache.list mirror="${build_mirror}/${target_branch}"
+    local list="${tmp_dir}"/mhwd-cache.list
     local mnt="$1"; shift
-    chroot-run -B "$mirror" "$mnt" \
+    chroot-run "$mnt" \
         pacman -v -Syw --noconfirm "$@" || return 1
-    chroot-run -B "$mirror" "$mnt" \
+    chroot-run "$mnt" \
         pacman -v -Sp --noconfirm "$@" > "$list"
     sed -ni '/.pkg.tar.xz/p' "$list"
     sed -i "s/.*\///" "$list"
