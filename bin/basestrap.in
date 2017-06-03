@@ -31,7 +31,7 @@ branch=stable
 usage() {
     echo "usage: ${0##*/} [options] root [packages...]"
     echo " -C <config>      Use an alternate config file for pacman"
-    echo " -P <config>      Use an alternate config file for pacman-mirrors"
+    echo " -S <config>      Use an alternate config file for pacman-mirrors"
     echo " -B <branch>      Use an alternate branch"
     echo ' -U <url>         Use a specific mirror'
     echo " -c               Use the package cache on the host, rather than the target"
@@ -55,12 +55,12 @@ usage() {
 
 orig_argv=("$0" "$@")
 
-opts=':C:P:cdGiM:B:U'
+opts=':C:S:B:U:cdGiM'
 
 while getopts ${opts} arg; do
     case "${arg}" in
         C) pacman_config=$OPTARG ;;
-        P) mirrors_conf="$OPTARG" ;;
+        S) mirrors_conf="$OPTARG" ;;
         d) directory=true ;;
         c) hostcache=true ;;
         i) interactive=true ;;
@@ -85,7 +85,6 @@ ${hostcache} && pacman_args+=(--cachedir="$newroot/var/cache/pacman/pkg")
 ${interactive} && pacman_args+=(--noconfirm)
 
 [[ -n $pacman_config ]] && pacman_args+=(--config="$pacman_config")
-[[ -n $mirrors_conf ]] && cp ${mirrors_conf} "$newroot/etc/pacman-mirrors.conf"
 
 [[ -d $newroot ]] || die "%s is not a directory" "$newroot"
 
@@ -93,19 +92,23 @@ if ! mountpoint -q "$newroot" && ! ${directory}; then
     die '%s is not a mountpoint!' "$newroot"
 fi
 
-
 mv "$working_dir/etc/locale.gen" "$working_dir/etc/locale.gen.bak"
 mv "$working_dir/etc/locale.conf" "$working_dir/etc/locale.conf.bak"
 printf '%s.UTF-8 UTF-8\n' en_US > "$working_dir/etc/locale.gen"
 printf 'LANG=%s.UTF-8\n' en_US > "$working_dir/etc/locale.conf"
 printf 'LC_MESSAGES=C\n' >> "$working_dir/etc/locale.conf"
 
-pm_args=(-a -p "$newroot" -S "${branch}" -R)
+pm_args=(-a -R -p "$newroot" -S "${branch}")
 
-[[ -n ${mirror} ]] && pm_args+=(-U "${mirror}" -n)
+[[ -n ${mirror} ]] && pm_args+=(-n -U "${mirror}")
 
+info "pm_args: %s" "${pm_args[*]}"
 # create obligatory directories
 create_min_fs "$newroot"
+
+if [[ -n $mirrors_conf ]]; then
+    cp ${mirrors_conf} "$newroot/etc/pacman-mirrors.conf"
+fi
 
 info "Configuring pacman-mirrors: %s" "${branch}"
 pacman-mirrors "${pm_args[@]}"
@@ -125,4 +128,3 @@ fi
 if ${copymirrorlist};then
     copy_mirrorlist "$newroot"
 fi
-

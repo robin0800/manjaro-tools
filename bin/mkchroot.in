@@ -44,7 +44,7 @@ usage() {
 
 orig_argv=("$0" "$@")
 
-opts='hC:M:S:c:f:s:U:B'
+opts='hC:M:S:U:B:c:f:s'
 
 while getopts ${opts} arg; do
     case "${arg}" in
@@ -100,7 +100,7 @@ for file in "${files[@]}"; do
     cp "$file" "$working_dir$file"
 done
 
-basestrap_args=(-GMcd ${pac_conf:+-C "$pac_conf"} ${cache_dirs[@]/#/--cachedir=} -B ${branch:+-"$branch"} ${mirrors_conf:+-P "$mirrors_conf"})
+basestrap_args=(-GMcd ${pac_conf:+-C "$pac_conf"} -B "${branch}" -S "$mirrors_conf")
 
 [[ -n ${mirror} ]] && basestrap_args+=(-U "${mirror}")
 
@@ -109,8 +109,7 @@ while read -r varname; do
     _env+=("$varname=${!varname}")
 done < <(declare -x | sed -r 's/^declare -x ([^=]*)=.*/\1/' | grep -i '_proxy$')
 env -i "${_env[@]}" \
-
-basestrap "${basestrap_args[@]}" "$working_dir" "$@" || die 'Failed to install all packages'
+basestrap "${basestrap_args[@]}" "$working_dir" ${cache_dirs[@]/#/--cachedir=} "$@" || die 'Failed to install all packages'
 
 echo "$version" > "$working_dir/.manjaro-tools"
 
@@ -120,4 +119,3 @@ ${nosetarch} && chroot_args+=(${nosetarch:+-s})
 exec chroot-run \
     ${chroot_args[*]} \
     "$working_dir" locale-gen
-

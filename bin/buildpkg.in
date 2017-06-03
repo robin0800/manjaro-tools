@@ -89,7 +89,7 @@ sign=false
 udev_root=false
 is_multilib=false
 
-mkchroot_args=(-L)
+mkchroot_args=()
 mkchrootpkg_args=()
 
 install_pkgs=()
@@ -113,7 +113,7 @@ prepare_build(){
 
     local mirrors_conf=${DATADIR}/pacman-mirrors.conf
 
-    mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -U ${build_mirror} -B "${target_branch}")
+    mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -U "${build_mirror}/" -B "${target_branch}")
 
     mkchrootpkg_args+=(-r ${work_dir})
 
