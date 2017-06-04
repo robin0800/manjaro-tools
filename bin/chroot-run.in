@@ -30,7 +30,6 @@ usage() {
     echo ' options:'
     echo '    -C <file>     Location of a pacman config file'
     echo '    -M <file>     Location of a makepkg config file'
-    echo '    -S <file>     Location of a pacman-mirrors config file'
     echo '    -c <dir>      Set pacman cache'
     echo '    -f <file>     Copy file from the host to the chroot'
     echo '    -s            Do not run setarch'
@@ -43,13 +42,12 @@ usage() {
 
 orig_argv=("$0" "$@")
 
-opts='hC:M:S:c:r:w:f:s'
+opts='hC:M:c:r:w:f:s'
 
 while getopts ${opts} arg; do
     case "${arg}" in
         C) pac_conf="$OPTARG" ;;
         M) makepkg_conf="$OPTARG" ;;
-        S) mirrors_conf="$OPTARG" ;;
         c) cache_dir="$OPTARG" ;;
         f) files+=("$OPTARG") ;;
         s) nosetarch=true ;;

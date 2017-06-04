@@ -18,16 +18,10 @@ copy_keyring(){
     fi
 }
 
-prepare_pac_mirrors(){
-    mkdir -m 0755 -p $1/etc/pacman.d $1/var/lib/pacman-mirrors $1/usr/share/pacman-mirrors
-#     curl https://raw.githubusercontent.com/manjaro/pacman-mirrors/master/share/mirrors.json -o $1/usr/share/pacman-mirrors/mirrors.json
-    #curl https://raw.githubusercontent.com/manjaro/pacman-mirrors/master/conf/pacman-mirrors.conf -o $1/etc/pacman-mirrors.conf
-#     cp ${DATADIR}/pacman-mirrors.conf $1/etc
-}
-
 create_min_fs(){
     msg "Creating install root at %s" "$1"
     mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
+    mkdir -m 0755 -p $1/etc/pacman.d $1/var/lib/pacman-mirrors $1/usr/share/pacman-mirrors
     mkdir -m 1777 -p $1/tmp
     mkdir -m 0555 -p $1/{sys,proc}
 }

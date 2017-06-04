@@ -41,8 +41,6 @@ prepare_build(){
         pacman_conf="${DATADIR}/pacman-$pac_arch.conf"
     fi
 
-#     local mirrors_conf=${DATADIR}/pacman-mirrors.conf
-
     iso_file=$(gen_iso_fn).iso
 
     mkchroot_args+=(-C ${pacman_conf} -U "${build_mirror}/" -B "${target_branch}")

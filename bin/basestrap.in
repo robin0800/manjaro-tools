@@ -31,7 +31,6 @@ branch=stable
 usage() {
     echo "usage: ${0##*/} [options] root [packages...]"
     echo " -C <config>      Use an alternate config file for pacman"
-    echo " -S <config>      Use an alternate config file for pacman-mirrors"
     echo " -B <branch>      Use an alternate branch"
     echo ' -U <url>         Use a specific mirror'
     echo " -c               Use the package cache on the host, rather than the target"
@@ -60,14 +59,13 @@ opts=':C:B:U:cdGiM'
 while getopts ${opts} arg; do
     case "${arg}" in
         C) pacman_config=$OPTARG ;;
-#         S) mirrors_conf="$OPTARG" ;;
+        B) branch="$OPTARG" ;;
+        U) mirror="$OPTARG" ;;
         d) directory=true ;;
         c) hostcache=true ;;
         i) interactive=true ;;
         G) copykeyring=false ;;
         M) copymirrorlist=false ;;
-        B) branch="$OPTARG" ;;
-        U) mirror="$OPTARG" ;;
         :) echo "invalid argument ${arg}:$OPTARG"; usage 1;;
         ?) usage 0 ;;
     esac
@@ -79,6 +77,7 @@ check_root
 (( $# )) || die "No root directory specified"
 newroot=$1; shift
 pacman_args=("${@:-base}")
+pm_args=(-a -p "$newroot" -S "${branch}")
 
 ${hostcache} && pacman_args+=(--cachedir="$newroot/var/cache/pacman/pkg")
 
@@ -86,33 +85,26 @@ ${interactive} && pacman_args+=(--noconfirm)
 
 [[ -n $pacman_config ]] && pacman_args+=(--config="$pacman_config")
 
+[[ -n ${mirror} ]] && pm_args+=(-U "${mirror}")
+
 [[ -d $newroot ]] || die "%s is not a directory" "$newroot"
 
 if ! mountpoint -q "$newroot" && ! ${directory}; then
     die '%s is not a mountpoint!' "$newroot"
 fi
 
-mv "$working_dir/etc/locale.gen" "$working_dir/etc/locale.gen.bak"
-mv "$working_dir/etc/locale.conf" "$working_dir/etc/locale.conf.bak"
-printf '%s.UTF-8 UTF-8\n' en_US > "$working_dir/etc/locale.gen"
-printf 'LANG=%s.UTF-8\n' en_US > "$working_dir/etc/locale.conf"
-printf 'LC_MESSAGES=C\n' >> "$working_dir/etc/locale.conf"
-
-pm_args=(-a -p "$newroot" -S "${branch}")
-
-[[ -n ${mirror} ]] && pm_args+=(-U "${mirror}")
+mv "$newroot/etc/locale.gen" "$newroot/etc/locale.gen.bak"
+mv "$newroot/etc/locale.conf" "$newroot/etc/locale.conf.bak"
+printf '%s.UTF-8 UTF-8\n' en_US > "$newroot/etc/locale.gen"
+printf 'LANG=%s.UTF-8\n' en_US > "$newroot/etc/locale.conf"
+printf 'LC_MESSAGES=C\n' >> "$newroot/etc/locale.conf"
 
 # create obligatory directories
 create_min_fs "$newroot"
 
-# if [[ -n $mirrors_conf ]]; then
-#     if [[ ! -e $newroot/etc/pacman-mirrors.conf ]]; then
-        prepare_pac_mirrors "$newroot"
-        info "Configuring pacman-mirrors: %s" "${branch}"
-        pacman-mirrors "${pm_args[@]}"
-#     fi
-#     rm $newroot/usr/share/pacman-mirrors/mirrors.json
-# fi
+if [[ ! -e $newroot/etc/pacman-mirrors.conf ]]; then
+    pacman-mirrors "${pm_args[@]}"
+fi
 
 # mount API filesystems
 chroot_api_mount "$newroot" || die "failed to setup API filesystems in new root"

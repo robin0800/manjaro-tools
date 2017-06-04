@@ -32,7 +32,6 @@ usage() {
     echo ' options:'
     echo '    -C <file>     Location of a pacman config file'
     echo '    -M <file>     Location of a makepkg config file'
-    echo '    -S <file>     Location of a pacman-mirrors config file'
     echo '    -B <branch>   Set branch'
     echo '    -U <url>      Set a specific mirror'
     echo '    -c <dir>      Set pacman cache'
@@ -50,12 +49,11 @@ while getopts ${opts} arg; do
     case "${arg}" in
         C) pac_conf="$OPTARG" ;;
         M) makepkg_conf="$OPTARG" ;;
-#         S) mirrors_conf="$OPTARG" ;;
+        B) branch="$OPTARG" ;;
+        U) mirror="$OPTARG" ;;
         c) cache_dir="$OPTARG" ;;
         f) files+=("$OPTARG") ;;
         s) nosetarch=true ;;
-        B) branch="$OPTARG" ;;
-        U) mirror="$OPTARG" ;;
         h|?) usage ;;
         *) error "invalid argument '%s'" "$arg"; usage ;;
     esac
