@@ -93,16 +93,10 @@ if ! mountpoint -q "$newroot" && ! ${directory}; then
     die '%s is not a mountpoint!' "$newroot"
 fi
 
-mv "$newroot/etc/locale.gen" "$newroot/etc/locale.gen.bak"
-mv "$newroot/etc/locale.conf" "$newroot/etc/locale.conf.bak"
-printf '%s.UTF-8 UTF-8\n' en_US > "$newroot/etc/locale.gen"
-printf 'LANG=%s.UTF-8\n' en_US > "$newroot/etc/locale.conf"
-printf 'LC_MESSAGES=C\n' >> "$newroot/etc/locale.conf"
-
 # create obligatory directories
 create_min_fs "$newroot"
 
-if [[ ! -e $newroot/etc/pacman-mirrors.conf ]]; then
+if [[ ! -f $newroot/etc/pacman-mirrors.conf ]]; then
     pacman-mirrors "${pm_args[@]}"
 fi
 

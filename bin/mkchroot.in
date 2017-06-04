@@ -75,6 +75,9 @@ else
     cache_dirs=(${cache_dir})
 fi
 
+basestrap_args=(-GMcd ${pac_conf:+-C "$pac_conf"} -B "${branch}")
+[[ -n ${mirror} ]] && basestrap_args+=(-U "${mirror}")
+
 umask 0022
 
 #[[ -e $working_dir ]] && die "Working directory '%s' already exists" "$working_dir"
@@ -98,10 +101,6 @@ for file in "${files[@]}"; do
     cp "$file" "$working_dir$file"
 done
 
-basestrap_args=(-GMcd ${pac_conf:+-C "$pac_conf"} -B "${branch}")
-
-[[ -n ${mirror} ]] && basestrap_args+=(-U "${mirror}")
-
 _env=()
 while read -r varname; do
     _env+=("$varname=${!varname}")
@@ -110,6 +109,8 @@ env -i "${_env[@]}" \
 basestrap "${basestrap_args[@]}" "$working_dir" ${cache_dirs[@]/#/--cachedir=} "$@" || die 'Failed to install all packages'
 
 echo "$version" > "$working_dir/.manjaro-tools"
+
+set_locale "$working_dir"
 
 chroot_args=(${pac_conf:+-C "$pac_conf"} ${makepkg_conf:+-M "$makepkg_conf"} ${cache_dir:+-c "$cache_dir"})
 ${nosetarch} && chroot_args+=(${nosetarch:+-s})

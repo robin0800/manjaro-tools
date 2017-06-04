@@ -183,7 +183,6 @@ clean_iso_root(){
 }
 
 clean_up_image(){
-
     local path mnt="$1"
     msg2 "Cleaning [%s]" "${mnt##*/}"
     if [[ ${mnt##*/} == 'mhwdfs' ]];then
@@ -196,8 +195,7 @@ clean_up_image(){
             find "$path" -mindepth 0 -delete &> /dev/null
         fi
     else
-        [[ -f "$mnt/etc/locale.gen.bak" ]] && mv "$mnt/etc/locale.gen.bak" "$mnt/etc/locale.gen"
-        [[ -f "$mnt/etc/locale.conf.bak" ]] && mv "$mnt/etc/locale.conf.bak" "$mnt/etc/locale.conf"
+        reset_locale "$mnt"
         path=$mnt/boot
         if [[ -d "$path" ]]; then
             find "$path" -name 'initramfs*.img' -delete &> /dev/null
