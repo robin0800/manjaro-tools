@@ -55,12 +55,12 @@ usage() {
 
 orig_argv=("$0" "$@")
 
-opts=':C:S:B:U:cdGiM'
+opts=':C:B:U:cdGiM'
 
 while getopts ${opts} arg; do
     case "${arg}" in
         C) pacman_config=$OPTARG ;;
-        S) mirrors_conf="$OPTARG" ;;
+#         S) mirrors_conf="$OPTARG" ;;
         d) directory=true ;;
         c) hostcache=true ;;
         i) interactive=true ;;
@@ -98,20 +98,21 @@ printf '%s.UTF-8 UTF-8\n' en_US > "$working_dir/etc/locale.gen"
 printf 'LANG=%s.UTF-8\n' en_US > "$working_dir/etc/locale.conf"
 printf 'LC_MESSAGES=C\n' >> "$working_dir/etc/locale.conf"
 
-pm_args=(-a -R -p "$newroot" -S "${branch}")
+pm_args=(-a -p "$newroot" -S "${branch}")
 
-[[ -n ${mirror} ]] && pm_args+=(-n -U "${mirror}")
+[[ -n ${mirror} ]] && pm_args+=(-U "${mirror}")
 
-info "pm_args: %s" "${pm_args[*]}"
 # create obligatory directories
 create_min_fs "$newroot"
 
-if [[ -n $mirrors_conf ]]; then
-    cp ${mirrors_conf} "$newroot/etc/pacman-mirrors.conf"
-fi
-
-info "Configuring pacman-mirrors: %s" "${branch}"
-pacman-mirrors "${pm_args[@]}"
+# if [[ -n $mirrors_conf ]]; then
+#     if [[ ! -e $newroot/etc/pacman-mirrors.conf ]]; then
+        prepare_pac_mirrors "$newroot"
+        info "Configuring pacman-mirrors: %s" "${branch}"
+        pacman-mirrors "${pm_args[@]}"
+#     fi
+#     rm $newroot/usr/share/pacman-mirrors/mirrors.json
+# fi
 
 # mount API filesystems
 chroot_api_mount "$newroot" || die "failed to setup API filesystems in new root"

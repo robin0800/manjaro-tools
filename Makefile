@@ -23,8 +23,7 @@ LIBS_BASE = \
 
 SHARED_BASE = \
 	data/pacman-default.conf \
-	data/pacman-multilib.conf \
-	data/pacman-mirrors.conf
+	data/pacman-multilib.conf
 
 LIST_PKG = \
 	$(wildcard data/pkg.list.d/*.list)

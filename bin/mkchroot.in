@@ -44,13 +44,13 @@ usage() {
 
 orig_argv=("$0" "$@")
 
-opts='hC:M:S:U:B:c:f:s'
+opts='hC:M:U:B:c:f:s'
 
 while getopts ${opts} arg; do
     case "${arg}" in
         C) pac_conf="$OPTARG" ;;
         M) makepkg_conf="$OPTARG" ;;
-        S) mirrors_conf="$OPTARG" ;;
+#         S) mirrors_conf="$OPTARG" ;;
         c) cache_dir="$OPTARG" ;;
         f) files+=("$OPTARG") ;;
         s) nosetarch=true ;;
@@ -100,7 +100,7 @@ for file in "${files[@]}"; do
     cp "$file" "$working_dir$file"
 done
 
-basestrap_args=(-GMcd ${pac_conf:+-C "$pac_conf"} -B "${branch}" -S "$mirrors_conf")
+basestrap_args=(-GMcd ${pac_conf:+-C "$pac_conf"} -B "${branch}")
 
 [[ -n ${mirror} ]] && basestrap_args+=(-U "${mirror}")
 

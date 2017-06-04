@@ -111,9 +111,9 @@ prepare_build(){
 
     [[ "$pac_arch" == 'multilib' ]] && target_arch='x86_64'
 
-    local mirrors_conf=${DATADIR}/pacman-mirrors.conf
+#     local mirrors_conf=${DATADIR}/pacman-mirrors.conf
 
-    mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -S ${mirrors_conf} -U "${build_mirror}/" -B "${target_branch}")
+    mkchroot_args+=(-C ${pacman_conf} -M ${makepkg_conf} -U "${build_mirror}/" -B "${target_branch}")
 
     mkchrootpkg_args+=(-r ${work_dir})
 

@@ -41,11 +41,11 @@ prepare_build(){
         pacman_conf="${DATADIR}/pacman-$pac_arch.conf"
     fi
 
-    local mirrors_conf=${DATADIR}/pacman-mirrors.conf
+#     local mirrors_conf=${DATADIR}/pacman-mirrors.conf
 
     iso_file=$(gen_iso_fn).iso
 
-    mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -U "${build_mirror}/" -B "${target_branch}")
+    mkchroot_args+=(-C ${pacman_conf} -U "${build_mirror}/" -B "${target_branch}")
     work_dir=${chroots_iso}/${profile}/${target_arch}
 
     iso_dir="${cache_dir_iso}/${edition}/${profile}/${dist_release}"
