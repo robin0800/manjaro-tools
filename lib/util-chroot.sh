@@ -45,6 +45,11 @@ subvolume_delete_recursive() {
     return 0
 }
 
+set_branch(){
+    local mnt="$1" branch="$2"
+    sed -e "s|^.*Branch = .*|Branch = $branch|" -i $mnt/etc/pacman-mirrors.conf
+}
+
 set_locale(){
     local mnt="$1"
     if [[ ! -f "$mnt/etc/locale.gen.bak" ]] && [[ ! -f "$mnt/etc/locale.conf.bak" ]];then
