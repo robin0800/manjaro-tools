@@ -17,11 +17,13 @@ libtool
 m4
 make
 pacman
+pacman-mirrors-dev
 patch
 pkg-config
 sed
 sudo
 texinfo
+libutil-linux-nosystemd
 util-linux-nosystemd
 which
 >multilib gcc-multilib
