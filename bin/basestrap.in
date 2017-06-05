@@ -108,6 +108,8 @@ if ! pacman -r "$newroot" -Sy "${pacman_args[@]}"; then
     die 'Failed to install packages to new root'
 fi
 
+set_branch "$newroot" "${branch}"
+
 if ${copykeyring};then
     copy_keyring "$newroot"
 fi
