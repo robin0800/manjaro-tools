@@ -266,13 +266,6 @@ gen_iso_fn(){
     echo $name
 }
 
-# reset_pac_conf(){
-#     local fs="$1"
-#     info "Restoring [%s/etc/pacman.conf] ..." "$fs"
-#         -e "s|^.*#CheckSpace|CheckSpace|" \
-#         -i "$fs/etc/pacman.conf"
-# }
-
 copy_overlay(){
     local src="$1" dest="$2"
     if [[ -e "$src" ]];then
@@ -292,8 +285,6 @@ make_image_root() {
         create_chroot "${mkchroot_args[@]}" "${rootfs}" "${packages[@]}"
 
         copy_overlay "${root_overlay}" "${rootfs}"
-
-#         reset_pac_conf "${rootfs}"
 
         configure_lsb "${rootfs}"
 
@@ -315,8 +306,6 @@ make_image_desktop() {
         create_chroot "${mkchroot_args[@]}" "${desktopfs}" "${packages[@]}"
 
         copy_overlay "${desktop_overlay}" "${desktopfs}"
-
-#         reset_pac_conf "${desktopfs}"
 
         umount_fs
         clean_up_image "${desktopfs}"
@@ -340,7 +329,7 @@ make_image_live() {
 
         configure_live_image "${livefs}"
 
-#         reset_pac_conf "${livefs}"
+        pacman -Qr "${livefs}" > ${iso_dir}/$(gen_iso_fn)-pkgs.txt
 
         umount_fs
 
@@ -358,8 +347,6 @@ make_image_mhwd() {
         prepare_dir "${mhwdfs}${mhwd_repo}"
 
         mount_fs "${mhwdfs}" "${work_dir}" "${desktop_list}"
-
-#         reset_pac_conf "${mhwdfs}"
 
         copy_from_cache "${mhwdfs}" "${packages[@]}"
 
@@ -391,8 +378,6 @@ make_image_boot() {
         local bootfs="${work_dir}/bootfs"
 
         mount_fs "${bootfs}" "${work_dir}" "${desktop_list}"
-
-        pacman -Qr "${bootfs}" > ${iso_dir}/$(gen_iso_fn)-pkgs.txt
 
         prepare_initcpio "${bootfs}"
         prepare_initramfs "${bootfs}"
