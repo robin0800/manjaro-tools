@@ -62,7 +62,7 @@ write_bootloader_conf(){
 }
 
 write_servicescfg_conf(){
-    local conf="${modules_dir}/servicescfg.conf" disable_openrc=()
+    local conf="${modules_dir}/servicescfg.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' >  "$conf"
     echo '' >> "$conf"
@@ -72,18 +72,10 @@ write_servicescfg_conf(){
         echo "      - name: $s" >> "$conf"
         echo '        runlevel: default' >> "$conf"
     done
-    if [[ -n ${disable_openrc[@]} ]];then
-        echo '    disabled:' >> "$conf"
-        for s in ${disable_openrc[@]};do
-            echo "      - name: $s" >> "$conf"
-            echo '        runlevel: default' >> "$conf"
-            echo '' >> "$conf"
-        done
-    fi
 }
 
 write_services_conf(){
-    local conf="${modules_dir}/services.conf" disable_systemd=('pacman-init')
+    local conf="${modules_dir}/services.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' >  "$conf"
     echo '' >> "$conf"
@@ -97,12 +89,6 @@ write_services_conf(){
     echo '    - name: "graphical"' >> "$conf"
     echo '      mandatory: true' >> "$conf"
     echo '' >> "$conf"
-    echo 'disable:' >> "$conf"
-    for s in ${disable_systemd[@]};do
-        echo "    - name: $s" >> "$conf"
-        echo '      mandatory: false' >> "$conf"
-        echo '' >> "$conf"
-    done
 }
 
 write_displaymanager_conf(){

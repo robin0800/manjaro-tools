@@ -266,13 +266,12 @@ gen_iso_fn(){
     echo $name
 }
 
-reset_pac_conf(){
-    local fs="$1"
-    info "Restoring [%s/etc/pacman.conf] ..." "$fs"
-    sed -e 's|^.*HoldPkg.*|HoldPkg      = pacman glibc manjaro-system|' \
-        -e "s|^.*#CheckSpace|CheckSpace|" \
-        -i "$fs/etc/pacman.conf"
-}
+# reset_pac_conf(){
+#     local fs="$1"
+#     info "Restoring [%s/etc/pacman.conf] ..." "$fs"
+#         -e "s|^.*#CheckSpace|CheckSpace|" \
+#         -i "$fs/etc/pacman.conf"
+# }
 
 copy_overlay(){
     local src="$1" dest="$2"
@@ -292,11 +291,9 @@ make_image_root() {
 
         create_chroot "${mkchroot_args[@]}" "${rootfs}" "${packages[@]}"
 
-#         pacman -Qr "${rootfs}" > "${rootfs}/rootfs-pkgs.txt"
-
         copy_overlay "${root_overlay}" "${rootfs}"
 
-        reset_pac_conf "${rootfs}"
+#         reset_pac_conf "${rootfs}"
 
         configure_lsb "${rootfs}"
 
@@ -317,13 +314,9 @@ make_image_desktop() {
 
         create_chroot "${mkchroot_args[@]}" "${desktopfs}" "${packages[@]}"
 
-#         pacman -Qr "${desktopfs}" > "${desktopfs}/desktopfs-pkgs.txt"
-
-#         cp "${desktopfs}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
-
         copy_overlay "${desktop_overlay}" "${desktopfs}"
 
-        reset_pac_conf "${desktopfs}"
+#         reset_pac_conf "${desktopfs}"
 
         umount_fs
         clean_up_image "${desktopfs}"
@@ -343,13 +336,11 @@ make_image_live() {
 
         create_chroot "${mkchroot_args[@]}" "${livefs}" "${packages[@]}"
 
-#         pacman -Qr "${livefs}" > "${livefs}/livefs-pkgs.txt"
-
         copy_overlay "${live_overlay}" "${livefs}"
 
         configure_live_image "${livefs}"
 
-        reset_pac_conf "${livefs}"
+#         reset_pac_conf "${livefs}"
 
         umount_fs
 
@@ -368,7 +359,7 @@ make_image_mhwd() {
 
         mount_fs "${mhwdfs}" "${work_dir}" "${desktop_list}"
 
-        reset_pac_conf "${mhwdfs}"
+#         reset_pac_conf "${mhwdfs}"
 
         copy_from_cache "${mhwdfs}" "${packages[@]}"
 
@@ -400,6 +391,8 @@ make_image_boot() {
         local bootfs="${work_dir}/bootfs"
 
         mount_fs "${bootfs}" "${work_dir}" "${desktop_list}"
+
+        pacman -Qr "${bootfs}" > ${iso_dir}/$(gen_iso_fn)-pkgs.txt
 
         prepare_initcpio "${bootfs}"
         prepare_initramfs "${bootfs}"

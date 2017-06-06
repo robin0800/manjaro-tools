@@ -135,9 +135,7 @@ reset_profile(){
     unset password
     unset addgroups
     unset enable_systemd
-    unset disable_systemd
     unset enable_openrc
-    unset disable_openrc
     unset enable_live
     unset login_shell
     unset netinstall

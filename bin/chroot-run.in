@@ -46,7 +46,7 @@ opts='hC:M:c:r:w:f:s'
 
 while getopts ${opts} arg; do
     case "${arg}" in
-        C) pac_conf="$OPTARG" ;;
+        C) pacman_conf="$OPTARG" ;;
         M) makepkg_conf="$OPTARG" ;;
         c) cache_dir="$OPTARG" ;;
         f) files+=("$OPTARG") ;;
@@ -77,7 +77,7 @@ fi
 copy_hostconf () {
     cp -a /etc/pacman.d/gnupg "$1/etc/pacman.d"
 
-    [[ -n $pac_conf ]] && cp $pac_conf "$1/etc/pacman.conf"
+    [[ -n $pacman_conf ]] && cp $pacman_conf "$1/etc/pacman.conf"
 
     [[ -n $makepkg_conf ]] && cp $makepkg_conf "$1/etc/makepkg.conf"
 
@@ -127,5 +127,3 @@ eval $(grep '^CARCH=' "$working_dir/etc/makepkg.conf")
 ${nosetarch} && unset CARCH
 
 ${CARCH:+setarch "$CARCH"} chroot "${working_dir}" "$@"
-
-# kill_chroot_process "${working_dir}"

@@ -21,7 +21,6 @@ copy_keyring(){
 create_min_fs(){
     msg "Creating install root at %s" "$1"
     mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
-    mkdir -m 0755 -p $1/etc/pacman.d $1/var/lib/pacman-mirrors $1/usr/share/pacman-mirrors
     mkdir -m 1777 -p $1/tmp
     mkdir -m 0555 -p $1/{sys,proc}
 }
@@ -53,6 +52,7 @@ set_branch(){
 set_locale(){
     local mnt="$1"
     if [[ ! -f "$mnt/etc/locale.gen.bak" ]] && [[ ! -f "$mnt/etc/locale.conf.bak" ]];then
+        info "Setting locale ..."
         mv "$mnt/etc/locale.gen" "$mnt/etc/locale.gen.bak"
         mv "$mnt/etc/locale.conf" "$mnt/etc/locale.conf.bak"
         printf '%s.UTF-8 UTF-8\n' en_US > "$mnt/etc/locale.gen"
@@ -63,6 +63,7 @@ set_locale(){
 
 reset_locale(){
     local mnt="$1"
+    info "Resetting locale ..."
     [[ -f "$mnt/etc/locale.gen.bak" ]] && mv "$mnt/etc/locale.gen.bak" "$mnt/etc/locale.gen"
     [[ -f "$mnt/etc/locale.conf.bak" ]] && mv "$mnt/etc/locale.conf.bak" "$mnt/etc/locale.conf"
 }

@@ -47,7 +47,7 @@ opts='hC:M:U:B:c:f:s'
 
 while getopts ${opts} arg; do
     case "${arg}" in
-        C) pac_conf="$OPTARG" ;;
+        C) pacman_conf="$OPTARG" ;;
         M) makepkg_conf="$OPTARG" ;;
         B) branch="$OPTARG" ;;
         U) mirror="$OPTARG" ;;
@@ -75,7 +75,7 @@ else
     cache_dirs=(${cache_dir})
 fi
 
-basestrap_args=(-GMcd ${pac_conf:+-C "$pac_conf"} -B "${branch}")
+basestrap_args=(-GMcd ${pacman_conf:+-C "$pacman_conf"} -B "${branch}")
 [[ -n ${mirror} ]] && basestrap_args+=(-U "${mirror}")
 
 umask 0022
@@ -96,9 +96,9 @@ if is_btrfs "$working_dir"; then
     chmod 0755 "$working_dir"
 fi
 
-for file in "${files[@]}"; do
-    mkdir -p "$(dirname "$working_dir$file")"
-    cp "$file" "$working_dir$file"
+for f in "${files[@]}"; do
+    mkdir -p "$(dirname "$working_dir$f")"
+    cp "$f" "$working_dir$f"
 done
 
 _env=()
@@ -112,7 +112,7 @@ echo "$version" > "$working_dir/.manjaro-tools"
 
 set_locale "$working_dir"
 
-chroot_args=(${pac_conf:+-C "$pac_conf"} ${makepkg_conf:+-M "$makepkg_conf"} ${cache_dir:+-c "$cache_dir"})
+chroot_args=(${pacman_conf:+-C "$pacman_conf"} ${makepkg_conf:+-M "$makepkg_conf"} ${cache_dir:+-c "$cache_dir"})
 ${nosetarch} && chroot_args+=(${nosetarch:+-s})
 
 exec chroot-run \

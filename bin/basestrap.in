@@ -47,18 +47,13 @@ usage() {
     exit $1
 }
 
-# if [[ -z $1 || $1 = @(-h|--help) ]]; then
-#     usage
-#     exit $(( $# ? 0 : 1 ))
-# fi
-
 orig_argv=("$0" "$@")
 
 opts=':C:B:U:cdGiM'
 
 while getopts ${opts} arg; do
     case "${arg}" in
-        C) pacman_config=$OPTARG ;;
+        C) pacman_conf=$OPTARG ;;
         B) branch="$OPTARG" ;;
         U) mirror="$OPTARG" ;;
         d) directory=true ;;
@@ -83,7 +78,7 @@ ${hostcache} && pacman_args+=(--cachedir="$newroot/var/cache/pacman/pkg")
 
 ${interactive} && pacman_args+=(--noconfirm)
 
-[[ -n $pacman_config ]] && pacman_args+=(--config="$pacman_config")
+[[ -n $pacman_conf ]] && pacman_args+=(--config="$pacman_conf")
 
 [[ -n ${mirror} ]] && pm_args+=(-U "${mirror}")
 
@@ -108,7 +103,7 @@ if ! pacman -r "$newroot" -Sy "${pacman_args[@]}"; then
     die 'Failed to install packages to new root'
 fi
 
-set_branch "$newroot" "${branch}"
+# set_branch "$newroot" "${branch}"
 
 if ${copykeyring};then
     copy_keyring "$newroot"
