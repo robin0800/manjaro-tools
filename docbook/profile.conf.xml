@@ -183,15 +183,6 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
                 </para></listitem>
             </varlistentry>
 
-            <varlistentry>
-                <term><varname>enable_live=</varname></term>
-
-                <listitem><para>Array of services that will be
-                enabled in the live-cd. It has to match
-                the service name.
-                </para></listitem>
-            </varlistentry>
-
         </variablelist>
 
     </refsect1>
