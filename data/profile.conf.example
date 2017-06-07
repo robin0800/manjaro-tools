@@ -20,17 +20,11 @@
 # nonfree xorg drivers
 # nonfree_mhwd="true"
 
-# possible values: grub;systemd-boot
-# efi_boot_loader="grub"
-
 # configure calamares for netinstall
 # netinstall="false"
 
 # configure calamares to use chrootcfg instead of unpackfs; default: unpackfs
 # chrootcfg="false"
-
-# use geoip
-# geoip="true"
 
 # unset defaults to given values
 # names must match systemd service names
@@ -38,7 +32,7 @@
 
 # unset defaults to given values,
 # names must match openrc service names
-# enable_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
+# enable_openrc=('acpid' 'bluetooth' 'elogind' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
 
 # unset defaults to given values
 # addgroups="video,power,disk,storage,optical,network,lp,scanner,wheel"
