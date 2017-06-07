@@ -44,7 +44,7 @@ get_preset(){
 }
 
 write_bootloader_conf(){
-    local conf="${modules_dir}/bootloader.conf"
+    local conf="${modules_dir}/bootloader.conf" efi_boot_loader='grub'
     msg2 "Writing %s ..." "${conf##*/}"
     source "$(get_preset)"
     echo '---' > "$conf"
@@ -256,12 +256,7 @@ write_locale_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "localeGenPath: /etc/locale.gen" >> "$conf"
-    if ${geoip};then
-        echo "geoipUrl: freegeoip.net" >> "$conf"
-    else
-        echo "region: Europe" >> "$conf"
-        echo "zone: London" >> "$conf"
-    fi
+    echo "geoipUrl: freegeoip.net" >> "$conf"
 }
 
 write_settings_conf(){

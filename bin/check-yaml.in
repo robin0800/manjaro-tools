@@ -48,9 +48,6 @@ show_profile(){
     msg2 "netinstall: %s" "${netinstall}"
     msg2 "chrootcfg: %s" "${chrootcfg}"
     ${netinstall} && msg2 "netgroups: %s" "$(get_yaml)"
-    msg2 "geoip: %s" "${geoip}"
-
-    msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
 
     msg2 "hostname: %s" "${hostname}"
     msg2 "username: %s" "${username}"
@@ -99,7 +96,7 @@ load_config "${MT_USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}
 # to force old way to have buildiso run in iso-profiles dir
 # run_dir=$(pwd)
 
-load_run_dir "${profile_repo}"
+load_run_dir
 
 calamares=false
 pretend=false

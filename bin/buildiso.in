@@ -19,7 +19,6 @@ SYSCONFDIR='@sysconfdir@'
 
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-iso.sh
-import ${LIBDIR}/util-iso-mount.sh
 import ${LIBDIR}/util-profile.sh
 
 prepare_build(){
@@ -71,9 +70,6 @@ show_profile(){
         msg2 "netinstall: %s" "${netinstall}"
         msg2 "chrootcfg: %s" "${chrootcfg}"
         ${netinstall} && msg2 "netgroups: %s" "$(get_yaml)"
-        msg2 "geoip: %s" "${geoip}"
-
-        msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
 
         msg2 "hostname: %s" "${hostname}"
         msg2 "username: %s" "${username}"
@@ -130,7 +126,7 @@ load_user_info
 
 load_config "${MT_USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
-load_run_dir "${profile_repo}"
+load_run_dir
 
 clean_first=true
 pretend=false

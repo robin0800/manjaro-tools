@@ -34,7 +34,7 @@ set_xdm(){
 }
 
 configure_mhwd_drivers(){
-    local path=$1${mhwd_repo}/ \
+    local path=$1$2/ \
         drv_path=$1/var/lib/mhwd/db/pci/graphic_drivers
     info "Configuring mwwd db ..."
     if  [ -z "$(ls $path | grep catalyst-utils 2> /dev/null)" ]; then
@@ -91,9 +91,11 @@ configure_logind(){
 }
 
 configure_journald(){
-    msg2 "Configuring journald ..."
     local conf=$1/etc/systemd/journald.conf
-    sed -i 's/#\(Storage=\)auto/\1volatile/' "$conf"
+    if [[ -e $conf ]];then
+        msg2 "Configuring journald ..."
+        sed -i 's/#\(Storage=\)auto/\1volatile/' "$conf"
+    fi
 }
 
 configure_services(){
@@ -171,9 +173,9 @@ configure_system(){
 }
 
 make_repo(){
-    local dest="$1"
+    local dest="$1" repo="$2"
     cp ${DATADIR}/pacman-mhwd.conf $dest/opt
-    repo-add $dest${mhwd_repo}/mhwd.db.tar.gz $dest${mhwd_repo}/*pkg*z
+    repo-add $dest$repo/mhwd.db.tar.gz $dest$repo/*pkg*z
 }
 
 clean_iso_root(){
@@ -235,7 +237,7 @@ clean_up_image(){
 
 copy_from_cache(){
     local list="${tmp_dir}"/mhwd-cache.list
-    local mnt="$1"; shift
+    local mnt="$1" repo="$2"; shift
     chroot-run "$mnt" \
         pacman -v -Syw --noconfirm "$@" || return 1
     chroot-run "$mnt" \
@@ -244,7 +246,7 @@ copy_from_cache(){
     sed -i "s/.*\///" "$list"
 
     msg2 "Copying mhwd package cache ..."
-    rsync -v --files-from="$list" /var/cache/pacman/pkg "$mnt${mhwd_repo}"
+    rsync -v --files-from="$list" /var/cache/pacman/pkg "$mnt$repo"
 }
 
 chroot_clean(){

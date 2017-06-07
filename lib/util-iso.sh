@@ -13,6 +13,7 @@ import ${LIBDIR}/util-chroot.sh
 import ${LIBDIR}/util-iso-chroot.sh
 import ${LIBDIR}/util-iso-grub.sh
 import ${LIBDIR}/util-yaml.sh
+import ${LIBDIR}/util-iso-mount.sh
 
 error_function() {
     if [[ -p $logpipe ]]; then
@@ -70,30 +71,6 @@ trap_exit() {
     kill "-$sig" "$$"
 }
 
-configure_thus(){
-    local fs="$1"
-    msg2 "Configuring Thus ..."
-    source "$fs/etc/mkinitcpio.d/${kernel}.preset"
-    local conf="$fs/etc/thus.conf"
-    echo "[distribution]" > "$conf"
-    echo "DISTRIBUTION_NAME = \"${dist_name} Linux\"" >> "$conf"
-    echo "DISTRIBUTION_VERSION = \"${dist_release}\"" >> "$conf"
-    echo "SHORT_NAME = \"${dist_name}\"" >> "$conf"
-    echo "[install]" >> "$conf"
-    echo "LIVE_MEDIA_SOURCE = \"/run/miso/bootmnt/${os_id}/${target_arch}/rootfs.sfs\"" >> "$conf"
-    echo "LIVE_MEDIA_DESKTOP = \"/run/miso/bootmnt/${os_id}/${target_arch}/desktopfs.sfs\"" >> "$conf"
-    echo "LIVE_MEDIA_TYPE = \"squashfs\"" >> "$conf"
-    echo "LIVE_USER_NAME = \"${username}\"" >> "$conf"
-    echo "KERNEL = \"${kernel}\"" >> "$conf"
-    echo "VMLINUZ = \"$(echo ${ALL_kver} | sed s'|/boot/||')\"" >> "$conf"
-    echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
-    echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
-
-    if [[ -f $fs/usr/share/applications/thus.desktop && -f $fs/usr/bin/kdesu ]];then
-        sed -i -e 's|sudo|kdesu|g' $fs/usr/share/applications/thus.desktop
-    fi
-}
-
 configure_live_image(){
     local fs="$1"
     msg "Configuring [livefs]"
@@ -101,7 +78,6 @@ configure_live_image(){
     configure_system "$fs"
     configure_services "$fs"
     configure_calamares "$fs"
-    [[ ${edition} == "sonar" ]] && configure_thus "$fs"
     write_live_session_conf "$fs"
     msg "Done configuring [livefs]"
 }
@@ -342,13 +318,13 @@ make_image_live() {
 make_image_mhwd() {
     if [[ ! -e ${work_dir}/mhwdfs.lock ]]; then
         msg "Prepare [drivers repository] (mhwdfs)"
-        local mhwdfs="${work_dir}/mhwdfs"
+        local mhwdfs="${work_dir}/mhwdfs" mhwd_repo="/opt/pkg"
 
         prepare_dir "${mhwdfs}${mhwd_repo}"
 
         mount_fs "${mhwdfs}" "${work_dir}" "${desktop_list}"
 
-        copy_from_cache "${mhwdfs}" "${packages[@]}"
+        copy_from_cache "${mhwdfs}" "${mhwd_repo}" "${packages[@]}"
 
         if [[ -n "${packages_cleanup[@]}" ]]; then
             for pkg in ${packages_cleanup[@]}; do
@@ -356,8 +332,8 @@ make_image_mhwd() {
             done
         fi
 
-        make_repo "${mhwdfs}"
-        configure_mhwd_drivers "${mhwdfs}"
+        make_repo "${mhwdfs}" "${mhwd_repo}"
+        configure_mhwd_drivers "${mhwdfs}" "${mhwd_repo}"
 
         umount_fs
         clean_up_image "${mhwdfs}"
@@ -488,11 +464,10 @@ make_profile(){
     if ${clean_first};then
         chroot_clean "${chroots_iso}/${profile}/${target_arch}"
 
-        local unused_arch=''
-        case ${target_arch} in
-            i686) unused_arch='x86_64' ;;
-            x86_64) unused_arch='i686' ;;
-        esac
+        local unused_arch='i686'
+        if [[ ${target_arch} == 'i686' ]];then
+            unused_arch='x86_64' ;;
+        fi
         if [[ -d "${chroots_iso}/${profile}/${unused_arch}" ]];then
             chroot_clean "${chroots_iso}/${profile}/${unused_arch}"
         fi

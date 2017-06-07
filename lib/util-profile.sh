@@ -20,8 +20,9 @@ write_repo_conf(){
 }
 
 load_run_dir(){
-    [[ -f ${MT_USERCONFDIR}/$1.conf ]] || write_repo_conf
-    [[ -r ${MT_USERCONFDIR}/$1.conf ]] && source ${MT_USERCONFDIR}/$1.conf
+    local gitrepo='iso-profiles'
+    [[ -f ${MT_USERCONFDIR}/$gitrepo.conf ]] || write_repo_conf
+    [[ -r ${MT_USERCONFDIR}/$gitrepo.conf ]] && source ${MT_USERCONFDIR}/$gitrepo.conf
     return 0
 }
 
@@ -41,8 +42,6 @@ load_profile(){
     [[ -z ${multilib} ]] && multilib="true"
 
     [[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
-
-    [[ -z ${efi_boot_loader} ]] && efi_boot_loader="grub"
 
     [[ -z ${hostname} ]] && hostname="manjaro"
 
@@ -81,8 +80,6 @@ load_profile(){
     fi
 
     netgroups="https://raw.githubusercontent.com/manjaro/calamares-netgroups/master"
-
-    [[ -z ${geoip} ]] && geoip='true'
 
     [[ -z ${smb_workgroup} ]] && smb_workgroup=''
 
@@ -129,7 +126,6 @@ reset_profile(){
     unset autologin
     unset multilib
     unset nonfree_mhwd
-    unset efi_boot_loader
     unset hostname
     unset username
     unset password
@@ -140,7 +136,6 @@ reset_profile(){
     unset login_shell
     unset netinstall
     unset chrootcfg
-    unset geoip
     unset extra
     unset root_list
     unset desktop_list

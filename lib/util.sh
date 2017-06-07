@@ -199,8 +199,6 @@ init_buildiso(){
 
     cache_dir_iso="${cache_dir}/iso"
 
-    profile_repo='iso-profiles'
-
     ##### iso settings #####
 
     [[ -z ${dist_release} ]] && dist_release=$(get_release)
@@ -220,8 +218,6 @@ init_buildiso(){
     [[ -z ${kernel} ]] && kernel="linux49"
 
     [[ -z ${gpgkey} ]] && gpgkey=''
-
-    mhwd_repo="/opt/pkg"
 }
 
 init_deployiso(){
