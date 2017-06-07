@@ -144,6 +144,29 @@ reset_profile(){
     unset live_overlay
 }
 
+write_live_session_conf(){
+    local path=$1${SYSCONFDIR}
+    prepare_dir "$path"
+    local conf=$path/live.conf
+    msg2 "Writing %s" "${conf##*/}"
+    echo '# live session configuration' > ${conf}
+    echo '' >> ${conf}
+    echo '# autologin' >> ${conf}
+    echo "autologin=${autologin}" >> ${conf}
+    echo '' >> ${conf}
+    echo '# login shell' >> ${conf}
+    echo "login_shell=${login_shell}" >> ${conf}
+    echo '' >> ${conf}
+    echo '# live username' >> ${conf}
+    echo "username=${username}" >> ${conf}
+    echo '' >> ${conf}
+    echo '# live password' >> ${conf}
+    echo "password=${password}" >> ${conf}
+    echo '' >> ${conf}
+    echo '# live group membership' >> ${conf}
+    echo "addgroups='${addgroups}'" >> ${conf}
+}
+
 # $1: file name
 load_pkgs(){
     local pkglist="$1" arch="$2" ed="$3" init="$4" _kv="$5"

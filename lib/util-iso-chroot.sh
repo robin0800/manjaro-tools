@@ -123,29 +123,6 @@ configure_services(){
     info "Done configuring [%s]" "${initsys}"
 }
 
-write_live_session_conf(){
-    local path=$1${SYSCONFDIR}
-    [[ ! -d $path ]] && mkdir -p $path
-    local conf=$path/live.conf
-    msg2 "Writing %s" "${conf##*/}"
-    echo '# live session configuration' > ${conf}
-    echo '' >> ${conf}
-    echo '# autologin' >> ${conf}
-    echo "autologin=${autologin}" >> ${conf}
-    echo '' >> ${conf}
-    echo '# login shell' >> ${conf}
-    echo "login_shell=${login_shell}" >> ${conf}
-    echo '' >> ${conf}
-    echo '# live username' >> ${conf}
-    echo "username=${username}" >> ${conf}
-    echo '' >> ${conf}
-    echo '# live password' >> ${conf}
-    echo "password=${password}" >> ${conf}
-    echo '' >> ${conf}
-    echo '# live group membership' >> ${conf}
-    echo "addgroups='${addgroups}'" >> ${conf}
-}
-
 configure_system(){
     local mnt="$1"
     case ${initsys} in
