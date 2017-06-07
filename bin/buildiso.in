@@ -76,7 +76,6 @@ show_profile(){
         msg2 "password: %s" "${password}"
         msg2 "login_shell: %s" "${login_shell}"
         msg2 "addgroups: %s" "${addgroups}"
-        [[ -n ${smb_workgroup} ]] && msg2 "smb_workgroup: %s" "${smb_workgroup}"
 
         msg2 "enable_live: %s" "${enable_live[*]}"
         if [[ ${initsys} == 'systemd' ]];then

@@ -144,11 +144,6 @@ write_live_session_conf(){
     echo '' >> ${conf}
     echo '# live group membership' >> ${conf}
     echo "addgroups='${addgroups}'" >> ${conf}
-    if [[ -n ${smb_workgroup} ]];then
-        echo '' >> ${conf}
-        echo '# samba workgroup' >> ${conf}
-        echo "smb_workgroup=${smb_workgroup}" >> ${conf}
-    fi
 }
 
 configure_system(){

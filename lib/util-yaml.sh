@@ -215,11 +215,6 @@ write_postcfg_conf(){
     echo "keyrings:" >> "$conf"
     echo "    - archlinux" >> "$conf"
     echo "    - manjaro" >> "$conf"
-    if [[ -n ${smb_workgroup} ]];then
-        echo "" >> "$conf"
-        echo "samba:" >> "$conf"
-        echo "    - workgroup:  ${smb_workgroup}" >> "$conf"
-    fi
 }
 
 write_umount_conf(){

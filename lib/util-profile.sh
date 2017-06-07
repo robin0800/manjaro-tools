@@ -81,8 +81,6 @@ load_profile(){
 
     netgroups="https://raw.githubusercontent.com/manjaro/calamares-netgroups/master"
 
-    [[ -z ${smb_workgroup} ]] && smb_workgroup=''
-
     basic='true'
     [[ -z ${extra} ]] && extra='false'
 
