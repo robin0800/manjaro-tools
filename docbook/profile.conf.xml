@@ -184,21 +184,13 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
-                <term><varname>enable_systemd_live=</varname></term>
+                <term><varname>enable_live=</varname></term>
 
                 <listitem><para>Array of services that will be
-                enabled in the systemd live-cd. It has to match
-                the names of .service systemd files.
+                enabled in the live-cd. It has to match
+                the service name.
                 </para></listitem>
             </varlistentry>
-
-            <varlistentry>
-            <term><varname>enable_openrc_live=</varname></term>
-
-            <listitem><para>Array of services that will be
-            enabled in the openrc live-cd.
-            </para></listitem>
-        </varlistentry>
 
         </variablelist>
 
