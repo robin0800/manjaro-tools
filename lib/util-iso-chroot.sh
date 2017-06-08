@@ -210,11 +210,11 @@ clean_up_image(){
 copy_from_cache(){
     local list="${tmp_dir}"/mhwd-cache.list
     local mnt="$1" repo="$2"
+    shift 2
     chroot-run "$mnt" pacman -v -Syw --noconfirm "$@" || return 1
     chroot-run "$mnt" pacman -v -Sp --noconfirm "$@" > "$list"
     sed -ni '/.pkg.tar.xz/p' "$list"
     sed -i "s/.*\///" "$list"
-
     msg2 "Copying mhwd package cache ..."
     rsync -v --files-from="$list" /var/cache/pacman/pkg "$mnt$repo"
 }
@@ -225,11 +225,9 @@ chroot_clean(){
         [[ -d ${root} ]] || continue
         local name=${root##*/}
         if [[ $name != "mhwdfs" ]];then
-#             lock 9 "$name.lock" "Locking chroot copy [%s]" "$name"
             delete_chroot "${root}" "$dest"
         fi
     done
-
     rm -rf --one-file-system "$dest"
 }
 
