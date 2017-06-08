@@ -19,7 +19,6 @@ SYSCONFDIR='@sysconfdir@'
 
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-iso.sh
-import ${LIBDIR}/util-profile.sh
 
 prepare_build(){
     timer_start=$(get_timer)

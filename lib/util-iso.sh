@@ -14,6 +14,7 @@ import ${LIBDIR}/util-iso-chroot.sh
 import ${LIBDIR}/util-iso-grub.sh
 import ${LIBDIR}/util-yaml.sh
 import ${LIBDIR}/util-iso-mount.sh
+import ${LIBDIR}/util-profile.sh
 
 error_function() {
     if [[ -p $logpipe ]]; then
@@ -318,22 +319,22 @@ make_image_live() {
 make_image_mhwd() {
     if [[ ! -e ${work_dir}/mhwdfs.lock ]]; then
         msg "Prepare [drivers repository] (mhwdfs)"
-        local mhwdfs="${work_dir}/mhwdfs" mhwd_repo="/opt/pkg"
+        local mhwdfs="${work_dir}/mhwdfs" repo="/opt/pkg"
 
-        prepare_dir "${mhwdfs}${mhwd_repo}"
+        prepare_dir "${mhwdfs}${repo}"
 
         mount_fs "${mhwdfs}" "${work_dir}" "${desktop_list}"
 
-        copy_from_cache "${mhwdfs}" "${mhwd_repo}" "${packages[@]}"
+        copy_from_cache "${mhwdfs}" "${repo}" "${packages[@]}"
 
         if [[ -n "${packages_cleanup[@]}" ]]; then
             for pkg in ${packages_cleanup[@]}; do
-                rm ${mhwdfs}${mhwd_repo}/${pkg}
+                rm ${mhwdfs}${repo}/${pkg}
             done
         fi
 
-        make_repo "${mhwdfs}" "${mhwd_repo}"
-        configure_mhwd_drivers "${mhwdfs}" "${mhwd_repo}"
+        make_repo "${mhwdfs}" "${repo}"
+        configure_mhwd_drivers "${mhwdfs}" "${repo}"
 
         umount_fs
         clean_up_image "${mhwdfs}"
@@ -466,7 +467,7 @@ make_profile(){
 
         local unused_arch='i686'
         if [[ ${target_arch} == 'i686' ]];then
-            unused_arch='x86_64' ;;
+            unused_arch='x86_64'
         fi
         if [[ -d "${chroots_iso}/${profile}/${unused_arch}" ]];then
             chroot_clean "${chroots_iso}/${profile}/${unused_arch}"

@@ -132,10 +132,10 @@ configure_system(){
 
             # Prevent some services to be started in the livecd
             echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
-            | tee "${path}/etc/.updated" >"${path}/var/.updated"
+            | tee "${mnt}/etc/.updated" >"${mnt}/var/.updated"
 
             msg2 "Disable systemd-gpt-auto-generator"
-            ln -sf /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
+            ln -sf /dev/null "${mnt}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
         ;;
         'openrc')
             configure_logind "$mnt" "elogind"
@@ -209,11 +209,9 @@ clean_up_image(){
 
 copy_from_cache(){
     local list="${tmp_dir}"/mhwd-cache.list
-    local mnt="$1" repo="$2"; shift
-    chroot-run "$mnt" \
-        pacman -v -Syw --noconfirm "$@" || return 1
-    chroot-run "$mnt" \
-        pacman -v -Sp --noconfirm "$@" > "$list"
+    local mnt="$1" repo="$2"
+    chroot-run "$mnt" pacman -v -Syw --noconfirm "$@" || return 1
+    chroot-run "$mnt" pacman -v -Sp --noconfirm "$@" > "$list"
     sed -ni '/.pkg.tar.xz/p' "$list"
     sed -i "s/.*\///" "$list"
 
