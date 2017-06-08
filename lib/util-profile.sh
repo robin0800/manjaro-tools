@@ -146,7 +146,7 @@ reset_profile(){
 
 write_live_session_conf(){
     local path=$1${SYSCONFDIR}
-    prepare_dir "$path"
+    [[ ! -d $path ]] && mkdir -p "$path"
     local conf=$path/live.conf
     msg2 "Writing %s" "${conf##*/}"
     echo '# live session configuration' > ${conf}
