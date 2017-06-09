@@ -270,17 +270,17 @@ get_distid(){
 }
 
 get_disturl(){
-    source /etc/os-release
+    source /usr/lib/os-release
     echo "${HOME_URL}"
 }
 
 get_osname(){
-    source /etc/os-release
+    source /usr/lib/os-release
     echo "${NAME}"
 }
 
 get_osid(){
-    source /etc/os-release
+    source /usr/lib/os-release
     echo "${ID}"
 }
 
