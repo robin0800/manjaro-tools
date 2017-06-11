@@ -13,6 +13,7 @@ version=@version@
 
 LIBDIR='@libdir@'
 
+import ${LIBDIR}/util-msg.sh
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-mount.sh
 

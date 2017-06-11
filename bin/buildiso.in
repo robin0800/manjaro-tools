@@ -15,6 +15,7 @@ LIBDIR='@libdir@'
 DATADIR='@datadir@'
 SYSCONFDIR='@sysconfdir@'
 
+import ${LIBDIR}/util-msg.sh
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-iso.sh
 

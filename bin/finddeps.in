@@ -11,6 +11,9 @@
 
 version=@version@
 
+LIBDIR='@libdir@'
+
+import ${LIBDIR}/util-msg.sh
 match=$1
 
 if [[ -z $match ]]; then

@@ -16,6 +16,7 @@ shopt -s extglob
 LIBDIR='@libdir@'
 SYSCONFDIR='@sysconfdir@'
 
+import ${LIBDIR}/util-msg.sh
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-mount.sh
 
