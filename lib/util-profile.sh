@@ -87,27 +87,22 @@ load_profile(){
     ${extra} && basic='false'
 
     root_list=${run_dir}/shared/Packages-Root
+    [[ -f "$profdir/Packages-Root" ]] && root_list="$profdir/Packages-Root"
+
     root_overlay="${run_dir}/shared/${os_id}/root-overlay"
-    if [[ -e "$profdir/root-overlay" ]];then
-        root_overlay="$profdir/root-overlay"
-    fi
+    [[ -d "$profdir/root-overlay" ]] && root_overlay="$profdir/root-overlay"
 
     mhwd_list=${run_dir}/shared/Packages-Mhwd
+    [[ -f "$profdir/Packages-Mhwd" ]] && mhwd_list="$profdir/Packages-Mhwd"
 
-    desktop_list=$profdir/Packages-Desktop
-    if [[ -e "$profdir/desktop-overlay" ]];then
-        desktop_overlay="$profdir/desktop-overlay"
-    fi
+    [[ -f "$profdir/Packages-Desktop" ]] && desktop_list=$profdir/Packages-Desktop
+    [[ -d "$profdir/desktop-overlay" ]] && desktop_overlay="$profdir/desktop-overlay"
 
     live_list="${run_dir}/shared/Packages-Live"
-    if [[ -f "$profdir/Packages-Live" ]];then
-        live_list="$profdir/Packages-Live"
-    fi
+    [[ -f "$profdir/Packages-Live" ]] && live_list="$profdir/Packages-Live"
 
     live_overlay="${run_dir}/shared/${os_id}/live-overlay"
-    if [[ -e "$profdir/live-overlay" ]];then
-        live_overlay="$profdir/live-overlay"
-    fi
+    [[ -d "$profdir/live-overlay" ]] && live_overlay="$profdir/live-overlay"
 
     if ${netinstall};then
         sort -u ${run_dir}/shared/Packages-Net ${live_list} > ${tmp_dir}/packages-live-net.list
