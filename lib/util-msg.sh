@@ -115,10 +115,10 @@ die() {
     cleanup 255
 }
 
-# import(){
-#     if [[ -r "$1" ]];then
-#         source "$1"
-#     else
-#         die 'Could not import %s' "$1"
-#     fi
-# }
+import(){
+    if [[ -r "$1" ]];then
+        source "$1"
+    else
+        die 'Could not import %s' "$1"
+    fi
+}

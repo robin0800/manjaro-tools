@@ -15,7 +15,7 @@ shopt -s extglob
 
 LIBDIR='@libdir@'
 
-import ${LIBDIR}/util-msg.sh
+[[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 import ${LIBDIR}/util-fstab.sh
 
 write_source() {

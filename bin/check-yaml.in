@@ -15,7 +15,7 @@ LIBDIR='@libdir@'
 DATADIR='@datadir@'
 SYSCONFDIR='@sysconfdir@'
 
-import ${LIBDIR}/util-msg.sh
+[[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-yaml-check.sh
 import ${LIBDIR}/util-profile.sh
