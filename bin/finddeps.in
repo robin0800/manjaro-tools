@@ -11,8 +11,6 @@
 
 version=@version@
 
-[[ -r ${MANJARO_MSG_LIB} ]] && source ${MANJARO_MSG_LIB}
-
 match=$1
 
 if [[ -z $match ]]; then

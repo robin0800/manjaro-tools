@@ -15,8 +15,6 @@ shopt -s extglob
 
 LIBDIR='@libdir@'
 
-[[ -r ${MANJARO_MSG_LIB} ]] && source ${MANJARO_MSG_LIB}
-
 import ${LIBDIR}/util-fstab.sh
 
 write_source() {

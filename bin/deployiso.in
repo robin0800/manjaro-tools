@@ -14,8 +14,6 @@ version=@version@
 LIBDIR='@libdir@'
 SYSCONFDIR='@sysconfdir@'
 
-[[ -r ${MANJARO_MSG_LIB} ]] && source ${MANJARO_MSG_LIB}
-
 import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-publish.sh
 

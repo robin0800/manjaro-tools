@@ -13,8 +13,6 @@ version=@version@
 
 LIBDIR='@libdir@'
 
-[[ -r ${MANJARO_MSG_LIB} ]] && source ${MANJARO_MSG_LIB}
-
 import ${LIBDIR}/util.sh
 
 load_user_info
