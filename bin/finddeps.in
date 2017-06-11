@@ -11,7 +11,7 @@
 
 version=@version@
 
-[[ -r @libdir@/util-msg.sh ]] && source @libdir@/util-msg.sh
+[[ -r ${MANJARO_MSG_LIB} ]] && source ${MANJARO_MSG_LIB}
 
 match=$1
 

@@ -17,7 +17,6 @@ BIN_BASE = \
 LIBS_BASE = \
 	lib/util.sh \
 	lib/util-mount.sh \
-	lib/util-msg.sh \
 	lib/util-chroot.sh \
 	lib/util-fstab.sh
 

@@ -13,7 +13,7 @@ version=@version@
 
 LIBDIR='@libdir@'
 
-[[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
+[[ -r ${MANJARO_MSG_LIB} ]] && source ${MANJARO_MSG_LIB}
 
 import ${LIBDIR}/util-pkg.sh
 
