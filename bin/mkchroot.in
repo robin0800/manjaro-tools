@@ -109,7 +109,7 @@ basestrap "${basestrap_args[@]}" "$working_dir" ${cache_dirs[@]/#/--cachedir=} "
 
 echo "$version" > "$working_dir/.manjaro-tools"
 
-set_locale "$working_dir"
+default_locale "set" "$working_dir"
 
 chroot_args=(${pacman_conf:+-C "$pacman_conf"} ${makepkg_conf:+-M "$makepkg_conf"} ${cache_dir:+-c "$cache_dir"})
 ${nosetarch} && chroot_args+=(${nosetarch:+-s})

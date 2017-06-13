@@ -44,23 +44,24 @@ subvolume_delete_recursive() {
     return 0
 }
 
-set_locale(){
-    local mnt="$1"
-    if [[ ! -f "$mnt/etc/locale.gen.bak" ]] && [[ ! -f "$mnt/etc/locale.conf.bak" ]];then
-        info "Setting locale ..."
-        mv "$mnt/etc/locale.gen" "$mnt/etc/locale.gen.bak"
-        mv "$mnt/etc/locale.conf" "$mnt/etc/locale.conf.bak"
-        printf '%s.UTF-8 UTF-8\n' en_US > "$mnt/etc/locale.gen"
-        printf 'LANG=%s.UTF-8\n' en_US > "$mnt/etc/locale.conf"
-        printf 'LC_MESSAGES=C\n' >> "$mnt/etc/locale.conf"
+default_locale(){
+    local action="$1" mnt="$2"
+    if [[ $action == "set" ]];then
+        if [[ ! -f "$mnt/etc/locale.gen.bak" ]] && [[ ! -f "$mnt/etc/locale.conf.bak" ]];then
+            info "Setting locale ..."
+            mv "$mnt/etc/locale.gen" "$mnt/etc/locale.gen.bak"
+            mv "$mnt/etc/locale.conf" "$mnt/etc/locale.conf.bak"
+            printf '%s.UTF-8 UTF-8\n' en_US > "$mnt/etc/locale.gen"
+            printf 'LANG=%s.UTF-8\n' en_US > "$mnt/etc/locale.conf"
+            printf 'LC_MESSAGES=C\n' >> "$mnt/etc/locale.conf"
+        fi
+    elif [[ $action == "reset" ]];then
+        if [[ -f "$mnt/etc/locale.gen.bak" ]] && [[ -f "$mnt/etc/locale.conf.bak" ]];then
+            info "Resetting locale ..."
+            mv "$mnt/etc/locale.gen.bak" "$mnt/etc/locale.gen"
+            mv "$mnt/etc/locale.conf.bak" "$mnt/etc/locale.conf"
+        fi
     fi
-}
-
-reset_locale(){
-    local mnt="$1"
-    info "Resetting locale ..."
-    [[ -f "$mnt/etc/locale.gen.bak" ]] && mv "$mnt/etc/locale.gen.bak" "$mnt/etc/locale.gen"
-    [[ -f "$mnt/etc/locale.conf.bak" ]] && mv "$mnt/etc/locale.conf.bak" "$mnt/etc/locale.conf"
 }
 
 create_chroot(){
