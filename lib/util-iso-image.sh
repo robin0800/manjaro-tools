@@ -45,11 +45,11 @@ set_xdm(){
 configure_mhwd_drivers(){
     local path=$1${mhwd_repo}/ \
         drv_path=$1/var/lib/mhwd/db/pci/graphic_drivers
-    info "Configuring mwwd db ..."
+    info "Configuring mhwd db ..."
     if  [ -z "$(ls $path | grep catalyst-utils 2> /dev/null)" ]; then
         msg2 "Disabling Catalyst driver"
         mkdir -p $drv_path/catalyst/
-        touch $drv_path/catalyst/MHWDCONFIG
+        echo "" > $drv_path/catalyst/MHWDCONFIG
     fi
     if  [ -z "$(ls $path | grep nvidia-utils 2> /dev/null)" ]; then
         msg2 "Disabling Nvidia driver"
@@ -57,22 +57,27 @@ configure_mhwd_drivers(){
         touch $drv_path/nvidia/MHWDCONFIG
         msg2 "Disabling Nvidia Bumblebee driver"
         mkdir -p $drv_path/hybrid-intel-nvidia-bumblebee/
-        touch $drv_path/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
+        echo "" > $drv_path/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
     fi
     if  [ -z "$(ls $path | grep nvidia-304xx-utils 2> /dev/null)" ]; then
         msg2 "Disabling Nvidia 304xx driver"
         mkdir -p $drv_path/nvidia-304xx/
-        touch $drv_path/nvidia-304xx/MHWDCONFIG
+        echo "" > $drv_path/nvidia-304xx/MHWDCONFIG
     fi
     if  [ -z "$(ls $path | grep nvidia-340xx-utils 2> /dev/null)" ]; then
         msg2 "Disabling Nvidia 340xx driver"
         mkdir -p $drv_path/nvidia-340xx/
-        touch $drv_path/nvidia-340xx/MHWDCONFIG
+        echo "" > $drv_path/nvidia-340xx/MHWDCONFIG
     fi
     if  [ -z "$(ls $path | grep xf86-video-amdgpu 2> /dev/null)" ]; then
         msg2 "Disabling AMD gpu driver"
         mkdir -p $drv_path/xf86-video-amdgpu/
-        touch $drv_path/xf86-video-amdgpu/MHWDCONFIG
+        echo "" > $drv_path/xf86-video-amdgpu/MHWDCONFIG
+    fi
+    if  [ -z "$(ls $path | grep virtualbox-guest-modules 2> /dev/null)" ]; then
+        msg2 "Disabling VirtualBox guest driver"
+        mkdir -p $drv_path/virtualbox/
+        echo "" > $drv_path/virtualbox/MHWDCONFIG
     fi
 }
 
@@ -270,8 +275,15 @@ clean_up_image(){
     local path
     if [[ ${1##*/} == 'mhwdfs' ]];then
         path=$1/var
+        if [[ -d $path/lib/mhwd ]];then
+            mv $path/lib/mhwd $1 &> /dev/null
+        fi
         if [[ -d $path ]];then
             find "$path" -mindepth 0 -delete &> /dev/null
+        fi
+        if [[ -d $1/mhwd ]];then
+            mkdir -p $path/lib
+            mv $1/mhwd $path/lib &> /dev/null
         fi
         path=$1/etc
         if [[ -d $path ]];then
