@@ -431,7 +431,7 @@ check_requirements(){
 compress_images(){
     local timer=$(get_timer)
     run_safe "make_iso"
-    user_own "${iso_dir}" "-R"
+    user_own "${cache_dir_iso}" "-R"
     show_elapsed_time "${FUNCNAME}" "${timer}"
 }
 
@@ -540,7 +540,7 @@ load_profile(){
     prepare_dir "${mnt_dir}"
 
     prepare_dir "${iso_dir}"
-    user_own "${iso_dir}"
+    user_own "${cache_dir_iso}" "-R"
 }
 
 prepare_profile(){
