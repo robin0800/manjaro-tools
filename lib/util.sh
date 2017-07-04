@@ -776,3 +776,9 @@ subvolume_delete_recursive() {
 
     return 0
 }
+
+create_chksums() {
+    msg2 "creating checksums for [$1]"
+    sha1sum $1 > $1.sha1
+    sha256sum $1 > $1.sha256
+}
