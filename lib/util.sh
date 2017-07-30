@@ -418,6 +418,8 @@ load_profile_config(){
 
     [[ -z ${netinstall} ]] && netinstall='false'
 
+    [[ -z ${mhwd_used} ]] && mhwd_used='true'
+
     [[ -z ${chrootcfg} ]] && chrootcfg='false'
 
     netgroups="https://raw.githubusercontent.com/manjaro/calamares-netgroups/master"

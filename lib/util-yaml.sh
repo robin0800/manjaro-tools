@@ -316,7 +316,9 @@ write_settings_conf(){
     echo "        - initcpio" >> "$conf" && write_initcpio_conf
     echo "        - users" >> "$conf"
     echo "        - displaymanager" >> "$conf" && write_displaymanager_conf
+    if ${mhwd_used};then
     echo "        - mhwdcfg" >> "$conf" && write_mhwdcfg_conf
+    fi
     echo "        - hwclock" >> "$conf"
     case ${initsys} in
         'systemd') echo "        - services" >> "$conf" && write_services_conf ;;
