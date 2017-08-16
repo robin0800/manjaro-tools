@@ -183,7 +183,9 @@ load_vars() {
 }
 
 prepare_dir(){
-    [[ ! -d $1 ]] && mkdir -p $1
+    if [[ ! -d $1 ]];then
+        mkdir -p $1
+    fi
 }
 
 # $1: chroot
@@ -417,6 +419,10 @@ load_profile_config(){
     fi
 
     [[ -z ${netinstall} ]] && netinstall='false'
+
+    [[ -z ${mhwd_used} ]] && mhwd_used='true'
+
+    [[ -z ${oem_used} ]] && oem_used='false'
 
     [[ -z ${chrootcfg} ]] && chrootcfg='false'
 

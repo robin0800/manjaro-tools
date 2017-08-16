@@ -281,10 +281,18 @@ write_settings_conf(){
     echo "sequence:" >> "$conf"
     echo "    - show:" >> "$conf"
     echo "        - welcome" >> "$conf" && write_welcome_conf
-    echo "        - locale" >> "$conf" && write_locale_conf
-    echo "        - keyboard" >> "$conf"
+    if ${oem_used};then
+        msg2 "Skipping to show locale and keyboard modules."
+    else
+        echo "        - locale" >> "$conf" && write_locale_conf
+        echo "        - keyboard" >> "$conf"
+    fi
     echo "        - partition" >> "$conf"
-    echo "        - users" >> "$conf" && write_users_conf
+    if ${oem_used};then
+        msg2 "Skipping to show users module."
+    else
+        echo "        - users" >> "$conf" && write_users_conf
+    fi
     if ${netinstall};then
         echo "        - netinstall" >> "$conf" && write_netinstall_conf
     fi
@@ -307,16 +315,29 @@ write_settings_conf(){
     fi
     echo "        - machineid" >> "$conf" && write_machineid_conf
     echo "        - fstab" >> "$conf"
-    echo "        - locale" >> "$conf"
-    echo "        - keyboard" >> "$conf"
-    echo "        - localecfg" >> "$conf"
+    if ${oem_used};then
+        msg2 "Skipping to set locale, keyboard and localecfg modules."
+    else
+        echo "        - locale" >> "$conf"
+        echo "        - keyboard" >> "$conf"
+        echo "        - localecfg" >> "$conf"
+    fi
     echo "        - luksopenswaphookcfg" >> "$conf"
     echo "        - luksbootkeyfile" >> "$conf"
     echo "        - initcpiocfg" >> "$conf"
     echo "        - initcpio" >> "$conf" && write_initcpio_conf
-    echo "        - users" >> "$conf"
+    if ${oem_used};then
+        msg2 "Skipping to set users module."
+        echo "        - oemuser" >> "$conf"
+    else
+        echo "        - users" >> "$conf"
+    fi
     echo "        - displaymanager" >> "$conf" && write_displaymanager_conf
-    echo "        - mhwdcfg" >> "$conf" && write_mhwdcfg_conf
+    if ${mhwd_used};then
+        echo "        - mhwdcfg" >> "$conf" && write_mhwdcfg_conf
+    else
+        msg2 "Skipping to set mhwdcfg module."
+    fi
     echo "        - hwclock" >> "$conf"
     case ${initsys} in
         'systemd') echo "        - services" >> "$conf" && write_services_conf ;;
@@ -324,7 +345,11 @@ write_settings_conf(){
     esac
     echo "        - grubcfg" >> "$conf"
     echo "        - bootloader" >> "$conf" && write_bootloader_conf
-    echo "        - postcfg" >> "$conf" && write_postcfg_conf
+    if ${oem_used};then
+        msg2 "Skipping to set postcfg module."
+    else
+        echo "        - postcfg" >> "$conf" && write_postcfg_conf
+    fi
     echo "        - umount" >> "$conf"
     echo "    - show:" >> "$conf"
     echo "        - finished" >> "$conf" && write_finished_conf
