@@ -356,9 +356,17 @@ write_settings_conf(){
     echo '' >> "$conf"
     echo "branding: ${iso_name}" >> "$conf"
     echo '' >> "$conf"
-    echo "prompt-install: false" >> "$conf"
+    if ${oem_used};then
+        echo "prompt-install: false" >> "$conf"
+    else
+        echo "prompt-install: true" >> "$conf"
+    fi
     echo '' >> "$conf"
-    echo "dont-chroot: false" >> "$conf"
+    if ${oem_used};then
+        echo "dont-chroot: true" >> "$conf"
+    else
+        echo "dont-chroot: false" >> "$conf"
+    fi
 }
 
 configure_calamares(){
