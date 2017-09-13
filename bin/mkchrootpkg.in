@@ -235,7 +235,7 @@ EOF
 # These functions aren't run in makechrootpkg,
 # so no global variables
 _chrootbuild() {
-    export LC_ALL=C
+    export LC_ALL=en_US.UTF-8
     . /etc/profile
 #     export HOME=/build
 #     cd /startdir
