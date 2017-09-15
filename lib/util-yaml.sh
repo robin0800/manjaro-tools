@@ -362,11 +362,7 @@ write_settings_conf(){
         echo "prompt-install: true" >> "$conf"
     fi
     echo '' >> "$conf"
-    if ${oem_used};then
-        echo "dont-chroot: true" >> "$conf"
-    else
-        echo "dont-chroot: false" >> "$conf"
-    fi
+    echo "dont-chroot: false" >> "$conf"
 }
 
 configure_calamares(){
