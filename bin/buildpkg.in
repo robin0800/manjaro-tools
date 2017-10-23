@@ -131,6 +131,8 @@ check_root "$0" "${orig_argv[@]}"
 
 prepare_dir "${log_dir}"
 
+user_own "${log_dir}"
+
 prepare_dir "${tmp_dir}"
 
 prepare_conf "${target_arch}"
