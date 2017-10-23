@@ -168,6 +168,8 @@ check_root "$0" "${orig_argv[@]}"
 
 prepare_dir "${log_dir}"
 
+user_own "${log_dir}"
+
 prepare_dir "${tmp_dir}"
 
 eval_build_list "${list_dir_iso}" "${build_list_iso}"
