@@ -313,7 +313,7 @@ init_buildiso(){
 
     [[ -z ${initsys} ]] && initsys="systemd"
 
-    [[ -z ${kernel} ]] && kernel="linux49"
+    [[ -z ${kernel} ]] && kernel="linux414"
 
     [[ -z ${gpgkey} ]] && gpgkey=''
 
