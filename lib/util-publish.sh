@@ -47,9 +47,20 @@ prepare_transfer(){
 }
 
 sync_dir(){
+	cont=1
+	max_cont=10
     prepare_transfer "$1"
     msg "Start upload [%s] ..." "$1"
+    while [[ $count != $max_cont  ]]; do 
     rsync ${rsync_args[*]} ${src_dir}/ ${url}/${target_dir}/
-    msg "Done upload [%s]" "$1"
-    show_elapsed_time "${FUNCNAME}" "${timer_start}"
+    	if [[ $? != 0 ]]; then
+    		cont=$(($cont + 1))
+    		msg "Failed to upload [%s] now try again: try $cont of $max_cont" "$1"
+    		sleep 2
+    	else
+    		cont=10
+    		msg "Done upload [%s]" "$1"
+    		show_elapsed_time "${FUNCNAME}" "${timer_start}"
+    	fi
+    done
 }
