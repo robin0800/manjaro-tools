@@ -111,7 +111,6 @@ display_settings(){
     msg2 "images_only: %s" "${images_only}"
     msg2 "iso_only: %s" "${iso_only}"
     msg2 "persist: %s" "${persist}"
-    msg2 "extra: %s" "${extra}"
 
     msg "DIST SETTINGS:"
     msg2 "dist_name: %s" "${dist_name}"
