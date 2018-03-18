@@ -111,6 +111,7 @@ display_settings(){
     msg2 "images_only: %s" "${images_only}"
     msg2 "iso_only: %s" "${iso_only}"
     msg2 "persist: %s" "${persist}"
+    msg2 "extra: %s" "${extra}"
 
     msg "DIST SETTINGS:"
     msg2 "dist_name: %s" "${dist_name}"
@@ -155,6 +156,7 @@ usage() {
     echo '    -g <key>           The gpg key for sfs signing'
     echo "                       [default: ${gpgkey}]"
     echo '    -m                 Set SquashFS image mode to persistence'
+    echo '    -n                 Build minimal if available (extra=false)'
     echo '    -c                 Disable clean work dir'
     echo '    -x                 Build images only'
     echo '    -z                 Generate iso only'
@@ -169,7 +171,7 @@ usage() {
 
 orig_argv=("$0" "$@")
 
-opts='p:a:b:r:t:k:i:g:czxmvqh'
+opts='p:a:b:r:t:k:i:g:czxmnvqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -185,6 +187,7 @@ while getopts "${opts}" arg; do
         x) images_only=true ;;
         z) iso_only=true ;;
         m) persist=true ;;
+        n) no_extra=true ;;
         v) verbose=true ;;
         q) pretend=true ;;
         h|?) usage 0 ;;

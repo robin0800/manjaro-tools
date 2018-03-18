@@ -379,6 +379,10 @@ load_profile_config(){
 
     [[ -z ${smb_workgroup} ]] && smb_workgroup=''
 
+    if ${no_extra}; then
+        extra='false'
+    fi
+    
     basic='true'
     [[ -z ${extra} ]] && extra='false'
 
