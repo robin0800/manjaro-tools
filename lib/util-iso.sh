@@ -255,7 +255,7 @@ gen_iso_fn(){
     local vars=() name
     vars+=("${iso_name}")
     
-    if ${no_extra}: then
+    if ${no_extra}; then
         vars+=("minimal")
     fi
     
