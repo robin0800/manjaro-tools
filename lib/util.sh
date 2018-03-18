@@ -433,9 +433,11 @@ load_profile_config(){
     [[ -z ${smb_workgroup} ]] && smb_workgroup=''
 
     basic='true'
-    [[ -z ${extra} ]] && extra='false'
+    extra='false'
 
-    ${extra} && basic='false'
+    [[ ${full_iso} ]] && extra='true'
+
+    [[ ${extra} ]] && basic='false'
 
     return 0
 }
@@ -470,6 +472,7 @@ reset_profile(){
     unset chrootcfg
     unset geoip
     unset extra
+    unset full_iso
 }
 
 check_profile(){
