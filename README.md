@@ -213,6 +213,7 @@ Usage: buildiso [options]
                        [default: empty]
     -m                 Set SquashFS image mode to persistence
     -c                 Disable clean work dir
+    -f				   Build full ISO (extra=true)
     -x                 Build images only
     -z                 Generate iso only
                        Requires pre built images (-x)
