@@ -432,11 +432,10 @@ load_profile_config(){
 
     [[ -z ${smb_workgroup} ]] && smb_workgroup=''
 
-    basic='true'
-    extra='false'
-
+    [[ -z ${extra} ]] && extra='false'
     [[ ${full_iso} ]] && extra='true'
 
+    basic='true'
     [[ ${extra} ]] && basic='false'
 
     return 0
