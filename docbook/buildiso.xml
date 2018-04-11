@@ -92,6 +92,54 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
+                <term><option>-c</option></term>
+
+                <listitem><para>Disable clean working directory step.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-f</option></term>
+
+                <listitem><para>Build full iso profile including packages with the >extra flag.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-g KEY</option></term>
+
+                <listitem><para>The GPG key to use to sign the sfs images.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-h</option></term>
+
+                <listitem><para>Help.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-i systemd|openrc</option></term>
+
+                <listitem><para>The init system on the iso</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-k linuxXXX</option></term>
+
+                <listitem><para>The kernel on the iso</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-m</option></term>
+
+                <listitem><para>Enable persistence mode.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-q</option></term>
+
+                <listitem><para>Query settings and pretend build.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
                 <term><option>-r DIR</option></term>
 
                 <listitem><para>Root working directory where the iso will be built.</para></listitem>
@@ -104,33 +152,9 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
-                <term><option>-i systemd|openrc</option></term>
+                <term><option>-v</option></term>
 
-                <listitem><para>The init system on the iso</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-g KEY</option></term>
-
-                <listitem><para>The GPG key to use to sign the sfs images.</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-k linuxXXX</option></term>
-
-                <listitem><para>The kernel on the iso</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-c</option></term>
-
-                <listitem><para>Disable clean working directory step.</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-m</option></term>
-
-                <listitem><para>Enable persistence mode.</para></listitem>
+                <listitem><para>Verbose output to log file, show profile detail in combination with pretend.</para></listitem>
             </varlistentry>
 
             <varlistentry>
@@ -143,24 +167,6 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
                 <term><option>-z</option></term>
 
                 <listitem><para>Generate iso from already created images, for example created with the -x option.</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-v</option></term>
-
-                <listitem><para>Verbose output to log file, show profile detail in combination with pretend.</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-q</option></term>
-
-                <listitem><para>Query settings and pretend build.</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-h</option></term>
-
-                <listitem><para>Help.</para></listitem>
             </varlistentry>
         </variablelist>
 
