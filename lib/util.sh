@@ -275,7 +275,7 @@ init_buildiso(){
 
 init_deployiso(){
 
-    host="sourceforge.net"
+    host="osdn.net"
 
     [[ -z ${project} ]] && project="[SetProject]"
 
