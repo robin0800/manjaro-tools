@@ -183,7 +183,7 @@ load_vars() {
 }
 
 prepare_dir(){
-    if [[ ! -d $1 ]];then
+    if [[ ! -d $1 ]]; then
         mkdir -p $1
     fi
 }
@@ -389,32 +389,21 @@ load_profile_config(){
 
     [[ -z ${login_shell} ]] && login_shell='/bin/bash'
 
-    if [[ -z ${addgroups} ]];then
-        addgroups="video,power,storage,optical,network,lp,scanner,wheel,sys"
+    if [[ -z ${addgroups} ]]; then
+        addgroups="video,audio,power,disk,storage,optical,network,lp,scanner,wheel"
     fi
 
-    if [[ -z ${enable_systemd[@]} ]];then
-        enable_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
+    if [[ -z ${enable_systemd[@]} ]]; then
+        enable_systemd=('avahi-daemon' 'bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep' 'ufw')
     fi
 
     [[ -z ${disable_systemd[@]} ]] && disable_systemd=('pacman-init')
 
-    if [[ -z ${enable_openrc[@]} ]];then
-        enable_openrc=('acpid' 'bluetooth' 'elogind' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
-    fi
-
-    [[ -z ${disable_openrc[@]} ]] && disable_openrc=()
-
-    if [[ -z ${enable_systemd_live[@]} ]];then
+    if [[ -z ${enable_systemd_live[@]} ]]; then
         enable_systemd_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
     fi
 
-    if [[ -z ${enable_openrc_live[@]} ]];then
-        enable_openrc_live=('manjaro-live' 'mhwd-live' 'pacman-init' 'mirrors-live')
-    fi
-
     if [[ ${displaymanager} != "none" ]]; then
-        enable_openrc+=('xdm')
         enable_systemd+=("${displaymanager}")
     fi
 
@@ -483,7 +472,7 @@ check_profile(){
 
     local has_keyfiles=false has_keydirs=false
     for f in ${keyfiles[@]}; do
-        if [[ -f $f ]];then
+        if [[ -f $f ]]; then
             has_keyfiles=true
         else
             has_keyfiles=false
@@ -491,14 +480,14 @@ check_profile(){
         fi
     done
     for d in ${keydirs[@]}; do
-        if [[ -d $d ]];then
+        if [[ -d $d ]]; then
             has_keydirs=true
         else
             has_keydirs=false
             break
         fi
     done
-    if ! ${has_keyfiles} && ! ${has_keydirs};then
+    if ! ${has_keyfiles} && ! ${has_keydirs}; then
         die "Profile [%s] sanity check failed!" "$1"
     fi
 
@@ -529,13 +518,13 @@ load_pkgs(){
 
     local _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64 _basic _basic_rm _extra _extra_rm
 
-    if ${basic};then
+    if ${basic}; then
         _basic="s|>basic||g"
     else
         _basic_rm="s|>basic.*||g"
     fi
 
-    if ${extra};then
+    if ${extra}; then
         _extra="s|>extra||g"
     else
         _extra_rm="s|>extra.*||g"
@@ -548,7 +537,7 @@ load_pkgs(){
             _multi="s|>multilib.*||g"
             _nonfree_multi="s|>nonfree_multilib.*||g"
             _nonfree_x86_64="s|>nonfree_x86_64.*||g"
-            if ${nonfree_mhwd};then
+            if ${nonfree_mhwd}; then
                 _nonfree_default="s|>nonfree_default||g"
                 _nonfree_i686="s|>nonfree_i686||g"
 
@@ -561,9 +550,9 @@ load_pkgs(){
             _arch="s|>x86_64||g"
             _arch_rm="s|>i686.*||g"
             _nonfree_i686="s|>nonfree_i686.*||g"
-            if ${multilib};then
+            if ${multilib}; then
                 _multi="s|>multilib||g"
-                if ${nonfree_mhwd};then
+                if ${nonfree_mhwd}; then
                     _nonfree_default="s|>nonfree_default||g"
                     _nonfree_x86_64="s|>nonfree_x86_64||g"
                     _nonfree_multi="s|>nonfree_multilib||g"
@@ -574,7 +563,7 @@ load_pkgs(){
                 fi
             else
                 _multi="s|>multilib.*||g"
-                if ${nonfree_mhwd};then
+                if ${nonfree_mhwd}; then
                     _nonfree_default="s|>nonfree_default||g"
                     _nonfree_x86_64="s|>nonfree_x86_64||g"
                     _nonfree_multi="s|>nonfree_multilib.*||g"
@@ -757,7 +746,7 @@ is_valid_branch(){
 }
 
 run(){
-    if ${is_build_list};then
+    if ${is_build_list}; then
         for item in ${build_list[@]};do
             $1 $item
         done

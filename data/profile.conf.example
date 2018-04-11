@@ -34,16 +34,11 @@
 
 # unset defaults to given values
 # names must match systemd service names
-# enable_systemd=('bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep')
-# disable_systemd=()
-
-# unset defaults to given values,
-# names must match openrc service names
-# enable_openrc=('acpid' 'bluetooth' 'consolekit' 'cronie' 'cupsd' 'dbus' 'syslog-ng' 'NetworkManager')
-# disable_openrc=()
+# enable_systemd=('avahi-daemon' 'bluetooth' 'cronie' 'ModemManager' 'NetworkManager' 'org.cups.cupsd' 'tlp' 'tlp-sleep' 'ufw')
+# disable_systemd=('pacman-init')
 
 # unset defaults to given values
-# addgroups="video,power,disk,storage,optical,network,lp,scanner,wheel"
+# addgroups="video,audio,power,disk,storage,optical,network,lp,scanner,wheel"
 
 # the same workgroup name if samba is used
 # smb_workgroup="Manjaro"
