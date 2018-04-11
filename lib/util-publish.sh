@@ -10,8 +10,8 @@
 # GNU General Public License for more details.
 
 connect(){
-    local storage="@storage.osdn.net:/storage/groups/m/ma/"
-    echo "${account}${storage}${project}"
+    local home="/home/frs/project"
+    echo "${account},${project}@frs.${host}:${home}/${project}"
 }
 
 gen_webseed(){
@@ -27,7 +27,7 @@ make_torrent(){
 
     if [[ -n $(find ${src_dir} -type f -name "*.iso") ]]; then
         for iso in $(ls ${src_dir}/*.iso);do
-            local seed=${host}/projects/${project}/storage/${profile}/${iso##*/}
+            local seed=${host}/project/${project}/${target_dir}/${iso##*/}
             local mktorrent_args=(-c "${torrent_meta}" -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed ${seed}))
             ${verbose} && mktorrent_args+=(-v)
             msg2 "Creating (%s) ..." "${iso##*/}.torrent"
