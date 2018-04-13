@@ -58,7 +58,7 @@ display_settings(){
     msg "PATHS:"
     msg2 "pkg_dir: %s" "${pkg_dir}"
 
-    if ${clean_first};then
+    if ${clean_first}; then
         msg "PKG:"
         msg2 "base_packages: %s" "${base_packages[*]}"
     fi

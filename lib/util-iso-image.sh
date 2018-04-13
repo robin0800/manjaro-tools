@@ -10,9 +10,9 @@
 # GNU General Public License for more details.
 
 copy_overlay(){
-    if [[ -e $1 ]];then
+    if [[ -e $1 ]]; then
         msg2 "Copying [%s] ..." "${1##*/}"
-        if [[ -L $1 ]];then
+        if [[ -L $1 ]]; then
             cp -a --no-preserve=ownership $1/* $2
         else
             cp -LR $1/* $2
@@ -21,7 +21,7 @@ copy_overlay(){
 }
 
 add_svc_rc(){
-    if [[ -f $1/etc/init.d/$2 ]];then
+    if [[ -f $1/etc/init.d/$2 ]]; then
         msg2 "Setting %s ..." "$2"
         chroot $1 rc-update add $2 default &>/dev/null
     fi
@@ -29,14 +29,14 @@ add_svc_rc(){
 
 add_svc_sd(){
     if [[ -f $1/etc/systemd/system/$2.service ]] || \
-    [[ -f $1/usr/lib/systemd/system/$2.service ]];then
+    [[ -f $1/usr/lib/systemd/system/$2.service ]]; then
         msg2 "Setting %s ..." "$2"
         chroot $1 systemctl enable $2 &>/dev/null
     fi
 }
 
 set_xdm(){
-    if [[ -f $1/etc/conf.d/xdm ]];then
+    if [[ -f $1/etc/conf.d/xdm ]]; then
         local conf='DISPLAYMANAGER="'${displaymanager}'"'
         sed -i -e "s|^.*DISPLAYMANAGER=.*|${conf}|" $1/etc/conf.d/xdm
     fi
@@ -148,7 +148,7 @@ write_live_session_conf(){
     echo '' >> ${conf}
     echo '# live group membership' >> ${conf}
     echo "addgroups='${addgroups}'" >> ${conf}
-    if [[ -n ${smb_workgroup} ]];then
+    if [[ -n ${smb_workgroup} ]]; then
         echo '' >> ${conf}
         echo '# samba workgroup' >> ${conf}
         echo "smb_workgroup=${smb_workgroup}" >> ${conf}
@@ -199,7 +199,7 @@ configure_thus(){
     echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
     echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
 
-    if [[ -f $1/usr/share/applications/thus.desktop && -f $1/usr/bin/kdesu ]];then
+    if [[ -f $1/usr/share/applications/thus.desktop && -f $1/usr/bin/kdesu ]]; then
         sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
     fi
 }
@@ -256,7 +256,7 @@ chroot_clean(){
     for image in "$1"/*fs; do
         [[ -d ${image} ]] || continue
         local name=${image##*/}
-        if [[ $name != "mhwdfs" ]];then
+        if [[ $name != "mhwdfs" ]]; then
             msg2 "Deleting chroot [%s] (%s) ..." "$name" "${1##*/}"
             lock 9 "${image}.lock" "Locking chroot '${image}'"
             if [[ "$(stat -f -c %T "${image}")" == btrfs ]]; then
@@ -273,20 +273,20 @@ clean_up_image(){
     msg2 "Cleaning [%s]" "${1##*/}"
 
     local path
-    if [[ ${1##*/} == 'mhwdfs' ]];then
+    if [[ ${1##*/} == 'mhwdfs' ]]; then
         path=$1/var
-        if [[ -d $path/lib/mhwd ]];then
+        if [[ -d $path/lib/mhwd ]]; then
             mv $path/lib/mhwd $1 &> /dev/null
         fi
-        if [[ -d $path ]];then
+        if [[ -d $path ]]; then
             find "$path" -mindepth 0 -delete &> /dev/null
         fi
-        if [[ -d $1/mhwd ]];then
+        if [[ -d $1/mhwd ]]; then
             mkdir -p $path/lib
             mv $1/mhwd $path/lib &> /dev/null
         fi
         path=$1/etc
-        if [[ -d $path ]];then
+        if [[ -d $path ]]; then
             find "$path" -mindepth 0 -delete &> /dev/null
         fi
     else
@@ -297,7 +297,7 @@ clean_up_image(){
             find "$path" -name 'initramfs*.img' -delete &> /dev/null
         fi
         path=$1/var/lib/pacman/sync
-        if [[ -d $path ]];then
+        if [[ -d $path ]]; then
             find "$path" -type f -delete &> /dev/null
         fi
         path=$1/var/cache/pacman/pkg
@@ -309,11 +309,11 @@ clean_up_image(){
             find "$path" -type f -delete &> /dev/null
         fi
         path=$1/var/tmp
-        if [[ -d $path ]];then
+        if [[ -d $path ]]; then
             find "$path" -mindepth 1 -delete &> /dev/null
         fi
         path=$1/tmp
-        if [[ -d $path ]];then
+        if [[ -d $path ]]; then
             find "$path" -mindepth 1 -delete &> /dev/null
         fi
     fi

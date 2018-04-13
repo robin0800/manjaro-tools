@@ -49,7 +49,7 @@ run_safe() {
     restoretrap=$(trap -p ERR)
     trap 'error_function $func' ERR
 
-    if ${verbose};then
+    if ${verbose}; then
         run_log "$func"
     else
         "$func"
@@ -110,7 +110,7 @@ make_sfs() {
         fi
     fi
 
-    if ${persist};then
+    if ${persist}; then
         local size=32G
         local mnt="${mnt_dir}/${name}"
         msg2 "Creating ext4 image of %s ..." "${size}"
@@ -129,7 +129,7 @@ make_sfs() {
 
     msg2 "Creating SquashFS image, this may take some time..."
     local used_kernel=${kernel:5:1} mksfs_args=()
-    if ${persist};then
+    if ${persist}; then
         mksfs_args+=(${work_dir}/${name}.img)
     else
         mksfs_args+=(${src})
@@ -144,7 +144,7 @@ make_sfs() {
     else
         mksfs_args+=(-comp ${comp} ${highcomp})
     fi
-    if ${verbose};then
+    if ${verbose}; then
         mksquashfs "${mksfs_args[@]}" >/dev/null
     else
         mksquashfs "${mksfs_args[@]}"
@@ -152,7 +152,7 @@ make_sfs() {
     make_checksum "${dest}" "${name}"
     ${persist} && rm "${src}.img"
 
-    if [[ -n ${gpgkey} ]];then
+    if [[ -n ${gpgkey} ]]; then
         make_sig "${dest}" "${name}"
     fi
 
@@ -216,7 +216,7 @@ make_iso() {
 gen_iso_fn(){
     local vars=() name
     vars+=("${iso_name}")
-    if ! ${chrootcfg};then
+    if ! ${chrootcfg}; then
         [[ -n ${profile} ]] && vars+=("${profile}")
     fi
     [[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
@@ -413,20 +413,20 @@ make_grub(){
 
 check_requirements(){
     [[ -f ${run_dir}/repo_info ]] || die "%s is not a valid iso profiles directory!" "${run_dir}"
-    if ! $(is_valid_arch_iso ${target_arch});then
+    if ! $(is_valid_arch_iso ${target_arch}); then
         die "%s is not a valid arch!" "${target_arch}"
     fi
-    if ! $(is_valid_branch ${target_branch});then
+    if ! $(is_valid_branch ${target_branch}); then
         die "%s is not a valid branch!" "${target_branch}"
     fi
 
-    if ! is_valid_init "${initsys}";then
+    if ! is_valid_init "${initsys}"; then
         die "%s is not a valid init system!" "${initsys}"
     fi
 
     local iso_kernel=${kernel:5:1} host_kernel=$(uname -r)
     if [[ ${iso_kernel} < "4" ]] \
-    || [[ ${host_kernel%%*.} < "4" ]];then
+    || [[ ${host_kernel%%*.} < "4" ]]; then
         die "The host and iso kernels must be version>=4.0!"
     fi
 }
@@ -471,7 +471,7 @@ archive_logs(){
 
 make_profile(){
     msg "Start building [%s]" "${profile}"
-    if ${clean_first};then
+    if ${clean_first}; then
         chroot_clean "${chroots_iso}/${profile}/${target_arch}"
 
         local unused_arch=''
@@ -479,7 +479,7 @@ make_profile(){
             i686) unused_arch='x86_64' ;;
             x86_64) unused_arch='i686' ;;
         esac
-        if [[ -d "${chroots_iso}/${profile}/${unused_arch}" ]];then
+        if [[ -d "${chroots_iso}/${profile}/${unused_arch}" ]]; then
             chroot_clean "${chroots_iso}/${profile}/${unused_arch}"
         fi
         clean_iso_root "${iso_root}"
@@ -509,7 +509,7 @@ make_profile(){
 get_pacman_conf(){
     local user_conf=${profile_dir}/user-repos.conf pac_arch='default' conf
     [[ "${target_arch}" == 'x86_64' ]] && pac_arch='multilib'
-    if [[ -f ${user_conf} ]];then
+    if [[ -f ${user_conf} ]]; then
         info "detected: %s" "user-repos.conf"
         check_user_repos_conf "${user_conf}"
         conf=${tmp_dir}/custom-pacman.conf

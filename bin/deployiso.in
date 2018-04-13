@@ -44,7 +44,7 @@ display_settings(){
     msg2 "verbose: %s" "${verbose}"
     msg2 "torrent: %s" "${torrent}"
 
-    if ${torrent};then
+    if ${torrent}; then
         msg2 "tracker_url: %s" "${tracker_url}"
         msg2 "piece_size: %s" "${piece_size}"
         msg2 "iso_mirrors: %s" "${iso_mirrors[*]}"

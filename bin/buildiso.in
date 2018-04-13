@@ -22,7 +22,7 @@ import ${LIBDIR}/util.sh
 show_profile(){
     prepare_profile "$1"
     msg2 "iso_file: %s" "${iso_file}"
-    if ${verbose};then
+    if ${verbose}; then
         msg2 "autologin: %s" "${autologin}"
         msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
 
@@ -44,7 +44,7 @@ show_profile(){
         msg2 "addgroups: %s" "${addgroups}"
         [[ -n ${smb_workgroup} ]] && msg2 "smb_workgroup: %s" "${smb_workgroup}"
 
-        if [[ ${initsys} == 'systemd' ]];then
+        if [[ ${initsys} == 'systemd' ]]; then
             msg2 "enable_systemd: %s" "${enable_systemd[*]}"
             msg2 "enable_systemd_live: %s" "${enable_systemd_live[*]}"
             [[ -n ${disable_systemd[*]} ]] && msg2 "disable_systemd: %s" "${disable_systemd[*]}"

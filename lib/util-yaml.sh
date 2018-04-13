@@ -72,7 +72,7 @@ write_servicescfg_conf(){
         echo "      - name: $s" >> "$conf"
         echo '        runlevel: default' >> "$conf"
     done
-    if [[ -n ${disable_openrc[@]} ]];then
+    if [[ -n ${disable_openrc[@]} ]]; then
         echo '    disabled:' >> "$conf"
         for s in ${disable_openrc[@]};do
             echo "      - name: $s" >> "$conf"
@@ -192,7 +192,7 @@ write_welcome_conf(){
     echo "      - storage" >> "$conf"
     echo "      - ram" >> "$conf"
     echo "      - root" >> "$conf"
-    if ${netinstall};then
+    if ${netinstall}; then
         echo "      - internet" >> "$conf"
     fi
 }
@@ -231,7 +231,7 @@ write_postcfg_conf(){
     echo "keyrings:" >> "$conf"
     echo "    - archlinux" >> "$conf"
     echo "    - manjaro" >> "$conf"
-    if [[ -n ${smb_workgroup} ]];then
+    if [[ -n ${smb_workgroup} ]]; then
         echo "" >> "$conf"
         echo "samba:" >> "$conf"
         echo "    - workgroup:  ${smb_workgroup}" >> "$conf"
@@ -240,7 +240,7 @@ write_postcfg_conf(){
 
 get_yaml(){
     local args=() yaml
-    if ${chrootcfg};then
+    if ${chrootcfg}; then
         args+=("${profile}/chrootcfg")
     else
         args+=("${profile}/packages")
@@ -264,7 +264,7 @@ write_locale_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "localeGenPath: /etc/locale.gen" >> "$conf"
-    if ${geoip};then
+    if ${geoip}; then
         echo "geoipUrl: https://geoip.tools/v1" >> "$conf"
         echo "geoipStyle: legacy" >> "$conf"
     else
@@ -282,26 +282,26 @@ write_settings_conf(){
     echo "sequence:" >> "$conf"
     echo "    - show:" >> "$conf"
     echo "        - welcome" >> "$conf" && write_welcome_conf
-    if ${oem_used};then
+    if ${oem_used}; then
         msg2 "Skipping to show locale and keyboard modules."
     else
         echo "        - locale" >> "$conf" && write_locale_conf
         echo "        - keyboard" >> "$conf"
     fi
     echo "        - partition" >> "$conf"
-    if ${oem_used};then
+    if ${oem_used}; then
         msg2 "Skipping to show users module."
     else
         echo "        - users" >> "$conf" && write_users_conf
     fi
-    if ${netinstall};then
+    if ${netinstall}; then
         echo "        - netinstall" >> "$conf" && write_netinstall_conf
     fi
     echo "        - summary" >> "$conf"
     echo "    - exec:" >> "$conf"
     echo "        - partition" >> "$conf"
     echo "        - mount" >> "$conf"
-    if ${netinstall};then
+    if ${netinstall}; then
         if ${chrootcfg}; then
             echo "        - chrootcfg" >> "$conf"
             echo "        - networkcfg" >> "$conf"
@@ -316,7 +316,7 @@ write_settings_conf(){
     fi
     echo "        - machineid" >> "$conf" && write_machineid_conf
     echo "        - fstab" >> "$conf"
-    if ${oem_used};then
+    if ${oem_used}; then
         msg2 "Skipping to set locale, keyboard and localecfg modules."
     else
         echo "        - locale" >> "$conf"
@@ -327,14 +327,14 @@ write_settings_conf(){
     echo "        - luksbootkeyfile" >> "$conf"
     echo "        - initcpiocfg" >> "$conf"
     echo "        - initcpio" >> "$conf" && write_initcpio_conf
-    if ${oem_used};then
+    if ${oem_used}; then
         msg2 "Skipping to set users module."
         echo "        - oemuser" >> "$conf"
     else
         echo "        - users" >> "$conf"
     fi
     echo "        - displaymanager" >> "$conf" && write_displaymanager_conf
-    if ${mhwd_used};then
+    if ${mhwd_used}; then
         echo "        - mhwdcfg" >> "$conf" && write_mhwdcfg_conf
     else
         msg2 "Skipping to set mhwdcfg module."
@@ -346,7 +346,7 @@ write_settings_conf(){
     esac
     echo "        - grubcfg" >> "$conf"
     echo "        - bootloader" >> "$conf" && write_bootloader_conf
-    if ${oem_used};then
+    if ${oem_used}; then
         msg2 "Skipping to set postcfg module."
     else
         echo "        - postcfg" >> "$conf" && write_postcfg_conf
@@ -357,7 +357,7 @@ write_settings_conf(){
     echo '' >> "$conf"
     echo "branding: ${iso_name}" >> "$conf"
     echo '' >> "$conf"
-    if ${oem_used};then
+    if ${oem_used}; then
         echo "prompt-install: false" >> "$conf"
     else
         echo "prompt-install: true" >> "$conf"

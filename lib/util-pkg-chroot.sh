@@ -38,13 +38,13 @@ get_makepkg_conf(){
 
 # $1: target_arch
 prepare_conf(){
-    if ! is_valid_arch_pkg "$1";then
+    if ! is_valid_arch_pkg "$1"; then
         die "%s is not a valid arch!" "$1"
     fi
 
     local pac_arch='default'
 
-    if [[ "$1" == 'multilib' ]];then
+    if [[ "$1" == 'multilib' ]]; then
         pac_arch='multilib'
         is_multilib=true
     fi
@@ -94,10 +94,10 @@ load_group(){
 }
 
 init_base_devel(){
-    if ${udev_root};then
+    if ${udev_root}; then
         base_packages=( "$(load_group)" )
     else
-        if ${is_multilib};then
+        if ${is_multilib}; then
             base_packages=('base-devel' 'multilib-devel')
         else
             base_packages=('base-devel')
@@ -143,7 +143,7 @@ clean_up(){
     msg "Cleaning up ..."
     msg2 "Cleaning [%s]" "${pkg_dir}"
     find ${pkg_dir} -maxdepth 1 -name "*.*" -delete #&> /dev/null
-    if [[ -z $SRCDEST ]];then
+    if [[ -z $SRCDEST ]]; then
         msg2 "Cleaning [source files]"
         find $PWD -maxdepth 1 -name '*.?z?' -delete #&> /dev/null
     fi
@@ -168,7 +168,7 @@ archive_logs(){
     local archive name="$1" ext=log.tar.xz ver src=${tmp_dir}/archives.list target='.'
     ver=$(get_full_version "$name")
     archive="${name}-${ver}-${target_arch}"
-    if [[ -n $LOGDEST ]];then
+    if [[ -n $LOGDEST ]]; then
             target=$LOGDEST
             find $target -maxdepth 1 -name "$archive*.log" -printf "%f\n" > $src
     else

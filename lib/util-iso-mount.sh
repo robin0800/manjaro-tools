@@ -21,7 +21,7 @@ mount_img() {
 }
 
 umount_img() {
-    if [[ -n ${IMG_ACTIVE_MOUNTS[@]} ]];then
+    if [[ -n ${IMG_ACTIVE_MOUNTS[@]} ]]; then
         info "umount: [%s]" "${IMG_ACTIVE_MOUNTS[@]}"
         umount "${IMG_ACTIVE_MOUNTS[@]}"
         unset IMG_ACTIVE_MOUNTS
@@ -60,7 +60,7 @@ mount_fs_net(){
 }
 
 umount_fs(){
-    if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]];then
+    if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]]; then
         info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
         umount "${FS_ACTIVE_MOUNTS[@]}"
         unset FS_ACTIVE_MOUNTS

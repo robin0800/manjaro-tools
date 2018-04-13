@@ -107,7 +107,7 @@ fi
 
 echo "$version" > "$working_dir/.manjaro-tools"
 
-if ${build_locales};then
+if ${build_locales}; then
     info "Using build locales ..."
     mv "$working_dir/etc/locale.gen" "$working_dir/etc/locale.gen.bak"
     mv "$working_dir/etc/locale.conf" "$working_dir/etc/locale.conf.bak"

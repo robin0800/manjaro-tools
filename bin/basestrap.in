@@ -99,11 +99,11 @@ fi
 # kill chroot process if needed (TODO: check if needed at all)
 kill_chroot_process "$newroot"
 
-if ${copykeyring};then
+if ${copykeyring}; then
     copy_keyring "$newroot"
 fi
 
-if ${copymirrorlist};then
+if ${copymirrorlist}; then
     copy_mirrorlist "$newroot"
 fi
 
