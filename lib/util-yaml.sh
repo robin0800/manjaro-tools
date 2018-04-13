@@ -267,8 +267,8 @@ write_locale_conf(){
     if ${geoip};then
         echo "geoipUrl: freegeoip.net" >> "$conf"
     else
-        echo "region: Europe" >> "$conf"
-        echo "zone: London" >> "$conf"
+        echo "region: America" >> "$conf"
+        echo "zone: New_York" >> "$conf"
     fi
 }
 
