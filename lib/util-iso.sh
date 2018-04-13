@@ -219,7 +219,6 @@ gen_iso_fn(){
     if ! ${chrootcfg}; then
         [[ -n ${profile} ]] && vars+=("${profile}")
     fi
-    [[ ${initsys} == 'openrc' ]] && vars+=("${initsys}")
     vars+=("${dist_release}")
     vars+=("${target_branch}")
 
@@ -380,8 +379,7 @@ make_image_boot() {
 
 configure_grub(){
     local default_args="misobasedir=${iso_name} misolabel=${iso_label}" \
-        boot_args=('quiet')
-    [[ ${initsys} == 'systemd' ]] && boot_args+=('systemd.show_status=1')
+        boot_args=('quiet' 'systemd.show_status=1')
 
     sed -e "s|@DIST_NAME@|${dist_name}|g" \
         -e "s|@ARCH@|${target_arch}|g" \
@@ -418,10 +416,6 @@ check_requirements(){
     fi
     if ! $(is_valid_branch ${target_branch}); then
         die "%s is not a valid branch!" "${target_branch}"
-    fi
-
-    if ! is_valid_init "${initsys}"; then
-        die "%s is not a valid init system!" "${initsys}"
     fi
 
     local iso_kernel=${kernel:5:1} host_kernel=$(uname -r)

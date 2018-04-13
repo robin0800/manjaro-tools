@@ -74,7 +74,7 @@ overriding
 ################ buildtree ###############
 
 # manjaro package tree
-# repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
+# repo_tree=('core' 'extra' 'community' 'multilib')
 
 # host_tree=https://github.com/manjaro
 
@@ -92,16 +92,13 @@ overriding
 # build_list_iso=default
 
 # the dist release; default: auto
-# dist_release=17.0
+# dist_release=17.1
 
 # the branding; default: auto
 # dist_branding="MJRO"
 
-# possible values: openrc,systemd
-# initsys="systemd"
-
 # unset defaults to given value
-# kernel="linux49"
+# kernel="linux414"
 
 # gpg key; leave empty or commented to skip sfs signing
 # gpgkey=""
@@ -110,6 +107,9 @@ overriding
 
 # the server user
 # account=[SetUser]
+
+# the server project: manjaro|manjaro-community
+# project="[SetProject]"
 
 # set upload bandwidth limit in kB/s
 # limit=100
@@ -136,19 +136,18 @@ It it run in a abs/pkgbuilds directory which contains directories with PKGBUILD.
 ~~~
 $ buildpkg -h
 Usage: buildpkg [options]
-    -p <pkg>           Buildset or pkg [default: default]
     -a <arch>          Arch [default: auto]
     -b <branch>        Branch [default: stable]
+    -c                 Recreate chroot
+    -h                 This help
+    -i <pkg>           Install a package into the working copy of the chroot
+    -n                 Install and run namcap check
+    -p <pkg>           Buildset or pkg [default: default]
+    -q                 Query settings and pretend build
     -r <dir>           Chroots directory
                        [default: /var/lib/manjaro-tools/buildpkg]
-    -i <pkg>           Install a package into the working copy of the chroot
-    -c                 Recreate chroot
-    -w                 Clean up cache and sources
-    -n                 Install and run namcap check
     -s                 Sign packages
-    -u                 udev base-devel group (no systemd)
-    -q                 Query settings and pretend build
-    -h                 This help
+    -w                 Clean up cache and sources
 ~~~
 
 ###### * build sysvinit package for both arches and branch testing:
@@ -181,16 +180,12 @@ The arch can also be set in manjaro-tools.conf, but under normal conditions, it 
 ###### * -n
 * Installs the built package in the chroot and runs a namcap check
 
-###### * -u
-* Create udev build root (for eudev builds)
-
 ### 3. buildiso
 
 buildiso is used to build manjaro-iso-profiles. It is run insde the profiles folder.
 
 ##### Packages for livecd only:
 
-* manjaro-livecd-openrc
 * manjaro-livecd-systemd
 
 #### Arguments
@@ -198,28 +193,26 @@ buildiso is used to build manjaro-iso-profiles. It is run insde the profiles fol
 ~~~
 $ buildiso -h
 Usage: buildiso [options]
-    -p <profile>       Buildset or profile [default: default]
     -a <arch>          Arch [default: auto]
     -b <branch>        Branch [default: stable]
+    -c                 Disable clean work dir
+    -f                 Build full ISO (extra=true)
+    -g <key>           The gpg key for sfs signing
+                       [default: empty]
+    -h                 This help
+    -k <name>          Kernel to use
+                       [default: linux49]
+    -m                 Set SquashFS image mode to persistence
+    -p <profile>       Buildset or profile [default: default]
+    -q                 Query settings and pretend build
     -r <dir>           Chroots directory
                        [default: /var/lib/manjaro-tools/buildiso]
     -t <dir>           Target directory
                        [default: /var/cache/manjaro-tools/iso]
-    -k <name>          Kernel to use
-                       [default: linux49]
-    -i <name>          Init system to use
-                       [default: systemd]
-    -g <key>           The gpg key for sfs signing
-                       [default: empty]
-    -m                 Set SquashFS image mode to persistence
-    -c                 Disable clean work dir
-    -f                 Build full ISO (extra=true)
+    -v                 Verbose output to log file, show profile detail (-q)
     -x                 Build images only
     -z                 Generate iso only
                        Requires pre built images (-x)
-    -v                 Verbose output to log file, show profile detail (-q)
-    -q                 Query settings and pretend build
-    -h                 This help
 ~~~
 
 ###### * build xfce iso profile for both arches and branch testing on x86_64 build system
@@ -256,15 +249,14 @@ yaml files are used by calamares netinstall option from a specified url(netgroup
 ~~~
 $ check-yaml -h
 Usage: check-yaml [options]
-    -p <profile>       Buildset or profile [default: default]
     -a <arch>          Arch [default: auto]
-    -k <name>          Kernel to use[default: linux44]
-    -i <name>          Init system to use [default: systemd]
     -c                 Check also calamares yaml files generated for the profile
     -g                 Enable pacman group accepted for -p
-    -v                 Validate by schema
-    -q                 Query settings
     -h                 This help
+    -k <name>          Kernel to use[default: linux44]
+    -p <profile>       Buildset or profile [default: default]
+    -q                 Query settings
+    -v                 Validate by schema
 ~~~
 ###### * build xfce iso profile for both arches and branch testing on x86_64 build system
 
@@ -303,11 +295,11 @@ buildtree is a little tools to sync arch abs and manjaro PKGBUILD git repos.
 ~~~
 $ buildtree -h
 Usage: buildtree [options]
-    -s            Sync manjaro tree
     -a            Sync arch abs
     -c            Clean package tree
-    -q            Query settings
     -h            This help
+    -q            Query settings
+    -s            Sync manjaro tree
 ~~~
 
 ###### * sync arch and manjaro trees
@@ -328,8 +320,8 @@ If there is only 1 system installed besides the host system, no list will pop up
 $ manjaro-chroot -h
 usage: manjaro-chroot -a [or] manjaro-chroot chroot-dir [command]
     -a             Automount detected linux system
-    -q             Query settings and pretend
     -h             Print this help message
+    -q             Query settings and pretend
 
     If 'command' is unspecified, manjaro-chroot will launch /bin/sh.
 
@@ -361,14 +353,14 @@ Ideally, you have a running ssh agent on the host, and your key added, and your 
 ~~~
 $ deployiso -h
 Usage: deployiso [options]
-    -p                 Source folder to upload [default:default]
-    -l                 Limit bandwidth in kB/s [default:80]
     -c                 Create new remote release directory
-    -u                 Update remote directory
-    -t                 Create iso torrent
-    -q                 Query settings and pretend upload
-    -v                 Verbose output
     -h                 This help
+    -l                 Limit bandwidth in kB/s [default:80]
+    -p                 Source folder to upload [default:default]
+    -q                 Query settings and pretend upload
+    -t                 Create iso torrent
+    -u                 Update remote directory
+    -v                 Verbose output
 ~~~
 
 ###### * upload official build list, ie all built iso defined in a build list

@@ -91,7 +91,7 @@ configure_lsb(){
 
 configure_logind(){
     msg2 "Configuring logind ..."
-    local conf=$1/etc/$2/logind.conf
+    local conf=$1/etc/systemd/logind.conf
     sed -i 's/#\(HandleSuspendKey=\)suspend/\1ignore/' "$conf"
     sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' "$conf"
     sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' "$conf"
@@ -104,27 +104,14 @@ configure_journald(){
 }
 
 configure_services(){
-    info "Configuring [%s]" "${initsys}"
-    case ${initsys} in
-        'openrc')
-            for svc in ${enable_openrc[@]}; do
-                [[ $svc == "xdm" ]] && set_xdm "$1"
-                add_svc_rc "$1" "$svc"
-            done
-            for svc in ${enable_openrc_live[@]}; do
-                add_svc_rc "$1" "$svc"
-            done
-        ;;
-        'systemd')
-            for svc in ${enable_systemd[@]}; do
-                add_svc_sd "$1" "$svc"
-            done
-            for svc in ${enable_systemd_live[@]}; do
-                add_svc_sd "$1" "$svc"
-            done
-        ;;
-    esac
-    info "Done configuring [%s]" "${initsys}"
+    info "Configuring services"
+    for svc in ${enable_systemd[@]}; do
+        add_svc_sd "$1" "$svc"
+    done
+    for svc in ${enable_systemd_live[@]}; do
+        add_svc_sd "$1" "$svc"
+    done
+    info "Done configuring services"
 }
 
 write_live_session_conf(){
@@ -160,24 +147,15 @@ configure_hosts(){
 }
 
 configure_system(){
-    case ${initsys} in
-        'systemd')
-            configure_logind "$1" "systemd"
-            configure_journald "$1"
+    configure_logind "$1"
+    configure_journald "$1"
 
-            # Prevent some services to be started in the livecd
-            echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
-            | tee "${path}/etc/.updated" >"${path}/var/.updated"
+    # Prevent some services to be started in the livecd
+    echo 'File created by manjaro-tools. See systemd-update-done.service(8).' \
+    | tee "${path}/etc/.updated" >"${path}/var/.updated"
 
-            msg2 "Disable systemd-gpt-auto-generator"
-            ln -sf /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
-        ;;
-        'openrc')
-            configure_logind "$1" "elogind"
-#             local hn='hostname="'${hostname}'"'
-#             sed -i -e "s|^.*hostname=.*|${hn}|" $1/etc/conf.d/hostname
-        ;;
-    esac
+    msg2 "Disable systemd-gpt-auto-generator"
+    ln -sf /dev/null "${path}/usr/lib/systemd/system-generators/systemd-gpt-auto-generator"
     echo ${hostname} > $1/etc/hostname
 }
 

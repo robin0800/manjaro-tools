@@ -116,12 +116,6 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
-                <term><option>-i systemd|openrc</option></term>
-
-                <listitem><para>The init system on the iso</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
                 <term><option>-k linuxXXX</option></term>
 
                 <listitem><para>The kernel on the iso</para></listitem>

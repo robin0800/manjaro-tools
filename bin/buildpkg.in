@@ -53,7 +53,6 @@ display_settings(){
     msg2 "wipe_clean: %s" "${wipe_clean}"
     msg2 "namcap: %s" "${namcap}"
     msg2 "sign: %s" "${sign}"
-    msg2 "udev_root: %s" "${udev_root}"
 
     msg "PATHS:"
     msg2 "pkg_dir: %s" "${pkg_dir}"
@@ -80,24 +79,22 @@ namcap=false
 pretend=false
 is_build_list=false
 sign=false
-udev_root=false
 is_multilib=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo "    -p <pkg>           Build list or pkg [default: ${build_list_pkg}]"
     echo "    -a <arch>          Arch [default: ${target_arch}]"
     echo "    -b <branch>        Branch [default: ${target_branch}]"
+    echo '    -c                 Recreate chroot'
+    echo '    -h                 This help'
+    echo '    -i <pkgs>          Install packages into the working copy of the chroot'
+    echo '    -n                 Install and run namcap check'
+    echo "    -p <pkg>           Build list or pkg [default: ${build_list_pkg}]"
+    echo '    -q                 Query settings and pretend build'
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_pkg}]"
-    echo '    -i <pkgs>          Install packages into the working copy of the chroot'
-    echo '    -c                 Recreate chroot'
-    echo '    -w                 Clean up cache and sources'
-    echo '    -n                 Install and run namcap check'
     echo '    -s                 Sign packages'
-    echo '    -u                 Udev base-devel group (no systemd)'
-    echo '    -q                 Query settings and pretend build'
-    echo '    -h                 This help'
+    echo '    -w                 Clean up cache and sources'
     echo ''
     echo ''
     exit $1
@@ -109,18 +106,17 @@ opts='p:a:b:r:i:cwnsuqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
-        p) build_list_pkg="${OPTARG%/}" ;;
         a) target_arch="$OPTARG" ;;
         b) target_branch="$OPTARG" ;;
-        r) chroots_pkg="$OPTARG" ;;
-        i) install_pkgs+=("$OPTARG"); mkchrootpkg_args+=(-I ${install_pkgs[*]}) ;;
         c) clean_first=true ;;
-        w) wipe_clean=true ;;
-        n) namcap=true; mkchrootpkg_args+=(-n) ;;
-        s) sign=true ;;
-        u) udev_root=true ;;
-        q) pretend=true ;;
         h|?) usage 0 ;;
+        i) install_pkgs+=("$OPTARG"); mkchrootpkg_args+=(-I ${install_pkgs[*]}) ;;
+        n) namcap=true; mkchrootpkg_args+=(-n) ;;
+        p) build_list_pkg="${OPTARG%/}" ;;
+        q) pretend=true ;;
+        r) chroots_pkg="$OPTARG" ;;
+        s) sign=true ;;
+        w) wipe_clean=true ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
     esac
 done

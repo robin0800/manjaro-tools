@@ -221,7 +221,7 @@ init_buildtree(){
 
     tree_dir_abs=${tree_dir}/packages-archlinux
 
-    [[ -z ${repo_tree[@]} ]] && repo_tree=('core' 'extra' 'community' 'multilib' 'openrc')
+    [[ -z ${repo_tree[@]} ]] && repo_tree=('core' 'extra' 'community' 'multilib')
 
     [[ -z ${host_tree} ]] && host_tree='https://github.com/manjaro'
 
@@ -312,8 +312,6 @@ init_buildiso(){
     [[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
-
-    [[ -z ${initsys} ]] && initsys="systemd"
 
     [[ -z ${kernel} ]] && kernel="linux414"
 
@@ -449,10 +447,7 @@ reset_profile(){
     unset addgroups
     unset enable_systemd
     unset disable_systemd
-    unset enable_openrc
-    unset disable_openrc
     unset enable_systemd_live
-    unset enable_openrc_live
     unset packages_desktop
     unset packages_mhwd
     unset login_shell
@@ -503,18 +498,6 @@ check_profile(){
 # $1: file name
 load_pkgs(){
     info "Loading Packages: [%s] ..." "${1##*/}"
-
-    local _init _init_rm
-    case "${initsys}" in
-        'openrc')
-            _init="s|>openrc||g"
-            _init_rm="s|>systemd.*||g"
-        ;;
-        *)
-            _init="s|>systemd||g"
-            _init_rm="s|>openrc.*||g"
-        ;;
-    esac
 
     local _multi _nonfree_default _nonfree_multi _arch _arch_rm _nonfree_i686 _nonfree_x86_64 _basic _basic_rm _extra _extra_rm
 
@@ -715,13 +698,6 @@ create_min_fs(){
     mkdir -m 0755 -p $1/var/{cache/pacman/pkg,lib/pacman,log} $1/{dev,run,etc}
     mkdir -m 1777 -p $1/tmp
     mkdir -m 0555 -p $1/{sys,proc}
-}
-
-is_valid_init(){
-    case $1 in
-        'openrc'|'systemd') return 0 ;;
-        *) return 1 ;;
-    esac
 }
 
 is_valid_arch_pkg(){

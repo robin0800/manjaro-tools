@@ -132,7 +132,7 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
                 <term><varname>repo_tree=</varname></term>
 
                 <listitem><para>Manjaro package tree. Default is
-                "('core' 'extra' 'community' 'multilib' 'openrc')".
+                "('core' 'extra' 'community' 'multilib')".
                 </para></listitem>
             </varlistentry>
 

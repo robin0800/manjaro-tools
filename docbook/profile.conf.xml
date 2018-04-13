@@ -153,14 +153,6 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
-                <term><varname>enable_openrc=</varname></term>
-
-                <listitem><para>Array of services that will be
-                enabled in openrc systems.
-                </para></listitem>
-            </varlistentry>
-
-            <varlistentry>
                 <term><varname>hostname=</varname></term>
 
                 <listitem><para>Hostname for the ISO.
@@ -208,14 +200,6 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
                 the names of .service systemd files.
                 </para></listitem>
             </varlistentry>
-
-            <varlistentry>
-            <term><varname>enable_openrc_live=</varname></term>
-
-            <listitem><para>Array of services that will be
-            enabled in the openrc live-cd.
-            </para></listitem>
-        </varlistentry>
 
         </variablelist>
 

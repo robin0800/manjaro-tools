@@ -13,19 +13,16 @@ write_machineid_conf(){
     local conf="${modules_dir}/machineid.conf" switch='false'
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' > "$conf"
-    [[ ${initsys} == 'systemd' ]] && switch='true'
-    echo "systemd: ${switch}" >> $conf
     echo "dbus: true" >> $conf
     echo "symlink: true" >> $conf
 }
 
 write_finished_conf(){
     msg2 "Writing %s ..." "finished.conf"
-    local conf="${modules_dir}/finished.conf" cmd="loginctl reboot"
+    local conf="${modules_dir}/finished.conf" cmd="systemctl reboot"
     echo '---' > "$conf"
     echo 'restartNowEnabled: true' >> "$conf"
     echo 'restartNowChecked: false' >> "$conf"
-    [[ ${initsys} == 'systemd' ]] && cmd="systemctl reboot"
     echo "restartNowCommand: \"${cmd}\"" >> "$conf"
 }
 
@@ -68,18 +65,6 @@ write_servicescfg_conf(){
     echo '' >> "$conf"
     echo 'services:' >> "$conf"
     echo '    enabled:' >> "$conf"
-    for s in ${enable_openrc[@]};do
-        echo "      - name: $s" >> "$conf"
-        echo '        runlevel: default' >> "$conf"
-    done
-    if [[ -n ${disable_openrc[@]} ]]; then
-        echo '    disabled:' >> "$conf"
-        for s in ${disable_openrc[@]};do
-            echo "      - name: $s" >> "$conf"
-            echo '        runlevel: default' >> "$conf"
-            echo '' >> "$conf"
-        done
-    fi
 }
 
 write_services_conf(){
@@ -245,7 +230,7 @@ get_yaml(){
     else
         args+=("${profile}/packages")
     fi
-    args+=("${initsys}")
+    args+=("systemd")
     for arg in ${args[@]};do
         yaml=${yaml:-}${yaml:+-}${arg}
     done
@@ -340,10 +325,7 @@ write_settings_conf(){
         msg2 "Skipping to set mhwdcfg module."
     fi
     echo "        - hwclock" >> "$conf"
-    case ${initsys} in
-        'systemd') echo "        - services" >> "$conf" && write_services_conf ;;
-        'openrc') echo "        - servicescfg" >> "$conf" && write_servicescfg_conf ;;
-    esac
+    echo "        - services" >> "$conf" && write_services_conf
     echo "        - grubcfg" >> "$conf"
     echo "        - bootloader" >> "$conf" && write_bootloader_conf
     if ${oem_used}; then
@@ -440,7 +422,7 @@ prepare_check(){
 }
 
 gen_fn(){
-    echo "${yaml_dir}/$1-${target_arch}-${initsys}.yaml"
+    echo "${yaml_dir}/$1-${target_arch}-systemd.yaml"
 }
 
 make_profile_yaml(){

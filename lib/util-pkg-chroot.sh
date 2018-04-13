@@ -69,39 +69,11 @@ find_pkg(){
     [[ -z $result ]] && die "%s is not a valid package or build list!" "$1"
 }
 
-load_group(){
-    local _multi \
-        _space="s| ||g" \
-        _clean=':a;N;$!ba;s/\n/ /g' \
-        _com_rm="s|#.*||g" \
-        devel_group='' \
-        file=${DATADIR}/base-devel-udev
-
-        info "Loading custom group: %s" "$file"
-
-    if ${is_multilib}; then
-        _multi="s|>multilib||g"
-    else
-        _multi="s|>multilib.*||g"
-    fi
-
-    devel_group=$(sed "$_com_rm" "$file" \
-            | sed "$_space" \
-            | sed "$_multi" \
-            | sed "$_clean")
-
-        echo ${devel_group}
-}
-
 init_base_devel(){
-    if ${udev_root}; then
-        base_packages=( "$(load_group)" )
+    if ${is_multilib}; then
+        base_packages=('base-devel' 'multilib-devel')
     else
-        if ${is_multilib}; then
-            base_packages=('base-devel' 'multilib-devel')
-        else
-            base_packages=('base-devel')
-        fi
+        base_packages=('base-devel')
     fi
 }
 
