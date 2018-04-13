@@ -43,8 +43,8 @@ pretend=false
 usage() {
     echo "usage: ${0##*/} -a [or] ${0##*/} chroot-dir [command]"
     echo '    -a             Automount detected linux system'
-    echo '    -q             Query settings and pretend'
     echo '    -h             Print this help message'
+    echo '    -q             Query settings and pretend'
     echo ''
     echo "    If 'command' is unspecified, ${0##*/} will launch /bin/sh."
     echo ''

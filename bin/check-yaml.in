@@ -113,11 +113,11 @@ while getopts "${opts}" arg; do
         a) target_arch="$OPTARG" ;;
         c) calamares=true ;;
         g) group=true ;;
-        h|?) usage 0 ;;
         k) kernel="$OPTARG" ;;
         p) build_list_iso="$OPTARG" ;;
         q) pretend=true ;;
         v) validate=true ;;
+        h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
     esac
 done

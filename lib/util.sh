@@ -584,8 +584,6 @@ load_pkgs(){
             | sed "$_space" \
             | sed "$_blacklist" \
             | sed "$_purge" \
-            | sed "$_init" \
-            | sed "$_init_rm" \
             | sed "$_arch" \
             | sed "$_arch_rm" \
             | sed "$_nonfree_default" \

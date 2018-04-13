@@ -55,11 +55,11 @@ opts=':C:cdGiM'
 
 while getopts ${opts} arg; do
     case "${arg}" in
+        c) hostcache=true ;;
         C) pacman_config=$OPTARG ;;
         d) directory=true ;;
-        c) hostcache=true ;;
-        i) interactive=true ;;
         G) copykeyring=false ;;
+        i) interactive=true ;;
         M) copymirrorlist=false ;;
         :) echo "invalid argument ${arg}:$OPTARG"; usage 1;;
         ?) usage 0 ;;
