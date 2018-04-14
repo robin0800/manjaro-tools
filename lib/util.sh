@@ -324,8 +324,6 @@ init_deployiso(){
 
     host="osdn.net"
 
-    [[ -z ${project} ]] && project="[SetProject]"
-
     [[ -z ${account} ]] && account="[SetUser]"
 
     [[ -z ${limit} ]] && limit=100
@@ -433,6 +431,18 @@ get_edition(){
     [[ -z $result ]] && die "%s is not a valid profile or build list!" "$1"
     path=${result%/*}
     echo ${path##*/}
+}
+
+get_project(){
+    case "${edition}" in
+        'manjaro')
+            project="manjaro"
+        ;;
+        'community')
+            project="manjaro-community"
+        ;;
+    esac
+    echo "${project}"
 }
 
 reset_profile(){

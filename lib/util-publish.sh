@@ -39,6 +39,7 @@ make_torrent(){
 prepare_transfer(){
     profile="$1"
     edition=$(get_edition "${profile}")
+    [[ -z ${project} ]] && project="$(get_project)"
     url=$(connect)
 
     target_dir="${profile}/${dist_release}"
