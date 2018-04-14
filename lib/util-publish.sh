@@ -51,7 +51,7 @@ sync_dir(){
 	cont=1
 	max_cont=10
     prepare_transfer "$1"
-    msg "Start upload [%s] ..." "$1"
+    msg "Start upload [%s] to [%s] ..." "$1" "${project}"
     while [[ $cont -le $max_cont  ]]; do 
     rsync ${rsync_args[*]} ${src_dir}/ ${url}/${target_dir}/
     	if [[ $? != 0 ]]; then
