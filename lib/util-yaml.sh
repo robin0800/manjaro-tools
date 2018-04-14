@@ -10,9 +10,10 @@
 # GNU General Public License for more details.
 
 write_machineid_conf(){
-    local conf="${modules_dir}/machineid.conf" switch='false'
+    local conf="${modules_dir}/machineid.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' > "$conf"
+    echo "systemd: true" >> $conf
     echo "dbus: true" >> $conf
     echo "symlink: true" >> $conf
 }
