@@ -237,6 +237,8 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
                 <term><varname>project=</varname></term>
 
                 <listitem><para>Default OSDN project name to be used for upload.
+                    If unset, 'manjaro' or 'manjaro-community' will be determined
+                    automatically based on profile.
                 </para></listitem>
             </varlistentry>
 
