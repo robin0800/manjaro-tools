@@ -71,23 +71,23 @@ update=false
 verbose=false
 torrent=false
 
-rsync_args=(-aP --progress -e ssh)
+rsync_args=(-aPc --progress -e ssh)
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo "    -p                 Source folder to upload [default:${build_list_iso}]"
-    echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
-    echo '    -u                 Update remote directory'
-    echo '    -t                 Create iso torrent'
-    echo '    -q                 Query settings and pretend upload'
-    echo '    -v                 Verbose output'
     echo '    -h                 This help'
+    echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
+    echo "    -p                 Source folder to upload [default:${build_list_iso}]"
+    echo '    -q                 Query settings and pretend upload'
+    echo '    -t                 Create iso torrent'
+    echo '    -u                 Update remote directory'
+    echo '    -v                 Verbose output'
     echo ''
     echo ''
     exit $1
 }
 
-opts='p:l:uvtqh'
+opts='hl:p:qtuv'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
