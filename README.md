@@ -119,9 +119,6 @@ overriding
 
 # Piece size, 2^n
 # piece_size=21
-
-# iso mirrors
-# iso_mirrors=('heanet' 'jaist' 'netcologne' 'iweb' 'kent')
 ~~~
 
 ### 2. buildpkg

@@ -332,8 +332,6 @@ init_deployiso(){
 
     [[ -z ${piece_size} ]] && piece_size=21
 
-    [[ -z ${iso_mirrors[@]} ]] && iso_mirrors=('heanet' 'jaist' 'netcologne' 'iweb' 'kent')
-
     torrent_meta="$(get_distid)"
 }
 

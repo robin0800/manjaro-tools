@@ -272,14 +272,6 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
                         </para></listitem>
             </varlistentry>
 
-            <varlistentry>
-                <term><varname>iso_mirrors=</varname></term>
-
-                <listitem><para>Array of iso mirrors that will be
-                used for webseeds.
-                </para></listitem>
-            </varlistentry>
-
         </variablelist>
     </refsect1>
 
