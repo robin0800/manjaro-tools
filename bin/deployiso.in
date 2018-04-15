@@ -37,7 +37,7 @@ display_settings(){
     msg2 "is_build_list: %s" "${is_build_list}"
 
     msg "OPTIONS:"
-    msg2 "limit: %s kB/s" "${limit}"
+    [[ -z ${limit} ]] && msg2 "bandwidth limit: no" || msg2 "bandwidth limit: %s kB/s" "${limit}"
     msg2 "dist_release: %s" "${dist_release}"
 
     msg "ARGS:"
@@ -94,7 +94,7 @@ opts='dhl:p:qtuv'
 while getopts "${opts}" arg; do
     case "${arg}" in
         d) hidden=true ;;
-        l) limit="$OPTARG" ;;
+        l) limit="$OPTARG"; rsync_args+=(--bwlimit=${limit}) ;;
         p) build_list_iso="$OPTARG" ;;
         q) pretend=true; rsync_args+=(-n) ;;
         t) torrent=true ;;
@@ -110,8 +110,6 @@ shift $(($OPTIND - 1))
 timer_start=$(get_timer)
 
 eval_build_list "${list_dir_iso}" "${build_list_iso}"
-
-rsync_args+=(--bwlimit=${limit})
 
 ${pretend} && display_settings && exit 1
 

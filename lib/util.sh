@@ -326,8 +326,6 @@ init_deployiso(){
 
     [[ -z ${account} ]] && account="[SetUser]"
 
-    [[ -z ${limit} ]] && limit=100
-
     [[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
 
     [[ -z ${piece_size} ]] && piece_size=21
