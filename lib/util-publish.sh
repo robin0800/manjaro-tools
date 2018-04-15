@@ -40,7 +40,6 @@ prepare_transfer(){
     src_dir="${run_dir}/${edition}/${target_dir}"
 
     ${hidden} && target_dir="${profile}/.${dist_release}"
-    ${torrent} && make_torrent
 }
 
 sync_dir(){
@@ -48,7 +47,8 @@ sync_dir(){
     max_cont=10
     prepare_transfer "$1" "${hidden}"
 
-    ${sign} && signiso "$1"
+    ${torrent} && make_torrent
+    ${sign} && signiso "${src_dir}"
 
     msg "Start upload [%s] to [%s] ..." "$1" "${project}"
     while [[ $cont -le $max_cont  ]]; do 
