@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 connect(){
-    [[ ${alt_storage} == true ]] && server="storage-in" || server="storage"
+    ${alt_storage} && server="storage-in" || server="storage"
     local storage="@${server}.osdn.net:/storage/groups/m/ma/"
     echo "${account}${storage}${project}"
 }
