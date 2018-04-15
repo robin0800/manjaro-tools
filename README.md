@@ -108,11 +108,18 @@ overriding
 # the server user
 # account=[SetUser]
 
+# Set to 'true' to use ssh-agent to store passphrase.
+# ssh_agent=false
+
+# use alternative storage server (one or the other might be more stable) 
+# alt_storage=false
+
 # the server project: manjaro|manjaro-community
+# determined automatically based on profile if unset
 # project="[SetProject]"
 
 # set upload bandwidth limit in kB/s
-# limit=100
+# limit=
 
 # the torrent tracker urls, comma separated
 # tracker_url='udp://mirror.strits.dk:6969'
@@ -168,14 +175,14 @@ The arch can also be set in manjaro-tools.conf, but under normal conditions, it 
 * Removes the chroot dir
 * If the -c parameter is not used, buildpkg will update the existing chroot or create a new one if none is present.
 
-###### * -w
-* Cleans pkgcache, and logfiles
+###### * -n
+* Installs the built package in the chroot and runs a namcap check
 
 ###### * -s
 * Signs the package when built
 
-###### * -n
-* Installs the built package in the chroot and runs a namcap check
+###### * -w
+* Cleans pkgcache, and logfiles
 
 ### 3. buildiso
 
@@ -340,21 +347,19 @@ manjaro-chroot /mnt /bin/bash
 
 ### 7. deployiso
 
-deployiso is a script to upload a specific iso or a buiildset to SF.
-It needs to be run inside the iso-profiles directory.
-
-Ideally, you have a running ssh agent on the host, and your key added, and your public key provided to your SF account. You can then upload without being asked for ssh password.
+deployiso is a script to upload a specific iso or a buiildset to OSDN.
 
 #### Arguments
 
 ~~~
 $ deployiso -h
 Usage: deployiso [options]
-    -c                 Create new remote release directory
+    -d                 Use hidden remote directory
     -h                 This help
-    -l                 Limit bandwidth in kB/s [default:80]
+    -l                 Limit bandwidth in kB/s [default:]
     -p                 Source folder to upload [default:default]
     -q                 Query settings and pretend upload
+    -s                 Sign ISO and create checksums
     -t                 Create iso torrent
     -u                 Update remote directory
     -v                 Verbose output
@@ -363,11 +368,11 @@ Usage: deployiso [options]
 ###### * upload official build list, ie all built iso defined in a build list
 
 ~~~
-deployiso -p official -c
+deployiso -p official
 ~~~
 
-###### * upload xfce
+###### * upload sign xfce ISO file, create checksums, create torrent and upload to hidden directory
 
 ~~~
-deployiso -p xfce -c
+deployiso -p xfce -std
 ~~~

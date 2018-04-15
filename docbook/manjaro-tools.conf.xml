@@ -233,6 +233,14 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
+                <term><varname>ssh_agent=true|false</varname></term>
+
+                <listitem><para>When set true, the ssh-agent will be used to store
+                the passphrase.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
                 <term><varname>alt_storage=true|false</varname></term>
 
                 <listitem><para>When set true deployiso will upload to OSDN's
