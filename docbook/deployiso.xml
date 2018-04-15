@@ -70,10 +70,16 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
         <variablelist>
             <varlistentry>
-                <term><option>-p PROFILE...</option></term>
+                <term><option>-d</option></term>
 
-                <listitem><para>Name of the build list or name of the directory
-                you will upload.</para></listitem>
+                <listitem><para>Use hidden remote directory.
+                The target directory name will be prefaced with a dot.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-h</option></term>
+
+                <listitem><para>Help.</para></listitem>
             </varlistentry>
 
             <varlistentry>
@@ -83,21 +89,10 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
-                <term><option>-u</option></term>
+                <term><option>-p PROFILE...</option></term>
 
-                <listitem><para>Update remote iso.</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-t</option></term>
-
-                <listitem><para>Create a torrent from iso file.</para></listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><option>-v</option></term>
-
-                <listitem><para>Verbose output.</para></listitem>
+                <listitem><para>Name of the build list or name of the directory
+                you will upload.</para></listitem>
             </varlistentry>
 
             <varlistentry>
@@ -107,9 +102,21 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
-                <term><option>-h</option></term>
+                <term><option>-t</option></term>
 
-                <listitem><para>Help.</para></listitem>
+                <listitem><para>Create a torrent from iso file.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-u</option></term>
+
+                <listitem><para>Update remote iso.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>-v</option></term>
+
+                <listitem><para>Verbose output.</para></listitem>
             </varlistentry>
         </variablelist>
 
