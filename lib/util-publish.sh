@@ -44,6 +44,9 @@ prepare_transfer(){
 
     target_dir="${profile}/${dist_release}"
     src_dir="${run_dir}/${edition}/${target_dir}"
+
+    "$2" && target_dir="${profile}/.${dist_release}"
+
     ${torrent} && make_torrent
 }
 

@@ -20,11 +20,11 @@ import ${LIBDIR}/util.sh
 import ${LIBDIR}/util-publish.sh
 
 show_profile(){
-    prepare_transfer "$1"
+    prepare_transfer "$1" "${hidden}"
     info "Profile: [$1]"
     msg2 "project: %s" "${project}"
     msg2 "src_dir: ${src_dir}"
-    msg2 "target_dir: ${url}/${target_dir}/"
+    msg2 "remote dir: ${url}/${target_dir}"
 }
 
 display_settings(){
@@ -66,15 +66,17 @@ load_config "${USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}/ma
 
 run_dir=${cache_dir_iso}
 
+hidden=false
 pretend=false
+torrent=false
 update=false
 verbose=false
-torrent=false
 
 rsync_args=(-aPc --progress -e ssh)
 
 usage() {
     echo "Usage: ${0##*/} [options]"
+    echo '    -d                 Use hidden remote directory'
     echo '    -h                 This help'
     echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
     echo "    -p                 Source folder to upload [default:${build_list_iso}]"
@@ -87,10 +89,11 @@ usage() {
     exit $1
 }
 
-opts='hl:p:qtuv'
+opts='dhl:p:qtuv'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
+        d) hidden=true ;;
         l) limit="$OPTARG" ;;
         p) build_list_iso="$OPTARG" ;;
         q) pretend=true; rsync_args+=(-n) ;;
