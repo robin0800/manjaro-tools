@@ -14,21 +14,13 @@ connect(){
     echo "${account}${storage}${project}"
 }
 
-gen_webseed(){
-    local webseed seed="$1"
-    for mirror in ${iso_mirrors[@]};do
-        webseed=${webseed:-}${webseed:+,}"http://${mirror}.dl.${seed}"
-    done
-    echo ${webseed}
-}
-
 make_torrent(){
     find ${src_dir} -type f -name "*.torrent" -delete
 
     if [[ -n $(find ${src_dir} -type f -name "*.iso") ]]; then
         for iso in $(ls ${src_dir}/*.iso);do
-            local seed=${host}/projects/${project}/storage/${profile}/${dist_release}/${iso##*/}
-            local mktorrent_args=(-c "${torrent_meta}" -p -l ${piece_size} -a ${tracker_url} -w $(gen_webseed ${seed}))
+            local seed=https://${host}/projects/${project}/storage/${profile}/${dist_release}/${iso##*/}
+            local mktorrent_args=(-c "${torrent_meta}" -p -l ${piece_size} -a ${tracker_url} -w ${seed})
             ${verbose} && mktorrent_args+=(-v)
             msg2 "Creating (%s) ..." "${iso##*/}.torrent"
             mktorrent ${mktorrent_args[*]} -o ${iso}.torrent ${iso}
