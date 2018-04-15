@@ -64,8 +64,8 @@ ssh_add(){
 }
 
 sync_dir(){
-    cont=1
-    max_cont=10
+    count=1
+    max_count=10
     prepare_transfer "$1" "${hidden}"
 
     ${torrent} && make_torrent
@@ -73,14 +73,14 @@ sync_dir(){
     ${ssh_agent} && ssh_add
 
     msg "Start upload [%s] to [%s] ..." "$1" "${project}"
-    while [[ $cont -le $max_cont  ]]; do 
+    while [[ $count -le $max_count ]]; do 
     rsync ${rsync_args[*]} ${src_dir}/ ${url}/${target_dir}/
         if [[ $? != 0 ]]; then
-            cont=$(($cont + 1))
-            msg "Failed to upload [%s] now try again: try $cont of $max_cont" "$1"
+            count=$(($count + 1))
+            msg "Upload failed. retrying (%s/%s) ..." "$count" "$max_count"
             sleep 2
         else
-            cont=$(($max_cont + 1))
+            count=$(($max_count + 1))
             msg "Done upload [%s]" "$1"
             show_elapsed_time "${FUNCNAME}" "${timer_start}"
         fi
