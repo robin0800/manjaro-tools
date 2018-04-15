@@ -81,11 +81,11 @@ usage() {
     echo "Usage: ${0##*/} [options]"
     echo '    -d                 Use hidden remote directory'
     echo '    -h                 This help'
-    echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
-    echo "    -p                 Source folder to upload [default:${build_list_iso}]"
+    echo "    -l                 Limit bandwidth in kB/s [default: ${limit}]"
+    echo "    -p                 Source folder to upload [default: ${build_list_iso}]"
     echo '    -q                 Query settings and pretend upload'
     echo '    -s                 Sign ISO and create checksums'
-    echo '    -t                 Create iso torrent'
+    echo '    -t                 Create ISO torrent'
     echo '    -u                 Update remote directory'
     echo '    -v                 Verbose output'
     echo ''

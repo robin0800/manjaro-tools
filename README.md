@@ -360,7 +360,7 @@ Usage: deployiso [options]
     -p                 Source folder to upload [default:default]
     -q                 Query settings and pretend upload
     -s                 Sign ISO and create checksums
-    -t                 Create iso torrent
+    -t                 Create ISO torrent
     -u                 Update remote directory
     -v                 Verbose output
 ~~~
