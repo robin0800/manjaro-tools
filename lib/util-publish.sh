@@ -42,6 +42,27 @@ prepare_transfer(){
     ${hidden} && target_dir="${profile}/.${dist_release}"
 }
 
+start_agent(){
+    msg2 "Initializing SSH agent..."
+    ssh-agent | sed 's/^echo/#echo/' > "$1"
+    chmod 600 "$1"
+    . "$1" > /dev/null
+    ssh-add
+}
+
+ssh_add(){
+    local ssh_env="$USER_HOME/.ssh/environment"
+
+    if [ -f "${ssh_env}" ]; then
+         . "${ssh_env}" > /dev/null
+         ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+            start_agent ${ssh_env};
+        }
+    else
+        start_agent ${ssh_env};
+    fi
+}
+
 sync_dir(){
     cont=1
     max_cont=10
@@ -49,6 +70,7 @@ sync_dir(){
 
     ${torrent} && make_torrent
     ${sign} && signiso "${src_dir}"
+    ${ssh_agent} && ssh_add
 
     msg "Start upload [%s] to [%s] ..." "$1" "${project}"
     while [[ $cont -le $max_cont  ]]; do 
