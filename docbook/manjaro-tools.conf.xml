@@ -225,11 +225,19 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
         <para>The following options are understood:</para>
 
         <variablelist>
-
             <varlistentry>
                 <term><varname>account=</varname></term>
 
                 <listitem><para>Default user to be used for upload.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><varname>alt_storage=true|false</varname></term>
+
+                <listitem><para>When set true deployiso will upload to OSDN's
+                alternative server. Under some circumstances and depending on your
+                location the connection might be more stable.
                 </para></listitem>
             </varlistentry>
 
