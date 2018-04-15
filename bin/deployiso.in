@@ -43,6 +43,7 @@ display_settings(){
     msg "ARGS:"
     msg2 "update: %s" "${update}"
     msg2 "verbose: %s" "${verbose}"
+    msg2 "signiso: %s" "${sign}"
     msg2 "torrent: %s" "${torrent}"
 
     if ${torrent}; then
@@ -72,6 +73,7 @@ pretend=false
 torrent=false
 update=false
 verbose=false
+sign=false
 
 rsync_args=(-aPc --progress -e ssh)
 
@@ -82,6 +84,7 @@ usage() {
     echo "    -l                 Limit bandwidth in kB/s [default:${limit}]"
     echo "    -p                 Source folder to upload [default:${build_list_iso}]"
     echo '    -q                 Query settings and pretend upload'
+    echo '    -s                 Sign ISO and create checksums'
     echo '    -t                 Create iso torrent'
     echo '    -u                 Update remote directory'
     echo '    -v                 Verbose output'
@@ -90,7 +93,7 @@ usage() {
     exit $1
 }
 
-opts='dhl:p:qtuv'
+opts='dhl:p:qstuv'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -98,6 +101,7 @@ while getopts "${opts}" arg; do
         l) limit="$OPTARG"; rsync_args+=(--bwlimit=${limit}) ;;
         p) build_list_iso="$OPTARG" ;;
         q) pretend=true; rsync_args+=(-n) ;;
+        s) sign=true ;;
         t) torrent=true ;;
         u) update=true; rsync_args+=(-u) ;;
         v) verbose=true; rsync_args+=(-v --stats) ;;

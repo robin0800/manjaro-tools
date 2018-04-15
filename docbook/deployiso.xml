@@ -102,6 +102,12 @@ along with systemd; If not, see <http://www.gnu.org/licenses/>.
             </varlistentry>
 
             <varlistentry>
+                <term><option>-s</option></term>
+
+                <listitem><para>Sign ISO and create checksums before uploading.</para></listitem>
+            </varlistentry>
+
+            <varlistentry>
                 <term><option>-t</option></term>
 
                 <listitem><para>Create a torrent from iso file.</para></listitem>
