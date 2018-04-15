@@ -38,6 +38,7 @@ make_torrent(){
 
 prepare_transfer(){
     profile="$1"
+    hidden="$2"
     edition=$(get_edition "${profile}")
     [[ -z ${project} ]] && project="$(get_project)"
     url=$(connect)
@@ -45,15 +46,14 @@ prepare_transfer(){
     target_dir="${profile}/${dist_release}"
     src_dir="${run_dir}/${edition}/${target_dir}"
 
-    "$2" && target_dir="${profile}/.${dist_release}"
-
+    ${hidden} && target_dir="${profile}/.${dist_release}"
     ${torrent} && make_torrent
 }
 
 sync_dir(){
     cont=1
     max_cont=10
-    prepare_transfer "$1"
+    prepare_transfer "$1" "${hidden}"
     msg "Start upload [%s] to [%s] ..." "$1" "${project}"
     while [[ $cont -le $max_cont  ]]; do 
     rsync ${rsync_args[*]} ${src_dir}/ ${url}/${target_dir}/
