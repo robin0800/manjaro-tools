@@ -225,7 +225,7 @@ gen_iso_fn(){
     ! [[ ${full_iso} ]] && vars+=("minimal")
 
     vars+=("${target_arch}")
-    for n in ${vars[@]};do
+    for n in ${vars[@]}; do
         name=${name:-}${name:+-}${n}
     done
     echo $name

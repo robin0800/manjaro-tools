@@ -156,7 +156,7 @@ archive_logs(){
 post_build(){
     source PKGBUILD
     local ext='pkg.tar.xz' tarch ver src
-    for pkg in ${pkgname[@]};do
+    for pkg in ${pkgname[@]}; do
         case $arch in
             any) tarch='any' ;;
             *) tarch=${target_arch}

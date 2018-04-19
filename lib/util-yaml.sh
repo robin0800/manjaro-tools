@@ -74,7 +74,7 @@ write_services_conf(){
     echo '---' >  "$conf"
     echo '' >> "$conf"
     echo 'services:' > "$conf"
-    for s in ${enable_systemd[@]};do
+    for s in ${enable_systemd[@]}; do
         echo "    - name: $s" >> "$conf"
         echo '      mandatory: false' >> "$conf"
         echo '' >> "$conf"
@@ -84,7 +84,7 @@ write_services_conf(){
     echo '      mandatory: true' >> "$conf"
     echo '' >> "$conf"
     echo 'disable:' >> "$conf"
-    for s in ${disable_systemd[@]};do
+    for s in ${disable_systemd[@]}; do
         echo "    - name: $s" >> "$conf"
         echo '      mandatory: false' >> "$conf"
         echo '' >> "$conf"
@@ -134,7 +134,7 @@ write_users_conf(){
     echo "---" > "$conf"
     echo "defaultGroups:" >> "$conf"
     local IFS=','
-    for g in ${addgroups[@]};do
+    for g in ${addgroups[@]}; do
         echo "    - $g" >> "$conf"
     done
     unset IFS
@@ -232,7 +232,7 @@ get_yaml(){
         args+=("${profile}/packages")
     fi
     args+=("systemd")
-    for arg in ${args[@]};do
+    for arg in ${args[@]}; do
         yaml=${yaml:-}${yaml:+-}${arg}
     done
     echo "${yaml}.yaml"
@@ -395,7 +395,7 @@ write_netgroup_yaml(){
     echo "  hidden: false" >> "$2"
     echo "  critical: false" >> "$2"
     echo "  packages:" >> "$2"
-    for p in ${packages[@]};do
+    for p in ${packages[@]}; do
         echo "       - $p" >> "$2"
     done
     ${validate} && check_yaml "$2"

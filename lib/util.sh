@@ -729,7 +729,7 @@ is_valid_branch(){
 
 run(){
     if ${is_build_list}; then
-        for item in ${build_list[@]};do
+        for item in ${build_list[@]}; do
             $1 $item
         done
     else

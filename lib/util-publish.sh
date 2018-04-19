@@ -19,7 +19,7 @@ make_torrent(){
     find ${src_dir} -type f -name "*.torrent" -delete
 
     if [[ -n $(find ${src_dir} -type f -name "*.iso") ]]; then
-        for iso in $(ls ${src_dir}/*.iso);do
+        for iso in $(ls ${src_dir}/*.iso); do
             local seed=https://${host}/projects/${project}/storage/${profile}/${dist_release}/${iso##*/}
             local mktorrent_args=(-c "${torrent_meta}" -p -l ${piece_size} -a ${tracker_url} -w ${seed})
             ${verbose} && mktorrent_args+=(-v)
