@@ -419,7 +419,7 @@ load_profile_config(){
     [[ ${full_iso} ]] && extra='true'
 
     basic='true'
-    [[ ${extra} ]] && basic='false'
+    [[ ${extra} == 'true' ]] && basic='false'
 
     return 0
 }
