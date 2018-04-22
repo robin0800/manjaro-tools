@@ -222,7 +222,7 @@ gen_iso_fn(){
     vars+=("${dist_release}")
     vars+=("${target_branch}")
 
-    ! [[ ${full_iso} ]] && vars+=("minimal")
+    ! [[ ${extra} ]] && vars+=("minimal")
 
     vars+=("${target_arch}")
     for n in ${vars[@]}; do
