@@ -75,7 +75,7 @@ update=false
 verbose=false
 sign=false
 
-rsync_args=(-aPc --progress -e ssh)
+rsync_args=(-aP -e ssh)
 
 usage() {
     echo "Usage: ${0##*/} [options]"
