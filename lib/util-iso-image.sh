@@ -68,6 +68,17 @@ configure_mhwd_drivers(){
         msg2 "Disabling Nvidia 340xx driver"
         mkdir -p $drv_path/nvidia-340xx/
         echo "" > $drv_path/nvidia-340xx/MHWDCONFIG
+        msg2 "Disabling Nvidia 340xx Bumblebee driver"
+        mkdir -p $drv_path/hybrid-intel-nvidia-340xx-bumblebee/
+        echo "" > $drv_path/hybrid-intel-nvidia-340xx-bumblebee/MHWDCONFIG
+    fi
+    if  [ -z "$(ls $path | grep nvidia-390xx-utils 2> /dev/null)" ]; then
+        msg2 "Disabling Nvidia 390xx driver"
+        mkdir -p $drv_path/nvidia-390xx/
+        echo "" > $drv_path/nvidia-390xx/MHWDCONFIG
+        msg2 "Disabling Nvidia 390xx Bumblebee driver"
+        mkdir -p $drv_path/hybrid-intel-nvidia-390xx-bumblebee/
+        echo "" > $drv_path/hybrid-intel-nvidia-390xx-bumblebee/MHWDCONFIG
     fi
     if  [ -z "$(ls $path | grep xf86-video-amdgpu 2> /dev/null)" ]; then
         msg2 "Disabling AMD gpu driver"
