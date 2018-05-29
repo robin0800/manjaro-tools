@@ -198,11 +198,6 @@ prepare_chroot() {
 
     $install -d "$copydir"/{build,build/.gnupg,startdir,{pkg,srcpkg,src,log}dest}
 
-    for x in .gnupg/pubring.{kbx,gpg}; do
-        [[ -r $USER_HOME/$x ]] || continue
-        $install -m 644 "$USER_HOME/$x" "$copydir/build/$x"
-    done
-
     sed -e '/^MAKEFLAGS=/d' -e '/^PACKAGER=/d' -i "$copydir/etc/makepkg.conf"
     for x in BUILDDIR=/build PKGDEST=/pkgdest SRCPKGDEST=/srcpkgdest SRCDEST=/srcdest LOGDEST=/logdest \
         "MAKEFLAGS='$MAKEFLAGS'" "PACKAGER='$PACKAGER'"
@@ -254,7 +249,7 @@ _chrootnamcap() {
 
 download_sources() {
     local builddir="$(mktemp -d)"
-    chmod 1777 "$builddir"
+    chown $SUDO_USER:$SUDO_USER "$builddir"
 
     # Ensure sources are downloaded
     if [[ -n $SUDO_USER ]]; then
