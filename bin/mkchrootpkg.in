@@ -19,7 +19,7 @@ import ${LIBDIR}/util.sh
 
 shopt -s nullglob
 
-makepkg_args=(-s --noconfirm -L)
+makepkg_args=(-s --skipinteg --noconfirm -L)
 repack=false
 update_first=false
 clean_first=false
