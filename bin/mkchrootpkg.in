@@ -19,7 +19,7 @@ import ${LIBDIR}/util.sh
 
 shopt -s nullglob
 
-makepkg_args=(-s --skipinteg --noconfirm -L)
+makepkg_args=(-s --noconfirm -L)
 repack=false
 update_first=false
 clean_first=false
@@ -197,6 +197,11 @@ prepare_chroot() {
     printf >>"$copydir/etc/shadow" 'builduser:!!:%d::::::\n' "$(( $(date -u +%s) / 86400 ))"
 
     $install -d "$copydir"/{build,build/.gnupg,startdir,{pkg,srcpkg,src,log}dest}
+
+    for x in .gnupg/pubring.{kbx,gpg}; do
+        [[ -r $USER_HOME/$x ]] || continue
+        $install -m 644 "$USER_HOME/$x" "$copydir/build/$x"
+    done
 
     sed -e '/^MAKEFLAGS=/d' -e '/^PACKAGER=/d' -i "$copydir/etc/makepkg.conf"
     for x in BUILDDIR=/build PKGDEST=/pkgdest SRCPKGDEST=/srcpkgdest SRCDEST=/srcdest LOGDEST=/logdest \
