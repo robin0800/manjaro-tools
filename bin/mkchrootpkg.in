@@ -242,6 +242,12 @@ _chrootbuild() {
 #     cd /startdir
 #     sudo -u builduser makepkg "$@"
     sudo -iu builduser bash -c 'cd /startdir; makepkg "$@"' -bash "$@"
+
+    ret=$?
+    case $ret in
+        0|14) return 0;;
+        *) return $ret;;
+    esac
 }
 
 _chrootnamcap() {
@@ -254,7 +260,7 @@ _chrootnamcap() {
 
 download_sources() {
     local builddir="$(mktemp -d)"
-    chown $SUDO_USER:$SUDO_USER "$builddir"
+    chown $SUDO_USER: "$builddir"
 
     # Ensure sources are downloaded
     if [[ -n $SUDO_USER ]]; then
