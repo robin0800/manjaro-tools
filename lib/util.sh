@@ -311,6 +311,8 @@ init_buildiso(){
 
     [[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
+    [[ -z ${iso_compression} ]] && iso_compression='xz'
+
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
 
     [[ -z ${kernel} ]] && kernel="linux414"
