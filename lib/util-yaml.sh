@@ -56,7 +56,10 @@ write_bootloader_conf(){
     echo 'grubInstall: "grub-install"' >> "$conf"
     echo 'grubMkconfig: "grub-mkconfig"' >> "$conf"
     echo 'grubCfg: "/boot/grub/grub.cfg"' >> "$conf"
+    echo 'grubProbe: "grub-probe"' >> "$conf"
+    echo 'efiBootMgr: "efibootmgr"' >> "$conf"
     echo '#efiBootloaderId: "dirname"' >> "$conf"
+    echo 'installEFIFallback: true' >> "$conf"
 }
 
 write_servicescfg_conf(){
