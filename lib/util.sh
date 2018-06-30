@@ -311,6 +311,8 @@ init_buildiso(){
 
     [[ -z ${dist_branding} ]] && dist_branding="MJRO"
 
+    [[ -z ${iso_compression} ]] && iso_compression='xz'
+
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
 
     [[ -z ${kernel} ]] && kernel="linux414"
@@ -384,7 +386,7 @@ load_profile_config(){
     [[ -z ${login_shell} ]] && login_shell='/bin/bash'
 
     if [[ -z ${addgroups} ]]; then
-        addgroups="audio,disk,lp,network,optical,power,scanner,storage,video,wheel"
+        addgroups="lp,network,power,wheel"
     fi
 
     if [[ -z ${enable_systemd[@]} ]]; then
