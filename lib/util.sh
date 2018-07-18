@@ -568,7 +568,8 @@ load_pkgs(){
             fi
         ;;
     esac
-
+    
+# We can reuse this code
     local _edition _edition_rm
     case "${edition}" in
         'sonar')
