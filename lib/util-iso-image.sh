@@ -188,9 +188,9 @@ configure_thus(){
     echo "INITRAMFS = \"$(echo ${default_image} | sed s'|/boot/||')\"" >> "$conf"
     echo "FALLBACK = \"$(echo ${fallback_image} | sed s'|/boot/||')\"" >> "$conf"
 
-    if [[ -f $1/usr/share/applications/thus.desktop && -f $1/usr/bin/kdesu ]]; then
-        sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
-    fi
+#    if [[ -f $1/usr/share/applications/thus.desktop && -f $1/usr/bin/kdesu ]]; then
+#        sed -i -e 's|sudo|kdesu|g' $1/usr/share/applications/thus.desktop
+#    fi
 }
 
 configure_live_image(){
@@ -199,7 +199,7 @@ configure_live_image(){
     configure_system "$1"
     configure_services "$1"
     configure_calamares "$1"
-    [[ ${edition} == "sonar" ]] && configure_thus "$1"
+#    [[ ${edition} == "sonar" ]] && configure_thus "$1"
     write_live_session_conf "$1"
     msg "Done configuring [livefs]"
 }
