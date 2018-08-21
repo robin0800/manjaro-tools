@@ -74,11 +74,13 @@ torrent=false
 update=false
 verbose=false
 sign=false
+alt_storage=false
 
 rsync_args=(-aP -e ssh)
 
 usage() {
     echo "Usage: ${0##*/} [options]"
+    echo '    -a                 Use alternate storage server'
     echo '    -d                 Use hidden remote directory'
     echo '    -h                 This help'
     echo "    -l                 Limit bandwidth in kB/s [default: ${limit}]"
@@ -93,10 +95,11 @@ usage() {
     exit $1
 }
 
-opts='dhl:p:qstuv'
+opts='adhl:p:qstuv'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
+        a) alt_storage=true ;;
         d) hidden=true ;;
         l) limit="$OPTARG"; rsync_args+=(--bwlimit=${limit}) ;;
         p) build_list_iso="$OPTARG" ;;
