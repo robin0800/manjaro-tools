@@ -38,7 +38,7 @@
 # disable_systemd=('pacman-init')
 
 # unset defaults to given values
-# addgroups="lp,network,power,wheel"
+# addgroups="lp,network,power,sys, wheel"
 
 # the same workgroup name if samba is used
 # smb_workgroup="Manjaro"
