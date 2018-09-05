@@ -71,8 +71,6 @@ load_user_info
 load_config "${USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}/manjaro-tools.conf"
 load_vars "$USER_HOME/.makepkg.conf" || load_vars /etc/makepkg.conf
 
-install_pkgs=()
-
 clean_first=false
 wipe_clean=false
 namcap=false
@@ -109,7 +107,7 @@ while getopts "${opts}" arg; do
         a) target_arch="$OPTARG" ;;
         b) target_branch="$OPTARG" ;;
         c) clean_first=true ;;
-        i) install_pkgs+=("$OPTARG"); mkchrootpkg_args+=(-I "$OPTARG") ;;
+        i) mkchrootpkg_args+=(-I "$OPTARG") ;;
         n) namcap=true; mkchrootpkg_args+=(-n) ;;
         p) build_list_pkg="${OPTARG%/}" ;;
         q) pretend=true ;;
