@@ -249,11 +249,9 @@ make_image_root() {
 
         chroot_create "${path}" "${packages}" || die
 
-        # if profile has 'multilib="false"' 
-        # work around mhwd install error when multilib files are not present
-        # create an empty file which presence is checked by mhwd
-        if [[ ${multilib} == "false" ]]; then
-            touch "${path}/etc/mhwd-x86_64.conf"
+        # profide multilib usage to mhwd-script
+        if [[ ! -z ${multilib} ]]; then
+            echo 'MHWD64_IS_LIB32="'${multilib}'"' > "${path}/etc/mhwd-x86_64.conf"
         fi
 
         pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
