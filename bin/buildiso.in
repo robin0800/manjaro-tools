@@ -9,7 +9,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-version=0.15.9
+version=@version@
 
 LIBDIR='@libdir@'
 DATADIR='@datadir@'
