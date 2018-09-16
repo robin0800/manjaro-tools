@@ -11,9 +11,9 @@
 
 version=0.15.9
 
-LIBDIR='/usr/lib/manjaro-tools'
-DATADIR='/usr/share/manjaro-tools'
-SYSCONFDIR='/etc/manjaro-tools'
+LIBDIR='@libdir@'
+DATADIR='@datadir@'
+SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
 import ${LIBDIR}/util.sh
