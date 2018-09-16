@@ -316,6 +316,8 @@ init_buildiso(){
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
 
     [[ -z ${kernel} ]] && kernel="linux414"
+    
+    [[ -z ${branch} ]] && branch="v17.1" #current branch release
 
     [[ -z ${gpgkey} ]] && gpgkey=''
 
@@ -386,7 +388,7 @@ load_profile_config(){
     [[ -z ${login_shell} ]] && login_shell='/bin/bash'
 
     if [[ -z ${addgroups} ]]; then
-        addgroups="audio,disk,lp,network,optical,power,scanner,storage,video,wheel"
+        addgroups="lp,network,power,sys,wheel"
     fi
 
     if [[ -z ${enable_systemd[@]} ]]; then
@@ -764,3 +766,20 @@ create_chksums() {
     sha1sum $1 > $1.sha1
     sha256sum $1 > $1.sha256
 }
+
+init_profiles() {	
+	_workdir='/usr/share/manjaro-tools'
+	if [[ -d ${_workdir}/iso-profiles ]]; then
+		rm -Rf ${_workdir}/iso-profiles ]]
+	fi
+	git clone -q --depth 1 -b ${branch} https://gitlab.manjaro.org/profiles-and-settings/iso-profiles.git ${_workdir}/iso-profiles/
+	
+	for i in ${_workdir}/iso-profiles/.gitignore ${_workdir}/iso-profiles/README.md; do
+		rm -f $i
+	done
+		
+	for i in ${_workdir}/iso-profiles/.git ${_workdir}/iso-profiles/sonar; do
+		rm -Rf $i
+	done
+}
+

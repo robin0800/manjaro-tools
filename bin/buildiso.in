@@ -9,14 +9,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-version=@version@
+version=0.15.9
 
-LIBDIR='@libdir@'
-DATADIR='@datadir@'
-SYSCONFDIR='@sysconfdir@'
+LIBDIR='/usr/lib/manjaro-tools'
+DATADIR='/usr/share/manjaro-tools'
+SYSCONFDIR='/etc/manjaro-tools'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
-
 import ${LIBDIR}/util.sh
 
 show_profile(){
@@ -56,6 +55,7 @@ display_settings(){
     show_config
 
     msg "PROFILE:"
+    msg2 "gitlab brach: %s" "${branch}"
     msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
     msg2 "build_list_iso: %s" "${build_list_iso}"
     msg2 "is_build_list: %s" "${is_build_list}"
@@ -88,6 +88,8 @@ display_settings(){
 load_user_info
 
 load_config "${USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}/manjaro-tools.conf"
+
+init_profiles 
 
 # to force old way to have buildiso run in iso-profiles dir
 # run_dir=$(pwd)
