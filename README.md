@@ -88,6 +88,9 @@ overriding
 
 ################ buildiso ################
 
+#default branch for iso-profiles repo: v17.1>current release | master>development release
+# branch=v17.1
+
 # default iso build list; name without .list extension
 # build_list_iso=default
 
@@ -197,6 +200,7 @@ buildiso is used to build manjaro-iso-profiles. It is run insde the profiles fol
 ~~~
 $ buildiso -h
 Usage: buildiso [options]
+    -0                 Initialize iso-profiles repo [default: v17.1]"
     -a <arch>          Arch [default: auto]
     -b <branch>        Branch [default: stable]
     -c                 Disable clean work dir
@@ -220,6 +224,14 @@ Usage: buildiso [options]
 ~~~
 
 ###### * build xfce iso profile for both arches and branch testing on x86_64 build system
+
+* Remember: if you run buildiso for the first time you need to do:
+
+~~~
+buildiso -0
+~~~
+
+for download in /usr/share/manjaro-tools/iso-profiles our manjaro profiles. You can override in manjaro-tools.conf what branch use with buildiso: v17.1 or master ( development profiles ). The previous command can be used to refresh the profiles as needed in your local.
 
 * i686 (buildsystem is x86_64)
 

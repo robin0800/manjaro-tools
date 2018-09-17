@@ -89,8 +89,6 @@ load_user_info
 
 load_config "${USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
-init_profiles 
-
 # to force old way to have buildiso run in iso-profiles dir
 # run_dir=$(pwd)
 
@@ -102,9 +100,11 @@ images_only=false
 iso_only=false
 verbose=false
 persist=false
+initialize=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
+    echo "    -0                 Initialize iso-profiles repo [default: ${branch}]"
     echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
     echo "    -a <arch>          Arch [default: ${target_arch}]"
     echo "    -b <branch>        Branch [default: ${target_branch}]"
@@ -134,10 +134,11 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:g:d:cfzxmvqh'
+opts='p:a:b:r:t:k:i:g:d:cfzxmvqh0'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
+     	0) initialize=true ;;
         a) target_arch="$OPTARG" ;;
         b) target_branch="$OPTARG" ;;
         c) clean_first=false ;;
@@ -159,6 +160,13 @@ while getopts "${opts}" arg; do
 done
 
 shift $(($OPTIND - 1))
+
+if ${initialize}; then
+	msg "Initialize iso profiles ${branch}"
+	init_profiles
+	msg2 "Done: iso profiles are stored in /usr/share/manjaro-tools/iso-profiles"
+	exit 1
+fi
 
 timer_start=$(get_timer)
 
