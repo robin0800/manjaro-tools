@@ -200,7 +200,7 @@ buildiso is used to build manjaro-iso-profiles. It is run insde the profiles fol
 ~~~
 $ buildiso -h
 Usage: buildiso [options]
-    -0                 Initialize iso-profiles repo [default: v17.1]"
+    -I                 Initialize iso-profiles repo [default: v17.1]"
     -a <arch>          Arch [default: auto]
     -b <branch>        Branch [default: stable]
     -c                 Disable clean work dir
@@ -228,7 +228,7 @@ Usage: buildiso [options]
 * Remember: if you run buildiso for the first time you need to do:
 
 ~~~
-buildiso -0
+buildiso -I
 ~~~
 
 for download in /usr/share/manjaro-tools/iso-profiles our manjaro profiles. You can override in manjaro-tools.conf what branch use with buildiso: v17.1 or master ( development profiles ). The previous command can be used to refresh the profiles as needed in your local.

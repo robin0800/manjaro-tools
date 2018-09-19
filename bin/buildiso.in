@@ -104,7 +104,7 @@ initialize=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo "    -0                 Initialize iso-profiles repo [default: ${branch}]"
+    echo "    -I                 Initialize iso-profiles repo [default: ${branch}]"
     echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
     echo "    -a <arch>          Arch [default: ${target_arch}]"
     echo "    -b <branch>        Branch [default: ${target_branch}]"
@@ -134,11 +134,11 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:g:d:cfzxmvqh0'
+opts='p:a:b:r:t:k:i:g:d:cfzxmvqhI'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
-     	0) initialize=true ;;
+     	I) initialize=true ;;
         a) target_arch="$OPTARG" ;;
         b) target_branch="$OPTARG" ;;
         c) clean_first=false ;;
