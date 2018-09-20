@@ -774,12 +774,18 @@ init_profiles() {
 	fi
 	git clone -q --depth 1 -b ${branch} https://gitlab.manjaro.org/profiles-and-settings/iso-profiles.git ${_workdir}/iso-profiles/
 	
-	for i in ${_workdir}/iso-profiles/.gitignore ${_workdir}/iso-profiles/README.md; do
+	#Check if git clone is done
+	if [[ -d ${_workdir}/iso-profiles/manjaro ]] && [[ -d ${_workdir}/iso-profiles/community ]]; then
+	
+		for i in ${_workdir}/iso-profiles/.gitignore ${_workdir}/iso-profiles/README.md; do
 		rm -f $i
-	done
+		done
 		
-	for i in ${_workdir}/iso-profiles/.git ${_workdir}/iso-profiles/sonar; do
-		rm -Rf $i
-	done
+		for i in ${_workdir}/iso-profiles/.git ${_workdir}/iso-profiles/sonar; do
+			rm -Rf $i
+		done
+	else msg2 "Impossible to initialize iso-profiles, please check internet connection or browse at 'https://gitlab.manjaro.org/profiles-and-settings/iso-profiles'"
+	exit 1
+	fi
 }
 
