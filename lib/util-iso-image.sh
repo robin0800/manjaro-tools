@@ -59,11 +59,6 @@ configure_mhwd_drivers(){
         mkdir -p $drv_path/hybrid-intel-nvidia-bumblebee/
         echo "" > $drv_path/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
     fi
-    if  [ -z "$(ls $path | grep nvidia-304xx-utils 2> /dev/null)" ]; then
-        msg2 "Disabling Nvidia 304xx driver"
-        mkdir -p $drv_path/nvidia-304xx/
-        echo "" > $drv_path/nvidia-304xx/MHWDCONFIG
-    fi
     if  [ -z "$(ls $path | grep nvidia-340xx-utils 2> /dev/null)" ]; then
         msg2 "Disabling Nvidia 340xx driver"
         mkdir -p $drv_path/nvidia-340xx/

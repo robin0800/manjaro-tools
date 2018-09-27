@@ -249,6 +249,11 @@ make_image_root() {
 
         chroot_create "${path}" "${packages}" || die
 
+        # profide multilib usage to mhwd-script
+        if [[ ! -z ${multilib} ]]; then
+            echo 'MHWD64_IS_LIB32="'${multilib}'"' > "${path}/etc/mhwd-x86_64.conf"
+        fi
+
         pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${path}"
 

@@ -56,7 +56,7 @@ display_settings(){
     msg2 "account: %s" "${account}"
     msg2 "host: %s" "${host}"
     msg2 "alt_storage: %s" "${alt_storage}"
-    msg2 "ssh_agentt: %s" "${ssh_agent}"
+    msg2 "ssh_agent: %s" "${ssh_agent}"
 
     msg "UPLOAD QUEUE:"
     run show_profile "${build_list_iso}"

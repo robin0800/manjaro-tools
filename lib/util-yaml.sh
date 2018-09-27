@@ -56,7 +56,10 @@ write_bootloader_conf(){
     echo 'grubInstall: "grub-install"' >> "$conf"
     echo 'grubMkconfig: "grub-mkconfig"' >> "$conf"
     echo 'grubCfg: "/boot/grub/grub.cfg"' >> "$conf"
+    echo 'grubProbe: "grub-probe"' >> "$conf"
+    echo 'efiBootMgr: "efibootmgr"' >> "$conf"
     echo '#efiBootloaderId: "dirname"' >> "$conf"
+    echo 'installEFIFallback: true' >> "$conf"
 }
 
 write_servicescfg_conf(){
@@ -145,6 +148,9 @@ write_users_conf(){
     echo "doReusePassword: false" >> "$conf" # only used in old 'users' module
     echo "availableShells: /bin/bash, /bin/zsh" >> "$conf" # only used in new 'users' module
     echo "avatarFilePath:  ~/.face" >> "$conf" # mostly used file-name for avatar
+    if [[ -n "$user_shell" ]]; then
+        echo "userShell:       $user_shell" >> "$conf"
+    fi    
 }
 
 write_packages_conf(){
