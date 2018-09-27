@@ -317,6 +317,15 @@ init_buildiso(){
 
     [[ -z ${kernel} ]] && kernel="linux414"
     
+    load_run_dir "${profile_repo}"
+    
+    if [[ -d ${run_dir}/.git ]]; then
+    	cd ${run_dir}
+    	branch=$(git rev-parse --abbrev-ref HEAD)
+    else
+    	[[ -z ${branch} ]] && branch="v17.1" #current branch release
+    fi
+  
     [[ -z ${branch} ]] && branch="v17.1" #current branch release
 
     [[ -z ${gpgkey} ]] && gpgkey=''
