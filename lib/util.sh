@@ -320,13 +320,13 @@ init_buildiso(){
     load_run_dir "${profile_repo}"
     
     if [[ -d ${run_dir}/.git ]]; then
+    	current_path=$(pwd)
     	cd ${run_dir}
     	branch=$(git rev-parse --abbrev-ref HEAD)
+    	cd ${current_path}
     else
     	[[ -z ${branch} ]] && branch="v17.1" #current branch release
     fi
-  
-    [[ -z ${branch} ]] && branch="v17.1" #current branch release
 
     [[ -z ${gpgkey} ]] && gpgkey=''
 
