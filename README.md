@@ -56,7 +56,7 @@ overriding
 # default target branch
 # target_branch=stable
 
-# default taget arch: auto detect
+# default target arch: auto detect
 # target_arch=$(uname -m)
 
 # cache dir where buildpkg, buildtree cache packages/pkgbuild, builiso iso files
