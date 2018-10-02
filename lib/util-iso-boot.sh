@@ -87,6 +87,9 @@ prepare_grub(){
     cp ${data}/unicode.pf2 ${grub}
     cp -r ${data_live}/{locales,tz} ${grub}
 
+    msg2 "Set menu_show_once=1 in '${grub}/grubenv'"
+    grub-editenv ${grub}/grubenv set menu_show_once=1
+
     local size=4M mnt="${mnt_dir}/efiboot" efi_img="$2/efi.img"
     msg2 "Creating fat image of %s ..." "${size}"
     truncate -s ${size} "${efi_img}"
