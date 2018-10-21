@@ -257,8 +257,8 @@ write_locale_conf(){
     echo "---" > "$conf"
     echo "localeGenPath: /etc/locale.gen" >> "$conf"
     if ${geoip}; then
-        echo "geoipUrl: http://ip-api.com" >> "$conf"
-        echo "geoipStyle: legacy" >> "$conf"
+        echo "geoipUrl: https://geoip.kde.org/v1/calamares" >> "$conf"
+        echo "geoipStyle: json" >> "$conf"
     else
         echo "region: America" >> "$conf"
         echo "zone: New_York" >> "$conf"
