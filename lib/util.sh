@@ -315,7 +315,7 @@ init_buildiso(){
 
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
 
-    [[ -z ${kernel} ]] && kernel="linux414"
+    [[ -z ${kernel} ]] && kernel="linux419"
     
     load_run_dir "${profile_repo}"
     
@@ -325,7 +325,7 @@ init_buildiso(){
     	branch=$(git rev-parse --abbrev-ref HEAD)
     	cd ${current_path}
     else
-    	[[ -z ${branch} ]] && branch="v17.1" #current branch release
+    	[[ -z ${branch} ]] && branch="master" #current branch release
     fi
 
     [[ -z ${gpgkey} ]] && gpgkey=''
