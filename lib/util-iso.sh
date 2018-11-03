@@ -178,6 +178,7 @@ assemble_iso(){
         --sort-weight 0 / \
         --sort-weight 1 /boot \
         --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
+        -iso_mbr_part_type 0x00 \
         -partition_offset 16 \
         -b boot/grub/i386-pc/eltorito.img \
         -c boot.catalog \
@@ -189,9 +190,6 @@ assemble_iso(){
         -iso-level 3 \
         -o ${iso_dir}/${iso_file} \
         ${iso_root}/
-
-#         arg to add with xorriso-1.4.7
-#         -iso_mbr_part_type 0x00
 }
 
 # Build ISO
