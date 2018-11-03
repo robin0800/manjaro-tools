@@ -37,7 +37,9 @@ prepare_initramfs(){
 }
 
 prepare_boot_extras(){
+    cp $1/boot/amd-ucode.img $2/amd_ucode.img
     cp $1/boot/intel-ucode.img $2/intel_ucode.img
+    cp $1/usr/share/licenses/amd-ucode/LICENSE $2/amd_ucode.LICENSE
     cp $1/usr/share/licenses/intel-ucode/LICENSE $2/intel_ucode.LICENSE
     cp $1/boot/memtest86+/memtest.bin $2/memtest
     cp $1/usr/share/licenses/common/GPL2/license.txt $2/memtest.COPYING
@@ -84,6 +86,9 @@ prepare_grub(){
     cp -r ${data_live}/themes/${iso_name}-live ${grub}/themes/
     cp ${data}/unicode.pf2 ${grub}
     cp -r ${data_live}/{locales,tz} ${grub}
+
+    msg2 "Set menu_show_once=1 in '${grub}/grubenv'"
+    grub-editenv ${grub}/grubenv set menu_show_once=1
 
     local size=4M mnt="${mnt_dir}/efiboot" efi_img="$2/efi.img"
     msg2 "Creating fat image of %s ..." "${size}"
