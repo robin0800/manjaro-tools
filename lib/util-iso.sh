@@ -187,6 +187,7 @@ assemble_iso(){
         -append_partition 2 0xef ${iso_root}/efi.img \
         -e --interval:appended_partition_2:all:: \
         -no-emul-boot \
+        -full-iso9660-filenames \
         -iso-level 3 \
         -o ${iso_dir}/${iso_file} \
         ${iso_root}/
