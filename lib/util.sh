@@ -325,7 +325,7 @@ init_buildiso(){
     	branch=$(git rev-parse --abbrev-ref HEAD)
     	cd ${current_path}
     else
-    	[[ -z ${branch} ]] && branch="master" #current branch release
+    	[[ -z ${branch} ]] && branch="v18.0" #current branch release
     fi
 
     [[ -z ${gpgkey} ]] && gpgkey=''
