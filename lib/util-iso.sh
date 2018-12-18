@@ -260,6 +260,8 @@ make_image_root() {
 
         configure_lsb "${path}"
 
+        configure_branding "${path}"
+
         clean_up_image "${path}"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [Base installation] (rootfs)"
