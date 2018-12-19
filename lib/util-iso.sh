@@ -312,6 +312,7 @@ make_image_live() {
         configure_live_image "${path}"
 
         configure_branding "${path}"
+        msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
 
         reset_pac_conf "${path}"
 
