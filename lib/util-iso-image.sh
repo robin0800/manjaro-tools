@@ -96,18 +96,17 @@ configure_lsb(){
 }
 
 configure_branding(){
-    if [ -e $1/usr/share/calamares/branding/manjaro/branding.desc ] ; then
-        msg2 "Configuring branding"
-        echo "---
+    msg2 "Configuring branding"
+    echo "---
 componentName:  manjaro
 
 strings:
     productName:         Manjaro Linux
     shortProductName:    Manjaro
-    version:             $dist_release
-    shortVersion:        $dist_release
-    versionedName:       Manjaro Linux $dist_release "$dist_codename"
-    shortVersionedName:  Manjaro $dist_release
+    version:             ${dist_release}
+    shortVersion:        ${dist_release}
+    versionedName:       Manjaro Linux ${dist_release} "${dist_codename}"
+    shortVersionedName:  Manjaro ${dist_release}
     bootloaderEntryName: Manjaro
 
 images:
@@ -123,7 +122,6 @@ style:
    sidebarTextSelect:    "#9E4F5D"
 
 " > $1/usr/share/calamares/branding/manjaro/branding.desc
-    fi
 }
 
 configure_logind(){

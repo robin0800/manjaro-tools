@@ -260,8 +260,6 @@ make_image_root() {
 
         configure_lsb "${path}"
 
-        configure_branding "${path}"
-
         clean_up_image "${path}"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [Base installation] (rootfs)"
@@ -312,6 +310,8 @@ make_image_live() {
         pacman -Qr "${path}" > "${path}/livefs-pkgs.txt"
         copy_overlay "${profile_dir}/live-overlay" "${path}"
         configure_live_image "${path}"
+
+        configure_branding "${path}"
 
         reset_pac_conf "${path}"
 
