@@ -178,6 +178,7 @@ assemble_iso(){
         --sort-weight 0 / \
         --sort-weight 1 /boot \
         --grub2-mbr ${iso_root}/boot/grub/i386-pc/boot_hybrid.img \
+        -iso_mbr_part_type 0x00 \
         -partition_offset 16 \
         -b boot/grub/i386-pc/eltorito.img \
         -c boot.catalog \
@@ -186,12 +187,10 @@ assemble_iso(){
         -append_partition 2 0xef ${iso_root}/efi.img \
         -e --interval:appended_partition_2:all:: \
         -no-emul-boot \
+        -full-iso9660-filenames \
         -iso-level 3 \
         -o ${iso_dir}/${iso_file} \
         ${iso_root}/
-
-#         arg to add with xorriso-1.4.7
-#         -iso_mbr_part_type 0x00
 }
 
 # Build ISO
@@ -248,6 +247,11 @@ make_image_root() {
         mkdir -p ${path}
 
         chroot_create "${path}" "${packages}" || die
+
+        # profide multilib usage to mhwd-script
+        if [[ ! -z ${multilib} ]]; then
+            echo 'MHWD64_IS_LIB32="'${multilib}'"' > "${path}/etc/mhwd-x86_64.conf"
+        fi
 
         pacman -Qr "${path}" > "${path}/rootfs-pkgs.txt"
         copy_overlay "${profile_dir}/root-overlay" "${path}"

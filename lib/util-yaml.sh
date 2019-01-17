@@ -257,8 +257,9 @@ write_locale_conf(){
     echo "---" > "$conf"
     echo "localeGenPath: /etc/locale.gen" >> "$conf"
     if ${geoip}; then
-        echo "geoipUrl: https://geoip.tools/v1" >> "$conf"
-        echo "geoipStyle: legacy" >> "$conf"
+        echo "geoipUrl: https://get.geojs.io/v1/ip/geo.json" >> "$conf"
+        echo "geoipStyle: json" >> "$conf"
+        echo "geoipSelector: timezone" >> "$conf"
     else
         echo "region: America" >> "$conf"
         echo "zone: New_York" >> "$conf"
