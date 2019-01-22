@@ -333,6 +333,26 @@ init_buildiso(){
     mhwd_repo="/opt/pkg"
 }
 
+init_calamares(){
+	
+	[[ -z ${welcomestyle} ]] && welcomestyle=false
+	
+	[[ -z ${welcomelogo} ]] && welcomelogo=true
+	
+	[[ -z ${windowexp} ]] && windowexp=noexpand
+	
+	[[ -z ${windowsize} ]] && windowsize="800px,520px"
+	
+	[[ -z ${sidebarbackground} ]] && sidebarbackground=#454948
+	
+	[[ -z ${sidebartext} ]] &&  sidebartext=#efefef
+	
+	[[ -z ${sidebartextselect} ]] && sidebartextselect=#4d915e
+	
+	[[ -z ${sidebartexthighlight} ]] && sidebartexthighlight=#1a1c1b
+}
+	
+
 init_deployiso(){
 
     host="osdn.net"
@@ -364,6 +384,8 @@ load_config(){
 
     init_buildiso
 
+	init_calamares	
+	
     init_deployiso
 
     return 0

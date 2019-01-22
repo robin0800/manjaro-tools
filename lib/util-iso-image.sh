@@ -96,32 +96,9 @@ configure_lsb(){
 }
 
 configure_branding(){
+
     msg2 "Configuring branding"
-    echo "---
-componentName:  manjaro
-
-strings:
-    productName:         Manjaro Linux
-    shortProductName:    Manjaro
-    version:             ${dist_release}
-    shortVersion:        ${dist_release}
-    versionedName:       Manjaro Linux ${dist_release} "${dist_codename}"
-    shortVersionedName:  Manjaro ${dist_release}
-    bootloaderEntryName: Manjaro
-
-images:
-    productLogo:         "logo.png"
-    productIcon:         "logo.png"
-    productWelcome:      "languages.png"
-
-slideshow:               "show.qml"
-
-style:
-   sidebarBackground:    "#454948"
-   sidebarText:          "#efefef"
-   sidebarTextSelect:    "#9E4F5D"
-
-" > $1/usr/share/calamares/branding/manjaro/branding.desc
+	cat /etc/manjaro-tools/branding.desc.d > $1/usr/share/calamares/branding/manjaro/branding.desc
 }
 
 configure_logind(){
