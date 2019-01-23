@@ -9,6 +9,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
+source /etc/manjaro-tools/branding.desc.d
+
 copy_overlay(){
     if [[ -e $1 ]]; then
         msg2 "Copying [%s] ..." "${1##*/}"
