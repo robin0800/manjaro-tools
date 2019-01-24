@@ -106,6 +106,36 @@ overriding
 # gpg key; leave empty or commented to skip sfs signing
 # gpgkey=""
 
+########## calamares preferences ##########
+#See branding.desc.d for reference
+
+# welcome style for calamares: true="Welcome to the %1 installer." ; false="Welcome to the Calamares installer for %1." (default)
+# welcomestyle=false
+
+# welcome image scaled (productWelcome) 
+# welcomelogo=true
+
+# size and expansion policy for Calamares (possible value: normal,fullscreen,noexpand)
+# windowexp=noexpand
+
+# size of Calamares window, expressed as w,h. 
+# (possible units: pixel (px) or font-units (em))
+# windowsize="800px,520px"
+
+# colors for text and background components:
+
+# background of the sidebar
+# sidebarbackground=#454948
+
+# text color
+# sidebartext=#efefef
+
+# background of the selected step
+# sidebartextselect=#4d915e
+
+# text color of the selected step
+# sidebartexthighlight=#1a1c1b
+
 ################ deployiso ################
 
 # the server user
