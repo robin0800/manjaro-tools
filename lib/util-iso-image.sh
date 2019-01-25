@@ -180,7 +180,7 @@ slideshow:               "show.qml"
 #  - sidebarSelect is the text color of the selected step.
 #
 style:
-   sidebarBackground:    "${sidebarckground}"
+   sidebarBackground:    "${sidebarbackground}"
    sidebarText:          "${sidebartext}"
    sidebarTextSelect:    "${sidebartextselect}"
    sidebarTextHighlight: "${sidebartexthighlight}"" > $1/usr/share/calamares/branding/manjaro/branding.desc
