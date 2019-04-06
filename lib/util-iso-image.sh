@@ -101,8 +101,8 @@ configure_branding(){
 componentName:  manjaro
 
 # This selects between different welcome texts. When false, uses
-# the traditional "Welcome to the %1 installer.", and when true,
-# uses "Welcome to the Calamares installer for %1.". This allows
+# the traditional 'Welcome to the %1 installer.', and when true,
+# uses 'Welcome to the Calamares installer for %1.'. This allows
 # to distinguish this installer from other installers for the
 # same distribution.
 welcomeStyleCalamares:   ${welcomestyle}
@@ -144,7 +144,7 @@ strings:
     shortProductName:    ${dist_name}
     version:             ${dist_release}
     shortVersion:        ${dist_release}
-    versionedName:       ${dist_name} Linux ${dist_release} "${dist_codename}"
+    versionedName:       ${dist_name} Linux ${dist_release} "\"${dist_codename}"\"
     shortVersionedName:  ${dist_name} ${dist_release}
     bootloaderEntryName: ${dist_name}
 
@@ -180,10 +180,10 @@ slideshow:               "show.qml"
 #  - sidebarSelect is the text color of the selected step.
 #
 style:
-   sidebarBackground:    "${sidebarbackground}"
-   sidebarText:          "${sidebartext}"
-   sidebarTextSelect:    "${sidebartextselect}"
-   sidebarTextHighlight: "${sidebartexthighlight}"" > $1/usr/share/calamares/branding/manjaro/branding.desc
+   sidebarBackground:    "\"${sidebarbackground}"\"
+   sidebarText:          "\"${sidebartext}"\"
+   sidebarTextSelect:    "\"${sidebartextselect}"\"
+   sidebarTextHighlight: "\"${sidebartexthighlight}"\"" > $1/usr/share/calamares/branding/manjaro/branding.desc
 }
 
 configure_logind(){
