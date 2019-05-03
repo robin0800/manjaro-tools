@@ -47,7 +47,7 @@ prepare_boot_extras(){
 
 prepare_grub(){
     local platform=i386-pc img='core.img' grub=$2/boot/grub efi=$2/efi/boot \
-        data_live=$1/usr/share/grub lib=usr/lib/grub prefix=/boot/grub data=/usr/share/grub \
+        data_live=$1/usr/share/grub lib=usr/lib/grub prefix=(hd0)/boot/grub data=/usr/share/grub \
         path="${work_dir}/rootfs"
 
     prepare_dir ${grub}/${platform}
