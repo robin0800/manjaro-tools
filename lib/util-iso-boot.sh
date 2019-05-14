@@ -58,7 +58,7 @@ prepare_grub(){
 
     msg2 "Building %s ..." "${img}"
 
-    grub-mkimage -d ${grub}/${platform} -o ${grub}/${platform}/${img} -O ${platform} -p ${prefix} biosdisk iso9660
+    grub-mkimage -d ${grub}/${platform} -o ${grub}/${platform}/${img} -O ${platform} -p ${prefix} biosdisk iso9660 part_msdos part_gpt fat ntfs
 
     cat ${grub}/${platform}/cdboot.img ${grub}/${platform}/${img} > ${grub}/${platform}/eltorito.img
 
@@ -80,7 +80,7 @@ prepare_grub(){
 
     msg2 "Building %s ..." "${img}"
 
-    grub-mkimage -d ${grub}/${platform} -o ${efi}/${img} -O ${platform} -p ${prefix} iso9660
+    grub-mkimage -d ${grub}/${platform} -o ${efi}/${img} -O ${platform} -p ${prefix} iso9660 part_msdos part_gpt fat ntfs
 
     prepare_dir ${grub}/themes
     cp -r ${data_live}/themes/${iso_name}-live ${grub}/themes/
@@ -98,6 +98,6 @@ prepare_grub(){
     mount_img "${efi_img}" "${mnt}"
     prepare_dir ${mnt}/efi/boot
     msg2 "Building %s ..." "${img}"
-    grub-mkimage -d ${grub}/${platform} -o ${mnt}/efi/boot/${img} -O ${platform} -p ${prefix} iso9660
+    grub-mkimage -d ${grub}/${platform} -o ${mnt}/efi/boot/${img} -O ${platform} -p ${prefix} iso9660 part_msdos part_gpt fat ntfs
     umount_img "${mnt}"
 }
