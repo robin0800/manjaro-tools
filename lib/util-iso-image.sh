@@ -85,6 +85,22 @@ configure_mhwd_drivers(){
         mkdir -p $drv_path/virtualbox/
         echo "" > $drv_path/virtualbox/MHWDCONFIG
     fi
+    local drv_path=$1/var/lib/mhwd/db/pci/network_drivers
+    if  [ -z "$(ls $path | grep broadcom-wl 2> /dev/null)" ]; then
+        msg2 "Disabling broadcom-wl driver"
+        mkdir -p $drv_path/broadcom-wl/
+        echo "" > $drv_path/broadcom-wl/MHWDCONFIG
+    fi
+    if  [ -z "$(ls $path | grep rt3562sta 2> /dev/null)" ]; then
+        msg2 "Disabling rt3562sta driver"
+        mkdir -p $drv_path/rt3562sta/
+        echo "" > $drv_path/rt3562sta/MHWDCONFIG
+    fi
+    if  [ -z "$(ls $path | grep r8168 2> /dev/null)" ]; then
+        msg2 "Disabling r8168 driver"
+        mkdir -p $drv_path/r8168/
+        echo "" > $drv_path/r8168/MHWDCONFIG
+    fi
 }
 
 configure_lsb(){
