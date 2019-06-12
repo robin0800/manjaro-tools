@@ -341,6 +341,8 @@ make_image_desktop() {
 
         reset_pac_conf "${path}"
 
+        seed_snaps
+
         umount_fs
         clean_up_image "${path}"
         : > ${work_dir}/build.${FUNCNAME}
