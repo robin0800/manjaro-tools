@@ -14,6 +14,13 @@
 # supported; lightdm, sddm, gdm, lxdm, mdm
 # displaymanager="none"
 
+# add strict snaps: strict_snaps="core18 snap-store"
+# strict_snaps=""
+# add classic snaps: classic_snaps="code"
+# classic_snaps=""
+# choose the snap channel. Possible options are: stable, candidate, beta, edge
+# snap_channel="stable"
+
 # Set to false to disable autologin in the livecd
 # autologin="true"
 
