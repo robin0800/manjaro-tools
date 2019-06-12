@@ -88,6 +88,9 @@ overriding
 
 ################ buildiso ################
 
+#default branch for iso-profiles repo: v17.1>current release | master>development release
+# branch=v17.1
+
 # default iso build list; name without .list extension
 # build_list_iso=default
 
@@ -102,6 +105,36 @@ overriding
 
 # gpg key; leave empty or commented to skip sfs signing
 # gpgkey=""
+
+########## calamares preferences ##########
+#See branding.desc.d for reference
+
+# welcome style for calamares: true="Welcome to the %1 installer." ; false="Welcome to the Calamares installer for %1." (default)
+# welcomestyle=false
+
+# welcome image scaled (productWelcome) 
+# welcomelogo=true
+
+# size and expansion policy for Calamares (possible value: normal,fullscreen,noexpand)
+# windowexp=noexpand
+
+# size of Calamares window, expressed as w,h. 
+# (possible units: pixel (px) or font-units (em))
+# windowsize="800px,520px"
+
+# colors for text and background components:
+
+# background of the sidebar
+# sidebarbackground=#454948
+
+# text color
+# sidebartext=#efefef
+
+# background of the selected step
+# sidebartextselect=#4d915e
+
+# text color of the selected step
+# sidebartexthighlight=#1a1c1b
 
 ################ deployiso ################
 
@@ -197,6 +230,7 @@ buildiso is used to build manjaro-iso-profiles. It is run insde the profiles fol
 ~~~
 $ buildiso -h
 Usage: buildiso [options]
+    -i                 Initialize iso-profiles repo [default: v17.1]"
     -a <arch>          Arch [default: auto]
     -b <branch>        Branch [default: stable]
     -c                 Disable clean work dir
@@ -220,6 +254,14 @@ Usage: buildiso [options]
 ~~~
 
 ###### * build xfce iso profile for both arches and branch testing on x86_64 build system
+
+* Remember: if you run buildiso for the first time you need to do:
+
+~~~
+buildiso -i
+~~~
+
+for download in /usr/share/manjaro-tools/iso-profiles our manjaro profiles. You can override in manjaro-tools.conf what branch use with buildiso: v17.1 or master ( development profiles ). The previous command can be used to refresh the profiles as needed in your local.
 
 * i686 (buildsystem is x86_64)
 

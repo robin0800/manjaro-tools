@@ -4,7 +4,8 @@ PREFIX = /usr/local
 SYSCONFDIR = /etc
 
 SYSCONF = \
-	data/manjaro-tools.conf
+	data/manjaro-tools.conf \
+	data/branding.desc.d
 
 BIN_BASE = \
 	bin/mkchroot \

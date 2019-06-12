@@ -315,12 +315,43 @@ init_buildiso(){
 
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
 
-    [[ -z ${kernel} ]] && kernel="linux414"
+    [[ -z ${kernel} ]] && kernel="linux419"
+    
+    load_run_dir "${profile_repo}"
+    
+    if [[ -d ${run_dir}/.git ]]; then
+    	current_path=$(pwd)
+    	cd ${run_dir}
+    	branch=$(git rev-parse --abbrev-ref HEAD)
+    	cd ${current_path}
+    else
+    	[[ -z ${branch} ]] && branch="v18.0" #current branch release
+    fi
 
     [[ -z ${gpgkey} ]] && gpgkey=''
 
     mhwd_repo="/opt/pkg"
 }
+
+init_calamares(){
+	
+	[[ -z ${welcomestyle} ]] && welcomestyle=false
+	
+	[[ -z ${welcomelogo} ]] && welcomelogo=true
+	
+	[[ -z ${windowexp} ]] && windowexp=noexpand
+	
+	[[ -z ${windowsize} ]] && windowsize="800px,520px"
+	
+	[[ -z ${sidebarbackground} ]] && sidebarbackground=#454948
+	
+	[[ -z ${sidebartext} ]] &&  sidebartext=#efefef
+	
+	[[ -z ${sidebartextselect} ]] && sidebartextselect=#4d915e
+	
+	[[ -z ${sidebartexthighlight} ]] && sidebartexthighlight=#1a1c1b
+}
+	
 
 init_deployiso(){
 
@@ -353,6 +384,8 @@ load_config(){
 
     init_buildiso
 
+	init_calamares	
+	
     init_deployiso
 
     return 0
@@ -568,7 +601,8 @@ load_pkgs(){
             fi
         ;;
     esac
-
+    
+# We can reuse this code
     local _edition _edition_rm
     case "${edition}" in
         'sonar')
@@ -763,3 +797,26 @@ create_chksums() {
     sha1sum $1 > $1.sha1
     sha256sum $1 > $1.sha256
 }
+
+init_profiles() {	
+	_workdir='/usr/share/manjaro-tools'
+	if [[ -d ${_workdir}/iso-profiles ]]; then
+		rm -Rf ${_workdir}/iso-profiles ]]
+	fi
+	git clone -q --depth 1 -b ${branch} https://gitlab.manjaro.org/profiles-and-settings/iso-profiles.git ${_workdir}/iso-profiles/
+	
+	#Check if git clone is done
+	if [[ -d ${_workdir}/iso-profiles/manjaro ]] && [[ -d ${_workdir}/iso-profiles/community ]]; then
+	
+		for i in ${_workdir}/iso-profiles/.gitignore ${_workdir}/iso-profiles/README.md; do
+		rm -f $i
+		done
+		
+		for i in ${_workdir}/iso-profiles/.git ${_workdir}/iso-profiles/sonar; do
+			rm -Rf $i
+		done
+	else msg2 "Impossible to initialize iso-profiles, please check internet connection or browse at 'https://gitlab.manjaro.org/profiles-and-settings/iso-profiles'"
+	exit 1
+	fi
+}
+

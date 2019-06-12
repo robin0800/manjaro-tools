@@ -16,7 +16,6 @@ DATADIR='@datadir@'
 SYSCONFDIR='@sysconfdir@'
 
 [[ -r ${LIBDIR}/util-msg.sh ]] && source ${LIBDIR}/util-msg.sh
-
 import ${LIBDIR}/util.sh
 
 show_profile(){
@@ -56,6 +55,7 @@ display_settings(){
     show_config
 
     msg "PROFILE:"
+    msg2 "gitlab brach: %s" "${branch}"
     msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
     msg2 "build_list_iso: %s" "${build_list_iso}"
     msg2 "is_build_list: %s" "${is_build_list}"
@@ -100,9 +100,11 @@ images_only=false
 iso_only=false
 verbose=false
 persist=false
+initialize=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
+    echo "    -i                 Initialize iso-profiles repo [default: ${branch}]"
     echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
     echo "    -a <arch>          Arch [default: ${target_arch}]"
     echo "    -b <branch>        Branch [default: ${target_branch}]"
@@ -132,10 +134,11 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:i:g:d:cfzxmvqh'
+opts='p:a:b:r:t:k:g:d:cfzxmvqhi'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
+     	i) initialize=true ;;
         a) target_arch="$OPTARG" ;;
         b) target_branch="$OPTARG" ;;
         c) clean_first=false ;;
@@ -157,6 +160,13 @@ while getopts "${opts}" arg; do
 done
 
 shift $(($OPTIND - 1))
+
+if ${initialize}; then
+	msg "Initialize iso profiles ${branch}"
+	init_profiles
+	msg2 "Done: iso profiles are stored in /usr/share/manjaro-tools/iso-profiles"
+	exit 1
+fi
 
 timer_start=$(get_timer)
 

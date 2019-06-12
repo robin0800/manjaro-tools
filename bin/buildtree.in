@@ -23,7 +23,7 @@ display_settings(){
     show_config
 
     msg "ARGS:"
-    msg2 "sync: %s" "${sync}"
+  # msg2 "sync: %s" "${sync}"
     msg2 "abs: %s" "${abs}"
     msg2 "clean: %s" "${clean}"
 
@@ -38,14 +38,14 @@ load_user_info
 
 load_config "${USERCONFDIR}/manjaro-tools.conf" || load_config "${SYSCONFDIR}/manjaro-tools.conf"
 
-sync=false
+#sync=false
 pretend=false
 abs=false
 clean=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo "    -s            Sync manjaro tree"
+   #echo "    -s            Sync manjaro tree"
     echo "    -a            Sync arch abs"
     echo '    -c            Clean package tree'
     echo '    -q            Query settings'
@@ -57,14 +57,14 @@ usage() {
 
 orig_argv=("$@")
 
-opts='sacqh'
+opts='acqh'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
         a) abs=true ;;
         c) clean=true ;;
         q) pretend=true ;;
-        s) sync=true ;;
+       #s) sync=true ;;
         h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
     esac
@@ -80,6 +80,6 @@ ${pretend} && display_settings && exit 1
 
 ${clean} && clean_dir "${tree_dir}"
 
-${sync} && sync_tree_manjaro
+#${sync} && sync_tree_manjaro
 
 ${abs} && sync_tree_abs

@@ -311,6 +311,9 @@ make_image_live() {
         copy_overlay "${profile_dir}/live-overlay" "${path}"
         configure_live_image "${path}"
 
+        configure_branding "${path}"
+        msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
+
         reset_pac_conf "${path}"
 
         umount_fs
