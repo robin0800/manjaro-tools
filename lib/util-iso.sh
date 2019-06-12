@@ -248,7 +248,6 @@ function seed_snaps() {
     local SEED_SNAPS="${strict_snaps} ${classic_snaps}"
 
     if [[ -n "${strict_snaps}" ]] || [[ -n "${classic_snaps}" ]]; then
-        msg2 "Installing snaps: %s" ${SEED_SNAPS}
         # Preseeded snaps should be downloaded from a versioned channel
         rm -rfv "$1/${SEED_DIR}"
         mkdir -p "$1/${SEED_DIR}/snaps"
@@ -258,8 +257,10 @@ function seed_snaps() {
         # Runs inside the container
         for SEED_SNAP in ${SEED_SNAPS}; do
             if [[ "${SEED_SNAP}" == "core" ]] || [[ "${SEED_SNAP}" == "core16" ]] || [[ "${SEED_SNAP}" == "core18" ]]; then
+                msg2 "Installing snaps: %s" ${SEED_SNAP}
                 chroot-run $1 snap download --channel=stable "${SEED_SNAP}"
             else
+                msg2 "Installing snaps: %s" ${SEED_SNAP}
                 chroot-run $1 snap download --channel="${SEED_CHANNEL}" "${SEED_SNAP}"
             fi
         done
@@ -271,10 +272,10 @@ function seed_snaps() {
 
         # Create model and account assertions
         # Runs inside the container.
-        snap known --remote model series=16 model=generic-classic brand-id=generic > $1/${SEED_DIR}/assertions/generic-classic.model
+        chroot-run $1 snap known --remote model series=16 model=generic-classic brand-id=generic > ${SEED_DIR}/assertions/generic-classic.model
         ACCOUNT_KEY=$(grep "^sign-key-sha3-384" $1/${SEED_DIR}/assertions/generic-classic.model | cut -d':' -f2 | sed 's/ //g')
-        snap known --remote account-key public-key-sha3-384=${ACCOUNT_KEY} > $1/${SEED_DIR}/assertions/generic.account-key
-        snap known --remote account account-id=generic > $1/${SEED_DIR}/assertions/generic.account
+        chroot-run $1 snap known --remote account-key public-key-sha3-384=${ACCOUNT_KEY} > ${SEED_DIR}/assertions/generic.account-key
+        chroot-run $1 snap known --remote account account-id=generic > ${SEED_DIR}/assertions/generic.account
 
         # Create the seed.yaml: the manifest of snaps to install
         # Runs outside the container
@@ -282,13 +283,14 @@ function seed_snaps() {
         for ASSERT_FILE in $1/${SEED_DIR}/assertions/*.assert; do
             SNAP_NAME=$(grep "^snap-name" ${ASSERT_FILE} | cut -d':' -f2 | sed 's/ //g')
             SNAP_REVISION=$(grep "^snap-revision" ${ASSERT_FILE} | cut -d':' -f2 | sed 's/ //g')
-            if [[ "${SNAP_NAME}" == "core" ]] || [[ "${SNAP}" == "core16" ]] || [[ "${SNAP}" == "core18" ]]; then
+            if [[ "${SNAP_NAME}" == "core" ]] || [[ "${SNAP_NAME}" == "core16" ]] || [[ "${SNAP_NAME}" == "core18" ]]; then
                 SNAP_CHANNEL="stable"
             else
                 SNAP_CHANNEL="${SEED_CHANNEL}"
             fi
 
             # Classic snaps require a "classic: true" attribute in the seed file
+            msg2 "debug: name: ${SNAP_NAME} channel: ${SNAP_CHANNEL} file: ${SNAP_NAME}_${SNAP_REVISION}.snap"
             if [[ $CLASSIC_SNAPS =~ $SNAP_NAME ]]; then
                 printf " - name: %s\n   channel: %s\n   classic: true\n   file: %s_%s.snap\n" ${SNAP_NAME} ${SNAP_CHANNEL} ${SNAP_NAME} ${SNAP_REVISION} >> $1/${SEED_DIR}/seed.yaml
             else
