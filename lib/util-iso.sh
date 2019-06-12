@@ -247,7 +247,8 @@ function seed_snaps() {
     local SEED_CHANNEL="${SEED_CHANNEL_ISO}"
     local SEED_SNAPS="${STRICT_SNAPS} ${CLASSIC_SNAPS}"
 
-    if [ -n "${STRICT_SNAPS}" ] || [ -n "${CLASSIC_SNAPS}" ]; then
+    if [[ -n "${STRICT_SNAPS}" ]] || [[ -n "${CLASSIC_SNAPS}" ]]; then
+        msg2 "Installing snaps: %s" ${SEED_SNAPS}
         # Preseeded snaps should be downloaded from a versioned channel
         rm -rfv "$1/${SEED_DIR}"
         mkdir -p "$1/${SEED_DIR}/snaps"
@@ -256,7 +257,7 @@ function seed_snaps() {
         # Download the published snaps and their related assert files
         # Runs inside the container
         for SEED_SNAP in ${SEED_SNAPS}; do
-            if [ "${SEED_SNAP}" == "core" ] || [ "${SEED_SNAP}" == "core16" ] || [ "${SEED_SNAP}" == "core18" ]; then
+            if [[ "${SEED_SNAP}" == "core" ]] || [[ "${SEED_SNAP}" == "core16" ]] || [[ "${SEED_SNAP}" == "core18" ]]; then
                 chroot-run $1 snap download --channel=stable "${SEED_SNAP}"
             else
                 chroot-run $1 snap download --channel="${SEED_CHANNEL}" "${SEED_SNAP}"
@@ -281,7 +282,7 @@ function seed_snaps() {
         for ASSERT_FILE in $1/${SEED_DIR}/assertions/*.assert; do
             SNAP_NAME=$(grep "^snap-name" ${ASSERT_FILE} | cut -d':' -f2 | sed 's/ //g')
             SNAP_REVISION=$(grep "^snap-revision" ${ASSERT_FILE} | cut -d':' -f2 | sed 's/ //g')
-            if [ "${SNAP_NAME}" == "core" ] || [ "${SNAP}" == "core16" ] || [ "${SNAP}" == "core18" ]; then
+            if [[ "${SNAP_NAME}" == "core" ]] || [[ "${SNAP}" == "core16" ]] || [[ "${SNAP}" == "core18" ]]; then
                 SNAP_CHANNEL="stable"
             else
                 SNAP_CHANNEL="${SEED_CHANNEL}"
@@ -297,6 +298,8 @@ function seed_snaps() {
         cat $1/${SEED_DIR}/seed.yaml
 
         snap_boot_args="'apparmor=1' 'security=apparmor'"
+    else
+        msg2 "No snaps found in profile. Skipping adding snaps"
     fi
 }
 
