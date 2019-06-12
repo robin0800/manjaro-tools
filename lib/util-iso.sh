@@ -271,11 +271,11 @@ function seed_snaps() {
         mv -v $1/*.assert $1/${SEED_DIR}/assertions/
 
         # Create model and account assertions
-        # Runs inside the container.
-        chroot-run $1 snap known --remote model series=16 model=generic-classic brand-id=generic > ${SEED_DIR}/assertions/generic-classic.model
+        # Runs outside the container.
+        snap known --remote model series=16 model=generic-classic brand-id=generic > $1/${SEED_DIR}/assertions/generic-classic.model
         ACCOUNT_KEY=$(grep "^sign-key-sha3-384" $1/${SEED_DIR}/assertions/generic-classic.model | cut -d':' -f2 | sed 's/ //g')
-        chroot-run $1 snap known --remote account-key public-key-sha3-384=${ACCOUNT_KEY} > ${SEED_DIR}/assertions/generic.account-key
-        chroot-run $1 snap known --remote account account-id=generic > ${SEED_DIR}/assertions/generic.account
+        snap known --remote account-key public-key-sha3-384=${ACCOUNT_KEY} > $1/${SEED_DIR}/assertions/generic.account-key
+        snap known --remote account account-id=generic > $1/${SEED_DIR}/assertions/generic.account
 
         # Create the seed.yaml: the manifest of snaps to install
         # Runs outside the container
