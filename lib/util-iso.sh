@@ -244,7 +244,7 @@ reset_pac_conf(){
 #  * https://blackboxsw.github.io/seed-snaps-using-maas.html
 function seed_snaps() {
     local SEED_DIR="/var/lib/snapd/seed"
-    local SEED_CHANNEL="${seed_channel}"
+    local SEED_CHANNEL="${snap_channel}"
     local SEED_SNAPS="${strict_snaps} ${classic_snaps}"
 
     if [[ -n "${strict_snaps}" ]] || [[ -n "${classic_snaps}" ]]; then
@@ -257,10 +257,10 @@ function seed_snaps() {
         # Runs inside the container
         for SEED_SNAP in ${SEED_SNAPS}; do
             if [[ "${SEED_SNAP}" == "core" ]] || [[ "${SEED_SNAP}" == "core16" ]] || [[ "${SEED_SNAP}" == "core18" ]]; then
-                msg2 "Installing snaps: %s" ${SEED_SNAP}
+                msg2 "Installing snap: %s" ${SEED_SNAP}
                 chroot-run $1 snap download --channel=stable "${SEED_SNAP}"
             else
-                msg2 "Installing snaps: %s" ${SEED_SNAP}
+                msg2 "Installing snap: %s" ${SEED_SNAP}
                 chroot-run $1 snap download --channel="${SEED_CHANNEL}" "${SEED_SNAP}"
             fi
         done

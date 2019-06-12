@@ -49,6 +49,7 @@ show_profile(){
 
         msg2 "strict_snaps: %s" "${strict_snaps}"
         msg2 "classic_snaps: %s" "${classic_snaps}"
+        msg2 "snap_channels: %s" "${snap_channel}"
     fi
     reset_profile
 }
