@@ -484,6 +484,9 @@ get_project(){
 
 reset_profile(){
     unset displaymanager
+    unset strict_snaps
+    unset classic_snaps
+    unset snap_channel
     unset autologin
     unset multilib
     unset nonfree_mhwd
