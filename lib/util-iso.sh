@@ -295,6 +295,8 @@ function seed_snaps() {
             fi
         done
         cat ${R}/${SEED_DIR}/seed.yaml
+
+        snap_boot_args="'apparmor=1' 'security=apparmor'"
     fi
 }
 
@@ -449,7 +451,7 @@ make_image_boot() {
 
 configure_grub(){
     local default_args="misobasedir=${iso_name} misolabel=${iso_label}" \
-        boot_args=('quiet' 'systemd.show_status=1')
+        boot_args=('quiet' 'systemd.show_status=1' ${snap_boot_args})
 
     sed -e "s|@DIST_NAME@|${dist_name}|g" \
         -e "s|@ARCH@|${target_arch}|g" \
