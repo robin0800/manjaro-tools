@@ -244,10 +244,10 @@ reset_pac_conf(){
 #  * https://blackboxsw.github.io/seed-snaps-using-maas.html
 function seed_snaps() {
     local SEED_DIR="/var/lib/snapd/seed"
-    local SEED_CHANNEL="${SEED_CHANNEL_ISO}"
-    local SEED_SNAPS="${STRICT_SNAPS} ${CLASSIC_SNAPS}"
+    local SEED_CHANNEL="${seed_channel}"
+    local SEED_SNAPS="${strict_snaps} ${classic_snaps}"
 
-    if [[ -n "${STRICT_SNAPS}" ]] || [[ -n "${CLASSIC_SNAPS}" ]]; then
+    if [[ -n "${strict_snaps}" ]] || [[ -n "${classic_snaps}" ]]; then
         msg2 "Installing snaps: %s" ${SEED_SNAPS}
         # Preseeded snaps should be downloaded from a versioned channel
         rm -rfv "$1/${SEED_DIR}"

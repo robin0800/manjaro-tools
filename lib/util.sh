@@ -404,9 +404,9 @@ load_profile_config(){
     [[ -z ${autologin} ]] && autologin="true"
     [[ ${displaymanager} == 'none' ]] && autologin="false"
 
-    [[ -z ${strict_snaps} ]] && STRICT_SNAPS=""
-    [[ -z ${classic_snaps} ]] && CLASSIC_SNAPS=""
-    [[ -z ${snap_channel} ]] && SNAP_CHANNEL_ISO="stable"
+    [[ -z ${strict_snaps} ]] && strict_snaps=""
+    [[ -z ${classic_snaps} ]] && classic-snaps=""
+    [[ -z ${snap_channel} ]] && snap_channel="stable"
 
     [[ -z ${multilib} ]] && multilib="true"
 
