@@ -244,7 +244,7 @@ reset_pac_conf(){
 #  * https://blackboxsw.github.io/seed-snaps-using-maas.html
 function seed_snaps() {
     local SEED_DIR="/var/lib/snapd/seed"
-    local SEED_CHANNEL="${SEED_BRANCH}"
+    local SEED_CHANNEL="${SEED_CHANNEL_ISO}"
     local SEED_SNAPS="${STRICT_SNAPS} ${CLASSIC_SNAPS}"
 
     if [ -n "${STRICT_SNAPS}" ] || [ -n "${CLASSIC_SNAPS}" ]; then

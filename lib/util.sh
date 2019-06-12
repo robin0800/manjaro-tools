@@ -404,6 +404,10 @@ load_profile_config(){
     [[ -z ${autologin} ]] && autologin="true"
     [[ ${displaymanager} == 'none' ]] && autologin="false"
 
+    [[ -z ${strict_snaps} ]] && STRICT_SNAPS=""
+    [[ -z ${classic_snaps} ]] && CLASSIC_SNAPS=""
+    [[ -z ${snap_channel} ]] && SNAP_CHANNEL_ISO="stable"
+
     [[ -z ${multilib} ]] && multilib="true"
 
     [[ -z ${nonfree_mhwd} ]] && nonfree_mhwd="true"
