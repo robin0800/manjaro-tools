@@ -249,36 +249,36 @@ function seed_snaps() {
 
     if [ -n "${STRICT_SNAPS}" ] || [ -n "${CLASSIC_SNAPS}" ]; then
         # Preseeded snaps should be downloaded from a versioned channel
-        rm -rfv "${SEED_DIR}"
-        mkdir -p "${SEED_DIR}/snaps"
-        mkdir -p "${SEED_DIR}/assertions"
+        rm -rfv "$1/${SEED_DIR}"
+        mkdir -p "$1/${SEED_DIR}/snaps"
+        mkdir -p "$1/${SEED_DIR}/assertions"
 
         # Download the published snaps and their related assert files
         # Runs inside the container
         for SEED_SNAP in ${SEED_SNAPS}; do
             if [ "${SEED_SNAP}" == "core" ] || [ "${SEED_SNAP}" == "core16" ] || [ "${SEED_SNAP}" == "core18" ]; then
-                snap download --channel=stable "${SEED_SNAP}"
+                chroot-run $1 snap download --channel=stable "${SEED_SNAP}"
             else
-                snap download --channel="${SEED_CHANNEL}" "${SEED_SNAP}"
+                chroot-run $1 snap download --channel="${SEED_CHANNEL}" "${SEED_SNAP}"
             fi
         done
 
         # Move snaps and seertions to the correct place
         # Runs outside the container.
-        mv -v ${R}/*.snap ${R}/${SEED_DIR}/snaps/
-        mv -v ${R}/*.assert ${R}/${SEED_DIR}/assertions/
+        mv -v $1/*.snap $1/${SEED_DIR}/snaps/
+        mv -v $1/*.assert $1/${SEED_DIR}/assertions/
 
         # Create model and account assertions
         # Runs inside the container.
-        snap known --remote model series=16 model=generic-classic brand-id=generic > ${R}/${SEED_DIR}/assertions/generic-classic.model
-        ACCOUNT_KEY=$(grep "^sign-key-sha3-384" ${R}/${SEED_DIR}/assertions/generic-classic.model | cut -d':' -f2 | sed 's/ //g')
-        snap known --remote account-key public-key-sha3-384=${ACCOUNT_KEY} > ${R}/${SEED_DIR}/assertions/generic.account-key
-        snap known --remote account account-id=generic > ${R}/${SEED_DIR}/assertions/generic.account
+        snap known --remote model series=16 model=generic-classic brand-id=generic > $1/${SEED_DIR}/assertions/generic-classic.model
+        ACCOUNT_KEY=$(grep "^sign-key-sha3-384" $1/${SEED_DIR}/assertions/generic-classic.model | cut -d':' -f2 | sed 's/ //g')
+        snap known --remote account-key public-key-sha3-384=${ACCOUNT_KEY} > $1/${SEED_DIR}/assertions/generic.account-key
+        snap known --remote account account-id=generic > $1/${SEED_DIR}/assertions/generic.account
 
         # Create the seed.yaml: the manifest of snaps to install
         # Runs outside the container
-        echo "snaps:" > ${R}/${SEED_DIR}/seed.yaml
-        for ASSERT_FILE in ${R}/${SEED_DIR}/assertions/*.assert; do
+        echo "snaps:" > $1/${SEED_DIR}/seed.yaml
+        for ASSERT_FILE in $1/${SEED_DIR}/assertions/*.assert; do
             SNAP_NAME=$(grep "^snap-name" ${ASSERT_FILE} | cut -d':' -f2 | sed 's/ //g')
             SNAP_REVISION=$(grep "^snap-revision" ${ASSERT_FILE} | cut -d':' -f2 | sed 's/ //g')
             if [ "${SNAP_NAME}" == "core" ] || [ "${SNAP}" == "core16" ] || [ "${SNAP}" == "core18" ]; then
@@ -289,12 +289,12 @@ function seed_snaps() {
 
             # Classic snaps require a "classic: true" attribute in the seed file
             if [[ $CLASSIC_SNAPS =~ $SNAP_NAME ]]; then
-                printf " - name: %s\n   channel: %s\n   classic: true\n   file: %s_%s.snap\n" ${SNAP_NAME} ${SNAP_CHANNEL} ${SNAP_NAME} ${SNAP_REVISION} >> ${R}/${SEED_DIR}/seed.yaml
+                printf " - name: %s\n   channel: %s\n   classic: true\n   file: %s_%s.snap\n" ${SNAP_NAME} ${SNAP_CHANNEL} ${SNAP_NAME} ${SNAP_REVISION} >> $1/${SEED_DIR}/seed.yaml
             else
-                printf " - name: %s\n   channel: %s\n   file: %s_%s.snap\n" ${SNAP_NAME} ${SNAP_CHANNEL} ${SNAP_NAME} ${SNAP_REVISION} >> ${R}/${SEED_DIR}/seed.yaml
+                printf " - name: %s\n   channel: %s\n   file: %s_%s.snap\n" ${SNAP_NAME} ${SNAP_CHANNEL} ${SNAP_NAME} ${SNAP_REVISION} >> $1/${SEED_DIR}/seed.yaml
             fi
         done
-        cat ${R}/${SEED_DIR}/seed.yaml
+        cat $1/${SEED_DIR}/seed.yaml
 
         snap_boot_args="'apparmor=1' 'security=apparmor'"
     fi
@@ -343,7 +343,7 @@ make_image_desktop() {
 
         reset_pac_conf "${path}"
 
-        seed_snaps
+        seed_snaps ${path}
 
         umount_fs
         clean_up_image "${path}"
