@@ -248,7 +248,7 @@ function seed_snaps() {
     if [[ -n "${strict_snaps}" ]] || [[ -n "${classic_snaps}" ]]; then
         # Preseeded snaps should be downloaded from a versioned channel
         rm -rfv "$1/${SEED_DIR}"
-
+        mkdir -p "$1/${SEED_DIR}"
         SEED_LIST=()
 
         # Download the published snaps and their related assert files
