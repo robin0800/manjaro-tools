@@ -249,7 +249,7 @@ function seed_snaps() {
         # Preseeded snaps should be downloaded from a versioned channel
         rm -rfv "$1/${SEED_DIR}"
 
-        unset SEED_LIST
+        SEED_LIST=()
 
         # Download the published snaps and their related assert files
         # Runs inside the container
@@ -261,7 +261,7 @@ function seed_snaps() {
                 msg2 "Installing snap: %s" ${SEED_SNAP}
                 chroot-run $1 snap download --channel="${SEED_CHANNEL}" "${SEED_SNAP}"
             fi
-            SEED_LIST=$(${SEED_LIST} --snap=${SEED_SNAP}=${SEED_CHANNEL}
+            SEED_LIST+=("--snap=${SEED_SNAP}=${SEED_CHANNEL}")
         done
 
         # Move snaps and seertions to the correct place
