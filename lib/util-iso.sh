@@ -252,18 +252,15 @@ function seed_snaps() {
         mkdir -p "$1/${SEED_DIR}/assertions"
         SEED_LIST=()
 
-        # Download the published snaps and their related assert files
-        # Runs inside the container
+        # Update SEED_LIST
         for SEED_SNAP in ${SEED_SNAPS}; do
-            SEED_LIST+=("--snap=${SEED_SNAP}=${SEED_CHANNEL}")
+            SEED_LIST+=(--snap=${SEED_SNAP}=${SEED_CHANNEL})
         done
-
-        msg2 "Snaps: ${SEED_LIST}"
 
         # Create model and account assertions
         # Runs outside the container.
         snap known model > /tmp/generic.model
-        snap prepare-image --arch amd64 --classic /tmp/generic.model "${SEED_LIST}" "$1"
+        snap prepare-image --arch amd64 --classic /tmp/generic.model "${SEED_LIST[@]}" "$1"
 
         snap_boot_args="'apparmor=1' 'security=apparmor'"
     else
