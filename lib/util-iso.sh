@@ -255,25 +255,15 @@ function seed_snaps() {
         # Download the published snaps and their related assert files
         # Runs inside the container
         for SEED_SNAP in ${SEED_SNAPS}; do
-            if [[ "${SEED_SNAP}" == "core" ]] || [[ "${SEED_SNAP}" == "core16" ]] || [[ "${SEED_SNAP}" == "core18" ]]; then
-                msg2 "Installing snap: %s" ${SEED_SNAP}
-                chroot-run $1 snap download --channel=stable "${SEED_SNAP}"
-            else
-                msg2 "Installing snap: %s" ${SEED_SNAP}
-                chroot-run $1 snap download --channel="${SEED_CHANNEL}" "${SEED_SNAP}"
-            fi
             SEED_LIST+=("--snap=${SEED_SNAP}=${SEED_CHANNEL}")
         done
 
-        # Move snaps and seertions to the correct place
-        # Runs outside the container.
-        mv -v $1/*.snap $1/${SEED_DIR}/snaps/
-        mv -v $1/*.assert $1/${SEED_DIR}/assertions/
+        msg2 "Snaps: ${SEED_LIST}"
 
         # Create model and account assertions
         # Runs outside the container.
         snap known model > /tmp/generic.model
-        snap prepare-image --arch amd64 --classic /tmp/generic.model "${SEED_LIST}" "$1/${SEED_DIR}"
+        snap prepare-image --arch amd64 --classic /tmp/generic.model "${SEED_LIST}" "$1"
 
         snap_boot_args="'apparmor=1' 'security=apparmor'"
     else
