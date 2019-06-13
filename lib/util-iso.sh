@@ -271,9 +271,9 @@ function seed_snaps() {
         mv -v $1/*.assert $1/${SEED_DIR}/assertions/
 
         # Create model and account assertions
-        # Runs inside the container.
-        chroot-run $1 snap known model > /tmp/generic.model
-        chroot-run $1 snap prepare-image --arch amd64 --classic /tmp/generic.model "${SEED_LIST}" "${SEED_DIR}"
+        # Runs outside the container.
+        snap known model > /tmp/generic.model
+        snap prepare-image --arch amd64 --classic /tmp/generic.model "${SEED_LIST}" "$1/${SEED_DIR}"
 
         snap_boot_args="'apparmor=1' 'security=apparmor'"
     else
