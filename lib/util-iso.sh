@@ -240,8 +240,6 @@ reset_pac_conf(){
 }
 
 # Snap support
-# Adapted from:
-#  * https://blackboxsw.github.io/seed-snaps-using-maas.html
 function seed_snaps() {
     local SEED_DIR="/var/lib/snapd/seed"
     local SEED_CHANNEL="${snap_channel}"
@@ -250,8 +248,8 @@ function seed_snaps() {
     if [[ -n "${strict_snaps}" ]] || [[ -n "${classic_snaps}" ]]; then
         # Preseeded snaps should be downloaded from a versioned channel
         rm -rfv "$1/${SEED_DIR}"
-        mkdir -p "$1/${SEED_DIR}/snaps"
-        mkdir -p "$1/${SEED_DIR}/assertions"
+
+        unset SEED_LIST
 
         # Download the published snaps and their related assert files
         # Runs inside the container
@@ -263,6 +261,7 @@ function seed_snaps() {
                 msg2 "Installing snap: %s" ${SEED_SNAP}
                 chroot-run $1 snap download --channel="${SEED_CHANNEL}" "${SEED_SNAP}"
             fi
+            SEED_LIST=$(${SEED_LIST} --snap=${SEED_SNAP}=${SEED_CHANNEL}
         done
 
         # Move snaps and seertions to the correct place
@@ -271,33 +270,9 @@ function seed_snaps() {
         mv -v $1/*.assert $1/${SEED_DIR}/assertions/
 
         # Create model and account assertions
-        # Runs outside the container.
-        snap known --remote model series=16 model=generic-classic brand-id=generic > $1/${SEED_DIR}/assertions/generic-classic.model
-        ACCOUNT_KEY=$(grep "^sign-key-sha3-384" $1/${SEED_DIR}/assertions/generic-classic.model | cut -d':' -f2 | sed 's/ //g')
-        snap known --remote account-key public-key-sha3-384=${ACCOUNT_KEY} > $1/${SEED_DIR}/assertions/generic.account-key
-        snap known --remote account account-id=generic > $1/${SEED_DIR}/assertions/generic.account
-
-        # Create the seed.yaml: the manifest of snaps to install
-        # Runs outside the container
-        echo "snaps:" > $1/${SEED_DIR}/seed.yaml
-        for ASSERT_FILE in $1/${SEED_DIR}/assertions/*.assert; do
-            SNAP_NAME=$(grep "^snap-name" ${ASSERT_FILE} | cut -d':' -f2 | sed 's/ //g')
-            SNAP_REVISION=$(grep "^snap-revision" ${ASSERT_FILE} | cut -d':' -f2 | sed 's/ //g')
-            if [[ "${SNAP_NAME}" == "core" ]] || [[ "${SNAP_NAME}" == "core16" ]] || [[ "${SNAP_NAME}" == "core18" ]]; then
-                SNAP_CHANNEL="stable"
-            else
-                SNAP_CHANNEL="${SEED_CHANNEL}"
-            fi
-
-            # Classic snaps require a "classic: true" attribute in the seed file
-            msg2 "debug: name: ${SNAP_NAME} channel: ${SNAP_CHANNEL} file: ${SNAP_NAME}_${SNAP_REVISION}.snap"
-            if [[ $CLASSIC_SNAPS =~ $SNAP_NAME ]]; then
-                printf " - name: %s\n   channel: %s\n   classic: true\n   file: %s_%s.snap\n" ${SNAP_NAME} ${SNAP_CHANNEL} ${SNAP_NAME} ${SNAP_REVISION} >> $1/${SEED_DIR}/seed.yaml
-            else
-                printf " - name: %s\n   channel: %s\n   file: %s_%s.snap\n" ${SNAP_NAME} ${SNAP_CHANNEL} ${SNAP_NAME} ${SNAP_REVISION} >> $1/${SEED_DIR}/seed.yaml
-            fi
-        done
-        cat $1/${SEED_DIR}/seed.yaml
+        # Runs inside the container.
+        chroot-run $1 snap known model > /tmp/generic.model
+        chroot-run $1 snap prepare-image --arch amd64 --classic /tmp/generic.model "${SEED_LIST}" "${SEED_DIR}"
 
         snap_boot_args="'apparmor=1' 'security=apparmor'"
     else
