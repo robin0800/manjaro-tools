@@ -254,7 +254,11 @@ function seed_snaps() {
 
         # Update SEED_LIST
         for SEED_SNAP in ${SEED_SNAPS}; do
-            SEED_LIST+=(--snap=${SEED_SNAP}=${SEED_CHANNEL})
+            if [[ "${SEED_SNAP}" == "core" ]] || [[ "${SEED_SNAP}" == "core16" ]] || [[ "${SEED_SNAP}" == "core18" ]]; then
+                SEED_LIST+=(--snap=${SEED_SNAP}=stable)
+            else
+                SEED_LIST+=(--snap=${SEED_SNAP}=${SEED_CHANNEL})
+            fi
         done
 
         # Create model and account assertions
