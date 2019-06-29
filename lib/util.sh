@@ -361,7 +361,7 @@ init_deployiso(){
 
     [[ -z ${alt_storage} ]] && alt_storage=false
 
-    [[ -z ${tracker_url} ]] && tracker_url='udp://mirror.strits.dk:6969'
+    [[ -z ${tracker_url} ]] && tracker_url='udp://tracker.opentrackr.org:1337'
 
     [[ -z ${piece_size} ]] && piece_size=21
 
