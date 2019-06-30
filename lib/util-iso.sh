@@ -246,6 +246,7 @@ function seed_snaps() {
     local SEED_SNAPS="${strict_snaps} ${classic_snaps}"
 
     if [[ -n "${strict_snaps}" ]] || [[ -n "${classic_snaps}" ]]; then
+        msg2 "Configuring snaps"
         # Preseeded snaps should be downloaded from a versioned channel
         rm -rfv "$1/${SEED_DIR}"
         mkdir -p "$1/${SEED_DIR}/snaps"
@@ -265,8 +266,6 @@ function seed_snaps() {
         # Runs outside the container.
         snap known model > /tmp/generic.model
         snap prepare-image --arch amd64 --classic /tmp/generic.model "${SEED_LIST[@]}" "$1"
-
-        snap_boot_args="'apparmor=1' 'security=apparmor'"
     else
         msg2 "No snaps found in profile. Skipping adding snaps"
     fi
@@ -423,7 +422,7 @@ make_image_boot() {
 
 configure_grub(){
     local default_args="misobasedir=${iso_name} misolabel=${iso_label}" \
-        boot_args=('quiet' 'systemd.show_status=1' ${snap_boot_args})
+        boot_args=('quiet' 'systemd.show_status=1' ${apparmor_boot_args})
 
     sed -e "s|@DIST_NAME@|${dist_name}|g" \
         -e "s|@ARCH@|${target_arch}|g" \

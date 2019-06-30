@@ -218,12 +218,22 @@ configure_journald(){
 
 configure_services(){
     info "Configuring services"
+    use_apparmor="false"
+    apparmor_boot_args=""
     for svc in ${enable_systemd[@]}; do
         add_svc_sd "$1" "$svc"
+        [[ "$svc" == "apparmor" ]] && use_apparmor="true"
     done
     for svc in ${enable_systemd_live[@]}; do
         add_svc_sd "$1" "$svc"
+        [[ "$svc" == "apparmor" ]] && use_apparmor="true"
     done
+
+    if [[ ${use_apparmor} == 'true' ]]; then
+        msg2 "Enable apparmor kernel parameters"
+        apparmor_boot_args="'apparmor=1' 'security=apparmor'"
+    fi
+
     info "Done configuring services"
 }
 
