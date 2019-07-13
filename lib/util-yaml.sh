@@ -187,6 +187,12 @@ write_welcome_conf(){
     if ${netinstall}; then
         echo "      - internet" >> "$conf"
     fi
+    if ${geoip}; then
+        echo 'geoip:' >> "$conf"
+        echo '    style:  "json"' >> "$conf"
+        echo '    url:    "https://geoip.kde.org/v1/calamares"' >> "$conf"
+        echo '    selector: ""' >> "$conf"
+    fi
 }
 
 write_mhwdcfg_conf(){
@@ -257,9 +263,10 @@ write_locale_conf(){
     echo "---" > "$conf"
     echo "localeGenPath: /etc/locale.gen" >> "$conf"
     if ${geoip}; then
-        echo "geoipUrl: https://get.geojs.io/v1/ip/geo.json" >> "$conf"
-        echo "geoipStyle: json" >> "$conf"
-        echo "geoipSelector: timezone" >> "$conf"
+        echo 'geoip:' >> "$conf"
+        echo '    style:  "json"' >> "$conf"
+        echo '    url:    "https://geoip.kde.org/v1/calamares"' >> "$conf"
+        echo '    selector: ""' >> "$conf"
     else
         echo "region: America" >> "$conf"
         echo "zone: New_York" >> "$conf"
