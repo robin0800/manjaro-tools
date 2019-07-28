@@ -315,7 +315,7 @@ init_buildiso(){
 
     iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
 
-    [[ -z ${kernel} ]] && kernel="linux51"
+    [[ -z ${kernel} ]] && kernel="linux52"
     
     load_run_dir "${profile_repo}"
     
