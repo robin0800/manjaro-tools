@@ -294,6 +294,11 @@ write_settings_conf(){
     else
         echo "        - users" >> "$conf" && write_users_conf
     fi
+    # WIP - OfficeChooser
+    if ${extra}; then
+        msg2 "Enabling OfficeChooser module."
+        echo "        - officechooser" >> "$conf"
+    fi
     if ${netinstall}; then
         echo "        - netinstall" >> "$conf" && write_netinstall_conf
     fi
