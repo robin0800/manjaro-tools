@@ -345,8 +345,10 @@ make_image_live() {
         copy_overlay "${profile_dir}/live-overlay" "${path}"
         configure_live_image "${path}"
 
-        configure_branding "${path}"
-        msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
+        if [[ ${profile} != "architect" ]]; then
+            configure_branding "${path}"
+            msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
+        fi
 
         reset_pac_conf "${path}"
 
