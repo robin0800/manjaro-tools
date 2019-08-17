@@ -191,7 +191,7 @@ write_welcome_conf(){
         echo 'geoip:' >> "$conf"
         echo '    style:  "json"' >> "$conf"
         echo '    url:    "https://geoip.kde.org/v1/calamares"' >> "$conf"
-        echo '    selector: ""' >> "$conf"
+        echo '    selector: "time_zone"' >> "$conf"
     fi
 }
 
