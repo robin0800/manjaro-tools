@@ -34,6 +34,7 @@ else
     VBoxManage createmedium disk --filename ~/VirtualBox\ VMs/Manjaro/Manjaro.vdi --size ${vdi_size} --format VDI --variant Fixed
     
     UUID=$(VBoxManage showhdinfo ~/VirtualBox\ VMs/Manjaro/Manjaro.vdi | awk 'NR == 1  {print $2}') #uuid of vdi disk
+    gui_lang=$(awk -F'[.=]' '/LANG/ {print $2}' /etc/locale.conf)
 
     echo '<?xml version="1.0"?>
 <!--
@@ -77,7 +78,7 @@ else
       <AudioAdapter codec="AD1980" driver="Pulse" enabled="true" enabledIn="false"/>
       <RTC localOrUTC="UTC"/>
       <GuestProperties>
-        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="it_IT" timestamp="1566055357633717000" flags=""/>
+        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="gui_lang" timestamp="1566055357633717000" flags=""/>
       </GuestProperties>
     </Hardware>
     <StorageControllers>
@@ -94,6 +95,8 @@ else
 </VirtualBox>' > ~/VirtualBox\ VMs/Manjaro/Manjaro.vbox
  
     sed -i "s/UUID/$UUID/g" ~/VirtualBox\ VMs/Manjaro/Manjaro.vbox
+    sed -i "s/gui_lang/$gui_lang/g" ~/VirtualBox\ VMs/Manjaro/Manjaro.vbox
+    
     VBoxManage registervm ~/VirtualBox\ VMs/Manjaro/Manjaro.vbox #register the manjaro vbox machine
 fi
 
@@ -127,3 +130,4 @@ msg2 "Run Vbox Manjaro with ${iso_name}"
 sleep 2
 
 VBoxManage startvm Manjaro #run vbox machine
+
