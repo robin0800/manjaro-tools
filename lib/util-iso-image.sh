@@ -51,14 +51,6 @@ configure_mhwd_drivers(){
         mkdir -p $drv_path/catalyst/
         echo "" > $drv_path/catalyst/MHWDCONFIG
     fi
-    if  [ -z "$(ls $path | grep nvidia-utils 2> /dev/null)" ]; then
-        msg2 "Disabling Nvidia driver"
-        mkdir -p $drv_path/nvidia/
-        touch $drv_path/nvidia/MHWDCONFIG
-        msg2 "Disabling Nvidia Bumblebee driver"
-        mkdir -p $drv_path/hybrid-intel-nvidia-bumblebee/
-        echo "" > $drv_path/hybrid-intel-nvidia-bumblebee/MHWDCONFIG
-    fi
     if  [ -z "$(ls $path | grep nvidia-340xx-utils 2> /dev/null)" ]; then
         msg2 "Disabling Nvidia 340xx driver"
         mkdir -p $drv_path/nvidia-340xx/
@@ -74,6 +66,27 @@ configure_mhwd_drivers(){
         msg2 "Disabling Nvidia 390xx Bumblebee driver"
         mkdir -p $drv_path/hybrid-intel-nvidia-390xx-bumblebee/
         echo "" > $drv_path/hybrid-intel-nvidia-390xx-bumblebee/MHWDCONFIG
+    fi
+    if  [ -z "$(ls $path | grep nvidia-418xx-utils 2> /dev/null)" ]; then
+        msg2 "Disabling Nvidia 418xx driver"
+        mkdir -p $drv_path/nvidia-418xx/
+        echo "" > $drv_path/nvidia-418xx/MHWDCONFIG
+        msg2 "Disabling Nvidia 418xx Bumblebee driver"
+        mkdir -p $drv_path/hybrid-intel-nvidia-418xx-bumblebee/
+        echo "" > $drv_path/hybrid-intel-nvidia-418xx-bumblebee/MHWDCONFIG
+    fi
+    if  [ -z "$(ls $path | grep nvidia-430xx-utils 2> /dev/null)" ]; then
+        msg2 "Disabling Nvidia 430xx driver"
+        mkdir -p $drv_path/nvidia-430xx/
+        echo "" > $drv_path/nvidia-430xx/MHWDCONFIG
+        msg2 "Disabling Nvidia 430xx Bumblebee driver"
+        mkdir -p $drv_path/hybrid-intel-nvidia-430xx-bumblebee/
+        echo "" > $drv_path/hybrid-intel-nvidia-430xx-bumblebee/MHWDCONFIG
+    fi
+    if  [ -z "$(ls $path | grep nvidia-435xx-utils 2> /dev/null)" ]; then
+        msg2 "Disabling Nvidia 435xx driver"
+        mkdir -p $drv_path/nvidia-435xx/
+        echo "" > $drv_path/nvidia-435xx/MHWDCONFIG
     fi
     if  [ -z "$(ls $path | grep xf86-video-amdgpu 2> /dev/null)" ]; then
         msg2 "Disabling AMD gpu driver"
