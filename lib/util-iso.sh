@@ -379,7 +379,7 @@ make_image_mhwd() {
                 rm ${path}${mhwd_repo}/${mhwd_clean}
             done
         fi
-        cp ${DATADIR}/pacman-mhwd.conf ${path}/opt
+        cp ${DATADIR}/pacman-mhwd.conf ${path}/opt/mhwd
         make_repo "${path}"
         configure_mhwd_drivers "${path}"
 

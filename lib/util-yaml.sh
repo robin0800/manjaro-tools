@@ -219,7 +219,7 @@ write_mhwdcfg_conf(){
     ${netinstall} && switch='false'
     echo "local: ${switch}" >> "$conf"
     echo '' >> "$conf"
-    echo 'repo: /opt/pacman-mhwd.conf' >> "$conf"
+    echo 'repo: /opt/mhwd/pacman-mhwd.conf' >> "$conf"
 }
 
 write_postcfg_conf(){

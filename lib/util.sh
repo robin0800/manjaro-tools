@@ -330,7 +330,7 @@ init_buildiso(){
 
     [[ -z ${gpgkey} ]] && gpgkey=''
 
-    mhwd_repo="/opt/pkg"
+    mhwd_repo="/opt/mhwd/pkg"
 }
 
 init_calamares(){
