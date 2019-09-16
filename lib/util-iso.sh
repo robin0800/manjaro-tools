@@ -225,6 +225,8 @@ gen_iso_fn(){
 
     [[ ${extra} == 'false' ]] && vars+=("minimal")
 
+    vars+=("$(date +%y%m%d)")
+    vars+=("$(kernel)")
     vars+=("${target_arch}")
     for n in ${vars[@]}; do
         name=${name:-}${name:+-}${n}
