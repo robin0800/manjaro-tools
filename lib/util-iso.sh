@@ -221,15 +221,25 @@ gen_iso_fn(){
         [[ -n ${profile} ]] && vars+=("${profile}")
     fi
     vars+=("${dist_release}")
+    
+    # add branch if not stable
     if [[ ! ${target_branch} == "stable" ]]; then
         vars+=("${target_branch}")
     fi
 
     [[ ${extra} == 'false' ]] && vars+=("minimal")
-
+    
+    # build date
     vars+=("$(date +%y%m%d)")
+    
+    # kernel version
     vars+=("${kernel}")
-    vars+=("${target_arch}")
+    
+    # add architecture if 32-bit
+    if [[ ${target_arch} == "i686" ]]; then
+        vars+=("${target_arch}")
+    fi
+    
     for n in ${vars[@]}; do
         name=${name:-}${name:+-}${n}
     done
