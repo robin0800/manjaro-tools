@@ -221,11 +221,16 @@ gen_iso_fn(){
         [[ -n ${profile} ]] && vars+=("${profile}")
     fi
     vars+=("${dist_release}")
-    vars+=("${target_branch}")
+    
+    [[ ! ${target_branch} == "stable" ]] && vars+=("${target_branch}")
 
     [[ ${extra} == 'false' ]] && vars+=("minimal")
 
-    vars+=("${target_arch}")
+    vars+=("$(date +%y%m%d)")
+
+    vars+=("${kernel}")
+
+    [[ ${target_arch} == "i686" ]] && vars+=("${target_arch}")    
     for n in ${vars[@]}; do
         name=${name:-}${name:+-}${n}
     done
