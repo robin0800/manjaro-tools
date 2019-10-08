@@ -317,6 +317,11 @@ make_image_desktop() {
         cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
         [[ -e ${profile_dir}/desktop-overlay ]] && copy_overlay "${profile_dir}/desktop-overlay" "${path}"
 
+        if [[ ${profile} != "architect"  && ${oem_used} ]]; then
+            configure_branding "${path}"
+            msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
+        fi
+
         reset_pac_conf "${path}"
 
         seed_snaps ${path}
