@@ -296,8 +296,12 @@ write_settings_conf(){
     fi
     # WIP - OfficeChooser
     if ${extra}; then
-        msg2 "Enabling PackageChooser module."
-        echo "        - packagechooser" >> "$conf"
+        if ${oem_used}; then
+            msg2 "Skipping enabling PackageChooser module."
+        else
+            msg2 "Enabling PackageChooser module."
+            echo "        - packagechooser" >> "$conf"
+        fi
     fi
     if ${netinstall}; then
         echo "        - netinstall" >> "$conf" && write_netinstall_conf
