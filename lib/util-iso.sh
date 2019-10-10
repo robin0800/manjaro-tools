@@ -317,12 +317,9 @@ make_image_desktop() {
         cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
         [[ -e ${profile_dir}/desktop-overlay ]] && copy_overlay "${profile_dir}/desktop-overlay" "${path}"
 
-        if [[ ${profile} != "architect"  ]]; then
-            if [[ ${oem_used} ]]; then
-                msg "Start Calamares Branding for OEM ISO ..."
-                configure_branding "${path}"
-                msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
-            fi
+        if [[ ${profile} != "architect" && ${oem_used} != "false" ]]; then
+            configure_branding "${path}"
+            msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
         fi
 
         reset_pac_conf "${path}"
