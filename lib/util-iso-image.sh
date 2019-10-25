@@ -88,6 +88,11 @@ configure_mhwd_drivers(){
         mkdir -p $drv_path/nvidia-435xx/
         echo "" > $drv_path/nvidia-435xx/MHWDCONFIG
     fi
+    if  [ -z "$(ls $path | grep nvidia-440xx-utils 2> /dev/null)" ]; then
+        msg2 "Disabling Nvidia 440xx driver"
+        mkdir -p $drv_path/nvidia-440xx/
+        echo "" > $drv_path/nvidia-440xx/MHWDCONFIG
+    fi
     if  [ -z "$(ls $path | grep xf86-video-amdgpu 2> /dev/null)" ]; then
         msg2 "Disabling AMD gpu driver"
         mkdir -p $drv_path/xf86-video-amdgpu/
