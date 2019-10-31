@@ -211,7 +211,7 @@ init_common(){
 
     [[ -z ${log_dir} ]] && log_dir='/var/log/manjaro-tools'
 
-    [[ -z ${build_mirror} ]] && build_mirror='https://manjaro.moson.eu/'
+    [[ -z ${build_mirror} ]] && build_mirror='https://manjaro.moson.eu'
 
     [[ -z ${tmp_dir} ]] && tmp_dir='/tmp/manjaro-tools'
 }
