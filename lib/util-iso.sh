@@ -469,12 +469,12 @@ check_requirements(){
     if ! $(is_valid_branch ${target_branch}); then
         die "%s is not a valid branch!" "${target_branch}"
     fi
-
-    local iso_kernel=${kernel:5:1} host_kernel=$(uname -r)
-    if [[ ${iso_kernel} < "4" ]] \
-    || [[ ${host_kernel%%*.} < "4" ]]; then
-        die "The host and iso kernels must be version>=4.0!"
+    if ! $(is_valid_comp ${iso_compression}); then
+        die "%s is not a valid compression algorithm!" "${iso_compression}"
     fi
+
+    local iso_kernel=${kernel:5:1}
+    [[ ${iso_kernel} < "4" ]] && die "ISO kernel must be version>=4.0!"
 }
 
 compress_images(){

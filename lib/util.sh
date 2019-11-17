@@ -768,6 +768,13 @@ is_valid_branch(){
     esac
 }
 
+is_valid_comp(){
+    case $1 in
+        'gzip'|'lzma'|'lz4'|'lzo'|'xz'|'zstd') return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 run(){
     if ${is_build_list}; then
         for item in ${build_list[@]}; do
