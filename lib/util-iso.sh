@@ -137,15 +137,12 @@ make_sfs() {
 
     mksfs_args+=(${sfs} -noappend)
 
-    local highcomp="-b 256K -Xbcj x86"
-   
-    [[ "${iso_compression}" != "zstd" ]] && highcomp=""
+    local highcomp
 
-    if [[ "${name}" == "mhwdfs" && ${used_kernel} < "4" ]]; then
-        mksfs_args+=(-comp lz4)
-    else
-        mksfs_args+=(-comp ${iso_compression} ${highcomp})
-    fi
+    [[ "${iso_compression}" == "xz" ]] && ${highcomp}="-b 256K -Xbcj x86")
+
+    mksfs_args+=(-comp ${iso_compression} ${highcomp})
+
     if ${verbose}; then
         mksquashfs "${mksfs_args[@]}" >/dev/null
     else
