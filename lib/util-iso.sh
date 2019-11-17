@@ -139,7 +139,7 @@ make_sfs() {
 
     local highcomp
 
-    [[ "${iso_compression}" == "xz" ]] && ${highcomp}="-b 256K -Xbcj x86")
+    [[ "${iso_compression}" == "xz" ]] && ${highcomp}="-b 256K -Xbcj x86"
 
     mksfs_args+=(-comp ${iso_compression} ${highcomp})
 
