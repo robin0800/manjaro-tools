@@ -123,7 +123,7 @@ usage() {
     echo '    -m                 Set SquashFS image mode to persistence'
     echo '    -c                 Disable clean work dir'
     echo '    -f                 Build full ISO (extra=true)'
-    echo '    -d <comp>          Compression used for build ISO: xz, gzip, lzma, lzo, lz4'
+    echo '    -d <comp>          Compression used for build ISO: xz, gzip, lzma, lzo, lz4, zstd'
     echo "                       [default: ${iso_compression}]"
     echo '    -x                 Build images only'
     echo '    -z                 Generate iso only'
