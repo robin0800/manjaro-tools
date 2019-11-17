@@ -138,8 +138,13 @@ make_sfs() {
     mksfs_args+=(${sfs} -noappend)
 
     local highcomp="-b 256K -Xbcj x86"
+<<<<<<< HEAD
    
     [[ "${iso_compression}" != "xz" ]] && highcomp=""
+=======
+
+    [[ "${iso_compression}" != "zstd" ]] && highcomp=""
+>>>>>>> af495a6... iso_compression default to zstd
 
     if [[ "${name}" == "mhwdfs" && ${used_kernel} < "4" ]]; then
         mksfs_args+=(-comp lz4)
