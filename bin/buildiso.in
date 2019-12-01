@@ -84,7 +84,7 @@ display_settings(){
     msg "ISO INFO:"
     msg2 "iso_label: %s" "${iso_label}"
     msg2 "iso_compression: %s" "${iso_compression}"
-    
+
     msg "BUILD QUEUE:"
     run show_profile "${build_list_iso}"
 }

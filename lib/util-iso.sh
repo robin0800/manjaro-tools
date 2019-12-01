@@ -204,11 +204,35 @@ make_iso() {
     # Sanity checks
     [[ ! -d "${iso_root}" ]] && return 1
     if [[ -f "${iso_dir}/${iso_file}" ]]; then
-        msg2 "Removing existing bootable image..."
-        rm -rf "${iso_dir}/${iso_file}"
+        msg2 "Removing ${iso_file} related files ..."
+        [[ -f "${iso_dir}/${iso_file}" ]] && rm -f "${iso_dir}/${iso_file}"
+        [[ -f "${iso_dir}/${iso_file}.sig" ]] && rm -f "${iso_dir}/${iso_file}.sig"
+        [[ -f "${iso_dir}/${iso_file}.sha1" ]] && rm -f "${iso_dir}/${iso_file}.sha1"
+        [[ -f "${iso_dir}/${iso_file}.sha256" ]] && rm -f "${iso_dir}/${iso_file}.sha256"
+        [[ -f "${iso_dir}/${iso_file}.torrent" ]] && rm -f "${iso_dir}/${iso_file}.torrent"
     fi
     assemble_iso
+
+    [[ ${target_branch} == "stable" ]] && [[ ${extra} == "true" ]] && gen_latest_html
+
     msg "Done [Build ISO]"
+}
+
+gen_latest_html(){
+    if [[ ${edition} == "community" ]] || [[ ${edition} == "manjaro" ]]; then
+    	if [[ -f "${iso_dir}/${iso_file}" ]]; then
+    		msg2 "Creating download link ..."
+            direct_url="https://osdn.net/dl/${edition}/${iso_file}"
+    		[[ ${edition} == "community" ]] && direct_url="https://osdn.net/dl/manjaro-${edition}/${iso_file}"
+    		html_doc="<!DOCTYPE HTML>"
+    		html_doc+="<meta charset=\"UTF-8\">"
+    		html_doc+="<meta http-equiv=\"refresh\" content=\"1; url=${direct_url}\">"
+    		html_doc+="<script>window.location.href=\"${direct_url}\"</script>"
+    		html_doc+="<title>Download Redirection</title>"
+    		html_doc+="If you are not redirected automatically, follow the <a href=\"${direct_url}\">link to latest iso</a>"
+    		echo ${html_doc} > "${iso_dir}/.latest"
+    	fi
+    fi
 }
 
 gen_iso_fn(){
@@ -218,7 +242,7 @@ gen_iso_fn(){
         [[ -n ${profile} ]] && vars+=("${profile}")
     fi
     vars+=("${dist_release}")
-    
+
     [[ ! ${target_branch} == "stable" ]] && vars+=("${target_branch}")
 
     [[ ${extra} == 'false' ]] && vars+=("minimal")
@@ -227,10 +251,11 @@ gen_iso_fn(){
 
     vars+=("${kernel}")
 
-    [[ ${target_arch} == "i686" ]] && vars+=("${target_arch}")    
+    [[ ${target_arch} == "i686" ]] && vars+=("${target_arch}")
     for n in ${vars[@]}; do
         name=${name:-}${name:+-}${n}
     done
+
     echo $name
 }
 

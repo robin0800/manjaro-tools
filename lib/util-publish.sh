@@ -15,6 +15,11 @@ connect(){
     echo "${account}${storage}${project}"
 }
 
+connect_webserver(){
+    local webserver="@shell.osdn.net:/home/groups/m/ma/"
+    echo "${account}${webserver}${project}"
+}
+
 make_torrent(){
     find ${src_dir} -type f -name "*.torrent" -delete
 
@@ -34,7 +39,7 @@ prepare_transfer(){
     hidden="$2"
     edition=$(get_edition "${profile}")
     [[ -z ${project} ]] && project="$(get_project)"
-    url=$(connect)
+    server=$(connect)
 
     target_dir="${profile}/${dist_release}"
     src_dir="${run_dir}/${edition}/${target_dir}"
@@ -73,16 +78,28 @@ sync_dir(){
     ${ssh_agent} && ssh_add
 
     msg "Start upload [%s] to [%s] ..." "$1" "${project}"
-    while [[ $count -le $max_count ]]; do 
-    rsync ${rsync_args[*]} ${src_dir}/ ${url}/${target_dir}/
+
+    while [[ $count -le $max_count ]]; do
+    rsync ${rsync_args[*]} --exclude '.latest' ${src_dir}/ ${server}/${target_dir}/
         if [[ $? != 0 ]]; then
             count=$(($count + 1))
             msg "Upload failed. retrying (%s/%s) ..." "$count" "$max_count"
             sleep 2
         else
             count=$(($max_count + 1))
+            [[ -f "${src_dir}/.latest" ]] && sync_latest_html
             msg "Done upload [%s]" "$1"
             show_elapsed_time "${FUNCNAME}" "${timer_start}"
         fi
     done
+
+}
+
+sync_latest_html(){
+    msg2 "Sending download link ..."
+    local webserver=$(connect_webserver)
+    local htdocs="htdocs/${profile}"
+    local html="latest"
+    scp "${src_dir}/.${html}" "${webserver}/${htdocs}/${html}"
+    rm -f "${src_dir}/.${html}"
 }
