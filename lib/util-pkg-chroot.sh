@@ -129,8 +129,10 @@ move_to_cache(){
     local src="$1"
     [[ -n $PKGDEST ]] && src="$PKGDEST/$1"
     [[ ! -f $src ]] && die
-    msg2 "Moving [%s] -> [%s]" "${src##*/}" "${pkg_dir}"
-    mv $src ${pkg_dir}/
+    if [[ ${pkg_dir} != $PKGDEST ]]; then
+        msg2 "Moving [%s] -> [%s]" "${src##*/}" "${pkg_dir}"
+        mv $src ${pkg_dir}/
+    fi
     ${sign} && sign_pkg "${src##*/}"
     user_own "${pkg_dir}" "-R"
 }
