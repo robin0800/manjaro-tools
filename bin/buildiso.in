@@ -33,8 +33,10 @@ show_profile(){
         msg2 "chrootcfg: %s" "${chrootcfg}"
         ${netinstall} && msg2 "netgroups: %s" "$(get_yaml)"
         msg2 "geoip: %s" "${geoip}"
+        msg2 "oem_used: %s" "${oem_used}"
 
         msg2 "efi_boot_loader: %s" "${efi_boot_loader}"
+        msg2 "custom_boot_args: %s" "${custom_boot_args}"
 
         msg2 "hostname: %s" "${hostname}"
         msg2 "username: %s" "${username}"
