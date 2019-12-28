@@ -11,4 +11,4 @@
 
 version=@version@
 
-find $PWD -maxdepth 1 -name '*.pkg.tar.xz' -o -name '*.pkg.tar.zst' -exec signfile {} \;
+find $PWD -maxdepth 1 -regex '.*\.pkg\.tar\.\(xz\|zst\)' -exec signfile {} \;
