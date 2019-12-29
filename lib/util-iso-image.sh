@@ -335,7 +335,7 @@ configure_live_image(){
 }
 
 make_repo(){
-    repo-add $1${mhwd_repo}/mhwd.db.tar.gz $1${mhwd_repo}/*pkg*z
+    repo-add $1${mhwd_repo}/mhwd.db.tar.gz $1${mhwd_repo}/*pkg.tar*
 }
 
 copy_from_cache(){
