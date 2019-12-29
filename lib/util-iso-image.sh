@@ -352,8 +352,7 @@ copy_from_cache(){
         -B "${build_mirror}/${target_branch}" \
         "$1" \
         pacman -v -Sp $2 --noconfirm > "$list"
-    sed -ni '/.pkg.tar.xz/p' "$list"
-    sed -ni '/.pkg.tar.zst/p' "$list"
+    sed -ni '/pkg.tar/p' "$list"
     sed -i "s/.*\///" "$list"
 
     msg2 "Copying mhwd package cache ..."
