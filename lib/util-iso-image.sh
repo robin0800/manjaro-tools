@@ -87,11 +87,17 @@ configure_mhwd_drivers(){
         msg2 "Disabling Nvidia 435xx driver"
         mkdir -p $drv_path/nvidia-435xx/
         echo "" > $drv_path/nvidia-435xx/MHWDCONFIG
+        msg2 "Disabling Nvidia 435xx Prime driver"
+        mkdir -p $drv_path/hybrid-intel-nvidia-435xx-prime/
+        echo "" > $drv_path/hybrid-intel-nvidia-435xx-prime/MHWDCONFIG
     fi
     if  [ -z "$(ls $path | grep nvidia-440xx-utils 2> /dev/null)" ]; then
         msg2 "Disabling Nvidia 440xx driver"
         mkdir -p $drv_path/nvidia-440xx/
         echo "" > $drv_path/nvidia-440xx/MHWDCONFIG
+        msg2 "Disabling Nvidia 440xx Prime driver"
+        mkdir -p $drv_path/hybrid-intel-nvidia-440xx-prime/
+        echo "" > $drv_path/hybrid-intel-nvidia-440xx-prime/MHWDCONFIG
     fi
     if  [ -z "$(ls $path | grep xf86-video-amdgpu 2> /dev/null)" ]; then
         msg2 "Disabling AMD gpu driver"
