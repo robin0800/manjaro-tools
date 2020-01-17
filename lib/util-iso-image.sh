@@ -168,6 +168,12 @@ windowExpanding:    ${windowexp}
 # in CalamaresUtilsGui, 800x520.
 windowSize: ${windowsize}
 
+# Placement of Calamares window. Either "center" or "free".
+# Whether "center" actually works does depend on the window
+# manager in use (and only makes sense if you're not using
+# *windowExpanding* set to "fullscreen").
+windowPlacement: ${windowplacement}
+
 # These are strings shown to the user in the user interface.
 # There is no provision for translating them -- since they
 # are names, the string is included as-is.

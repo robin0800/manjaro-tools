@@ -342,6 +342,8 @@ init_calamares(){
 	[[ -z ${windowexp} ]] && windowexp=noexpand
 	
 	[[ -z ${windowsize} ]] && windowsize="800px,520px"
+
+	[[ -z ${windowplacement} ]] && windowplacement="center"
 	
 	[[ -z ${sidebarbackground} ]] && sidebarbackground=#454948
 	
