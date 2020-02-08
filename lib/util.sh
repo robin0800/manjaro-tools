@@ -309,7 +309,7 @@ init_buildiso(){
 
     iso_name=$(get_osid)
 
-    [[ -z ${dist_branding} ]] && dist_branding="MJRO"
+    [[ -z ${dist_branding} ]] && dist_branding="MANJARO"
 
     [[ -z ${iso_compression} ]] && iso_compression='zstd'
 
