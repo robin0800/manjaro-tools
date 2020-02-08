@@ -80,7 +80,7 @@ sync_dir(){
     msg "Start upload [%s] to [%s] ..." "$1" "${project}"
 
     while [[ $count -le $max_count ]]; do
-    rsync ${rsync_args[*]} --exclude '.latest' ${src_dir}/ ${server}/${target_dir}/
+    rsync ${rsync_args[*]} --exclude '.latest*' ${src_dir}/ ${server}/${target_dir}/
         if [[ $? != 0 ]]; then
             count=$(($count + 1))
             msg "Upload failed. retrying (%s/%s) ..." "$count" "$max_count"
@@ -88,6 +88,7 @@ sync_dir(){
         else
             count=$(($max_count + 1))
             [[ -f "${src_dir}/.latest" ]] && sync_latest_html
+            [[ -f "${src_dir}/.latest.php" ]] && sync_latest_php
             msg "Done upload [%s]" "$1"
             show_elapsed_time "${FUNCNAME}" "${timer_start}"
         fi
@@ -96,10 +97,19 @@ sync_dir(){
 }
 
 sync_latest_html(){
-    msg2 "Sending download link ..."
+    msg2 "Uploading url redirector ..."
     local webserver=$(connect_webserver)
     local htdocs="htdocs/${profile}"
     local html="latest"
     scp "${src_dir}/.${html}" "${webserver}/${htdocs}/${html}"
     rm -f "${src_dir}/.${html}"
+}
+
+sync_latest_php(){
+    msg2 "Uploading php redirector ..."
+    local webserver=$(connect_webserver)
+    local htdocs="htdocs/${profile}"
+    local php="latest.php"
+    scp "${src_dir}/.${php}" "${webserver}/${htdocs}/${php}"
+    rm -f "${src_dir}/.${php}"
 }

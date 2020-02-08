@@ -233,6 +233,12 @@ gen_latest_html(){
     		html_doc+="<title>Download Redirection</title>"
     		html_doc+="If you are not redirected automatically, follow the <a href=\"${direct_url}\">link to latest iso</a>"
     		echo ${html_doc} > "${iso_dir}/.latest"
+
+            php_doc="<?php "
+            php_doc+="header('Location: ' . '${direct_url}', true, 303); "
+            php_doc+="die(); "
+            php_doc+="?>"
+            echo ${php_doc} > "${iso_dir}/.latest.php"
     	fi
     fi
 }
