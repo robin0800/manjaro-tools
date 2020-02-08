@@ -244,7 +244,7 @@ init_buildpkg(){
 
 get_iso_label(){
     local label="$1"
-    label="${label//_}"	# relace all _
+    #label="${label//_}"	# relace all _
     label="${label//-}"	# relace all -
     label="${label^^}"		# all uppercase
     label="${label::32}"	# limit to 32 characters
