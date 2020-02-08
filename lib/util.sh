@@ -313,8 +313,6 @@ init_buildiso(){
 
     [[ -z ${iso_compression} ]] && iso_compression='zstd'
 
-    iso_label=$(get_iso_label "${dist_branding}${dist_release//.}")
-
     [[ -z ${kernel} ]] && kernel="linux54"
     
     load_run_dir "${profile_repo}"
