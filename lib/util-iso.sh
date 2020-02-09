@@ -188,6 +188,7 @@ assemble_iso(){
         -no-emul-boot \
         -full-iso9660-filenames \
         -iso-level 3 \
+        -J \
         -o ${iso_dir}/${iso_file} \
         ${iso_root}/
 }
