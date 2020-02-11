@@ -347,7 +347,7 @@ make_image_desktop() {
         cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
         [[ -e ${profile_dir}/desktop-overlay ]] && copy_overlay "${profile_dir}/desktop-overlay" "${path}"
 
-        if [[ ${profile} != "architect" && ${oem_used} != "false" ]]; then
+        if [[ -e "${path}/usr/share/calamares/branding/manjaro/branding.desc" ]]; then
             configure_branding "${path}"
             msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
         fi
@@ -385,7 +385,7 @@ make_image_live() {
         copy_overlay "${profile_dir}/live-overlay" "${path}"
         configure_live_image "${path}"
 
-        if [[ ${profile} != "architect" ]]; then
+        if [[ -e "${path}/usr/share/calamares/branding/manjaro/branding.desc" ]]; then
             configure_branding "${path}"
             msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
         fi
@@ -611,6 +611,8 @@ load_profile(){
     mirrors_conf=$(get_pac_mirrors_conf "${target_branch}")
 
     iso_file=$(gen_iso_fn).iso
+
+    iso_label=$(get_iso_label "${dist_branding}_${profile}_${dist_release//.}")
 
     mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -K)
     work_dir=${chroots_iso}/${profile}/${target_arch}
