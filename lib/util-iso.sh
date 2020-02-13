@@ -612,7 +612,8 @@ load_profile(){
 
     iso_file=$(gen_iso_fn).iso
 
-    iso_label=$(get_iso_label "${dist_branding}_${profile}_${dist_release//.}")
+    [[ ${extra} == 'false' ]] && _edition=("m")
+    iso_label=$(get_iso_label "${dist_branding}_${profile}${_edition}_${dist_release//.}")
 
     mkchroot_args+=(-C ${pacman_conf} -S ${mirrors_conf} -B "${build_mirror}/${target_branch}" -K)
     work_dir=${chroots_iso}/${profile}/${target_arch}
