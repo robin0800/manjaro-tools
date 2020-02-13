@@ -21,6 +21,7 @@ import ${LIBDIR}/util.sh
 show_profile(){
     prepare_profile "$1"
     msg2 "iso_file: %s" "${iso_file}"
+    msg2 "iso_label: %s" "${iso_label}"
     if ${verbose}; then
         msg2 "autologin: %s" "${autologin}"
         msg2 "nonfree_mhwd: %s" "${nonfree_mhwd}"
@@ -84,7 +85,6 @@ display_settings(){
     msg2 "dist_codename: %s" "${dist_codename}"
 
     msg "ISO INFO:"
-    msg2 "iso_label: %s" "${iso_label}"
     msg2 "iso_compression: %s" "${iso_compression}"
 
     msg "BUILD QUEUE:"
