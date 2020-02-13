@@ -45,6 +45,12 @@ run_hook () {
     [[ -z "${img_flags}" ]] && img_flags="defaults"
     if [[ "${img_loop}" ]]; then
         img_dev=$(find_dev_by_path "${img_loop}")
+
+        if [[ -z "${img_dev}" ]]; then
+            [[ -b "/dev/disk/by-label/${img_label}" ]] &&
+                img_dev="/dev/disk/by-label/${img_label}"
+        fi
+
         mount_handler="miso_loop_mount_handler"
     fi
 }
