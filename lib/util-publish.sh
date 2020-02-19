@@ -130,35 +130,10 @@ sync_web_shell(){
     fi
 }
 
-sync_latest_index(){
-    msg2 "Creating index file ..."
-    local indexfile="${src_dir}/index.html"
-
-    local content="<!DOCTYPE html><html lang=\"en\"><head>
-        <meta charset=\"utf-8\"/>
-        <title>Manjaro ${profile} download</title>
-        <link href=\"https://fonts.googleapis.com/css?family=Open+Sans&display=swap\" rel=\"stylesheet\">
-        <link href=\"://styles.css\" type=\"text/css\" rel=\"stylesheet\"/>
-    </head>
-    <body>
-        <h2>Manjaro ${profile} ${dist_release}</h2><ul>"
-    echo ${content} > "${indexfile}"
-
-    content=$(cat ${src_dir}/${LINKS})
-    echo ${content}  >> "${indexfile}"
-
-    content="</ul></body></html>"
-    echo ${content} >> "${indexfile}"
-
-    msg2 "Uploading index file ..."
-    scp "${indexfile}" "${webshell}/${htdocs}/index.html"
-}
-
 sync_latest_pkg_list(){
     msg2 "Uploading package list ..."
     local pkglist="latest-pkgs.txt"
     scp "${src_dir}/${PKGLIST}" "${webshell}/${htdocs}/${pkglist}"
-    #echo body_link "${pkglist}" "${PKGLIST}" "Pkglist: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_checksum_sha256(){
@@ -166,8 +141,6 @@ sync_latest_checksum_sha256(){
     local filename="${LATEST_ISO}.sha256"
     local checksum_file="latest.sha256"
     scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
-    #local checksum=$(cat ${filename} | awk '{split($0,x," "); print x[1]}')
-    #echo body_link "${checksum_file}" "${checksum}" "SHA256: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_checksum_sha1(){
@@ -175,8 +148,6 @@ sync_latest_checksum_sha1(){
     local filename="${LATEST_ISO}.sha1"
     local checksum_file="latest.sha1"
     scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
-    #local checksum=$(cat ${filename} | awk '{split($0,x," "); print x[1]}')
-    #echo body_link "${checksum_file}" "${checksum}" "SHA1: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_signature(){
@@ -184,7 +155,6 @@ sync_latest_signature(){
     local filename="${LATEST_ISO}.sig"
     local signature="latest.sig"
     scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${signature}"
-    #echo body_link "${signature}" "${filename}" "GPG: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_torrent(){
@@ -192,7 +162,6 @@ sync_latest_torrent(){
     local filename="${LATEST_ISO}.torrent"
     local torrent="latest.torrent"
     scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${torrent}"
-    #echo body_link "${torrent}" "${filename}" "Torrent: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_php(){
@@ -205,16 +174,4 @@ sync_latest_html(){
     msg2 "Uploading url redirector ..."
     local html="latest"
     scp "${src_dir}/.latest" "${webshell}/${htdocs}/${html}"
-    #echo body_link "$html" "${profile} ${dist_release}" "Latest ISO: " >> "${src_dir}/${LINKS}"
-}
-
-# $1 link
-# $2 text
-# $3 description
-body_link(){
-    local osdn_io="https://manjaro.osdn.io"
-    if [[ ${edition} == "community" ]]; then
-        osdn_io="https://manjaro-community.osdn.io"
-    fi
-    echo "<li>$3 <a href=\"${osdn_io}/${profile}/$1\">$2</a></li>"
 }
