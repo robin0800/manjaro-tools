@@ -116,9 +116,9 @@ sync_web_shell(){
         [[ -f "${src_dir}/${LATEST_ISO}.sig" ]] && sync_latest_signature
         [[ -f "${src_dir}/${LATEST_ISO}.sha1" ]] && sync_latest_checksum_sha1
         [[ -f "${src_dir}/${LATEST_ISO}.sha256" ]] && sync_latest_checksum_sha256
-        #[[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
+        [[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
 
-        sync_latest_index
+        #sync_latest_index
 
         rm -f "${src_dir}/latest"
         rm -f "${src_dir}/latest.php"
