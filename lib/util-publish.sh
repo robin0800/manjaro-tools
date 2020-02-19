@@ -132,12 +132,11 @@ sync_latest_index(){
     msg2 "Creating index file ..."
     local indexfile="${src_dir}/index.html"
 
-    local content="<!DOCTYPE html><html lang="en">
-    <head>
+    local content="<!DOCTYPE html><html lang=\"en\"><head>
         <meta charset=\"utf-8\"/>
         <title>Manjaro ${profile} download</title>
         <link href=\"https://fonts.googleapis.com/css?family=Open+Sans&display=swap\" rel=\"stylesheet\">
-        <link href="://styles.css" type="text/css" rel="stylesheet"/>
+        <link href=\"://styles.css\" type=\"text/css\" rel=\"stylesheet\"/>
     </head>
     <body>
         <h2>Manjaro ${profile} ${dist_release}</h2><ul>"
