@@ -105,6 +105,7 @@ sync_dir(){
 }
 
 sync_web_shell(){
+    if [[ -f "${src_dir}/.latest" ]]; then
         LINKS="links.txt"
         LATEST_ISO=$(sed -e 's/\"/\n/g' < "${src_dir}/.latest" | grep -Eo 'http.*iso$' -m1 | awk '{split($0,x,"/"); print x[6]}')
         PKGLIST="${LATEST_ISO/.iso/-pkgs.txt}"
@@ -126,6 +127,7 @@ sync_web_shell(){
         rm -f "${src_dir}/*.iso.sig"
         rm -f "${src_dir}/*.iso.sha1"
         rm -f "${src_dir}/*.iso.sha256"
+    fi
 }
 
 sync_latest_index(){
@@ -156,7 +158,7 @@ sync_latest_pkg_list(){
     msg2 "Uploading package list ..."
     local pkglist="latest-pkgs.txt"
     scp "${src_dir}/${PKGLIST}" "${webshell}/${htdocs}/${pkglist}"
-    echo body_link "${pkglist}" "${PKGLIST}" "Pkglist: " >> "${src_dir}/${LINKS}"
+    #echo body_link "${pkglist}" "${PKGLIST}" "Pkglist: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_checksum_sha256(){
@@ -164,8 +166,8 @@ sync_latest_checksum_sha256(){
     local filename="${LATEST_ISO}.sha256"
     local checksum_file="latest.sha256"
     scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
-    local checksum=$(cat ${filename} | awk '{split($0,x," "); print x[1]}')
-    echo body_link "${checksum_file}" "${checksum}" "SHA256: " >> "${src_dir}/${LINKS}"
+    #local checksum=$(cat ${filename} | awk '{split($0,x," "); print x[1]}')
+    #echo body_link "${checksum_file}" "${checksum}" "SHA256: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_checksum_sha1(){
@@ -173,8 +175,8 @@ sync_latest_checksum_sha1(){
     local filename="${LATEST_ISO}.sha1"
     local checksum_file="latest.sha1"
     scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
-    local checksum=$(cat ${filename} | awk '{split($0,x," "); print x[1]}')
-    echo body_link "${checksum_file}" "${checksum}" "SHA1: " >> "${src_dir}/${LINKS}"
+    #local checksum=$(cat ${filename} | awk '{split($0,x," "); print x[1]}')
+    #echo body_link "${checksum_file}" "${checksum}" "SHA1: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_signature(){
@@ -182,7 +184,7 @@ sync_latest_signature(){
     local filename="${LATEST_ISO}.sig"
     local signature="latest.sig"
     scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${signature}"
-    echo body_link "${signature}" "${filename}" "GPG: " >> "${src_dir}/${LINKS}"
+    #echo body_link "${signature}" "${filename}" "GPG: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_torrent(){
@@ -190,7 +192,7 @@ sync_latest_torrent(){
     local filename="${LATEST_ISO}.torrent"
     local torrent="latest.torrent"
     scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${torrent}"
-    echo body_link "${torrent}" "${filename}" "Torrent: " >> "${src_dir}/${LINKS}"
+    #echo body_link "${torrent}" "${filename}" "Torrent: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_php(){
@@ -203,7 +205,7 @@ sync_latest_html(){
     msg2 "Uploading url redirector ..."
     local html="latest"
     scp "${src_dir}/.latest" "${webshell}/${htdocs}/${html}"
-    echo body_link "$html" "${profile} ${dist_release}" "Latest ISO: " >> "${src_dir}/${LINKS}"
+    #echo body_link "$html" "${profile} ${dist_release}" "Latest ISO: " >> "${src_dir}/${LINKS}"
 }
 
 # $1 link
