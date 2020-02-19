@@ -15,16 +15,17 @@ connect(){
     echo "${account}${storage}${project}"
 }
 
-connect_webserver(){
-    local webserver="@shell.osdn.net:/home/groups/m/ma/"
-    echo "${account}${webserver}${project}"
+connect_shell(){
+    local shell="@shell.osdn.net:/home/groups/m/ma/"
+    echo "${account}${shell}${project}"
 }
 
 make_torrent(){
     find ${src_dir} -type f -name "*.torrent" -delete
 
     if [[ -n $(find ${src_dir} -type f -name "*.iso") ]]; then
-        for iso in $(ls ${src_dir}/*.iso); do
+        isos=$(ls ${src_dir}/*.iso)
+        for iso in ${isos}; do
             local seed=https://${host}/dl/${project}/${iso##*/}
             local mktorrent_args=(-c "${torrent_meta}" -p -l ${piece_size} -a ${tracker_url} -w ${seed})
             ${verbose} && mktorrent_args+=(-v)
@@ -40,6 +41,9 @@ prepare_transfer(){
     edition=$(get_edition "${profile}")
     [[ -z ${project} ]] && project="$(get_project)"
     server=$(connect)
+
+    webshell=$(connect_shell)
+    htdocs="htdocs/${profile}"
 
     target_dir="${profile}/${dist_release}"
     src_dir="${run_dir}/${edition}/${target_dir}"
@@ -80,15 +84,19 @@ sync_dir(){
     msg "Start upload [%s] to [%s] ..." "$1" "${project}"
 
     while [[ $count -le $max_count ]]; do
-    rsync ${rsync_args[*]} --exclude '.latest*' ${src_dir}/ ${server}/${target_dir}/
+    rsync ${rsync_args[*]} --exclude '.latest*' --exclude 'index.html' --exclude 'links.txt' ${src_dir}/ ${server}/${target_dir}/
         if [[ $? != 0 ]]; then
             count=$(($count + 1))
             msg "Upload failed. retrying (%s/%s) ..." "$count" "$max_count"
             sleep 2
         else
             count=$(($max_count + 1))
-            [[ -f "${src_dir}/.latest" ]] && sync_latest_html
-            [[ -f "${src_dir}/.latest.php" ]] && sync_latest_php
+
+            # sync latest files
+            #   manjaro.osdn.io
+            #   manjaro-community.osdn.io
+            sync_web_shell
+
             msg "Done upload [%s]" "$1"
             show_elapsed_time "${FUNCNAME}" "${timer_start}"
         fi
@@ -96,20 +104,116 @@ sync_dir(){
 
 }
 
-sync_latest_html(){
-    msg2 "Uploading url redirector ..."
-    local webserver=$(connect_webserver)
-    local htdocs="htdocs/${profile}"
-    local html="latest"
-    scp "${src_dir}/.${html}" "${webserver}/${htdocs}/${html}"
-    rm -f "${src_dir}/.${html}"
+sync_web_shell(){
+        LINKS="links.txt"
+        LATEST_ISO=$(sed -e 's/\"/\n/g' < "${src_dir}/.latest" | grep -Eo 'http.*iso$' -m1 | awk '{split($0,x,"/"); print x[6]}')
+        PKGLIST="${LATEST_ISO/.iso/-pkgs.txt}"
+
+        [[ -f "${src_dir}/.latest" ]] && sync_latest_html
+        [[ -f "${src_dir}/.latest.php" ]] && sync_latest_php
+
+        [[ -f "${src_dir}/${LATEST_ISO}.torrent" ]] && sync_latest_torrent
+        [[ -f "${src_dir}/${LATEST_ISO}.sig" ]] && sync_latest_signature
+        [[ -f "${src_dir}/${LATEST_ISO}.sha1" ]] && sync_latest_checksum_sha1
+        [[ -f "${src_dir}/${LATEST_ISO}.sha256" ]] && sync_latest_checksum_sha256
+        #[[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
+
+        sync_latest_index
+
+        rm -f "${src_dir}/latest"
+        rm -f "${src_dir}/latest.php"
+        rm -f "${src_dir}/*.iso.torrent"
+        rm -f "${src_dir}/*.iso.sig"
+        rm -f "${src_dir}/*.iso.sha1"
+        rm -f "${src_dir}/*.iso.sha256"
+}
+
+sync_latest_index(){
+    msg2 "Creating index file ..."
+    local indexfile="${src_dir}/index.html"
+
+    local content="<!DOCTYPE html><html lang="en">
+    <head>
+        <meta charset=\"utf-8\"/>
+        <title>Manjaro ${profile} download</title>
+        <link href=\"https://fonts.googleapis.com/css?family=Open+Sans&display=swap\" rel=\"stylesheet\">
+        <link href="://styles.css" type="text/css" rel="stylesheet"/>
+    </head>
+    <body>
+        <h2>Manjaro ${profile} ${dist_release}</h2><ul>"
+    echo ${content} > "${indexfile}"
+
+    content=$(cat ${src_dir}/${LINKS})
+    echo ${content}  >> "${indexfile}"
+
+    content="</ul></body></html>"
+    echo ${content} >> "${indexfile}"
+
+    msg2 "Uploading index file ..."
+    scp "${indexfile}" "${webshell}/${htdocs}/index.html"
+}
+
+sync_latest_pkg_list(){
+    msg2 "Uploading package list ..."
+    local pkglist="latest-pkgs.txt"
+    scp "${src_dir}/${PKGLIST}" "${webshell}/${htdocs}/${pkglist}"
+    echo body_link "${pkglist}" "${PKGLIST}" "Pkglist: " >> "${src_dir}/${LINKS}"
+}
+
+sync_latest_checksum_sha256(){
+    msg2 "Uploading sha256 checksum file ..."
+    local filename="${LATEST_ISO}.sha256"
+    local checksum_file="latest.sha256"
+    scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
+    local checksum=$(cat ${filename} | awk '{split($0,x," "); print x[1]}')
+    echo body_link "${checksum_file}" "${checksum}" "SHA256: " >> "${src_dir}/${LINKS}"
+}
+
+sync_latest_checksum_sha1(){
+    msg2 "Uploading sha1 checksum file ..."
+    local filename="${LATEST_ISO}.sha1"
+    local checksum_file="latest.sha1"
+    scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
+    local checksum=$(cat ${filename} | awk '{split($0,x," "); print x[1]}')
+    echo body_link "${checksum_file}" "${checksum}" "SHA1: " >> "${src_dir}/${LINKS}"
+}
+
+sync_latest_signature(){
+    msg2 "Uploading signature file ..."
+    local filename="${LATEST_ISO}.sig"
+    local signature="latest.sig"
+    scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${signature}"
+    echo body_link "${signature}" "${filename}" "GPG: " >> "${src_dir}/${LINKS}"
+}
+
+sync_latest_torrent(){
+    msg2 "Uploading torrent file ..."
+    local filename="${LATEST_ISO}.torrent"
+    local torrent="latest.torrent"
+    scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${torrent}"
+    echo body_link "${torrent}" "${filename}" "Torrent: " >> "${src_dir}/${LINKS}"
 }
 
 sync_latest_php(){
     msg2 "Uploading php redirector ..."
-    local webserver=$(connect_webserver)
-    local htdocs="htdocs/${profile}"
     local php="latest.php"
-    scp "${src_dir}/.${php}" "${webserver}/${htdocs}/${php}"
-    rm -f "${src_dir}/.${php}"
+    scp "${src_dir}/.${php}" "${webshell}/${htdocs}/${php}"
+}
+
+sync_latest_html(){
+    msg2 "Uploading url redirector ..."
+    local html="latest"
+    scp "${src_dir}/.latest" "${webshell}/${htdocs}/${html}"
+    echo body_link "$html" "${profile} ${dist_release}" "Latest ISO: " >> "${src_dir}/${LINKS}"
+}
+
+# $1 link
+# $2 text
+# $3 description
+body_link(){
+    local osdn_io="https://manjaro.osdn.io"
+    if [[ ${edition} == "community" ]]; then
+        osdn_io="https://manjaro-community.osdn.io"
+    fi
+    echo "<li>$3 <a href=\"${osdn_io}/${profile}/$1\">$2</a></li>"
 }
