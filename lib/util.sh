@@ -196,8 +196,10 @@ get_branch(){
 # $1: chroot
 # $2: branch
 set_branch(){
-    info "Setting mirrorlist branch: %s" "$2"
-    sed -e "s|/stable|/$2|g" -i "$1/etc/pacman.d/mirrorlist"
+    if [[ $1 == "rootfs" ]]; then
+        info "Setting mirrorlist branch: %s" "$2"
+        sed -e "s|/stable|/$2|g" -i "$1/etc/pacman.d/mirrorlist"
+    fi
 }
 
 init_common(){
@@ -763,7 +765,7 @@ is_valid_arch_iso(){
 
 is_valid_branch(){
     case $1 in
-        'stable'|'testing'|'unstable') return 0 ;;
+        'stable'|'stable-staging'|'testing'|'unstable') return 0 ;;
         *) return 1 ;;
     esac
 }
