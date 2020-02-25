@@ -196,7 +196,7 @@ get_branch(){
 # $1: chroot
 # $2: branch
 set_branch(){
-    if [[ $1 == "rootfs" ]]; then
+    if [[ $1 =~ "rootfs" ]]; then
         info "Setting mirrorlist branch: %s" "$2"
         sed -e "s|/stable|/$2|g" -i "$1/etc/pacman.d/mirrorlist"
     fi
