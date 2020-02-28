@@ -187,7 +187,7 @@ assemble_iso(){
         -e --interval:appended_partition_2:all:: \
         -no-emul-boot \
         -full-iso9660-filenames \
-        -iso-level 3 \
+        -iso-level 3 -rock -joliet \
         -o ${iso_dir}/${iso_file} \
         ${iso_root}/
 }
