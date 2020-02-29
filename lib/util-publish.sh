@@ -9,6 +9,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+local MINIMAL
+
 connect(){
     ${alt_storage} && server="storage-in" || server="storage"
     local storage="@${server}.osdn.net:/storage/groups/m/ma/"
@@ -92,10 +94,7 @@ sync_dir(){
         else
             count=$(($max_count + 1))
 
-            # sync latest files
-            #   manjaro.osdn.io
-            #   manjaro-community.osdn.io
-            sync_web_shell
+            ${shell_upload} && upload_permalinks
 
             msg "Done upload [%s]" "$1"
             show_elapsed_time "${FUNCNAME}" "${timer_start}"
@@ -104,74 +103,125 @@ sync_dir(){
 
 }
 
-sync_web_shell(){
+upload_permalinks(){
+    ## permalinks for full ISO
     if [[ -f "${src_dir}/.latest" ]]; then
-        LINKS="links.txt"
+        msg "Uploading permalinks ..."
         LATEST_ISO=$(sed -e 's/\"/\n/g' < "${src_dir}/.latest" | grep -Eo 'http.*iso$' -m1 | awk '{split($0,x,"/"); print x[6]}')
         PKGLIST="${LATEST_ISO/.iso/-pkgs.txt}"
 
+        ## upload redirector files
         [[ -f "${src_dir}/.latest" ]] && sync_latest_html
         [[ -f "${src_dir}/.latest.php" ]] && sync_latest_php
 
+        ## upload verification files, torrent and package list
         [[ -f "${src_dir}/${LATEST_ISO}.torrent" ]] && sync_latest_torrent
         [[ -f "${src_dir}/${LATEST_ISO}.sig" ]] && sync_latest_signature
         [[ -f "${src_dir}/${LATEST_ISO}.sha1" ]] && sync_latest_checksum_sha1
         [[ -f "${src_dir}/${LATEST_ISO}.sha256" ]] && sync_latest_checksum_sha256
         [[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
 
-        #sync_latest_index
-
+        ## remove uploaded files
         rm -f "${src_dir}/latest"
         rm -f "${src_dir}/latest.php"
-        rm -f "${src_dir}/*.iso.torrent"
-        rm -f "${src_dir}/*.iso.sig"
-        rm -f "${src_dir}/*.iso.sha1"
-        rm -f "${src_dir}/*.iso.sha256"
+        rm -f "${src_dir}/${LATEST_ISO}.torrent"
+        rm -f "${src_dir}/${LATEST_ISO}.sig"
+        rm -f "${src_dir}/${LATEST_ISO}.sha1"
+        rm -f "${src_dir}/${LATEST_ISO}.sha256"
+    fi
+
+    ## permalinks for minimal ISO
+    if [[ -f "${src_dir}/.latest-minimal" ]]; then
+        msg "Uploading permalinks (minimal) ..."
+        MINIMAL="yes"
+        LATEST_ISO=$(sed -e 's/\"/\n/g' < "${src_dir}/.latest-minimal" | grep -Eo 'http.*iso$' -m1 | awk '{split($0,x,"/"); print x[6]}')
+        PKGLIST="${LATEST_ISO/.iso/-pkgs.txt}"
+
+        ## upload redirector files
+        [[ -f "${src_dir}/.latest-minimal" ]] && sync_latest_html
+        [[ -f "${src_dir}/.latest-minimal.php" ]] && sync_latest_php
+
+        ## upload verification files, torrent and package list
+        [[ -f "${src_dir}/${LATEST_ISO}.torrent" ]] && sync_latest_torrent
+        [[ -f "${src_dir}/${LATEST_ISO}.sig" ]] && sync_latest_signature
+        [[ -f "${src_dir}/${LATEST_ISO}.sha1" ]] && sync_latest_checksum_sha1
+        [[ -f "${src_dir}/${LATEST_ISO}.sha256" ]] && sync_latest_checksum_sha256
+        [[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
+
+        ## remove uploaded files
+        rm -f "${src_dir}/latest-minimal"
+        rm -f "${src_dir}/latest-minimal.php"
+        rm -f "${src_dir}/${LATEST_ISO}.torrent"
+        rm -f "${src_dir}/${LATEST_ISO}.sig"
+        rm -f "${src_dir}/${LATEST_ISO}.sha1"
+        rm -f "${src_dir}/${LATEST_ISO}.sha256"
     fi
 }
 
 sync_latest_pkg_list(){
     msg2 "Uploading package list ..."
     local pkglist="latest-pkgs.txt"
-    scp "${src_dir}/${PKGLIST}" "${webshell}/${htdocs}/${pkglist}"
+    [[ ${MINIMAL} == "yes" ]] && pkglist="latest-minimal-pkgs.txt"
+    chmod g+w "${src_dir}/${PKGLIST}"
+    sftp -p "${webshell}/${htdocs}/${pkglist} <<<'put ${src_dir}/${PKGLIST}'"
 }
 
 sync_latest_checksum_sha256(){
     msg2 "Uploading sha256 checksum file ..."
     local filename="${LATEST_ISO}.sha256"
     local checksum_file="latest.sha256"
-    scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
+    [[ ${MINIMAL} == "yes" ]] && checksum_file="latest-minimal.sha256"
+    #scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
+    chmod g+w "${src_dir}/${filename}"
+    sftp -p "${webshell}/${htdocs}/${checksum_file} <<<'put ${src_dir}/${filename}'"
 }
 
 sync_latest_checksum_sha1(){
     msg2 "Uploading sha1 checksum file ..."
     local filename="${LATEST_ISO}.sha1"
     local checksum_file="latest.sha1"
-    scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
+    [[ ${MINIMAL} == "yes" ]] && checksum_file="latest-minimal.sha1"
+    #scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
+    chmod g+w "${src_dir}/${filename}"
+    sftp -p "${webshell}/${htdocs}/${checksum_file} <<<'put ${src_dir}/${filename}'"
 }
 
 sync_latest_signature(){
     msg2 "Uploading signature file ..."
     local filename="${LATEST_ISO}.sig"
     local signature="latest.sig"
-    scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${signature}"
+    [[ ${MINIMAL} == "yes" ]] && signature="latest-minimal.sig"
+    #scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${signature}"
+    chmod g+w "${src_dir}/${filename}"
+    sftp -p "${webshell}/${htdocs}/${signature} <<<'put ${src_dir}/${filename}'"
 }
 
 sync_latest_torrent(){
     msg2 "Uploading torrent file ..."
     local filename="${LATEST_ISO}.torrent"
     local torrent="latest.torrent"
-    scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${torrent}"
+    [[ ${MINIMAL} == "yes" ]] && torrent="latest-minimal.torrent"
+    #scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${torrent}"
+    chmod g+w "${src_dir}/${filename}"
+    sftp -p "${webshell}/${htdocs}/${torrent} <<<'put ${src_dir}/${filename}'"
 }
 
 sync_latest_php(){
     msg2 "Uploading php redirector ..."
+    local filename=".latest.php"
     local php="latest.php"
-    scp "${src_dir}/.${php}" "${webshell}/${htdocs}/${php}"
+    [[ ${MINIMAL} == "yes" ]] && php="latest-minimal.php"
+    #scp "${src_dir}/.${php}" "${webshell}/${htdocs}/${php}"
+    chmod g+w "${src_dir}/${filename}"
+    sftp -p "${webshell}/${htdocs}/${php} <<<'put ${src_dir}/${filename}'"
 }
 
 sync_latest_html(){
     msg2 "Uploading url redirector ..."
+    local filename=".latest"
     local html="latest"
-    scp "${src_dir}/.latest" "${webshell}/${htdocs}/${html}"
+    [[ ${MINIMAL} == "yes" ]] && html="latest-minimal"
+    #scp "${src_dir}/.${html}" "${webshell}/${htdocs}/${html}"
+    chmod g+w "${src_dir}/${filename}"
+    sftp -p "${webshell}/${htdocs}/${html} <<<'put ${src_dir}/${filename}'"
 }

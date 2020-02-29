@@ -29,6 +29,7 @@ show_profile(){
         [[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
 
         msg2 "extra: %s" "${extra}"
+        msg2 "permalink: %s" "${permalink}"
 
         msg2 "netinstall: %s" "${netinstall}"
         msg2 "chrootcfg: %s" "${chrootcfg}"
@@ -78,6 +79,8 @@ display_settings(){
     msg2 "images_only: %s" "${images_only}"
     msg2 "iso_only: %s" "${iso_only}"
     msg2 "persist: %s" "${persist}"
+    msg2 "extra: %s" "${full_iso}"
+    msg2 "permalink: %s" "${permalink}"
 
     msg "DIST SETTINGS:"
     msg2 "dist_name: %s" "${dist_name}"
@@ -107,31 +110,33 @@ iso_only=false
 verbose=false
 persist=false
 initialize=false
+permalink=false
 
 usage() {
     echo "Usage: ${0##*/} [options]"
-    echo "    -i                 Initialize iso-profiles repo [default: ${branch}]"
-    echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
     echo "    -a <arch>          Arch [default: ${target_arch}]"
     echo "    -b <branch>        Branch [default: ${target_branch}]"
+    echo '    -c                 Disable clean work dir'
+    echo '    -d <comp>          Compression used for build ISO: gzip, lzma, lz4, lzo, xz, zstd'
+    echo "                       [default: ${iso_compression}]"
+    echo '    -f                 Build full ISO (extra=true)'
+    echo '    -g <key>           The gpg key for sfs signing'
+    echo "                       [default: ${gpgkey}]"
+    echo "    -i                 Initialize iso-profiles repo [default: ${branch}]"
+    echo '    -k <name>          Kernel to use'
+    echo "                       [default: ${kernel}]"
+    echo '    -l                 Create permalink'
+    echo '    -m                 Set SquashFS image mode to persistence'
+    echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
+    echo '    -q                 Query settings and pretend build'
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
     echo '    -t <dir>           Target directory'
     echo "                       [default: ${cache_dir_iso}]"
-    echo '    -k <name>          Kernel to use'
-    echo "                       [default: ${kernel}]"
-    echo '    -g <key>           The gpg key for sfs signing'
-    echo "                       [default: ${gpgkey}]"
-    echo '    -m                 Set SquashFS image mode to persistence'
-    echo '    -c                 Disable clean work dir'
-    echo '    -f                 Build full ISO (extra=true)'
-    echo '    -d <comp>          Compression used for build ISO: gzip, lzma, lz4, lzo, xz, zstd'
-    echo "                       [default: ${iso_compression}]"
+    echo '    -v                 Verbose output to log file, show profile detail (-q)'
     echo '    -x                 Build images only'
     echo '    -z                 Generate iso only'
     echo '                       Requires pre built images (-x)'
-    echo '    -v                 Verbose output to log file, show profile detail (-q)'
-    echo '    -q                 Query settings and pretend build'
     echo '    -h                 This help'
     echo ''
     echo ''
@@ -140,7 +145,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:g:d:cfzxmvqhi'
+opts='p:a:b:r:t:k:g:d:cfzxmvqhil'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -160,6 +165,7 @@ while getopts "${opts}" arg; do
         v) verbose=true ;;
         x) images_only=true ;;
         z) iso_only=true ;;
+        l) permalink=true ;;
         h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
     esac
