@@ -215,31 +215,38 @@ make_iso() {
     fi
     assemble_iso
 
-    [[ ${target_branch} == "stable" ]] && [[ ${extra} == "true" ]] && gen_latest_html
+    ${permalink} && gen_permalink
 
     msg "Done [Build ISO]"
 }
 
-gen_latest_html(){
+gen_permalink(){
     if [[ ${edition} == "community" ]] || [[ ${edition} == "manjaro" ]]; then
-    	if [[ -f "${iso_dir}/${iso_file}" ]]; then
-    		msg2 "Creating download link ..."
+        if [[ -f "${iso_dir}/${iso_file}" ]]; then
+            msg2 "Creating download link ..."
             direct_url="https://osdn.net/dl/${edition}/${iso_file}"
-    		[[ ${edition} == "community" ]] && direct_url="https://osdn.net/dl/manjaro-${edition}/${iso_file}"
-    		html_doc="<!DOCTYPE HTML>"
-    		html_doc+="<meta charset=\"UTF-8\">"
-    		html_doc+="<meta http-equiv=\"refresh\" content=\"1; url=${direct_url}\">"
-    		html_doc+="<script>window.location.href=\"${direct_url}\"</script>"
-    		html_doc+="<title>Download Redirection</title>"
-    		html_doc+="If you are not redirected automatically, follow the <a href=\"${direct_url}\">link to latest iso</a>"
-    		echo ${html_doc} > "${iso_dir}/.latest"
-
+            [[ ${edition} == "community" ]] && direct_url="https://osdn.net/dl/manjaro-${edition}/${iso_file}"
+            ## html permalink
+            html_doc="<!DOCTYPE HTML>"
+            html_doc+="<meta charset=\"UTF-8\">"
+            html_doc+="<meta http-equiv=\"refresh\" content=\"1; url=${direct_url}\">"
+            html_doc+="<script>window.location.href=\"${direct_url}\"</script>"
+            html_doc+="<title>Download Redirection</title>"
+            html_doc+="If you are not redirected automatically, follow the <a href=\"${direct_url}\">link to latest iso</a>"
+            ## php permalink
             php_doc="<?php "
             php_doc+="header('Location: ' . '${direct_url}', true, 303); "
             php_doc+="die(); "
             php_doc+="?>"
-            echo ${php_doc} > "${iso_dir}/.latest.php"
-    	fi
+            ## write files
+            if [[ ${extra} == "true" ]]; then
+                echo ${html_doc} > "${iso_dir}/.latest"
+                echo ${php_doc} > "${iso_dir}/.latest.php"
+            else
+                echo ${html_doc} > "${iso_dir}/.latest-minimal"
+                echo ${php_doc} > "${iso_dir}/.latest-minimal.php"
+            fi
+        fi
     fi
 }
 

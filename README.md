@@ -69,7 +69,7 @@ overriding
 # log_dir='/var/log/manjaro-tools'
 
 # custom build mirror server
-# build_mirror=https://mirror.netzspielplatz.de/manjaro/packages
+# build_mirror=https://manjaro.moson.eu
 
 ################ buildtree ###############
 
@@ -95,13 +95,13 @@ overriding
 # build_list_iso=default
 
 # the dist release; default: auto
-# dist_release=17.1
+# dist_release=auto
 
 # the branding; default: auto
-# dist_branding="MJRO"
+# dist_branding="MANJARO"
 
 # unset defaults to given value
-# kernel="linux414"
+# kernel="linux54"
 
 # gpg key; leave empty or commented to skip sfs signing
 # gpgkey=""
@@ -240,6 +240,7 @@ Usage: buildiso [options]
     -h                 This help
     -k <name>          Kernel to use
                        [default: linux49]
+    -l                 Create permalink
     -m                 Set SquashFS image mode to persistence
     -p <profile>       Buildset or profile [default: default]
     -q                 Query settings and pretend build
@@ -405,6 +406,7 @@ Usage: deployiso [options]
     -t                 Create ISO torrent
     -u                 Update remote directory
     -v                 Verbose output
+    -z                 Upload permalinks (shell.osdn.net)
 ~~~
 
 ###### * upload official build list, ie all built iso defined in a build list
