@@ -120,14 +120,6 @@ upload_permalinks(){
         [[ -f "${src_dir}/${LATEST_ISO}.sha1" ]] && sync_latest_checksum_sha1
         [[ -f "${src_dir}/${LATEST_ISO}.sha256" ]] && sync_latest_checksum_sha256
         [[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
-
-        ## remove uploaded files
-        rm -f "${src_dir}/latest"
-        rm -f "${src_dir}/latest.php"
-        rm -f "${src_dir}/${LATEST_ISO}.torrent"
-        rm -f "${src_dir}/${LATEST_ISO}.sig"
-        rm -f "${src_dir}/${LATEST_ISO}.sha1"
-        rm -f "${src_dir}/${LATEST_ISO}.sha256"
     fi
 
     ## permalinks for minimal ISO
@@ -147,14 +139,6 @@ upload_permalinks(){
         [[ -f "${src_dir}/${LATEST_ISO}.sha1" ]] && sync_latest_checksum_sha1
         [[ -f "${src_dir}/${LATEST_ISO}.sha256" ]] && sync_latest_checksum_sha256
         [[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
-
-        ## remove uploaded files
-        rm -f "${src_dir}/latest-minimal"
-        rm -f "${src_dir}/latest-minimal.php"
-        rm -f "${src_dir}/${LATEST_ISO}.torrent"
-        rm -f "${src_dir}/${LATEST_ISO}.sig"
-        rm -f "${src_dir}/${LATEST_ISO}.sha1"
-        rm -f "${src_dir}/${LATEST_ISO}.sha256"
     fi
 }
 
