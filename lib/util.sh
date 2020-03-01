@@ -462,8 +462,6 @@ load_profile_config(){
 
     [[ -z ${office_installer} ]] && office_installer="false"
 
-    [[ -z ${permalink} ]] && permalink="false"
-
     return 0
 }
 
@@ -511,7 +509,6 @@ reset_profile(){
     unset extra
     unset full_iso
     unset office_installer
-    unset permalink
 }
 
 check_profile(){

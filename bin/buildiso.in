@@ -148,7 +148,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:g:d:cfzxmvqhilon'
+opts='p:a:b:r:t:k:g:d:cfzxmvqhilo'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -169,7 +169,7 @@ while getopts "${opts}" arg; do
         x) images_only=true ;;
         z) iso_only=true ;;
         l) permalink=true ;;
-        n) office_installer=false ;;
+        o) office_installer=true ;;
         h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
     esac
