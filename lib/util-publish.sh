@@ -190,7 +190,7 @@ sync_latest_php(){
     msg2 "Uploading php redirector ..."
     local filename=".latest.php"
     local php="latest.php"
-    [[ ${MINIMAL} == "yes" ]] && php="latest-minimal.php"
+    [[ ${MINIMAL} == "yes" ]] && filename=".latest.php" && php="latest-minimal.php"
     chmod g+w "${src_dir}/${filename}"
     scp -p "${src_dir}/.${php}" "${webshell}/${htdocs}/${php}"
 }
@@ -199,7 +199,7 @@ sync_latest_html(){
     msg2 "Uploading url redirector ..."
     local filename=".latest"
     local html="latest"
-    [[ ${MINIMAL} == "yes" ]] && html="latest-minimal"
+    [[ ${MINIMAL} == "yes" ]] && filename=".latest-minimal" && html="latest-minimal"
     chmod g+w "${src_dir}/${filename}"
     scp -p "${src_dir}/.${html}" "${webshell}/${htdocs}/${html}"
 }
