@@ -147,7 +147,7 @@ sync_latest_pkg_list(){
     local pkglist="latest-pkgs.txt"
     [[ ${MINIMAL} == "yes" ]] && pkglist="latest-minimal-pkgs.txt"
     chmod g+w "${src_dir}/${PKGLIST}"
-    sftp -p "${webshell}/${htdocs}/${pkglist} <<<'put ${src_dir}/${PKGLIST}'"
+    scp -p "${src_dir}/${PKGLIST}" "${webshell}/${htdocs}/${pkglist}"
 }
 
 sync_latest_checksum_sha256(){
@@ -155,9 +155,8 @@ sync_latest_checksum_sha256(){
     local filename="${LATEST_ISO}.sha256"
     local checksum_file="latest.sha256"
     [[ ${MINIMAL} == "yes" ]] && checksum_file="latest-minimal.sha256"
-    #scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
     chmod g+w "${src_dir}/${filename}"
-    sftp -p "${webshell}/${htdocs}/${checksum_file} <<<'put ${src_dir}/${filename}'"
+    scp -p "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
 }
 
 sync_latest_checksum_sha1(){
@@ -165,9 +164,8 @@ sync_latest_checksum_sha1(){
     local filename="${LATEST_ISO}.sha1"
     local checksum_file="latest.sha1"
     [[ ${MINIMAL} == "yes" ]] && checksum_file="latest-minimal.sha1"
-    #scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
     chmod g+w "${src_dir}/${filename}"
-    sftp -p "${webshell}/${htdocs}/${checksum_file} <<<'put ${src_dir}/${filename}'"
+    scp -p "${src_dir}/${filename}" "${webshell}/${htdocs}/${checksum_file}"
 }
 
 sync_latest_signature(){
@@ -175,9 +173,8 @@ sync_latest_signature(){
     local filename="${LATEST_ISO}.sig"
     local signature="latest.sig"
     [[ ${MINIMAL} == "yes" ]] && signature="latest-minimal.sig"
-    #scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${signature}"
     chmod g+w "${src_dir}/${filename}"
-    sftp -p "${webshell}/${htdocs}/${signature} <<<'put ${src_dir}/${filename}'"
+    scp -p "${src_dir}/${filename}" "${webshell}/${htdocs}/${signature}"
 }
 
 sync_latest_torrent(){
@@ -185,9 +182,8 @@ sync_latest_torrent(){
     local filename="${LATEST_ISO}.torrent"
     local torrent="latest.torrent"
     [[ ${MINIMAL} == "yes" ]] && torrent="latest-minimal.torrent"
-    #scp "${src_dir}/${filename}" "${webshell}/${htdocs}/${torrent}"
     chmod g+w "${src_dir}/${filename}"
-    sftp -p "${webshell}/${htdocs}/${torrent} <<<'put ${src_dir}/${filename}'"
+    scp -p "${src_dir}/${filename}" "${webshell}/${htdocs}/${torrent}"
 }
 
 sync_latest_php(){
@@ -195,9 +191,8 @@ sync_latest_php(){
     local filename=".latest.php"
     local php="latest.php"
     [[ ${MINIMAL} == "yes" ]] && php="latest-minimal.php"
-    #scp "${src_dir}/.${php}" "${webshell}/${htdocs}/${php}"
     chmod g+w "${src_dir}/${filename}"
-    sftp -p "${webshell}/${htdocs}/${php} <<<'put ${src_dir}/${filename}'"
+    scp -p "${src_dir}/.${php}" "${webshell}/${htdocs}/${php}"
 }
 
 sync_latest_html(){
@@ -205,7 +200,6 @@ sync_latest_html(){
     local filename=".latest"
     local html="latest"
     [[ ${MINIMAL} == "yes" ]] && html="latest-minimal"
-    #scp "${src_dir}/.${html}" "${webshell}/${htdocs}/${html}"
     chmod g+w "${src_dir}/${filename}"
-    sftp -p "${webshell}/${htdocs}/${html} <<<'put ${src_dir}/${filename}'"
+    scp -p "${src_dir}/.${html}" "${webshell}/${htdocs}/${html}"
 }
