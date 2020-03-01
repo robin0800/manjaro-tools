@@ -462,6 +462,8 @@ load_profile_config(){
 
     [[ -z ${office_installer} ]] && office_installer="false"
 
+    [[ -z ${permalink} ]] && permalink="false"
+
     return 0
 }
 
@@ -508,6 +510,8 @@ reset_profile(){
     unset geoip
     unset extra
     unset full_iso
+    unset office_installer
+    unset permalink
 }
 
 check_profile(){
@@ -625,7 +629,7 @@ load_pkgs(){
     esac
 
     local _office _office_rm
-    if ${office_chooser}; then
+    if ${office_installer}; then
         _office="s|>office||g"
     else
         _office_rm="s|>office.*||g"
