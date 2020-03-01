@@ -460,6 +460,8 @@ load_profile_config(){
     basic='true'
     [[ ${extra} == 'true' ]] && basic='false'
 
+    [[ -z ${office_installer} ]] && office_installer="false"
+
     return 0
 }
 
@@ -622,6 +624,13 @@ load_pkgs(){
         ;;
     esac
 
+    local _office _office_rm
+    if ${office_chooser}; then
+        _office="s|>office||g"
+    else
+        _office_rm="s|>office.*||g"
+    fi
+
     local _blacklist="s|>blacklist.*||g" \
         _kernel="s|KERNEL|$kernel|g" \
         _used_kernel=${kernel:5:2} \
@@ -649,6 +658,8 @@ load_pkgs(){
             | sed "$_basic_rm" \
             | sed "$_extra" \
             | sed "$_extra_rm" \
+            | sed "$_office" \
+            | sed "$_office_rm" \            
             | sed "$_clean")
 
     if [[ $1 == "${packages_mhwd}" ]]; then
