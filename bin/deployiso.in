@@ -46,6 +46,7 @@ display_settings(){
     msg2 "signiso: %s" "${sign}"
     msg2 "torrent: %s" "${torrent}"
     msg2 "shell_upload: %s" "${shell_upload}"
+    msg2 "upd_homepage: %s" "${upd_homepage}"
 
     if ${torrent}; then
         msg2 "tracker_url: %s" "${tracker_url}"
@@ -77,6 +78,7 @@ verbose=false
 sign=false
 alt_storage=false
 shell_upload=false
+upd_homepage=false
 
 rsync_args=(-aP -e ssh)
 
@@ -92,13 +94,14 @@ usage() {
     echo '    -t                 Create ISO torrent'
     echo '    -u                 Update remote directory'
     echo '    -v                 Verbose output'
+    echo '    -w                 Update download page on manjaro.org'
     echo '    -z                 Upload permalinks (shell.osdn.net)'
     echo ''
     echo ''
     exit $1
 }
 
-opts='adhl:p:qstuvz'
+opts='adhl:p:qstuvwz'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -111,6 +114,7 @@ while getopts "${opts}" arg; do
         t) torrent=true ;;
         u) update=true; rsync_args+=(-u) ;;
         v) verbose=true; rsync_args+=(-v --stats) ;;
+        w) upd_homepage=true; shell_upload=true ;;
         z) shell_upload=true ;;
         h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
