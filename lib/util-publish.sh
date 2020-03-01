@@ -190,7 +190,7 @@ sync_latest_php(){
     msg2 "Uploading php redirector ..."
     local filename=".latest.php"
     local php="latest.php"
-    [[ ${MINIMAL} == "yes" ]] && filename=".latest.php" && php="latest-minimal.php"
+    [[ ${MINIMAL} == "yes" ]] && filename=".latest-minimal.php" && php="latest-minimal.php"
     chmod g+w "${src_dir}/${filename}"
     scp -p "${src_dir}/.${php}" "${webshell}/${htdocs}/${php}"
 }
