@@ -216,7 +216,7 @@ pull_hp_repo(){
     [[ -z $SRCDEST ]] && SRCDEST=${cache_dir}
     
     hp_repo=manjaro-homepage
-    dl_file="${SRCDEST}/${hp_repo}/site/content/download/${edition}/${profile}.md"
+    dl_file="${SRCDEST}/${hp_repo}/site/content/downloads/${edition}/${profile}.md"
 
     cd "${SRCDEST}"
     if [[ ! -d "${hp_repo}" ]]; then
