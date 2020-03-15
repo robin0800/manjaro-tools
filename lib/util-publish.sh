@@ -86,7 +86,7 @@ sync_dir(){
     msg "Start upload [%s] to [%s] ..." "$1" "${project}"
 
     while [[ $count -le $max_count ]]; do
-    rsync ${rsync_args[*]} --exclude '.latest*' --exclude 'index.html' --exclude 'links.txt' ${src_dir}/ ${server}/${target_dir}/
+        rsync ${rsync_args[*]} --exclude '.latest*' --exclude 'index.html' --exclude 'links.txt' ${src_dir}/ ${server}/${target_dir}/
         if [[ $? != 0 ]]; then
             count=$(($count + 1))
             msg "Upload failed. retrying (%s/%s) ..." "$count" "$max_count"
@@ -94,6 +94,7 @@ sync_dir(){
         else
             count=$(($max_count + 1))
 
+            ${upd_homepage} && pull_hp_repo
             ${shell_upload} && upload_permalinks
 
             msg "Done upload [%s]" "$1"
@@ -120,6 +121,8 @@ upload_permalinks(){
         [[ -f "${src_dir}/${LATEST_ISO}.sha1" ]] && sync_latest_checksum_sha1
         [[ -f "${src_dir}/${LATEST_ISO}.sha256" ]] && sync_latest_checksum_sha256
         [[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
+        
+        ${upd_homepage} && upd_dl_checksum
     fi
 
     ## permalinks for minimal ISO
@@ -139,7 +142,11 @@ upload_permalinks(){
         [[ -f "${src_dir}/${LATEST_ISO}.sha1" ]] && sync_latest_checksum_sha1
         [[ -f "${src_dir}/${LATEST_ISO}.sha256" ]] && sync_latest_checksum_sha256
         [[ -f "${src_dir}/${PKGLIST}" ]] && sync_latest_pkg_list
+        
+        ${upd_homepage} && upd_dl_checksum_minimal
     fi
+
+    ${upd_homepage} && upd_dl_version && push_hp_repo
 }
 
 sync_latest_pkg_list(){
@@ -202,4 +209,52 @@ sync_latest_html(){
     [[ ${MINIMAL} == "yes" ]] && filename=".latest-minimal" && html="latest-minimal"
     chmod g+w "${src_dir}/${filename}"
     scp -p "${src_dir}/.${html}" "${webshell}/${htdocs}/${html}"
+}
+
+pull_hp_repo(){
+    load_vars "$USER_HOME/.makepkg.conf" || load_vars /etc/makepkg.conf
+    [[ -z $SRCDEST ]] && SRCDEST=${cache_dir}
+    
+    hp_repo=manjaro-homepage
+    dl_file="${SRCDEST}/${hp_repo}/site/content/downloads/${edition}/${profile}.md"
+
+    cd "${SRCDEST}"
+    if [[ ! -d "${hp_repo}" ]]; then
+        msg "Cloning manjaro.org"
+        git clone "ssh://git@gitlab.manjaro.org:22277/webpage/${hp_repo}.git"
+    else
+        cd "${hp_repo}"
+        msg "Pulling manjaro.org"
+        git pull
+    fi
+}
+
+push_hp_repo(){
+    cd "${SRCDEST}/${hp_repo}"
+    msg "Updating manjaro.org"
+    git add ${dl_file}
+    git commit -m "update download ${profile}"
+    git push
+}
+
+upd_dl_checksum(){
+    local checksum=$(cat "${src_dir}/${LATEST_ISO}.sha1" | cut -d' ' -f1)
+    msg "Updating download page:"
+    msg2 "checksum > ${checksum}"
+    sed -i "/Download_x64_Checksum/c\Download_x64_Checksum = \"${checksum}\"" ${dl_file}
+}
+
+upd_dl_checksum_minimal(){
+    local checksum=$(cat "${src_dir}/${LATEST_ISO}.sha1" | cut -d' ' -f1)
+    msg "Updating download page:"
+    msg2 "checksum_minimal > ${checksum}"
+    sed -i "/Download_Minimal_x64_Checksum/c\Download_Minimal_x64_Checksum = \"${checksum}\"" ${dl_file}
+}
+
+upd_dl_version(){
+    timestamp=$(date -u +%Y-%m-%dT%T%Z)
+    msg2 "Version > ${dist_release}"
+    sed -i "/Version/c\Version = \"${dist_release}\"" ${dl_file}
+    msg2 "date > ${timestamp}"
+    sed -i "/date/c\date = \"${timestamp}\"" ${dl_file}
 }
