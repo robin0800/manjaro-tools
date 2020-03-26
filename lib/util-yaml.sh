@@ -282,14 +282,14 @@ write_settings_conf(){
     echo "sequence:" >> "$conf"
     echo "    - show:" >> "$conf"
     echo "        - welcome" >> "$conf" && write_welcome_conf
-    if ${oem_used} || [[ ${profile} == "gnome" ]]; then
+    if ${oem_used}; then
         msg2 "Skipping to show locale and keyboard modules."
     else
         echo "        - locale" >> "$conf" && write_locale_conf
         echo "        - keyboard" >> "$conf"
     fi
     echo "        - partition" >> "$conf"
-    if ${oem_used} || [[ ${profile} == "gnome" ]]; then
+    if ${oem_used}; then
         msg2 "Skipping to show users module."
     else
         echo "        - users" >> "$conf" && write_users_conf
@@ -325,7 +325,7 @@ write_settings_conf(){
     fi
     echo "        - machineid" >> "$conf" && write_machineid_conf
     echo "        - fstab" >> "$conf"
-    if ${oem_used} || [[ ${profile} == "gnome" ]]; then
+    if ${oem_used}; then
         msg2 "Skipping to set locale, keyboard and localecfg modules."
     else
         echo "        - locale" >> "$conf"
