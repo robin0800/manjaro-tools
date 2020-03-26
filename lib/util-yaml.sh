@@ -325,15 +325,11 @@ write_settings_conf(){
     fi
     echo "        - machineid" >> "$conf" && write_machineid_conf
     echo "        - fstab" >> "$conf"
-    if ${oem_used}; then
+    if ${oem_used} || [[ ${profile} == "gnome" ]]; then
         msg2 "Skipping to set locale, keyboard and localecfg modules."
     else
-        if [[ ${profile} == "gnome" ]]; then
-            msg2 "Skipping to set locale and keyboard modules."
-        else
-            echo "        - locale" >> "$conf"
-            echo "        - keyboard" >> "$conf"
-        fi
+        echo "        - locale" >> "$conf"
+        echo "        - keyboard" >> "$conf"
         echo "        - localecfg" >> "$conf"
     fi
     echo "        - luksopenswaphookcfg" >> "$conf"
