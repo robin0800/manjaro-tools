@@ -341,7 +341,7 @@ init_calamares(){
 	
 	[[ -z ${windowexp} ]] && windowexp=noexpand
 	
-	[[ -z ${windowsize} ]] && windowsize="800px,520px"
+	[[ -z ${windowsize} ]] && windowsize="800px,560px"
 
 	[[ -z ${windowplacement} ]] && windowplacement="center"
 	
