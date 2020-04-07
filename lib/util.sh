@@ -246,10 +246,10 @@ init_buildpkg(){
 
 get_iso_label(){
     local label="$1"
-    #label="${label//_}"    # relace all _
-    label="${label//-}" # relace all -
-    label="${label^^}"      # all uppercase
-    label="${label::32}"    # limit to 32 characters
+    #label="${label//_}"	# relace all _
+    label="${label//-}"	# relace all -
+    label="${label^^}"		# all uppercase
+    label="${label::32}"	# limit to 32 characters
     echo ${label}
 }
 
@@ -316,16 +316,16 @@ init_buildiso(){
     [[ -z ${iso_compression} ]] && iso_compression='zstd'
 
     [[ -z ${kernel} ]] && kernel="linux54"
-
+    
     load_run_dir "${profile_repo}"
-
+    
     if [[ -d ${run_dir}/.git ]]; then
-        current_path=$(pwd)
-        cd ${run_dir}
-        branch=$(git rev-parse --abbrev-ref HEAD)
-        cd ${current_path}
+    	current_path=$(pwd)
+    	cd ${run_dir}
+    	branch=$(git rev-parse --abbrev-ref HEAD)
+    	cd ${current_path}
     else
-        [[ -z ${branch} ]] && branch="v18.0" #current branch release
+    	[[ -z ${branch} ]] && branch="v18.0" #current branch release
     fi
 
     [[ -z ${gpgkey} ]] && gpgkey=''
@@ -334,26 +334,26 @@ init_buildiso(){
 }
 
 init_calamares(){
+	
+	[[ -z ${welcomestyle} ]] && welcomestyle=false
+	
+	[[ -z ${welcomelogo} ]] && welcomelogo=true
+	
+	[[ -z ${windowexp} ]] && windowexp=noexpand
+	
+	[[ -z ${windowsize} ]] && windowsize="800px,560px"
 
-    [[ -z ${welcomestyle} ]] && welcomestyle=false
-
-    [[ -z ${welcomelogo} ]] && welcomelogo=true
-
-    [[ -z ${windowexp} ]] && windowexp=noexpand
-
-    [[ -z ${windowsize} ]] && windowsize="800px,520px"
-
-    [[ -z ${windowplacement} ]] && windowplacement="center"
-
-    [[ -z ${sidebarbackground} ]] && sidebarbackground=#454948
-
-    [[ -z ${sidebartext} ]] &&  sidebartext=#efefef
-
-    [[ -z ${sidebartextselect} ]] && sidebartextselect=#4d915e
-
-    [[ -z ${sidebartexthighlight} ]] && sidebartexthighlight=#1a1c1b
+	[[ -z ${windowplacement} ]] && windowplacement="center"
+	
+	[[ -z ${sidebarbackground} ]] && sidebarbackground=#454948
+	
+	[[ -z ${sidebartext} ]] &&  sidebartext=#efefef
+	
+	[[ -z ${sidebartextselect} ]] && sidebartextselect=#4d915e
+	
+	[[ -z ${sidebartexthighlight} ]] && sidebartexthighlight=#1a1c1b
 }
-
+	
 
 init_deployiso(){
 
@@ -386,8 +386,8 @@ load_config(){
 
     init_buildiso
 
-    init_calamares
-
+    init_calamares	
+	
     init_deployiso
 
     return 0

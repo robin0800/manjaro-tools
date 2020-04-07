@@ -370,6 +370,15 @@ write_settings_conf(){
     fi
     echo '' >> "$conf"
     echo "dont-chroot: false" >> "$conf"
+    if ${oem_used}; then
+        echo "oem-setup: true" >> "$conf"
+        echo "disable-cancel: true" >> "$conf"        
+    else
+        echo "oem-setup: false" >> "$conf"
+        echo "disable-cancel: false" >> "$conf"
+    fi
+    echo "disable-cancel-during-exec: true" >> "$conf"
+    echo "quit-at-end: false" >> "$conf"
 }
 
 configure_calamares(){
