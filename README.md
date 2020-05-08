@@ -242,6 +242,7 @@ Usage: buildiso [options]
                        [default: linux49]
     -l                 Create permalink
     -m                 Set SquashFS image mode to persistence
+    -o                 Enable office installer
     -p <profile>       Buildset or profile [default: default]
     -q                 Query settings and pretend build
     -r <dir>           Chroots directory

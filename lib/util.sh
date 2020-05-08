@@ -460,6 +460,8 @@ load_profile_config(){
     basic='true'
     [[ ${extra} == 'true' ]] && basic='false'
 
+    [[ -z ${office_installer} ]] && office_installer="false"
+
     return 0
 }
 
@@ -506,6 +508,7 @@ reset_profile(){
     unset geoip
     unset extra
     unset full_iso
+    unset office_installer
 }
 
 check_profile(){
@@ -608,7 +611,7 @@ load_pkgs(){
             fi
         ;;
     esac
-    
+
 # We can reuse this code
     local _edition _edition_rm
     case "${edition}" in
@@ -621,6 +624,13 @@ load_pkgs(){
             _edition_rm="s|>sonar.*||g"
         ;;
     esac
+
+    local _office _office_rm
+    if ${office_installer}; then
+        _office="s|>office||g"
+    else
+        _office_rm="s|>office.*||g"
+    fi
 
     local _blacklist="s|>blacklist.*||g" \
         _kernel="s|KERNEL|$kernel|g" \
@@ -649,6 +659,8 @@ load_pkgs(){
             | sed "$_basic_rm" \
             | sed "$_extra" \
             | sed "$_extra_rm" \
+            | sed "$_office" \
+            | sed "$_office_rm" \
             | sed "$_clean")
 
     if [[ $1 == "${packages_mhwd}" ]]; then
@@ -812,25 +824,25 @@ create_chksums() {
     sha256sum $1 > $1.sha256
 }
 
-init_profiles() {	
-	_workdir='/usr/share/manjaro-tools'
-	if [[ -d ${_workdir}/iso-profiles ]]; then
-		rm -Rf ${_workdir}/iso-profiles ]]
-	fi
-	git clone -q --depth 1 -b ${branch} https://gitlab.manjaro.org/profiles-and-settings/iso-profiles.git ${_workdir}/iso-profiles/
-	
-	#Check if git clone is done
-	if [[ -d ${_workdir}/iso-profiles/manjaro ]] && [[ -d ${_workdir}/iso-profiles/community ]]; then
-	
-		for i in ${_workdir}/iso-profiles/.gitignore ${_workdir}/iso-profiles/README.md; do
-		rm -f $i
-		done
-		
-		for i in ${_workdir}/iso-profiles/.git ${_workdir}/iso-profiles/sonar; do
-			rm -Rf $i
-		done
-	else msg2 "Impossible to initialize iso-profiles, please check internet connection or browse at 'https://gitlab.manjaro.org/profiles-and-settings/iso-profiles'"
-	exit 1
-	fi
+init_profiles() {
+    _workdir='/usr/share/manjaro-tools'
+    if [[ -d ${_workdir}/iso-profiles ]]; then
+        rm -Rf ${_workdir}/iso-profiles ]]
+    fi
+    git clone -q --depth 1 -b ${branch} https://gitlab.manjaro.org/profiles-and-settings/iso-profiles.git ${_workdir}/iso-profiles/
+
+    #Check if git clone is done
+    if [[ -d ${_workdir}/iso-profiles/manjaro ]] && [[ -d ${_workdir}/iso-profiles/community ]]; then
+
+        for i in ${_workdir}/iso-profiles/.gitignore ${_workdir}/iso-profiles/README.md; do
+        rm -f $i
+        done
+
+        for i in ${_workdir}/iso-profiles/.git ${_workdir}/iso-profiles/sonar; do
+            rm -Rf $i
+        done
+    else msg2 "Impossible to initialize iso-profiles, please check internet connection or browse at 'https://gitlab.manjaro.org/profiles-and-settings/iso-profiles'"
+    exit 1
+    fi
 }
 
