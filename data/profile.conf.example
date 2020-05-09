@@ -8,6 +8,9 @@
 # use extra packages as defined in pkglist to activate a full profile
 # extra="false"
 
+# use office installer module
+# office_installer="false"
+
 ################ install ################
 
 # default displaymanager: none

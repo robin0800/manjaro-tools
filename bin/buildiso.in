@@ -29,6 +29,7 @@ show_profile(){
         [[ ${target_arch} == 'x86_64' ]] && msg2 "multilib: %s" "${multilib}"
 
         msg2 "extra: %s" "${extra}"
+        msg2 "office_installer: %s" "${office_installer}"
         msg2 "permalink: %s" "${permalink}"
 
         msg2 "netinstall: %s" "${netinstall}"
@@ -63,7 +64,7 @@ display_settings(){
     show_config
 
     msg "PROFILE:"
-    msg2 "gitlab brach: %s" "${branch}"
+    msg2 "gitlab branch: %s" "${branch}"
     msg2 "build_lists: %s" "$(show_build_lists ${list_dir_iso})"
     msg2 "build_list_iso: %s" "${build_list_iso}"
     msg2 "is_build_list: %s" "${is_build_list}"
@@ -81,6 +82,7 @@ display_settings(){
     msg2 "persist: %s" "${persist}"
     msg2 "extra: %s" "${full_iso}"
     msg2 "permalink: %s" "${permalink}"
+    msg2 "office_installer: %s" "${office_installer}"
 
     msg "DIST SETTINGS:"
     msg2 "dist_name: %s" "${dist_name}"
@@ -128,6 +130,7 @@ usage() {
     echo '    -l                 Create permalink'
     echo '    -m                 Set SquashFS image mode to persistence'
     echo "    -p <profile>       Buildset or profile [default: ${build_list_iso}]"
+    echo '    -o                 Enable office installer module'    
     echo '    -q                 Query settings and pretend build'
     echo '    -r <dir>           Chroots directory'
     echo "                       [default: ${chroots_iso}]"
@@ -145,7 +148,7 @@ usage() {
 
 orig_argv=("$@")
 
-opts='p:a:b:r:t:k:g:d:cfzxmvqhil'
+opts='p:a:b:r:t:k:g:d:cfzxmvqhilo'
 
 while getopts "${opts}" arg; do
     case "${arg}" in
@@ -166,6 +169,7 @@ while getopts "${opts}" arg; do
         x) images_only=true ;;
         z) iso_only=true ;;
         l) permalink=true ;;
+        o) office_installer=true ;;
         h|?) usage 0 ;;
         *) echo "invalid argument '${arg}'"; usage 1 ;;
     esac
