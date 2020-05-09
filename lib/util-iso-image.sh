@@ -33,6 +33,11 @@ add_svc_sd(){
         msg2 "Setting %s ..." "$2"
         chroot $1 systemctl enable $2 &>/dev/null
     fi
+    if [[ -f $1/etc/systemd/system/$2 ]] || \
+    [[ -f $1/usr/lib/systemd/system/$2 ]]; then
+        msg2 "Setting %s ..." "$2"
+        chroot $1 systemctl enable $2 &>/dev/null
+    fi
 }
 
 set_xdm(){
