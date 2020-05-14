@@ -421,3 +421,7 @@ deployiso -p official
 ~~~
 deployiso -p xfce -std
 ~~~
+
+
+##### Fast compression
+Lz4 Is very fast but not a good compression ratio, good for testing
