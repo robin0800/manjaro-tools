@@ -164,7 +164,7 @@ run_hook() {
     [[ -z "${misobasedir}" ]] && misobasedir="manjaro"
 
     [[ -z "${dm_snap_prefix}" ]] && dm_snap_prefix="manjaro"
-    misodevice="$(_find_dev_by_path /.miso")"
+    misodevice=$(_find_dev_by_path /.miso)
     [[ -z "${misodevice}" ]] && misodevice="/dev/disk/by-label/${misolabel}"
     [[ -z "${cow_spacesize}" ]] && cow_spacesize="256M"
     [[ -z "${overlay_root_size}" ]] && overlay_root_size="75%"
