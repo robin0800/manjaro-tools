@@ -257,5 +257,5 @@ upd_dl_version(){
     msg2 "Version > ${dist_release}"
     sed -i "/Version/c\Version = \"${dist_release}\"" ${dl_file}
     msg2 "date > ${timestamp}"
-    sed -i "/date/c\date = \"${timestamp}\"" ${dl_file}
+    sed -i "/^date/c\date = \"${timestamp}\"" ${dl_file}
 }
