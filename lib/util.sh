@@ -450,7 +450,7 @@ load_profile_config(){
 
     [[ -z ${chrootcfg} ]] && chrootcfg='false'
 
-    netgroups="https://raw.githubusercontent.com/manjaro/calamares-netgroups/master"
+    netgroups="https://gitlab.manjaro.org/applications/calamares-netgroups/-/raw/master/"
 
     [[ -z ${geoip} ]] && geoip='true'
 
