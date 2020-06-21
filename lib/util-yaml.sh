@@ -159,7 +159,9 @@ write_packages_conf(){
     echo "---" > "$conf"
     echo "backend: pacman" >> "$conf"
     echo '' >> "$conf"
+    echo "skip_if_no_internet: true" >> "$conf"
     echo "update_db: true" >> "$conf"
+    echo "update_system: true" >> "$conf"
 }
 
 write_welcome_conf(){
