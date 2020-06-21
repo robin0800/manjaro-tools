@@ -159,7 +159,11 @@ write_packages_conf(){
     echo "---" > "$conf"
     echo "backend: pacman" >> "$conf"
     echo '' >> "$conf"
-    echo "skip_if_no_internet: true" >> "$conf"
+    if ${needs_internet}; then
+        echo "skip_if_no_internet: false" >> "$conf"
+    else
+        echo "skip_if_no_internet: true" >> "$conf"
+    fi 
     echo "update_db: true" >> "$conf"
     echo "update_system: true" >> "$conf"
 }
@@ -186,7 +190,7 @@ write_welcome_conf(){
     echo "      - storage" >> "$conf"
     echo "      - ram" >> "$conf"
     echo "      - root" >> "$conf"
-    if ${netinstall}; then
+    if ${needs_internet}; then
         echo "      - internet" >> "$conf"
     fi
     if ${geoip}; then
