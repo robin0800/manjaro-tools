@@ -441,8 +441,8 @@ load_profile_config(){
     fi
     
     [[ -z ${needs_internet} ]] && needs_internet='false'
-
     [[ -z ${netinstall} ]] && netinstall='false'
+    [[ -z ${netinstall_label}]] && netinstall_label='Package selection'
 
     [[ -z ${mhwd_used} ]] && mhwd_used='true'
 
