@@ -439,6 +439,8 @@ load_profile_config(){
     if [[ ${displaymanager} != "none" ]]; then
         enable_systemd+=("${displaymanager}")
     fi
+    
+    [[ -z ${needs_internet} ]] && needs_internet='false'
 
     [[ -z ${netinstall} ]] && netinstall='false'
 
