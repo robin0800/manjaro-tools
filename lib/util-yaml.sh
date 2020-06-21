@@ -272,8 +272,7 @@ write_locale_conf(){
     echo "localeGenPath: /etc/locale.gen" >> "$conf"
     if ${geoip}; then
         echo 'geoip:' >> "$conf"
-        echo 'label:
-sidebar: "Package selection"style:  "json"' >> "$conf"
+        echo 'style:  "json"' >> "$conf"
         echo '    url:    "https://ipapi.co/json"' >> "$conf"
         echo '    selector: "timezone"' >> "$conf"
     else
