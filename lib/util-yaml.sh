@@ -261,6 +261,8 @@ write_netinstall_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "groupsUrl: ${netgroups}/$(get_yaml)" >> "$conf"
+    echo "label:" >> "$conf"
+    echo "    sidebar: \"${netinstall_label}\"" >> "$conf"
 }
 
 write_locale_conf(){
@@ -270,7 +272,8 @@ write_locale_conf(){
     echo "localeGenPath: /etc/locale.gen" >> "$conf"
     if ${geoip}; then
         echo 'geoip:' >> "$conf"
-        echo '    style:  "json"' >> "$conf"
+        echo 'label:
+sidebar: "Package selection"style:  "json"' >> "$conf"
         echo '    url:    "https://ipapi.co/json"' >> "$conf"
         echo '    selector: "timezone"' >> "$conf"
     else
