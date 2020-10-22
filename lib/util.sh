@@ -502,6 +502,7 @@ reset_profile(){
     unset enable_systemd
     unset disable_systemd
     unset enable_systemd_live
+    unset disable_systemd_live
     unset packages_desktop
     unset packages_mhwd
     unset login_shell

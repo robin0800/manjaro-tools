@@ -262,10 +262,19 @@ configure_journald(){
     sed -i 's/#\(Storage=\)auto/\1volatile/' "$conf"
 }
 
+disable_srv_live(){
+    for srv in ${disable_systemd_live[@]}; do
+         enable_systemd=(${enable_systemd[@]//*$srv*})
+    done
+}
+
 configure_services(){
     info "Configuring services"
     use_apparmor="false"
     apparmor_boot_args=""
+
+    [[ ! -z $disable_systemd_live ]] && disable_srv_live
+
     for svc in ${enable_systemd[@]}; do
         add_svc_sd "$1" "$svc"
         [[ "$svc" == "apparmor" ]] && use_apparmor="true"
