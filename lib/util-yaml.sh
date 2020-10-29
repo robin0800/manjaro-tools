@@ -349,6 +349,7 @@ write_settings_conf(){
         echo "        - oemuser" >> "$conf"
     elif [[ ${profile} != "gnome" ]]; then
         msg2 "Skipping to set users module."
+    else
         echo "        - users" >> "$conf"
     fi
     echo "        - displaymanager" >> "$conf" && write_displaymanager_conf
