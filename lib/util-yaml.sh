@@ -347,7 +347,7 @@ write_settings_conf(){
     if ${oem_used}; then
         msg2 "Skipping to set users module."
         echo "        - oemuser" >> "$conf"
-    elif [[ ${profile} != "gnome" ]]; then
+    elif [[ ${profile} == "gnome" ]]; then
         msg2 "Skipping to set users module."
     else
         echo "        - users" >> "$conf"
