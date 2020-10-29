@@ -115,11 +115,12 @@ if ${build_locales}; then
     printf '%s.UTF-8 UTF-8\n' en_US > "$working_dir/etc/locale.gen"
     printf 'LANG=%s.UTF-8\n' en_US > "$working_dir/etc/locale.conf"
     printf 'LC_MESSAGES=C\n' >> "$working_dir/etc/locale.conf"
+
+    chroot_args=(${pac_conf:+-C "$pac_conf"} ${makepkg_conf:+-M "$makepkg_conf"} \
+                 ${mirrors_conf:+-S "$mirrors_conf"} ${build_mirror:+-B "$build_mirror"} \
+                 ${cache_dir:+-c "$cache_dir"} ${keep_flag})
+
+    exec chroot-run \
+        ${chroot_args[*]} \
+        "$working_dir" locale-gen
 fi
-
-chroot_args=(${pac_conf:+-C "$pac_conf"} ${makepkg_conf:+-M "$makepkg_conf"} ${mirrors_conf:+-S "$mirrors_conf"} ${build_mirror:+-B "$build_mirror"} ${cache_dir:+-c "$cache_dir"} ${keep_flag})
-
-exec chroot-run \
-    ${chroot_args[*]} \
-    "$working_dir" locale-gen
-
