@@ -44,6 +44,7 @@ show_profile(){
         msg2 "hostname: %s" "${hostname}"
         msg2 "username: %s" "${username}"
         msg2 "password: %s" "${password}"
+        msg2 "user_shell: %s" "${user_shell}"
         msg2 "login_shell: %s" "${login_shell}"
         msg2 "addgroups: %s" "${addgroups}"
         [[ -n ${smb_workgroup} ]] && msg2 "smb_workgroup: %s" "${smb_workgroup}"
