@@ -420,6 +420,8 @@ load_profile_config(){
 
     [[ -z ${password} ]] && password="manjaro"
 
+    [[ -z ${user_shell} ]] && user_shell='/bin/bash'
+
     [[ -z ${login_shell} ]] && login_shell='/bin/bash'
 
     if [[ -z ${addgroups} ]]; then
@@ -505,6 +507,7 @@ reset_profile(){
     unset disable_systemd_live
     unset packages_desktop
     unset packages_mhwd
+    unset user_shell
     unset login_shell
     unset netinstall
     unset chrootcfg
