@@ -272,7 +272,7 @@ configure_services(){
     info "Configuring services"
     use_apparmor="false"
     apparmor_boot_args=""
-    enable_systemd_live="$enable_systemd_live $enable_systemd"
+    enable_systemd_live=(${enable_systemd_live[@]} ${enable_systemd[@]})
 
     [[ ! -z $disable_systemd_live ]] && disable_srv_live
 
