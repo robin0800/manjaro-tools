@@ -264,7 +264,7 @@ configure_journald(){
 
 disable_srv_live(){
     for srv in ${disable_systemd_live[@]}; do
-         enable_systemd=(${enable_systemd[@]//*$srv*})
+         enable_systemd_live=(${enable_systemd_live[@]//*$srv*})
     done
 }
 
@@ -272,13 +272,10 @@ configure_services(){
     info "Configuring services"
     use_apparmor="false"
     apparmor_boot_args=""
+    enable_systemd_live="$enable_systemd_live $enable_systemd"
 
     [[ ! -z $disable_systemd_live ]] && disable_srv_live
 
-    for svc in ${enable_systemd[@]}; do
-        add_svc_sd "$1" "$svc"
-        [[ "$svc" == "apparmor" ]] && use_apparmor="true"
-    done
     for svc in ${enable_systemd_live[@]}; do
         add_svc_sd "$1" "$svc"
         [[ "$svc" == "apparmor" ]] && use_apparmor="true"
