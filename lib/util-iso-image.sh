@@ -264,18 +264,18 @@ configure_journald(){
 
 disable_srv_live(){
     for srv in ${disable_systemd_live[@]}; do
-        enable_systemd_both=(${enable_systemd[@]//*$srv*})
+         enable_systemd=(${enable_systemd[@]//*$srv*})
     done
 }
 
-configure_services_live(){
+configure_services(){
     info "Configuring services"
     use_apparmor="false"
     apparmor_boot_args=""
 
     [[ ! -z $disable_systemd_live ]] && disable_srv_live
 
-    for svc in ${enable_systemd_both[@]}; do
+    for svc in ${enable_systemd[@]}; do
         add_svc_sd "$1" "$svc"
         [[ "$svc" == "apparmor" ]] && use_apparmor="true"
     done
@@ -364,7 +364,7 @@ configure_live_image(){
     msg "Configuring [livefs]"
     configure_hosts "$1"
     configure_system "$1"
-    configure_services_live "$1"
+    configure_services "$1"
     configure_calamares "$1"
 #    [[ ${edition} == "sonar" ]] && configure_thus "$1"
     write_live_session_conf "$1"
