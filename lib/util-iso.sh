@@ -396,6 +396,8 @@ make_image_live() {
             configure_branding "${path}"
             msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
         fi
+        
+        configure_polkit_user_rules
 
         reset_pac_conf "${path}"
 

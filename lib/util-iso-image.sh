@@ -248,6 +248,17 @@ style:
    sidebarTextHighlight: "\"${sidebartexthighlight}"\"" > $1/usr/share/calamares/branding/manjaro/branding.desc
 }
 
+configure_polkit_user_rules(){
+    msg2 "Configuring polkit user rules"
+    echo "/* Stop asking the user for a password while they are in a live session
+ */
+polkit.addRule(function(action, subject) {
+    if (subject.user == \"${username}\")
+    {
+        return polkit.Result.YES;
+    }
+});" > $1/etc/polkit-1/rules.d/49-nopasswd-live.rules
+
 configure_logind(){
     msg2 "Configuring logind ..."
     local conf=$1/etc/systemd/logind.conf
