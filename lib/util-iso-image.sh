@@ -258,6 +258,7 @@ polkit.addRule(function(action, subject) {
         return polkit.Result.YES;
     }
 });" > $1/etc/polkit-1/rules.d/49-nopasswd-live.rules
+}
 
 configure_logind(){
     msg2 "Configuring logind ..."
