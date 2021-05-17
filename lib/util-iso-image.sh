@@ -487,6 +487,4 @@ clean_up_image(){
         if [[ -f "$file" ]]; then
             rm $file
         fi
-    path=$1/etc/pacman.d
-    rm -R $path/gnupg
 }

@@ -195,6 +195,8 @@ assemble_iso(){
 # Build ISO
 make_iso() {
     msg "Start [Build ISO]"
+    msg2 "Remove gnugp"
+    find . -type d -name '*gnupg' -exec rm -r {} +
     touch "${iso_root}/.miso"
     for sfs_dir in $(find "${work_dir}" -maxdepth 1 -type d); do
         if [[ "${sfs_dir}" != "${work_dir}" ]]; then
