@@ -196,10 +196,13 @@ assemble_iso(){
 make_iso() {
     msg "Start [Build ISO]"
     msg2 "Remove gnugp"
-    find . -type d -name '*gnupg' -exec rm -r {} +
     touch "${iso_root}/.miso"
     for sfs_dir in $(find "${work_dir}" -maxdepth 1 -type d); do
         if [[ "${sfs_dir}" != "${work_dir}" ]]; then
+            root_fs=$(echo "${sfs_dir}" | rev | cut -d'/' -f 1 | rev)
+            if [[ "${root_fs}" == "rootfs" ]]; then
+                rm -rf "${sfs_dir}"/etc/pacman.d/gnupg
+            fi
             make_sfs "${sfs_dir}"
         fi
     done
