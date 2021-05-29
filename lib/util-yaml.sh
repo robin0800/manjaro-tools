@@ -281,6 +281,11 @@ write_locale_conf(){
     fi
 }
 
+check_gis(){
+    has_gis=false
+    [[ -e $1/usr/lib/gnome-initial-setup ]] && has_gis=true
+}
+
 write_settings_conf(){
     local conf="$1/etc/calamares/settings.conf"
     msg2 "Writing %s ..." "${conf##*/}"
@@ -290,14 +295,14 @@ write_settings_conf(){
     echo "sequence:" >> "$conf"
     echo "    - show:" >> "$conf"
     echo "        - welcome" >> "$conf" && write_welcome_conf
-    if ${oem_used} || [[ ${profile} == "gnome" ]]; then
+    if ${oem_used} || ${has_gis}; then
         msg2 "Skipping to show locale and keyboard modules."
     else
         echo "        - locale" >> "$conf" && write_locale_conf
         echo "        - keyboard" >> "$conf"
     fi
     echo "        - partition" >> "$conf"
-    if ${oem_used} || [[ ${profile} == "gnome" ]]; then
+    if ${oem_used} || ${has_gis}; then
         msg2 "Skipping to show users module."
     else
         echo "        - users" >> "$conf" && write_users_conf
@@ -333,7 +338,7 @@ write_settings_conf(){
     fi
     echo "        - machineid" >> "$conf" && write_machineid_conf
     echo "        - fstab" >> "$conf"
-    if ${oem_used}|| [[ ${profile} == "gnome" ]]; then
+    if ${oem_used}|| ${has_gis}; then
         msg2 "Skipping to set locale, keyboard and localecfg modules."
     else
         echo "        - locale" >> "$conf"
@@ -347,7 +352,7 @@ write_settings_conf(){
     if ${oem_used}; then
         msg2 "Skipping to set users module."
         echo "        - oemuser" >> "$conf"
-    elif [[ ${profile} == "gnome" ]]; then
+    elif ${has_gis}; then
         msg2 "Skipping to set users module."
     else
         echo "        - users" >> "$conf"
