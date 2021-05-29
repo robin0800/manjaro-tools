@@ -282,12 +282,13 @@ write_locale_conf(){
 }
 
 check_gis(){
-    has_gis=false
-    [[ -e $1/usr/lib/gnome-initial-setup ]] && has_gis=true
+    has_gis='false'
+    [[ -e $1/usr/lib/gnome-initial-setup ]] && has_gis='true'
 }
 
 write_settings_conf(){
     local conf="$1/etc/calamares/settings.conf"
+    check_gis
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "modules-search: [ local ]" >> "$conf"
