@@ -283,7 +283,8 @@ write_locale_conf(){
 
 check_gis(){
     has_gis='false'
-    [[ -e $1/usr/lib/gnome-initial-setup ]] && has_gis='true'
+    msg2 "Check for GIS"
+    [[ -e "${work_dir}/desktopfs/usr/lib/gnome-initial-setup" ]] && has_gis='true'
 }
 
 write_settings_conf(){
