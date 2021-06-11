@@ -195,11 +195,11 @@ assemble_iso(){
 # Build ISO
 make_iso() {
     msg "Start [Build ISO]"
-    msg2 "Remove gnugp"
     touch "${iso_root}/.miso"
     for sfs_dir in $(find "${work_dir}" -maxdepth 1 -type d); do
         if [[ "${sfs_dir}" != "${work_dir}" ]]; then
-            if [[ "$(basename "${sfs_dir}")" == "rootfs" ]]; then
+            if [[ -e "${sfs_dir}"/etc/pacman.d/gnupg ]]; then
+                msg2 "Removing '/etc/pacman.d/gnupg' folder from ${sfs_dir}"
                 rm -rf "${sfs_dir}"/etc/pacman.d/gnupg
             fi
             make_sfs "${sfs_dir}"
@@ -410,8 +410,6 @@ make_image_live() {
 
         umount_fs
 
-        # Clean up GnuPG keys
-        rm -rf "${path}/etc/pacman.d/gnupg"
         clean_up_image "${path}"
         : > ${work_dir}/build.${FUNCNAME}
         msg "Done [Live installation] (livefs)"
