@@ -153,6 +153,25 @@ write_users_conf(){
     fi    
 }
 
+write_partition_conf(){
+    local conf="${modules_dir}/partition.conf""
+    msg2 "Writing %s ..." "${conf##*/}"
+    echo "---" > "$conf"
+    echo "efiSystemPartition:     \"/boot/efi\"" >> "$conf"
+    echo "userSwapChoices:" >> "$conf"
+    echo "    - none      # Create no swap, use no swap" >> "$conf"
+    echo "    - small     # Up to 4GB" >> "$conf"
+    echo "    - suspend   # At least main memory size" >> "$conf"
+    echo "    - file      # To swap file instead of partition" >> "$conf"
+    echo "alwaysShowPartitionLabels: true" >> "$conf"
+    echo "# There are four options: erase, replace, alongside, manual)," >> "$conf"
+    echo "# the default is \"none\"." >> "$conf"
+    echo "initialPartitioningChoice: erase" >> "$conf"
+    echo "initialSwapChoice: none" >> "$conf"
+    echo "defaultFileSystemType:  \"ext4\"" >> "$conf"
+    echo "availableFileSystemTypes:  [\"ext4\",\"btrfs\",\"f2fs\"]" >> "$conf"
+}
+
 write_packages_conf(){
     local conf="${modules_dir}/packages.conf"
     msg2 "Writing %s ..." "${conf##*/}"
@@ -296,7 +315,7 @@ write_settings_conf(){
         echo "        - locale" >> "$conf" && write_locale_conf
         echo "        - keyboard" >> "$conf"
     fi
-    echo "        - partition" >> "$conf"
+    echo "        - partition" >> "$conf" && write_partition_conf
     if ${oem_used}; then
         msg2 "Skipping to show users module."
     else
