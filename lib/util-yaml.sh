@@ -154,7 +154,7 @@ write_users_conf(){
 }
 
 write_partition_conf(){
-    local conf="${modules_dir}/partition.conf""
+    local conf="${modules_dir}/partition.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "efiSystemPartition:     \"/boot/efi\"" >> "$conf"
