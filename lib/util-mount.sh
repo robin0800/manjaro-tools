@@ -161,8 +161,6 @@ chroot_api_mount() {
 }
 
 chroot_part_umount() {
-    info "active mounts: [%s]" "${CHROOT_ACTIVE_MOUNTS}"
-    mount
     info "umount: [%s]" "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
     umount "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
     unset CHROOT_ACTIVE_PART_MOUNTS
