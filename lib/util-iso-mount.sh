@@ -61,8 +61,10 @@ mount_fs_net(){
 
 umount_fs(){
     if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]]; then
+        info "active mounts: [%s]" "${FS_ACTIVE_MOUNTS}"
+        mount
         info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
-        umount "${FS_ACTIVE_MOUNTS[@]}"
+        umount -f "${FS_ACTIVE_MOUNTS[@]}"
         unset FS_ACTIVE_MOUNTS
         rm -rf "${mnt_dir}/work"
     fi
