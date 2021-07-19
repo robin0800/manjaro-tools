@@ -114,7 +114,8 @@ chroot_mount_partitions(){
     chroot_mount run "$1/run" -t tmpfs -o nosuid,nodev,mode=0755 &&
     chroot_mount tmp "$1/tmp" -t tmpfs -o mode=1777,strictatime,nodev,nosuid
     chroot_mount /etc/resolv.conf "$1/etc/resolv.conf" --bind
-    mount
+    info "chroot_mount: active mounts [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
+    info "chroot_mount: active part mounts [%s]" "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
 }
 
 chroot_mount() {
@@ -144,7 +145,7 @@ chroot_api_efi_mount() {
     chroot_mount shm "$1/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev &&
     chroot_mount run "$1/run" -t tmpfs -o nosuid,nodev,mode=0755 &&
     chroot_mount tmp "$1/tmp" -t tmpfs -o mode=1777,strictatime,nodev,nosuid
-    mount
+    info "api_efi_mount: active mounts [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
 }
 
 chroot_api_mount() {
@@ -160,29 +161,29 @@ chroot_api_mount() {
     chroot_mount shm "$1/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev &&
     chroot_mount run "$1/run" -t tmpfs -o nosuid,nodev,mode=0755 &&
     chroot_mount tmp "$1/tmp" -t tmpfs -o mode=1777,strictatime,nodev,nosuid
-    mount
+    info "api_mount: active mounts [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
 }
 
 chroot_part_umount() {
     info "part_umount: active mounts [%s]" "${CHROOT_ACTIVE_PART_MOUNTS}"
     mount
-    info "umount: [%s]" "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
+    info "part_umount: [%s]" "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
     umount "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
     unset CHROOT_ACTIVE_PART_MOUNTS
 }
 
 chroot_api_umount() {
-    info "api_umount: active mounts [%s]" "${CHROOT_ACTIVE_MOUNTS}"
+    info "api_umount: active mounts [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
     mount    
-    info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
+    info "api_umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
     umount "${CHROOT_ACTIVE_MOUNTS[@]}"
     unset CHROOT_ACTIVE_MOUNTS
 }
 
 chroot_api_efi_umount() {
-    info "api_efi_umount: active mounts [%s]" "${CHROOT_ACTIVE_MOUNTS}"
+    info "api_efi_umount: active mounts [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
     mount    
-    info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
+    info "api_efi_umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
     umount "${CHROOT_ACTIVE_MOUNTS[@]}"
     unset CHROOT_ACTIVE_MOUNTS
 }
