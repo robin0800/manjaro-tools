@@ -162,19 +162,19 @@ chroot_api_mount() {
 
 chroot_part_umount() {
     info "umount: [%s]" "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
-    umount "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
+    umount -l "${CHROOT_ACTIVE_PART_MOUNTS[@]}"
     unset CHROOT_ACTIVE_PART_MOUNTS
 }
 
 chroot_api_umount() {
     #info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
-    umount "${CHROOT_ACTIVE_MOUNTS[@]}"
+    umount -l "${CHROOT_ACTIVE_MOUNTS[@]}"
     unset CHROOT_ACTIVE_MOUNTS
 }
 
 chroot_api_efi_umount() {
     #info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
-    umount "${CHROOT_ACTIVE_MOUNTS[@]}"
+    umount -l "${CHROOT_ACTIVE_MOUNTS[@]}"
     unset CHROOT_ACTIVE_MOUNTS
 }
 
