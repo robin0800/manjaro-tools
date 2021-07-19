@@ -64,7 +64,7 @@ umount_fs(){
         info "active mounts: [%s]" "${FS_ACTIVE_MOUNTS}"
         mount
         info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
-        info "proc mounts: [%s]" "$(grep \"${FS_ACTIVE_MOUNTS[@]}\" /proc/mounts | awk '{print$2}' | sort -r)"
+        info "proc mounts: [%s]" "$(cat /proc/mounts | awk '{print$2}' | sort -r)"
         umount -f "${FS_ACTIVE_MOUNTS[@]}"
         unset FS_ACTIVE_MOUNTS
         rm -rf "${mnt_dir}/work"
