@@ -117,7 +117,7 @@ chroot_mount_partitions(){
 }
 
 chroot_mount() {
-    info "mount: [%s]" "$2"
+    #info "mount: [%s]" "$2"
     mount "$@" && CHROOT_ACTIVE_MOUNTS=("$2" "${CHROOT_ACTIVE_MOUNTS[@]}")
 }
 
@@ -167,13 +167,13 @@ chroot_part_umount() {
 }
 
 chroot_api_umount() {
-    info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
+    #info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
     umount "${CHROOT_ACTIVE_MOUNTS[@]}"
     unset CHROOT_ACTIVE_MOUNTS
 }
 
-chroot_api_efi_umount() {  
-    info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
+chroot_api_efi_umount() {
+    #info "umount: [%s]" "${CHROOT_ACTIVE_MOUNTS[@]}"
     umount "${CHROOT_ACTIVE_MOUNTS[@]}"
     unset CHROOT_ACTIVE_MOUNTS
 }
