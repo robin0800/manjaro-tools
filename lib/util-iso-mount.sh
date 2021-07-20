@@ -60,7 +60,8 @@ mount_fs_net(){
 }
 
 check_umount() {
-    if [[ mountpoint -q "$1" ]]; then
+    if mountpoint -q "$1"
+        then
         umount -l "$1"
     fi
 }
