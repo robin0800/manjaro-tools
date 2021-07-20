@@ -59,15 +59,31 @@ mount_fs_net(){
     track_fs -t overlay overlay -olowerdir="${work_dir}/livefs":"${work_dir}/rootfs",upperdir="$1",workdir="${mnt_dir}/work" "$1"
 }
 
+check_mount() {
+    busy=true
+    while $busy
+    do
+        if mountpoint -q "$1"
+        then
+            umount "$1" 2> /dev/null
+            if [ $? -eq 0 ]
+            then
+                busy=false  # umount successful
+            else
+                echo -n '.'  # output to show that the script is alive
+                sleep 5      # 5 seconds for testing, modify to 300 seconds later on
+            fi
+        else
+            busy=false  # not mounted
+        fi
+    done
+}
+
 umount_fs(){
     if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]]; then
         info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
         #umount "${FS_ACTIVE_MOUNTS[@]}"
-        info "workdir: [%s]" "${work_dir}"
-        grep ${work_dir} /proc/mounts
-        $(grep ${work_dir} /proc/mounts | awk '{print$2}' | sort -r)
-        info "overlayfs umount: [%s]" "$(\"${FS_ACTIVE_MOUNTS[@]}\" | sort -r)"
-        umount -l "$(\"${FS_ACTIVE_MOUNTS[@]}\" | sort -r)"
+        check_mount "${FS_ACTIVE_MOUNTS[@]}"
         unset FS_ACTIVE_MOUNTS
         rm -rf "${mnt_dir}/work"
     fi
