@@ -67,13 +67,12 @@ check_umount() {
 }
 
 umount_fs(){
-    cat /proc/mounts
     if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]]; then
         info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
         #umount "${FS_ACTIVE_MOUNTS[@]}"
         for i in "${FS_ACTIVE_MOUNTS[@]}"
         do
-            info "umount: [%s]" "$i"
+            info "umount overlayfs: [%s]" "$i"
             check_umount $i
         done
         unset FS_ACTIVE_MOUNTS
@@ -82,8 +81,7 @@ umount_fs(){
     mount_folders=$(grep "${work_dir}" /proc/mounts | awk '{print$2}' | sort -r)
     for i in $mount_folders
     do
-        info "umount: [%s]" "$i"
+        info "umount folder: [%s]" "$i"
         check_umount $i
     done
-    cat /proc/mounts
 }
