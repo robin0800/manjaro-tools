@@ -63,8 +63,12 @@ umount_fs(){
     if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]]; then
         #info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
         #umount "${FS_ACTIVE_MOUNTS[@]}"
-        info "overlayfs umount: [%s]" "$(${FS_ACTIVE_MOUNTS[@]} | sort -r)"
-        umount "$(${FS_ACTIVE_MOUNTS[@]} | sort -r)"
+        info "workdir: [%s]" "${work_dir}"
+        grep ${work_dir} /proc/mounts
+        $(cat /proc/mounts)
+        $(cat /proc/mounts | awk '{print$2}' | sort -r)
+        info "overlayfs umount: [%s]" "$(\"${FS_ACTIVE_MOUNTS[@]}\" | sort -r)"
+        umount "$(\"${FS_ACTIVE_MOUNTS[@]}\" | sort -r)"
         unset FS_ACTIVE_MOUNTS
         rm -rf "${mnt_dir}/work"
     fi
