@@ -73,11 +73,19 @@ umount_fs(){
         for i in "${FS_ACTIVE_MOUNTS[@]}"
         do
             cat /proc/mounts
+            info "umount: [%s]" "$i"
             check_umount $i
             cat /proc/mounts
         done
         unset FS_ACTIVE_MOUNTS
         rm -rf "${mnt_dir}/work"
     fi
+    for i in "$(grep ${work_dir} /proc/mounts | awk '{print$2}' | sort -r)"
+    do
+        cat /proc/mounts
+        info "umount: [%s]" "$i"
+        check_umount $i
+        cat /proc/mounts
+    done
     cat /proc/mounts
 }
