@@ -82,7 +82,7 @@ umount_fs(){
         rm -rf "${mnt_dir}/work"
     fi
     mount_folders=$(grep "${work_dir}" /proc/mounts | awk '{print$2}' | sort -r)
-    for i in mount_folders
+    for i in $mount_folders
     do
         cat /proc/mounts
         info "umount: [%s]" "$i"
