@@ -65,7 +65,7 @@ check_mount() {
     do
         if mountpoint -q "$1"
         then
-            umount "$1" 2> /dev/null
+            umount -l "$1" 2> /dev/null
             if [ $? -eq 0 ]
             then
                 busy=false  # umount successful
@@ -80,12 +80,15 @@ check_mount() {
 }
 
 umount_fs(){
+    cat /proc/mounts
     if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]]; then
         info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
         #umount "${FS_ACTIVE_MOUNTS[@]}"
         for i in "${FS_ACTIVE_MOUNTS[@]}"
         do
+            cat /proc/mounts
             check_mount $i
+            cat /proc/mounts
         done
         unset FS_ACTIVE_MOUNTS
         rm -rf "${mnt_dir}/work"
