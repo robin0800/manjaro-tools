@@ -61,13 +61,10 @@ mount_fs_net(){
 
 umount_fs(){
     if [[ -n ${FS_ACTIVE_MOUNTS[@]} ]]; then
-        if [[ "$(grep rootfs ${FS_ACTIVE_MOUNTS[@]})" ]]; then
-            info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
-            umount "${FS_ACTIVE_MOUNTS[@]}"
-        else
-            info "overlayfs umount: [%s]" "$(grep overlay /proc/mounts | awk '{print$2}' | sort -r)"
-            umount -l "$(grep overlay /proc/mounts | awk '{print$2}' | sort -r)"
-        fi
+        #info "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
+        #umount "${FS_ACTIVE_MOUNTS[@]}"
+        info "overlayfs umount: [%s]" "$(grep \"${work_dir}\" /proc/mounts | awk '{print$2}' | sort -r)"
+        umount -l "$(grep \"${work_dir}\" /proc/mounts | awk '{print$2}' | sort -r)"
         unset FS_ACTIVE_MOUNTS
         rm -rf "${mnt_dir}/work"
     fi
