@@ -168,8 +168,8 @@ write_partition_conf(){
     echo "# the default is \"none\"." >> "$conf"
     echo "initialPartitioningChoice: erase" >> "$conf"
     echo "initialSwapChoice: none" >> "$conf"
-    echo "defaultFileSystemType:  \"btrfs\"" >> "$conf"
-    echo "availableFileSystemTypes:  [\"btrfs\",\"ext4\",\"f2fs\",\"xfs\"]" >> "$conf"
+    echo "defaultFileSystemType:  \"ext4\"" >> "$conf"
+    echo "availableFileSystemTypes:  [\"ext4\",\"btrfs\",\"f2fs\",\"xfs\"]" >> "$conf"
 }
 
 write_packages_conf(){
