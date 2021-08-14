@@ -58,7 +58,7 @@ write_bootloader_conf(){
     echo 'grubCfg: "/boot/grub/grub.cfg"' >> "$conf"
     echo 'grubProbe: "grub-probe"' >> "$conf"
     echo 'efiBootMgr: "efibootmgr"' >> "$conf"
-    echo 'efiBootloaderId: "manjaro"' >> "$conf"
+    echo "efiBootloaderId: \"${dist_name}\"" >> "$conf"
     echo 'installEFIFallback: true' >> "$conf"
 }
 
