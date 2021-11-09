@@ -42,7 +42,6 @@ prepare_boot_extras(){
     cp $1/usr/share/licenses/amd-ucode/LIC* $2/amd_ucode.LICENSE
     cp $1/usr/share/licenses/intel-ucode/LIC* $2/intel_ucode.LICENSE
     cp $1/boot/memtest86+/memtest.bin $2/memtest
-    cp $1/usr/share/licenses/common/GPL2/license.txt $2/memtest.COPYING
 }
 
 prepare_grub(){
