@@ -51,19 +51,6 @@ configure_mhwd_drivers(){
     local path=$1${mhwd_repo}/ \
         drv_path=$1/var/lib/mhwd/db/pci/graphic_drivers
     info "Configuring mhwd db ..."
-    if  [ -z "$(ls $path | grep catalyst-utils 2> /dev/null)" ]; then
-        msg2 "Disabling Catalyst driver"
-        mkdir -p $drv_path/catalyst/
-        echo "" > $drv_path/catalyst/MHWDCONFIG
-    fi
-    if  [ -z "$(ls $path | grep nvidia-340xx-utils 2> /dev/null)" ]; then
-        msg2 "Disabling Nvidia 340xx driver"
-        mkdir -p $drv_path/nvidia-340xx/
-        echo "" > $drv_path/nvidia-340xx/MHWDCONFIG
-        msg2 "Disabling Nvidia 340xx Bumblebee driver"
-        mkdir -p $drv_path/hybrid-intel-nvidia-340xx-bumblebee/
-        echo "" > $drv_path/hybrid-intel-nvidia-340xx-bumblebee/MHWDCONFIG
-    fi
     if  [ -z "$(ls $path | grep nvidia-390xx-utils 2> /dev/null)" ]; then
         msg2 "Disabling Nvidia 390xx driver"
         mkdir -p $drv_path/nvidia-390xx/
@@ -72,47 +59,27 @@ configure_mhwd_drivers(){
         mkdir -p $drv_path/hybrid-intel-nvidia-390xx-bumblebee/
         echo "" > $drv_path/hybrid-intel-nvidia-390xx-bumblebee/MHWDCONFIG
     fi
-    if  [ -z "$(ls $path | grep nvidia-418xx-utils 2> /dev/null)" ]; then
-        msg2 "Disabling Nvidia 418xx driver"
-        mkdir -p $drv_path/nvidia-418xx/
-        echo "" > $drv_path/nvidia-418xx/MHWDCONFIG
-        msg2 "Disabling Nvidia 418xx Bumblebee driver"
-        mkdir -p $drv_path/hybrid-intel-nvidia-418xx-bumblebee/
-        echo "" > $drv_path/hybrid-intel-nvidia-418xx-bumblebee/MHWDCONFIG
+    if  [ -z "$(ls $path | grep nvidia-utils 2> /dev/null)" ]; then
+        msg2 "Disabling Nvidia driver"
+        mkdir -p $drv_path/nvidia/
+        echo "" > $drv_path/nvidia/MHWDCONFIG
+        msg2 "Disabling Nvidia AMD Prime driver"
+        mkdir -p $drv_path/hybrid-amd-nvidia-prime/
+        echo "" > $drv_path/hybrid-amd-nvidia-prime/MHWDCONFIG
+        msg2 "Disabling Nvidia Intel Prime driver"
+        mkdir -p $drv_path/hybrid-intel-nvidia-prime/
+        echo "" > $drv_path/hybrid-intel-nvidia-prime/MHWDCONFIG  
     fi
-    if  [ -z "$(ls $path | grep nvidia-430xx-utils 2> /dev/null)" ]; then
-        msg2 "Disabling Nvidia 430xx driver"
-        mkdir -p $drv_path/nvidia-430xx/
-        echo "" > $drv_path/nvidia-430xx/MHWDCONFIG
-        msg2 "Disabling Nvidia 430xx Bumblebee driver"
-        mkdir -p $drv_path/hybrid-intel-nvidia-430xx-bumblebee/
-        echo "" > $drv_path/hybrid-intel-nvidia-430xx-bumblebee/MHWDCONFIG
-    fi
-    if  [ -z "$(ls $path | grep nvidia-435xx-utils 2> /dev/null)" ]; then
-        msg2 "Disabling Nvidia 435xx driver"
-        mkdir -p $drv_path/nvidia-435xx/
-        echo "" > $drv_path/nvidia-435xx/MHWDCONFIG
-        msg2 "Disabling Nvidia 435xx Prime driver"
-        mkdir -p $drv_path/hybrid-intel-nvidia-435xx-prime/
-        echo "" > $drv_path/hybrid-intel-nvidia-435xx-prime/MHWDCONFIG
-    fi
-    if  [ -z "$(ls $path | grep nvidia-440xx-utils 2> /dev/null)" ]; then
-        msg2 "Disabling Nvidia 440xx driver"
-        mkdir -p $drv_path/nvidia-440xx/
-        echo "" > $drv_path/nvidia-440xx/MHWDCONFIG
-        msg2 "Disabling Nvidia 440xx Prime driver"
-        mkdir -p $drv_path/hybrid-intel-nvidia-440xx-prime/
-        echo "" > $drv_path/hybrid-intel-nvidia-440xx-prime/MHWDCONFIG
-    fi
-    if  [ -z "$(ls $path | grep xf86-video-amdgpu 2> /dev/null)" ]; then
-        msg2 "Disabling AMD gpu driver"
-        mkdir -p $drv_path/xf86-video-amdgpu/
-        echo "" > $drv_path/xf86-video-amdgpu/MHWDCONFIG
-    fi
-    if  [ -z "$(ls $path | grep virtualbox-guest-modules 2> /dev/null)" ]; then
-        msg2 "Disabling VirtualBox guest driver"
-        mkdir -p $drv_path/virtualbox/
-        echo "" > $drv_path/virtualbox/MHWDCONFIG
+    if  [ -z "$(ls $path | grep nvidia-470xx-utils 2> /dev/null)" ]; then
+        msg2 "Disabling Nvidia 470xx driver"
+        mkdir -p $drv_path/nvidia-470xx/
+        echo "" > $drv_path/nvidia-470xx/MHWDCONFIG
+        msg2 "Disabling Nvidia 470xx AMD Prime driver"
+        mkdir -p $drv_path/hybrid-amd-nvidia-470xx-prime/
+        echo "" > $drv_path/hybrid-amd-nvidia-470xx-prime/MHWDCONFIG
+        msg2 "Disabling Nvidia 470xx Intel Prime driver"
+        mkdir -p $drv_path/hybrid-intel-nvidia-470xx-prime/
+        echo "" > $drv_path/hybrid-intel-nvidia-470xx-prime/MHWDCONFIG        
     fi
     local drv_path=$1/var/lib/mhwd/db/pci/network_drivers
     if  [ -z "$(ls $path | grep broadcom-wl 2> /dev/null)" ]; then
