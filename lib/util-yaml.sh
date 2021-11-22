@@ -144,6 +144,8 @@ write_users_conf(){
     echo "autologinGroup:  autologin" >> "$conf"
     echo "doAutologin:     false" >> "$conf" # can be either 'true' or 'false'
     echo "sudoersGroup:    wheel" >> "$conf"
+    echo "passwordRequirements:" >> "$conf"
+    echo "    nonempty: true" >> "$conf" # can be either 'true' or 'false'
     echo "setRootPassword: true" >> "$conf" # must be true, else some options get hidden
     echo "doReusePassword: false" >> "$conf" # only used in old 'users' module
     echo "availableShells: /bin/bash, /bin/zsh" >> "$conf" # only used in new 'users' module
