@@ -372,7 +372,7 @@ strings:
 # productWelcome is shown on the welcome page of the application in
 #       the middle of the window, below the welcome text. It can be
 #       any size and proportion, and will be scaled to fit inside
-#       the window. Use `welcomeExpandingLogo` to make it non-scaled.
+#       the window. Use 'welcomeExpandingLogo' to make it non-scaled.
 #       Recommended size is 320x150.
 #
 # These filenames can also use substitutions from os-release (see above).
