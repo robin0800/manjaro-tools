@@ -358,8 +358,11 @@ make_image_desktop() {
         cp "${path}/desktopfs-pkgs.txt" ${iso_dir}/$(gen_iso_fn)-pkgs.txt
         [[ -e ${profile_dir}/desktop-overlay ]] && copy_overlay "${profile_dir}/desktop-overlay" "${path}"
 
-        if [[ -e "${path}/usr/share/calamares/branding/manjaro/branding.desc" ]]; then
+        if [[ -e "${path}/usr/share/calamares/branding/manjaro/calamares-sidebar.qml" ]]; then
             configure_branding "${path}"
+            msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
+        elif [[ -e "${path}/usr/share/calamares/branding/manjaro/show.qml" ]]; then
+            configure_branding_old "${path}"
             msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
         fi
 
