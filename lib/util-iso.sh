@@ -402,8 +402,11 @@ make_image_live() {
         copy_overlay "${profile_dir}/live-overlay" "${path}"
         configure_live_image "${path}"
 
-        if [[ -e "${path}/usr/share/calamares/branding/manjaro/branding.desc" ]]; then
+        if [[ -e "${path}/usr/share/calamares/branding/manjaro/calamares-sidebar.qml" ]]; then
             configure_branding "${path}"
+            msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
+        elif [[ -e "${path}/usr/share/calamares/branding/manjaro/show.qml" ]]; then
+            configure_branding_old "${path}"
             msg "Done [Distribution: Release ${dist_release} Codename ${dist_codename}]"
         fi
         
