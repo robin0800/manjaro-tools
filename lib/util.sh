@@ -449,7 +449,7 @@ load_profile_config(){
     [[ -z ${mhwd_used} ]] && mhwd_used='true'
 
     [[ -z ${oem_used} ]] && oem_used='false'
-    [[ -z ${set_oem_user ]] && set_oem_user='true'
+    [[ -z ${set_oem_user} ]] && set_oem_user='true'
 
     [[ -z ${chrootcfg} ]] && chrootcfg='false'
 
