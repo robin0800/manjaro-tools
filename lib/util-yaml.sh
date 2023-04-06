@@ -76,13 +76,13 @@ write_services_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' >  "$conf"
     echo '' >> "$conf"
-    echo 'services:' > "$conf"
+    echo 'services:' >> "$conf"
     for s in ${enable_systemd[@]}; do
         echo "    - name: $s" >> "$conf"
         echo '      mandatory: false' >> "$conf"
         echo '' >> "$conf"
     done
-    echo 'timers:' > "$conf"
+    echo 'timers:' >> "$conf"
     for s in ${enable_systemd_timers[@]}; do
         echo "    - name: $s" >> "$conf"
         echo '      mandatory: false' >> "$conf"
