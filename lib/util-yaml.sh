@@ -82,11 +82,13 @@ write_services_conf(){
         echo '      mandatory: false' >> "$conf"
         echo '' >> "$conf"
     done
-    echo 'timers:' >> "$conf"
-    for s in ${enable_systemd_timers[@]}; do
-        echo "    - name: $s" >> "$conf"
-        echo '      mandatory: false' >> "$conf"
-        echo '' >> "$conf"
+    if [ ! ${enable_systemd_timers[@]} -eq 0 ]; then
+        echo 'timers:' >> "$conf"
+        for s in ${enable_systemd_timers[@]}; do
+            echo "    - name: $s" >> "$conf"
+            echo '      mandatory: false' >> "$conf"
+            echo '' >> "$conf"
+    fi
     done
     echo 'targets:' >> "$conf"
     echo '    - name: "graphical"' >> "$conf"
