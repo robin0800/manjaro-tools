@@ -88,8 +88,8 @@ write_services_conf(){
             echo "    - name: $s" >> "$conf"
             echo '      mandatory: false' >> "$conf"
             echo '' >> "$conf"
+        done
     fi
-    done
     echo 'targets:' >> "$conf"
     echo '    - name: "graphical"' >> "$conf"
     echo '      mandatory: true' >> "$conf"
