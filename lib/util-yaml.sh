@@ -76,13 +76,15 @@ write_services_conf(){
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' >  "$conf"
     echo '' >> "$conf"
-    echo 'services:' >> "$conf"
-    for s in ${enable_systemd[@]}; do
-        echo "    - name: $s" >> "$conf"
-        echo '      mandatory: false' >> "$conf"
-        echo '' >> "$conf"
-    done
-    if [ ! ${enable_systemd_timers[@]} -eq 0 ]; then
+    if [ ! ${#enable_systemd[@]} -eq 0 ]; then
+        echo 'services:' >> "$conf"
+        for s in ${enable_systemd[@]}; do
+            echo "    - name: $s" >> "$conf"
+            echo '      mandatory: false' >> "$conf"
+            echo '' >> "$conf"
+        done
+    fi
+    if [ ! ${#enable_systemd_timers[@]} -eq 0 ]; then
         echo 'timers:' >> "$conf"
         for s in ${enable_systemd_timers[@]}; do
             echo "    - name: $s" >> "$conf"
@@ -94,12 +96,14 @@ write_services_conf(){
     echo '    - name: "graphical"' >> "$conf"
     echo '      mandatory: true' >> "$conf"
     echo '' >> "$conf"
-    echo 'disable:' >> "$conf"
-    for s in ${disable_systemd[@]}; do
-        echo "    - name: $s" >> "$conf"
-        echo '      mandatory: false' >> "$conf"
-        echo '' >> "$conf"
-    done
+    if [ ! ${#disable_systemd[@]} -eq 0 ]; then
+        echo 'disable:' >> "$conf"
+        for s in ${disable_systemd[@]}; do
+            echo "    - name: $s" >> "$conf"
+            echo '      mandatory: false' >> "$conf"
+            echo '' >> "$conf"
+        done
+    fi
 }
 
 write_displaymanager_conf(){
