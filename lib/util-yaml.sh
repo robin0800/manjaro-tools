@@ -78,13 +78,13 @@ write_services_conf(){
     echo '---' >  "$conf"
     echo '' >> "$conf"
     if [ ! ${#enable_systemd[@]} -eq 0 ]; then
-        if [ ! $(grep "services: \[\]" ${check} | wc -l) -eq 0 ]; then
+        if [ ! $(grep "services:" ${check} | wc -l) -eq 0 ]; then
             echo 'services:' >> "$conf"
         else
             echo 'units:' >> "$conf"
         fi
         for s in ${enable_systemd[@]}; do
-            if [ ! $(grep "services: \[\]" ${check} | wc -l) -eq 0 ]; then
+            if [ ! $(grep "services:" ${check} | wc -l) -eq 0 ]; then
                 echo "    - name: $s" >> "$conf"
             else
                 echo "    - name: $s.service"  >> "$conf"
@@ -95,9 +95,9 @@ write_services_conf(){
         done
     fi
     if [ ! ${#enable_systemd_timers[@]} -eq 0 ]; then
-        [ ! $(grep "timers: \[\]" ${check} | wc -l) -eq 0 ] && echo 'timers:' >> "$conf"
+        [ ! $(grep "timers:" ${check} | wc -l) -eq 0 ] && echo 'timers:' >> "$conf"
         for s in ${enable_systemd_timers[@]}; do
-            if [ ! $(grep "timers: \[\]" ${check} | wc -l) -eq 0 ]; then
+            if [ ! $(grep "timers:" ${check} | wc -l) -eq 0 ]; then
                 echo "    - name: $s" >> "$conf"
             else
                 echo "    - name: $s.timer"  >> "$conf"
@@ -107,8 +107,8 @@ write_services_conf(){
             echo '' >> "$conf"
         done
     fi
-    [ ! $(grep "targets: \[\]" ${check} | wc -l) -eq 0 ] && echo 'targets:' >> "$conf"
-    if [ ! $(grep "targets: \[\]" ${check} | wc -l) -eq 0 ]; then
+    [ ! $(grep "targets:" ${check} | wc -l) -eq 0 ] && echo 'targets:' >> "$conf"
+    if [ ! $(grep "targets:" ${check} | wc -l) -eq 0 ]; then
                 echo '    - name: "graphical"' >> "$conf"
             else
                 echo '    - name: "graphical.target"'  >> "$conf"
@@ -117,9 +117,9 @@ write_services_conf(){
     echo '      mandatory: true' >> "$conf"
     echo '' >> "$conf"
     if [ ! ${#disable_systemd[@]} -eq 0 ]; then
-        [ ! $(grep "disable: \[\]" ${check} | wc -l) -eq 0 ] && echo 'disable:' >> "$conf"
+        [ ! $(grep "disable:" ${check} | wc -l) -eq 0 ] && echo 'disable:' >> "$conf"
         for s in ${disable_systemd[@]}; do
-            if [ ! $(grep "services: \[\]" ${check} | wc -l) -eq 0 ]; then
+            if [ ! $(grep "services:" ${check} | wc -l) -eq 0 ]; then
                 echo "    - name: $s" >> "$conf"
             else
                 echo "    - name: $s.service"  >> "$conf"
