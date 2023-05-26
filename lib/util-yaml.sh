@@ -84,8 +84,12 @@ write_services_conf(){
             echo 'units:'
         fi
         for s in ${enable_systemd[@]}; do
-            echo "    - name: $s" >> "$conf"
-            [ $(grep "services: \[\]" ${check} | wc -l) -eq 0 ] && action: "enable"
+            if [ ! $(grep "services: \[\]" ${check} | wc -l) -eq 0 ]; then
+                echo "    - name: $s" >> "$conf"
+            else
+                echo "    - name: $s.service"  >> "$conf"
+                echo '      action: "enable"' >> "$conf"
+            fi
             echo '      mandatory: false' >> "$conf"
             echo '' >> "$conf"
         done
@@ -93,22 +97,34 @@ write_services_conf(){
     if [ ! ${#enable_systemd_timers[@]} -eq 0 ]; then
         [ ! $(grep "timers: \[\]" ${check} | wc -l) -eq 0 ] && echo 'timers:' >> "$conf"
         for s in ${enable_systemd_timers[@]}; do
-            echo "    - name: $s" >> "$conf"
-            [ $(grep "timers: \[\]" ${check} | wc -l) -eq 0 ] && action: "enable"
+            if [ ! $(grep "timers: \[\]" ${check} | wc -l) -eq 0 ]; then
+                echo "    - name: $s" >> "$conf"
+            else
+                echo "    - name: $s.timer"  >> "$conf"
+                echo '      action: "enable"' >> "$conf"
+            fi
             echo '      mandatory: false' >> "$conf"
             echo '' >> "$conf"
         done
     fi
     [ ! $(grep "targets: \[\]" ${check} | wc -l) -eq 0 ] && echo 'targets:' >> "$conf"
-    echo '    - name: "graphical"' >> "$conf"
-    [ $(grep "targets: \[\]" ${check} | wc -l) -eq 0 ] && action: "enable"
+    if [ ! $(grep "targets: \[\]" ${check} | wc -l) -eq 0 ]; then
+                echo '    - name: "graphical"' >> "$conf"
+            else
+                echo '    - name: "graphical.target"'  >> "$conf"
+                echo '      action: "set-default"' >> "$conf"
+            fi
     echo '      mandatory: true' >> "$conf"
     echo '' >> "$conf"
     if [ ! ${#disable_systemd[@]} -eq 0 ]; then
         [ ! $(grep "disable: \[\]" ${check} | wc -l) -eq 0 ] && echo 'disable:' >> "$conf"
         for s in ${disable_systemd[@]}; do
-            echo "    - name: $s" >> "$conf"
-            [ $(grep "disable: \[\]" ${check} | wc -l) -eq 0 ] && action: "disable"
+            if [ ! $(grep "services: \[\]" ${check} | wc -l) -eq 0 ]; then
+                echo "    - name: $s" >> "$conf"
+            else
+                echo "    - name: $s.service"  >> "$conf"
+                echo '      action: "disable"' >> "$conf"
+            fi
             echo '      mandatory: false' >> "$conf"
             echo '' >> "$conf"
         done
