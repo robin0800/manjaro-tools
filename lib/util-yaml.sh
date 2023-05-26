@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 
 write_machineid_conf(){
-    local conf="${modules_dir}/machineid.conf"
+    local conf="${etc_config_dir}/machineid.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' > "$conf"
     echo "systemd: true" >> $conf
@@ -20,7 +20,7 @@ write_machineid_conf(){
 
 write_finished_conf(){
     msg2 "Writing %s ..." "finished.conf"
-    local conf="${modules_dir}/finished.conf" cmd="systemctl reboot"
+    local conf="${etc_config_dir}/finished.conf" cmd="systemctl reboot"
     echo '---' > "$conf"
     echo 'restartNowEnabled: true' >> "$conf"
     echo 'restartNowChecked: false' >> "$conf"
@@ -42,7 +42,7 @@ get_preset(){
 }
 
 write_bootloader_conf(){
-    local conf="${modules_dir}/bootloader.conf"
+    local conf="${etc_config_dir}/bootloader.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     source "$(get_preset)"
     echo '---' > "$conf"
@@ -63,7 +63,7 @@ write_bootloader_conf(){
 }
 
 write_servicescfg_conf(){
-    local conf="${modules_dir}/servicescfg.conf"
+    local conf="${etc_config_dir}/servicescfg.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' >  "$conf"
     echo '' >> "$conf"
@@ -72,34 +72,43 @@ write_servicescfg_conf(){
 }
 
 write_services_conf(){
-    local conf="${modules_dir}/services.conf"
+    local conf="${etc_config_dir}/services.conf"
+    local check="${modules_dir}/services.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo '---' >  "$conf"
     echo '' >> "$conf"
     if [ ! ${#enable_systemd[@]} -eq 0 ]; then
-        echo 'services:' >> "$conf"
+        if [ ! $(grep "services: \[\]" ${check} | wc -l) -eq 0 ]; then
+            echo 'services:' >> "$conf"
+        else
+            echo 'units:'
+        fi
         for s in ${enable_systemd[@]}; do
             echo "    - name: $s" >> "$conf"
+            [ $(grep "services: \[\]" ${check} | wc -l) -eq 0 ] && action: "enable"
             echo '      mandatory: false' >> "$conf"
             echo '' >> "$conf"
         done
     fi
     if [ ! ${#enable_systemd_timers[@]} -eq 0 ]; then
-        echo 'timers:' >> "$conf"
+        [ ! $(grep "timers: \[\]" ${check} | wc -l) -eq 0 ] && echo 'timers:' >> "$conf"
         for s in ${enable_systemd_timers[@]}; do
             echo "    - name: $s" >> "$conf"
+            [ $(grep "timers: \[\]" ${check} | wc -l) -eq 0 ] && action: "enable"
             echo '      mandatory: false' >> "$conf"
             echo '' >> "$conf"
         done
     fi
-    echo 'targets:' >> "$conf"
+    [ ! $(grep "targets: \[\]" ${check} | wc -l) -eq 0 ] && echo 'targets:' >> "$conf"
     echo '    - name: "graphical"' >> "$conf"
+    [ $(grep "targets: \[\]" ${check} | wc -l) -eq 0 ] && action: "enable"
     echo '      mandatory: true' >> "$conf"
     echo '' >> "$conf"
     if [ ! ${#disable_systemd[@]} -eq 0 ]; then
-        echo 'disable:' >> "$conf"
+        [ ! $(grep "disable: \[\]" ${check} | wc -l) -eq 0 ] && echo 'disable:' >> "$conf"
         for s in ${disable_systemd[@]}; do
             echo "    - name: $s" >> "$conf"
+            [ $(grep "disable: \[\]" ${check} | wc -l) -eq 0 ] && action: "disable"
             echo '      mandatory: false' >> "$conf"
             echo '' >> "$conf"
         done
@@ -107,7 +116,7 @@ write_services_conf(){
 }
 
 write_displaymanager_conf(){
-    local conf="${modules_dir}/displaymanager.conf"
+    local conf="${etc_config_dir}/displaymanager.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "displaymanagers:" >> "$conf"
@@ -122,14 +131,14 @@ write_displaymanager_conf(){
 }
 
 write_initcpio_conf(){
-    local conf="${modules_dir}/initcpio.conf"
+    local conf="${etc_config_dir}/initcpio.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "kernel: ${kernel}" >> "$conf"
 }
 
 write_unpack_conf(){
-    local conf="${modules_dir}/unpackfs.conf"
+    local conf="${etc_config_dir}/unpackfs.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "unpack:" >> "$conf"
@@ -144,7 +153,7 @@ write_unpack_conf(){
 }
 
 write_users_conf(){
-    local conf="${modules_dir}/users.conf"
+    local conf="${etc_config_dir}/users.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "defaultGroups:" >> "$conf"
@@ -168,7 +177,7 @@ write_users_conf(){
 }
 
 write_partition_conf(){
-    local conf="${modules_dir}/partition.conf"
+    local conf="${etc_config_dir}/partition.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "efiSystemPartition:     \"/boot/efi\"" >> "$conf"
@@ -187,7 +196,7 @@ write_partition_conf(){
 }
 
 write_packages_conf(){
-    local conf="${modules_dir}/packages.conf"
+    local conf="${etc_config_dir}/packages.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "backend: pacman" >> "$conf"
@@ -202,7 +211,7 @@ write_packages_conf(){
 }
 
 write_welcome_conf(){
-    local conf="${modules_dir}/welcome.conf"
+    local conf="${etc_config_dir}/welcome.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf" >> "$conf"
     echo "showSupportUrl:         true" >> "$conf"
@@ -235,7 +244,7 @@ write_welcome_conf(){
 }
 
 write_mhwdcfg_conf(){
-    local conf="${modules_dir}/mhwdcfg.conf"
+    local conf="${etc_config_dir}/mhwdcfg.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "bus:" >> "$conf"
@@ -262,7 +271,7 @@ write_mhwdcfg_conf(){
 }
 
 write_postcfg_conf(){
-    local conf="${modules_dir}/postcfg.conf"
+    local conf="${etc_config_dir}/postcfg.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "keyrings:" >> "$conf"
@@ -290,7 +299,7 @@ get_yaml(){
 }
 
 write_netinstall_conf(){
-    local conf="${modules_dir}/netinstall.conf"
+    local conf="${etc_config_dir}/netinstall.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "groupsUrl: ${netgroups}/$(get_yaml)" >> "$conf"
@@ -299,7 +308,7 @@ write_netinstall_conf(){
 }
 
 write_locale_conf(){
-    local conf="${modules_dir}/locale.conf"
+    local conf="${etc_config_dir}/locale.conf"
     msg2 "Writing %s ..." "${conf##*/}"
     echo "---" > "$conf"
     echo "localeGenPath: /etc/locale.gen" >> "$conf"
@@ -427,8 +436,9 @@ write_settings_conf(){
 
 configure_calamares(){
     info "Configuring [Calamares]"
-    modules_dir=$1/etc/calamares/modules
-    prepare_dir "${modules_dir}"
+    etc_config_dir=$1/etc/calamares/modules
+    modules_dir=$1/usr/share/calamares/modules
+    prepare_dir "${etc_config_dir}"
     write_settings_conf "$1"
     info "Done configuring [Calamares]"
 }
