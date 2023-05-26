@@ -81,7 +81,7 @@ write_services_conf(){
         if [ ! $(grep "services: \[\]" ${check} | wc -l) -eq 0 ]; then
             echo 'services:' >> "$conf"
         else
-            echo 'units:'
+            echo 'units:' >> "$conf"
         fi
         for s in ${enable_systemd[@]}; do
             if [ ! $(grep "services: \[\]" ${check} | wc -l) -eq 0 ]; then
