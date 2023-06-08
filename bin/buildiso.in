@@ -50,6 +50,7 @@ show_profile(){
         [[ -n ${smb_workgroup} ]] && msg2 "smb_workgroup: %s" "${smb_workgroup}"
 
         msg2 "enable_systemd: %s" "${enable_systemd[*]}"
+        msg2 "enable_systemd_timers: %s" "${enable_systemd_timers[*]}"
         msg2 "enable_systemd_live: %s" "${enable_systemd_live[*]}"
         [[ -n ${disable_systemd[*]} ]] && msg2 "disable_systemd: %s" "${disable_systemd[*]}"
 
